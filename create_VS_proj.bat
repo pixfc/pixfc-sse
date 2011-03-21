@@ -1,4 +1,4 @@
 @echo off
 call cleanup.bat
-cmake -G "Visual Studio 9 2008" .
+cmake -G "Visual Studio 10 Win64" .
 pause
