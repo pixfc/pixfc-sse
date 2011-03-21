@@ -1,0 +1,5 @@
+v0.01:
+ - first working version
+ - converts from {YUYV, UYVY} to {ARGB, BGRA, RGB24, BGR24}
+ - supports full-range, bt.601 and bt.709 conversions
+

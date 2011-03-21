@@ -1,0 +1,13 @@
+PixFC-SSE TODO list:
+
+* Investigate where to place prefecting instructions and check its 
+  platform dependency
+* Investigate if using static xmm intermediate buffers instead of 
+  stack-allocated ones significantly improves conversion performance.
+* Add support for more pixel formats:
+  - VYUY, YVYU
+  - planar formats (YUV420, YVU420, YUV410, YVU410)
+  - packed RGB, grey and bayer formats.
+* Create subdirectories to sort source files (lib, test, common, include, ...)
+* Some other things I cant think of.
+
