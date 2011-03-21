@@ -1,0 +1,128 @@
+Conversion Block Name                                                           	  Avg Time	Avg User Time	Avg Sys Time	Ctx Sw
+YUYV to ARGB - SSE2 / SSSE3 - no interpolation                                  	  1.916937	  1.814690	  0.112380	  0.0
+YUYV to ARGB - BT601 - SSE2 / SSSE3 - no interpolation                          	  1.999576	  1.973750	  0.035960	  0.0
+YUYV to ARGB - BT709 - SSE2 / SSSE3 - no interpolation                          	  2.072916	  2.042140	  0.040250	  0.0
+YUYV to ARGB - SSE2 / SSSE3                                                     	  2.108170	  2.078640	  0.039810	  0.0
+YUYV to ARGB - BT601 - SSE2 / SSSE3                                             	  2.824195	  2.789240	  0.044800	  0.0
+YUYV to ARGB - BT709 - SSE2 / SSSE3                                             	  2.812833	  2.779380	  0.043370	  0.0
+YUYV to ARGB - SSE2 - no interpolation                                          	  1.863732	  1.834800	  0.039110	  0.0
+YUYV to ARGB - BT601 - SSE2 - no interpolation                                  	  2.011707	  1.988130	  0.033750	  0.0
+YUYV to ARGB - BT709 - SSE2 - no interpolation                                  	  2.059996	  2.027600	  0.042660	  0.0
+YUYV to ARGB - SSE2                                                             	  2.258662	  2.226540	  0.042140	  0.0
+YUYV to ARGB - BT601 - SSE2                                                     	  2.686691	  2.654920	  0.042020	  0.0
+YUYV to ARGB - BT709 - SSE2                                                     	  2.680972	  2.644960	  0.045940	  0.0
+YUYV to ARGB - NON-SSE                                                          	 14.425036	 14.303280	  0.130220	  0.0
+YUYV to ARGB - BT601 - NON-SSE                                                  	 13.682260	 13.565280	  0.126290	  0.0
+YUYV to ARGB - BT709 - NON-SSE                                                  	 15.394097	 15.262510	  0.140790	  0.0
+
+YUYV to BGRA - SSE2 / SSSE3 - no interpolation                                  	  1.767316	  1.743060	  0.034700	  0.0
+YUYV to BGRA - BT601 - SSE2 / SSSE3 - no interpolation                          	  1.990961	  1.964100	  0.037130	  0.0
+YUYV to BGRA - BT709 - SSE2 / SSSE3 - no interpolation                          	  2.057862	  2.031140	  0.036350	  0.0
+YUYV to BGRA - SSE2 / SSSE3                                                     	  2.137861	  2.108480	  0.039390	  0.0
+YUYV to BGRA - BT601 - SSE2 / SSSE3                                             	  2.856796	  2.825010	  0.041240	  0.0
+YUYV to BGRA - BT709 - SSE2 / SSSE3                                             	  2.832553	  2.801690	  0.040640	  0.0
+YUYV to BGRA - SSE2 - no interpolation                                          	  1.851693	  1.828810	  0.033130	  0.0
+YUYV to BGRA - BT601 - SSE2 - no interpolation                                  	  2.045124	  2.020320	  0.034900	  0.0
+YUYV to BGRA - BT709 - SSE2 - no interpolation                                  	  2.066733	  2.041070	  0.035800	  0.0
+YUYV to BGRA - SSE2                                                             	  2.295545	  2.262970	  0.042400	  0.0
+YUYV to BGRA - BT601 - SSE2                                                     	  2.699532	  2.666970	  0.042590	  0.0
+YUYV to BGRA - BT709 - SSE2                                                     	  2.689996	  2.658390	  0.041770	  0.0
+YUYV to BGRA - NON-SSE                                                          	 15.164004	 15.031110	  0.142260	  0.0
+YUYV to BGRA - BT601 - NON-SSE                                                  	 14.756768	 14.610240	  0.155740	  0.0
+YUYV to BGRA - BT709 - NON-SSE                                                  	 16.021439	 15.882280	  0.148850	  0.0
+
+YUYV to RGB24 - SSE2 / SSSE3 - no interpolation                                 	  1.521554	  1.502020	  0.029480	  0.0
+YUYV to RGB24 - BT601 - SSE2 / SSSE3 - no interpolation                         	  2.007599	  1.977650	  0.040510	  0.0
+YUYV to RGB24 - BT709 - SSE2 / SSSE3 - no interpolation                         	  2.008973	  1.984070	  0.034850	  0.0
+YUYV to RGB24 - SSE2 / SSSE3                                                    	  2.253963	  2.224330	  0.039320	  0.0
+YUYV to RGB24 - BT601 - SSE2 / SSSE3                                            	  2.985096	  2.951030	  0.043810	  0.0
+YUYV to RGB24 - BT709 - SSE2 / SSSE3                                            	  2.968369	  2.936970	  0.041100	  0.0
+YUYV to RGB24 - SSE2 / slower repacking - no interpolation                      	  3.535520	  3.497300	  0.047890	  0.0
+YUYV to RGB24 - BT601 - SSE2 / slower repacking - no interpolation              	  3.936101	  3.889270	  0.056430	  0.0
+YUYV to RGB24 - BT709 - SSE2 / slower repacking - no interpolation              	  3.924785	  3.885420	  0.049590	  0.0
+YUYV to RGB24 - SSE2 / slower repacking                                         	  4.501764	  4.454910	  0.056270	  0.0
+YUYV to RGB24 - BT601 - SSE2 / slower repacking                                 	  4.923065	  4.879730	  0.052810	  0.0
+YUYV to RGB24 - BT709 - SSE2 / slower repacking                                 	  4.933342	  4.897380	  0.044580	  0.0
+YUYV to RGB24 - NON-SSE                                                         	 17.124547	 16.978060	  0.155020	  0.0
+YUYV to RGB24 - BT601 - NON-SSE                                                 	 17.164181	 17.034240	  0.138720	  0.0
+YUYV to RGB24 - BT709 - NON-SSE                                                 	 17.525507	 17.393220	  0.140980	  0.0
+
+YUYV to BGR24 - SSE2 / SSSE3 - no interpolation                                 	  1.616670	  1.599120	  0.027460	  0.0
+YUYV to BGR24 - BT601 - SSE2 / SSSE3 - no interpolation                         	  2.027678	  2.003970	  0.033350	  0.0
+YUYV to BGR24 - BT709 - SSE2 / SSSE3 - no interpolation                         	  2.026257	  2.002360	  0.033180	  0.0
+YUYV to BGR24 - SSE2 / SSSE3                                                    	  2.306606	  2.279770	  0.036070	  0.0
+YUYV to BGR24 - BT601 - SSE2 / SSSE3                                            	  2.984542	  2.951730	  0.041700	  0.0
+YUYV to BGR24 - BT709 - SSE2 / SSSE3                                            	  2.996914	  2.971860	  0.033360	  0.0
+YUYV to BGR24 - SSE2 / slower repacking - no interpolation                      	  3.505949	  3.478720	  0.035810	  0.0
+YUYV to BGR24 - BT601 - SSE2 / slower repacking - no interpolation              	  3.979368	  3.945290	  0.043060	  0.0
+YUYV to BGR24 - BT709 - SSE2 / slower repacking - no interpolation              	  3.955908	  3.927900	  0.036890	  0.0
+YUYV to BGR24 - SSE2 / slower repacking                                         	  4.394731	  4.345950	  0.057870	  0.0
+YUYV to BGR24 - BT601 - SSE2 / slower repacking                                 	  4.789858	  4.751570	  0.047020	  0.0
+YUYV to BGR24 - BT709 - SSE2 / slower repacking                                 	  4.789056	  4.748210	  0.049750	  0.0
+YUYV to BGR24 - NON-SSE                                                         	 15.251197	 15.141180	  0.118200	  0.0
+YUYV to BGR24 - BT601 - NON-SSE                                                 	 15.996588	 15.862880	  0.142030	  0.0
+YUYV to BGR24 - BT709 - NON-SSE                                                 	 17.362430	 17.205220	  0.166200	  0.0
+
+UYVY to ARGB - SSE2 / SSSE3 - no interpolation                                  	  1.763068	  1.737300	  0.035980	  0.0
+UYVY to ARGB - BT601 - SSE2 / SSSE3 - no interpolation                          	  2.028023	  2.001220	  0.036680	  0.0
+UYVY to ARGB - BT709 - SSE2 / SSSE3 - no interpolation                          	  2.009744	  1.984270	  0.035480	  0.0
+UYVY to ARGB - SSE2 / SSSE3                                                     	  2.103088	  2.075770	  0.037220	  0.0
+UYVY to ARGB - BT601 - SSE2 / SSSE3                                             	  2.846153	  2.814330	  0.041190	  0.0
+UYVY to ARGB - BT709 - SSE2 / SSSE3                                             	  2.817744	  2.781530	  0.046520	  0.0
+UYVY to ARGB - SSE2 - no interpolation                                          	  1.827235	  1.802120	  0.035030	  0.0
+UYVY to ARGB - BT601 - SSE2 - no interpolation                                  	  2.154993	  2.128110	  0.036730	  0.0
+UYVY to ARGB - BT709 - SSE2 - no interpolation                                  	  2.168479	  2.144850	  0.033020	  0.0
+UYVY to ARGB - SSE2                                                             	  2.387411	  2.364380	  0.031930	  0.0
+UYVY to ARGB - BT601- SSE2                                                      	  2.807773	  2.778080	  0.038430	  0.0
+UYVY to ARGB - BT709 - SSE2                                                     	  2.801932	  2.773430	  0.037220	  0.0
+UYVY to ARGB - NON-SSE                                                          	 14.668385	 14.586130	  0.089990	  0.0
+UYVY to ARGB - BT601 - NON-SSE                                                  	 13.980055	 13.870710	  0.116370	  0.1
+UYVY to ARGB - BT709 - NON-SSE                                                  	 15.461831	 15.330790	  0.139640	  0.0
+
+UYVY to BGRA - SSE2 / SSSE3 - no interpolation                                  	  1.846163	  1.822520	  0.033410	  0.0
+UYVY to BGRA - BT601 - SSE2 / SSSE3 - no interpolation                          	  2.021557	  1.994470	  0.037140	  0.0
+UYVY to BGRA - BT709 - SSE2 / SSSE3 - no interpolation                          	  2.020120	  1.993480	  0.036790	  0.0
+UYVY to BGRA - SSE2 / SSSE3                                                     	  2.179747	  2.149760	  0.039710	  0.0
+UYVY to BGRA - BT601 - SSE2 / SSSE3                                             	  2.835000	  2.803560	  0.041280	  0.0
+UYVY to BGRA - BT709 - SSE2 / SSSE3                                             	  2.833048	  2.804220	  0.038240	  0.0
+UYVY to BGRA - SSE2 - no interpolation                                          	  1.837489	  1.813320	  0.034230	  0.0
+UYVY to BGRA - BT601 - SSE2 - no interpolation                                  	  2.121824	  2.093140	  0.038730	  0.0
+UYVY to BGRA - BT709 - SSE2 - no interpolation                                  	  2.124422	  2.098420	  0.036300	  0.0
+UYVY to BGRA - SSE2                                                             	  2.281100	  2.251710	  0.039460	  0.0
+UYVY to BGRA - BT601 - SSE2                                                     	  2.747002	  2.711150	  0.046160	  0.0
+UYVY to BGRA - BT709 - SSE2                                                     	  2.737188	  2.705860	  0.041430	  0.0
+UYVY to BGRA - NON-SSE                                                          	 15.205452	 15.076020	  0.138500	  0.0
+UYVY to BGRA - BT601 - NON-SSE                                                  	 14.774959	 14.655950	  0.127860	  0.0
+UYVY to BGRA - BT709 - NON-SSE                                                  	 15.973229	 15.844020	  0.138150	  0.0
+
+UYVY to RGB24 - SSE2 / SSSE3 - no interpolation                                 	  1.540377	  1.521250	  0.028810	  0.0
+UYVY to RGB24 - BT601 - SSE2 / SSSE3 - no interpolation                         	  2.006134	  1.980620	  0.035120	  0.0
+UYVY to RGB24 - BT709 - SSE2 / SSSE3 - no interpolation                         	  2.011463	  1.985300	  0.035790	  0.0
+UYVY to RGB24 - SSE2 / SSSE3                                                    	  2.244829	  2.217560	  0.037500	  0.0
+UYVY to RGB24 - BT601 - SSE2 / SSSE3                                            	  2.967023	  2.933700	  0.043300	  0.0
+UYVY to RGB24 - BT709 - SSE2 / SSSE3                                            	  2.977804	  2.941240	  0.046350	  0.0
+UYVY to RGB24 - SSE2 / slower repacking - no interpolation                      	  3.539395	  3.497330	  0.052150	  0.0
+UYVY to RGB24 - BT601 - SSE2 / slower repacking - no interpolation              	  4.170718	  4.124570	  0.055970	  0.0
+UYVY to RGB24 - BT709 - SSE2 / slower repacking - no interpolation              	  4.169062	  4.125660	  0.053110	  0.0
+UYVY to RGB24 - SSE2 / slower repacking                                         	  4.275166	  4.232350	  0.052600	  0.0
+UYVY to RGB24 - BT601 - SSE2 / slower repacking                                 	  4.882258	  4.837560	  0.053700	  0.0
+UYVY to RGB24 - BT709 - SSE2 / slower repacking                                 	  4.911519	  4.874390	  0.045880	  0.0
+UYVY to RGB24 - NON-SSE                                                         	 17.619138	 17.530670	  0.094170	  0.1
+UYVY to RGB24 - BT601 - NON-SSE                                                 	 16.359076	 16.267160	  0.096800	  0.0
+UYVY to RGB24 - BT709 - NON-SSE                                                 	 17.913222	 17.807190	  0.112150	  0.0
+
+UYVY to BGR24 - SSE2 / SSSE3 - no interpolation                                 	  1.582639	  1.561010	  0.031990	  0.0
+UYVY to BGR24 - BT601 - SSE2 / SSSE3 - no interpolation                         	  2.004602	  1.980190	  0.034140	  0.0
+UYVY to BGR24 - BT709 - SSE2 / SSSE3 - no interpolation                         	  2.005741	  1.979260	  0.036380	  0.0
+UYVY to BGR24 - SSE2 / SSSE3                                                    	  2.276663	  2.248910	  0.037640	  0.0
+UYVY to BGR24 - BT601 - SSE2 / SSSE3                                            	  2.973900	  2.938750	  0.044910	  0.0
+UYVY to BGR24 - BT709 - SSE2 / SSSE3                                            	  2.976554	  2.943010	  0.043440	  0.0
+UYVY to BGR24 - SSE2 / slower repacking - no interpolation                      	  3.507535	  3.467430	  0.049990	  0.0
+UYVY to BGR24 - BT601 - SSE2 / slower repacking - no interpolation              	  4.210546	  4.157790	  0.062320	  0.0
+UYVY to BGR24 - BT709 - SSE2 / slower repacking - no interpolation              	  4.206704	  4.168100	  0.047440	  0.0
+UYVY to BGR24 - SSE2 / slower repacking                                         	  4.251561	  4.208840	  0.052150	  0.0
+UYVY to BGR24 - BT601 - SSE2 / slower repacking                                 	  4.764102	  4.714510	  0.058880	  0.0
+UYVY to BGR24 - BT709 - SSE2 / slower repacking                                 	  4.768505	  4.724010	  0.053810	  0.0
+UYVY to BGR24 - NON-SSE                                                         	 15.214842	 15.072360	  0.151190	  0.0
+UYVY to BGR24 - BT601 - NON-SSE                                                 	 15.989719	 15.858540	  0.139690	  0.0
+UYVY to BGR24 - BT709 - NON-SSE                                                 	 17.375132	 17.221580	  0.162580	  0.0
