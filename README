@@ -16,8 +16,9 @@ builds as a static library which you then link to your application. Building
 the PixFC-SSE static library depends on the target platform: 
 - On Linux platforms, run 'cmake .' to generate a Makefile first. Then run
   'make' to build the static library and test applications.
-- On Windows, run 'create_VS_proj.bat' to create a Visual Studio solution, 
-  which you then open to build the static library and test applications.
+- On Windows, run 'create_VS_proj.bat' to create a Visual Studio 2010 64-bit
+  solution. Then, open the solution file (pixfc-sse.sln) to build the static
+  library and test applications.
 - On Mac, run 'cmake .' to generate a Makefile like on Linux, or run
  'cmake -G "Xcode" .' to generate an XCode project which you then open to build
  the static library and test applications.

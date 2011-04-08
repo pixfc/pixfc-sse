@@ -5,7 +5,7 @@ gcc (Ubuntu 4.4.3-4ubuntu5) 4.4.3
 
 
 Windows 7 Home 64-bit
-Microsoft Visual Studio 10 SP1
+Microsoft Visual Studio 10
 
 =========        Hardware        =========
 processor	: 0
