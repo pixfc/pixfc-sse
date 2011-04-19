@@ -44,7 +44,7 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 
 	// If we were told to require conversion blocks performing interpolation,
 	// enforce it.
-	if ((flags & PIXFC_REQUIRE_INTERPOLATION_FLAG) && ! (block->attributes & PERFORM_INTERPOLATION_ATTRIBUTE)) {
+	if ((flags & PIXFC_AVG_UPSAMPLING_FLAG) && ! (block->attributes & PERFORM_AVG_UPSAMPLING)) {
 		dprintf("Enforcing REQUIRE_INTERPOLATION_FLAG flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}

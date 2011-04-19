@@ -22,7 +22,7 @@
 #define _PIXFC_SSE_H_
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif 
 
 #include <stdint.h>
@@ -102,7 +102,7 @@ uint32_t		create_pixfc(struct PixFcSSE**,	// out - returns a struct PixFcSSE
 #define			PIXFC_DEFAULT_FLAGS					0
 #define			PIXFC_NO_SSE_FLAG					(1 << 0)	// Force the use of a non-SSE conversion routine
 #define			PIXFC_SSE2_ONLY_FLAG				(1 << 1)	// Force the use of a SSE2-only conversion routine
-#define			PIXFC_REQUIRE_INTERPOLATION_FLAG	(1 << 2)	// Force the use of a conversion routine which recreates missing components from existing ones
+#define			PIXFC_AVG_UPSAMPLING_FLAG			(1 << 2)	// Force the use of a conversion routine which recreates missing components from existing ones (using average upsampling)
 #define			PIXFC_BT601_CONVERSION_FLAG			(1 << 3)	// Force the use of conversion equations suitable for SD image formats, as defined in bt.601
 #define			PIXFC_BT709_CONVERSION_FLAG			(1 << 4)	// Force the use of conversion equations suitable for HD image formats, as defined in bt.709
 

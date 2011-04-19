@@ -28,8 +28,8 @@
  */
 
 #define DEFAULT_ATTRIBUTE						0
-// Set if a conversion routine reconstructs missing component values from existing ones
-#define PERFORM_INTERPOLATION_ATTRIBUTE			(1 << 1)
+// Set if a conversion routine uses average upsampling (reconstructs missing component values by averaging previous and next ones)
+#define PERFORM_AVG_UPSAMPLING					(1 << 1)
 // Set if a conversion routine uses the conversion equations for SD formats (bt601)
 #define USE_BT601_CONVERSION_ATTRIBUTE			(1 << 2)
 // Set if a conversion routine uses the conversion equations for HD formats (bt709)
