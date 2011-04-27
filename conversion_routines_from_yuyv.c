@@ -23,21 +23,21 @@
 #include "common.h"
 #include "pixfc-sse.h"
 #include "platform_util.h"
-#include "conversion_routines_common.h"
+#include "yuyv_conversion_common.h"
+
+#define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\
+	UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_, 4, pack_fn, instr_set)
+
+#define UPSAMPLE_AND_CONVERT_TO_RGB24(pack_fn, instr_set)\
+	UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_, 3, pack_fn, instr_set)
+
+
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_, 4, pack_fn, instr_set)
+	CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_no_interpolation_, 4, pack_fn, instr_set)
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_, 3, pack_fn, instr_set)
-
-
-
-#define CONVERT_TO_RGB32_NO_INTERPOLATION(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB_NO_INTERPOLATION(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_no_interpolation_, 4, pack_fn, instr_set)
-
-#define CONVERT_TO_RGB24_NO_INTERPOLATION(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB_NO_INTERPOLATION(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_no_interpolation_, 3, pack_fn, instr_set)
+	CONVERT_YUV_TO_RGB(unpack_yuyv_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_no_interpolation_, 3, pack_fn, instr_set)
 
 
 /*
@@ -49,28 +49,28 @@
  * 		A R G B
  */
 void		convert_yuyv_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	 CONVERT_TO_RGB32(
+	 UPSAMPLE_AND_CONVERT_TO_RGB32(
 			 pack_6_rgb_vectors_in_4_argb_vectors_sse2,
 			 sse2_ssse3
 	 );
 }
 
 void		convert_yuyv_to_argb_no_interpolation_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32_NO_INTERPOLATION(
+	CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_argb_vectors_sse2,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_argb_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(
+	UPSAMPLE_AND_CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_argb_vectors_sse2,
 			sse2
 	);
 }
 
 void		convert_yuyv_to_argb_no_interpolation_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32_NO_INTERPOLATION(
+	CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_argb_vectors_sse2,
 			sse2
 	);
@@ -85,28 +85,28 @@ void		convert_yuyv_to_argb_no_interpolation_sse2(const struct PixFcSSE * pixfc, 
  *
  */
 void		convert_yuyv_to_bgra_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(
+	UPSAMPLE_AND_CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_bgra_vectors_sse2,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_bgra_no_interpolation_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32_NO_INTERPOLATION(
+	CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_bgra_vectors_sse2,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_bgra_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(
+	UPSAMPLE_AND_CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_bgra_vectors_sse2,
 			sse2
 	);
 }
 
 void		convert_yuyv_to_bgra_no_interpolation_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32_NO_INTERPOLATION(
+	CONVERT_TO_RGB32(
 			pack_6_rgb_vectors_in_4_bgra_vectors_sse2,
 			sse2
 	);
@@ -122,28 +122,28 @@ void		convert_yuyv_to_bgra_no_interpolation_sse2(const struct PixFcSSE * pixfc, 
  * 		R G B   2 4
  */
 void		convert_yuyv_to_rgb24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(
+	UPSAMPLE_AND_CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_rgb24_no_interpolation_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24_NO_INTERPOLATION(
+	CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_rgb24_sse2_slowrepacking(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(
+	UPSAMPLE_AND_CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking,
 			sse2
 	);
 }
 
 void		convert_yuyv_to_rgb24_no_interpolation_sse2_slowrepacking(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24_NO_INTERPOLATION(
+	CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking,
 			sse2
 	);
@@ -159,28 +159,28 @@ void		convert_yuyv_to_rgb24_no_interpolation_sse2_slowrepacking(const struct Pix
  *
  */
 void		convert_yuyv_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(
+	UPSAMPLE_AND_CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_bgr24_no_interpolation_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24_NO_INTERPOLATION(
+	CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3,
 			sse2_ssse3
 	);
 }
 
 void		convert_yuyv_to_bgr24_sse2_slowrepacking(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(
+	UPSAMPLE_AND_CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking,
 			sse2
 	);
 }
 
 void		convert_yuyv_to_bgr24_no_interpolation_sse2_slowrepacking(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24_NO_INTERPOLATION(
+	CONVERT_TO_RGB24(
 			pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking,
 			sse2
 	);

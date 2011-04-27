@@ -1,5 +1,5 @@
 /*
- * conversion_routines_common.h
+ * yuyv_conversion_routines_common.h
  *
  * Copyright (C) 2011 PixFC Team (pixelfc@gmail.com)
  *
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef CONVERSION_ROUTINES_COMMON_H_
-#define CONVERSION_ROUTINES_COMMON_H_
+#ifndef YUYV_CONVERSION_COMMON_H_
+#define YUYV_CONVERSION_COMMON_H_
 
 #include "rgb_pack.h"
 #include "yuv_to_rgb_convert.h"
@@ -28,7 +28,7 @@
 #include "yuv_unpack.h"
 
 /*
- * Convert YUYV to RGB with interpolation
+ * Convert YUYV to RGB with upsampling
  *
  *
  * Example of the expansion for a conversion to ARGB :
@@ -96,7 +96,7 @@
  *	pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
  *
  */
-#define CONVERT_YUV_TO_RGB(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
+#define UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
@@ -127,7 +127,7 @@
 
 /*
  *
- * Convert YUYV to RGB without interpolation
+ * Convert YUYV to RGB without upsampling
  *
  *
  * Expansion for a conversion to ARGB:
@@ -163,7 +163,7 @@
  *	}
  *
  */
-#define CONVERT_YUV_TO_RGB_NO_INTERPOLATION(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
+#define CONVERT_YUV_TO_RGB(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
 	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -181,4 +181,4 @@
 	};\
 
 
-#endif /* CONVERSION_ROUTINES_COMMON_H_ */
+#endif /* YUYV_CONVERSION_COMMON_H_ */
