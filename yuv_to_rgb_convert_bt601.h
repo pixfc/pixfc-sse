@@ -34,6 +34,8 @@
  * using BT601 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
  * Total latency: 			68 cycles
  * Num of pixel handled:	8
@@ -70,7 +72,7 @@
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_bt601_no_interpolation_sse2(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors) 
+EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_sse2(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors)
 {
 	CONST_M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);
 	CONST_M128I(sub16, 0xFFF0FFF0FFF0FFF0LL, 0xFFF0FFF0FFF0FFF0LL);
@@ -346,6 +348,8 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_bt601_sse2(__m128i* in_3_
  * using BT601 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
  * Total latency: 			59 cycles
  * Num of pixel handled:	8
@@ -382,7 +386,7 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_bt601_sse2(__m128i* in_3_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_bt601_no_interpolation_sse2_ssse3(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors)
+EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_sse2_ssse3(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors)
 {
 	CONST_M128I(shuffMask, 0x0504050401000100LL, 0x0D0C0D0C09080908LL);
 	CONST_M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);

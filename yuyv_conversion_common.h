@@ -127,7 +127,8 @@
 
 /*
  *
- * Convert YUYV to RGB without upsampling
+ * Convert YUYV to RGB using Nearest Neighbour upsampling
+ * ie. re-create the missing chromas by duplicating the previous existing ones.
  *
  *
  * Expansion for a conversion to ARGB:

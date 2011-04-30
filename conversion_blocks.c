@@ -41,33 +41,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUYV to ARGB
 	{
-		convert_yuyv_to_argb_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_argb_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - SSE2 / SSSE3 - no interpolation",
+		"YUYV to ARGB - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_argb_bt601_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_argb_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - BT601 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to ARGB - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_argb_bt709_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_argb_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - BT709 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to ARGB - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_argb_sse2_ssse3,
+		upsample_n_convert_yuyv_to_argb_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -75,7 +75,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to ARGB - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_argb_bt601_sse2_ssse3,
+		upsample_n_convert_yuyv_to_argb_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE | PERFORM_AVG_UPSAMPLING,
@@ -83,7 +83,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to ARGB - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_argb_bt709_sse2_ssse3,
+		upsample_n_convert_yuyv_to_argb_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE | PERFORM_AVG_UPSAMPLING,
@@ -93,33 +93,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_yuyv_to_argb_no_interpolation_sse2,
+		convert_yuyv_to_argb_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - SSE2 - no interpolation",
+		"YUYV to ARGB - SSE2 - no upsampling",
 	},
 	{
-		convert_yuyv_to_argb_bt601_no_interpolation_sse2,
+		convert_yuyv_to_argb_bt601_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - BT601 - SSE2 - no interpolation",
+		"YUYV to ARGB - BT601 - SSE2 - no upsampling",
 	},
 	{
-		convert_yuyv_to_argb_bt709_no_interpolation_sse2,
+		convert_yuyv_to_argb_bt709_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to ARGB - BT709 - SSE2 - no interpolation",
+		"YUYV to ARGB - BT709 - SSE2 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_argb_sse2,
+		upsample_n_convert_yuyv_to_argb_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -127,7 +127,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to ARGB - SSE2",
 	},
 	{
-		convert_yuyv_to_argb_bt601_sse2,
+		upsample_n_convert_yuyv_to_argb_bt601_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -135,7 +135,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to ARGB - BT601 - SSE2",
 	},
 	{
-		convert_yuyv_to_argb_bt709_sse2,
+		upsample_n_convert_yuyv_to_argb_bt709_sse2,
 		PixFcYUYV, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -172,33 +172,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUYV to BGRA
 	{
-		convert_yuyv_to_bgra_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgra_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGRA - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgra_bt601_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgra_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - BT601 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGRA - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgra_bt709_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgra_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - BT709 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGRA - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_bgra_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgra_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -206,7 +206,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGRA - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_bgra_bt601_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgra_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -214,7 +214,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGRA - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_bgra_bt709_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgra_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -224,33 +224,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_yuyv_to_bgra_no_interpolation_sse2,
+		convert_yuyv_to_bgra_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - SSE2 - no interpolation",
+		"YUYV to BGRA - SSE2 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgra_bt601_no_interpolation_sse2,
+		convert_yuyv_to_bgra_bt601_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - BT601 - SSE2 - no interpolation",
+		"YUYV to BGRA - BT601 - SSE2 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgra_bt709_no_interpolation_sse2,
+		convert_yuyv_to_bgra_bt709_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGRA - BT709 - SSE2 - no interpolation",
+		"YUYV to BGRA - BT709 - SSE2 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_bgra_sse2,
+		upsample_n_convert_yuyv_to_bgra_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -258,7 +258,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGRA - SSE2",
 	},
 	{
-		convert_yuyv_to_bgra_bt601_sse2,
+		upsample_n_convert_yuyv_to_bgra_bt601_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -266,7 +266,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGRA - BT601 - SSE2",
 	},
 	{
-		convert_yuyv_to_bgra_bt709_sse2,
+		upsample_n_convert_yuyv_to_bgra_bt709_sse2,
 		PixFcYUYV, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -303,33 +303,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUYV to RGB24
 	{
-		convert_yuyv_to_rgb24_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_rgb24_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to RGB24 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_rgb24_bt601_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_rgb24_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - BT601 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to RGB24 - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_rgb24_bt709_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_rgb24_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - BT709 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to RGB24 - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_rgb24_sse2_ssse3,
+		upsample_n_convert_yuyv_to_rgb24_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -337,7 +337,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to RGB24 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_rgb24_bt601_sse2_ssse3,
+		upsample_n_convert_yuyv_to_rgb24_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -345,7 +345,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to RGB24 - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_rgb24_bt709_sse2_ssse3,
+		upsample_n_convert_yuyv_to_rgb24_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -355,34 +355,34 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_yuyv_to_rgb24_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_rgb24_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - SSE2 / slower repacking - no interpolation",
+		"YUYV to RGB24 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_yuyv_to_rgb24_bt601_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_rgb24_bt601_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - BT601 - SSE2 / slower repacking - no interpolation",
+		"YUYV to RGB24 - BT601 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_yuyv_to_rgb24_bt709_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_rgb24_bt709_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to RGB24 - BT709 - SSE2 / slower repacking - no interpolation",
+		"YUYV to RGB24 - BT709 - SSE2 / slower repacking - no upsampling",
 	},
 
 
 
 	{
-		convert_yuyv_to_rgb24_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_rgb24_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -390,7 +390,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to RGB24 - SSE2 / slower repacking",
 	},
 	{
-		convert_yuyv_to_rgb24_bt601_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_rgb24_bt601_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -398,7 +398,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to RGB24 - BT601 - SSE2 / slower repacking",
 	},
 	{
-		convert_yuyv_to_rgb24_bt709_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_rgb24_bt709_sse2_slowrepacking,
 		PixFcYUYV, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -434,33 +434,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUYV to BGR24
 	{
-		convert_yuyv_to_bgr24_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgr24_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGR24 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgr24_bt601_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgr24_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - BT601 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGR24 - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgr24_bt709_no_interpolation_sse2_ssse3,
+		convert_yuyv_to_bgr24_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - BT709 - SSE2 / SSSE3 - no interpolation",
+		"YUYV to BGR24 - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_bgr24_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgr24_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -468,7 +468,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGR24 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_bgr24_bt601_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgr24_bt601_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -476,7 +476,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGR24 - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_yuyv_to_bgr24_bt709_sse2_ssse3,
+		upsample_n_convert_yuyv_to_bgr24_bt709_sse2_ssse3,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -487,33 +487,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_yuyv_to_bgr24_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_bgr24_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - SSE2 / slower repacking - no interpolation",
+		"YUYV to BGR24 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgr24_bt601_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_bgr24_bt601_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - BT601 - SSE2 / slower repacking - no interpolation",
+		"YUYV to BGR24 - BT601 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_yuyv_to_bgr24_bt709_no_interpolation_sse2_slowrepacking,
+		convert_yuyv_to_bgr24_bt709_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"YUYV to BGR24 - BT709 - SSE2 / slower repacking - no interpolation",
+		"YUYV to BGR24 - BT709 - SSE2 / slower repacking - no upsampling",
 	},
 
 
 	{
-		convert_yuyv_to_bgr24_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_bgr24_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -521,7 +521,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGR24 - SSE2 / slower repacking",
 	},
 	{
-		convert_yuyv_to_bgr24_bt601_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_bgr24_bt601_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -529,7 +529,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"YUYV to BGR24 - BT601 - SSE2 / slower repacking",
 	},
 	{
-		convert_yuyv_to_bgr24_bt709_sse2_slowrepacking,
+		upsample_n_convert_yuyv_to_bgr24_bt709_sse2_slowrepacking,
 		PixFcYUYV, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -576,33 +576,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to ARGB
 	{
-		convert_uyvy_to_argb_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_argb_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - SSE2 / SSSE3 - no interpolation",
+		"UYVY to ARGB - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_argb_bt601_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_argb_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - BT601 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to ARGB - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_argb_bt709_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_argb_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - BT709 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to ARGB - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_uyvy_to_argb_sse2_ssse3,
+		upsample_n_convert_uyvy_to_argb_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -610,7 +610,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to ARGB - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_argb_bt601_sse2_ssse3,
+		upsample_n_convert_uyvy_to_argb_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -618,7 +618,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to ARGB - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_argb_bt709_sse2_ssse3,
+		upsample_n_convert_uyvy_to_argb_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -629,34 +629,34 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_uyvy_to_argb_no_interpolation_sse2,
+		convert_uyvy_to_argb_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - SSE2 - no interpolation",
+		"UYVY to ARGB - SSE2 - no upsampling",
 	},
 	{
-		convert_uyvy_to_argb_bt601_no_interpolation_sse2,
+		convert_uyvy_to_argb_bt601_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - BT601 - SSE2 - no interpolation",
+		"UYVY to ARGB - BT601 - SSE2 - no upsampling",
 	},
 	{
-		convert_uyvy_to_argb_bt709_no_interpolation_sse2,
+		convert_uyvy_to_argb_bt709_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to ARGB - BT709 - SSE2 - no interpolation",
+		"UYVY to ARGB - BT709 - SSE2 - no upsampling",
 	},
 
 
 
 	{
-		convert_uyvy_to_argb_sse2,
+		upsample_n_convert_uyvy_to_argb_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -664,7 +664,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to ARGB - SSE2",
 	},
 	{
-		convert_uyvy_to_argb_bt601_sse2,
+		upsample_n_convert_uyvy_to_argb_bt601_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -672,7 +672,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to ARGB - BT601- SSE2",
 	},
 	{
-		convert_uyvy_to_argb_bt709_sse2,
+		upsample_n_convert_uyvy_to_argb_bt709_sse2,
 		PixFcUYVY, PixFcARGB,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -710,34 +710,34 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to BGRA
 	{
-		convert_uyvy_to_bgra_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgra_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGRA - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgra_bt601_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgra_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - BT601 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGRA - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgra_bt709_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgra_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - BT709 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGRA - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 
 	{
-		convert_uyvy_to_bgra_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgra_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -745,7 +745,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGRA - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_bgra_bt601_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgra_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -753,7 +753,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGRA - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_bgra_bt709_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgra_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -763,33 +763,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_uyvy_to_bgra_no_interpolation_sse2,
+		convert_uyvy_to_bgra_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - SSE2 - no interpolation",
+		"UYVY to BGRA - SSE2 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgra_bt601_no_interpolation_sse2,
+		convert_uyvy_to_bgra_bt601_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - BT601 - SSE2 - no interpolation",
+		"UYVY to BGRA - BT601 - SSE2 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgra_bt709_no_interpolation_sse2,
+		convert_uyvy_to_bgra_bt709_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGRA - BT709 - SSE2 - no interpolation",
+		"UYVY to BGRA - BT709 - SSE2 - no upsampling",
 	},
 
 
 	{
-		convert_uyvy_to_bgra_sse2,
+		upsample_n_convert_uyvy_to_bgra_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -797,7 +797,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGRA - SSE2",
 	},
 	{
-		convert_uyvy_to_bgra_bt601_sse2,
+		upsample_n_convert_uyvy_to_bgra_bt601_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -805,7 +805,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGRA - BT601 - SSE2",
 	},
 	{
-		convert_uyvy_to_bgra_bt709_sse2,
+		upsample_n_convert_uyvy_to_bgra_bt709_sse2,
 		PixFcUYVY, PixFcBGRA,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -841,33 +841,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to RGB24
 	{
-		convert_uyvy_to_rgb24_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_rgb24_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to RGB24 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_rgb24_bt601_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_rgb24_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - BT601 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to RGB24 - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_rgb24_bt709_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_rgb24_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - BT709 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to RGB24 - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 	{
-		convert_uyvy_to_rgb24_sse2_ssse3,
+		upsample_n_convert_uyvy_to_rgb24_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -875,7 +875,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to RGB24 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_rgb24_bt601_sse2_ssse3,
+		upsample_n_convert_uyvy_to_rgb24_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -883,7 +883,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to RGB24 - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_rgb24_bt709_sse2_ssse3,
+		upsample_n_convert_uyvy_to_rgb24_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -894,33 +894,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_uyvy_to_rgb24_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_rgb24_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - SSE2 / slower repacking - no interpolation",
+		"UYVY to RGB24 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_uyvy_to_rgb24_bt601_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_rgb24_bt601_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - BT601 - SSE2 / slower repacking - no interpolation",
+		"UYVY to RGB24 - BT601 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_uyvy_to_rgb24_bt709_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_rgb24_bt709_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to RGB24 - BT709 - SSE2 / slower repacking - no interpolation",
+		"UYVY to RGB24 - BT709 - SSE2 / slower repacking - no upsampling",
 	},
 
 
 	{
-		convert_uyvy_to_rgb24_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_rgb24_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -928,7 +928,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to RGB24 - SSE2 / slower repacking",
 	},
 	{
-		convert_uyvy_to_rgb24_bt601_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_rgb24_bt601_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -936,7 +936,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to RGB24 - BT601 - SSE2 / slower repacking",
 	},
 	{
-		convert_uyvy_to_rgb24_bt709_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_rgb24_bt709_sse2_slowrepacking,
 		PixFcUYVY, PixFcRGB24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -974,34 +974,34 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to BGR24
 	{
-		convert_uyvy_to_bgr24_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgr24_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGR24 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgr24_bt601_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgr24_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - BT601 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGR24 - BT601 - SSE2 / SSSE3 - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgr24_bt709_no_interpolation_sse2_ssse3,
+		convert_uyvy_to_bgr24_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - BT709 - SSE2 / SSSE3 - no interpolation",
+		"UYVY to BGR24 - BT709 - SSE2 / SSSE3 - no upsampling",
 	},
 
 
 
 	{
-		convert_uyvy_to_bgr24_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgr24_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING,
@@ -1009,7 +1009,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGR24 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_bgr24_bt601_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgr24_bt601_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -1017,7 +1017,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGR24 - BT601 - SSE2 / SSSE3",
 	},
 	{
-		convert_uyvy_to_bgr24_bt709_sse2_ssse3,
+		upsample_n_convert_uyvy_to_bgr24_bt709_sse2_ssse3,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,
@@ -1028,33 +1028,33 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 
 	{
-		convert_uyvy_to_bgr24_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_bgr24_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		DEFAULT_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - SSE2 / slower repacking - no interpolation",
+		"UYVY to BGR24 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgr24_bt601_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_bgr24_bt601_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		USE_BT601_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - BT601 - SSE2 / slower repacking - no interpolation",
+		"UYVY to BGR24 - BT601 - SSE2 / slower repacking - no upsampling",
 	},
 	{
-		convert_uyvy_to_bgr24_bt709_no_interpolation_sse2_slowrepacking,
+		convert_uyvy_to_bgr24_bt709_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		USE_BT709_CONVERSION_ATTRIBUTE,
 		16,
-		"UYVY to BGR24 - BT709 - SSE2 / slower repacking - no interpolation",
+		"UYVY to BGR24 - BT709 - SSE2 / slower repacking - no upsampling",
 	},
 
 
 	{
-		convert_uyvy_to_bgr24_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_bgr24_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING,
@@ -1062,7 +1062,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGR24 - SSE2 / slower repacking",
 	},
 	{
-		convert_uyvy_to_bgr24_bt601_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_bgr24_bt601_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT601_CONVERSION_ATTRIBUTE,
@@ -1070,7 +1070,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"UYVY to BGR24 - BT601 - SSE2 / slower repacking",
 	},
 	{
-		convert_uyvy_to_bgr24_bt709_sse2_slowrepacking,
+		upsample_n_convert_uyvy_to_bgr24_bt709_sse2_slowrepacking,
 		PixFcUYVY, PixFcBGR24,
 		CPUID_FEATURE_SSE2,
 		PERFORM_AVG_UPSAMPLING | USE_BT709_CONVERSION_ATTRIBUTE,

@@ -24,33 +24,33 @@
 #include "pixfc-sse.h"
 
 // UYVY to ARGB			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_argb_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to ARGB			SSE2
+void		upsample_n_convert_uyvy_to_argb_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to BGRA			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgra_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to BGRA			SSE2
+void		upsample_n_convert_uyvy_to_bgra_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to RGB24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to RGB24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_rgb24_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 // UYVY to BGR24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to BGR24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_bgr24_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 
@@ -73,33 +73,33 @@ void 		convert_uyvy_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, voi
  */
 
 // UYVY to ARGB			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_bt601_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to ARGB			SSE2
+void		upsample_n_convert_uyvy_to_argb_bt601_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_bt601_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_bt601_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to BGRA			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_bt601_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to BGRA			SSE2
+void		upsample_n_convert_uyvy_to_bgra_bt601_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_bt601_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_bt601_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to RGB24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_bt601_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to RGB24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_rgb24_bt601_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_bt601_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_bt601_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 // UYVY to BGR24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_bt601_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to BGR24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_bgr24_bt601_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_bt601_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_bt601_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 
@@ -122,33 +122,33 @@ void 		convert_uyvy_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* i
  */
 
 // UYVY to ARGB			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_bt709_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to ARGB			SSE2
+void		upsample_n_convert_uyvy_to_argb_bt709_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_argb_bt709_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_argb_bt709_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to BGRA			SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_bt709_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 // UYVY to BGRA			SSE2
+void		upsample_n_convert_uyvy_to_bgra_bt709_sse2(const struct PixFcSSE *, void*, void*);
 void		convert_uyvy_to_bgra_bt709_sse2(const struct PixFcSSE *, void*, void*);
-void		convert_uyvy_to_bgra_bt709_no_interpolation_sse2(const struct PixFcSSE *, void*, void*);
 
 // UYVY to RGB24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_bt709_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to RGB24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_rgb24_bt709_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_rgb24_bt709_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_rgb24_bt709_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 // UYVY to BGR24		SSE2 SSSE3
+void		upsample_n_convert_uyvy_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_bt709_no_interpolation_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 // UYVY to BGR24		SSE2 slow repacking
+void		upsample_n_convert_uyvy_to_bgr24_bt709_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 void		convert_uyvy_to_bgr24_bt709_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
-void		convert_uyvy_to_bgr24_bt709_no_interpolation_sse2_slowrepacking(const struct PixFcSSE *, void *, void *);
 
 
 
