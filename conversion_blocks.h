@@ -28,12 +28,12 @@
  */
 
 #define DEFAULT_ATTRIBUTE						0
-// Set if a conversion routine uses average upsampling (reconstructs missing component values by averaging previous and next ones)
-#define PERFORM_AVG_UPSAMPLING					(1 << 1)
+// Set if a conversion routine uses nearest neighbour resampling
+#define NNB_RESAMPLING				(1 << 1)
 // Set if a conversion routine uses the conversion equations for SD formats (bt601)
-#define USE_BT601_CONVERSION_ATTRIBUTE			(1 << 2)
+#define BT601_CONVERSION			(1 << 2)
 // Set if a conversion routine uses the conversion equations for HD formats (bt709)
-#define USE_BT709_CONVERSION_ATTRIBUTE			(1 << 3)
+#define BT709_CONVERSION			(1 << 3)
 
 /*
  * A ConversionBlock is a structure grouping together 

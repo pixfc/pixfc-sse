@@ -79,7 +79,7 @@ int main(int argc, char ** argv){
 
 
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, input_format, output_format, width, height, PIXFC_DEFAULT_FLAGS) != 0) {
+	if (create_pixfc(&pixfc, input_format, output_format, width, height, PixFcFlag_Default) != 0) {
 		fprintf(stderr, "Error creating struct pixfc\n");
 		free(output);
 		free(input);

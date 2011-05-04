@@ -74,7 +74,7 @@ static int		do_image_conversion(const struct ConversionBlock *block, void* in, v
 	struct PixFcSSE *	pixfc = NULL;
 	
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PIXFC_DEFAULT_FLAGS) != 0) {
+	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
 		dprint("Error create struct pixfc\n");
 		return -1;
 	}

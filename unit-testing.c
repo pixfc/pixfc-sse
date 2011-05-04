@@ -45,7 +45,7 @@ static int		time_conversion_block(const struct ConversionBlock *block, struct ti
 	uint32_t				i;		// index into the input buffer array
 
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PIXFC_DEFAULT_FLAGS) != 0) {
+	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
 		dprint("Error create struct pixfc\n");
 		return -1;
 	}

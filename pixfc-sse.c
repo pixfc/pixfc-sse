@@ -42,30 +42,30 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
-	// If we were told to require conversion blocks performing interpolation,
+	// If we were told to require conversion blocks performing NNB resampling,
 	// enforce it.
-	if ((flags & PIXFC_AVG_UPSAMPLING_FLAG) && ! (block->attributes & PERFORM_AVG_UPSAMPLING)) {
-		dprintf("Enforcing REQUIRE_INTERPOLATION_FLAG flag\n");
+	if ((flags & PixFcFlag_NNbResampling) && ! (block->attributes & NNB_RESAMPLING)) {
+		dprintf("Enforcing NNbResampling flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 	
 	// If we were told to disable SSE conversion blocks, make sure this block
 	// does not require any SSE features.
-	if ((flags & PIXFC_NO_SSE_FLAG) && (block->required_cpu_features != CPUID_FEATURE_NONE)) {
+	if ((flags & PixFcFlag_NoSSE) && (block->required_cpu_features != CPUID_FEATURE_NONE)) {
 		dprintf("Enforcing FORCE_NO_SSE flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
-	// If we were told to use BT601 conversion blocks, make sure this block
+	// If we were told to use ITU-R Rec. BT601 conversion, make sure this block
 	// uses these equations.
-	if ((flags & PIXFC_BT601_CONVERSION_FLAG) && ! (block->attributes & USE_BT601_CONVERSION_ATTRIBUTE)) {
+	if ((flags & PixFcFlag_BT601Conversion) && ! (block->attributes & BT601_CONVERSION)) {
 		dprintf("Enforcing SD_FORMAT_CONVERSION flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
-	// If we were told to use BT709 conversion blocks, make sure this block
+	// If we were told to use ITU-R Rec. BT709 conversion, make sure this block
 	// uses these equations.
-	if ((flags & PIXFC_BT709_CONVERSION_FLAG) && ! (block->attributes & USE_BT709_CONVERSION_ATTRIBUTE)) {
+	if ((flags & PixFcFlag_BT709Conversion) && ! (block->attributes & BT709_CONVERSION)) {
 		dprintf("Enforcing HD_FORMAT_CONVERSION flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
@@ -79,7 +79,7 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	}
 
 	// If we were told to use an SSE2-only routine, make sure that's the case
-	if ((flags & PIXFC_SSE2_ONLY_FLAG) && (block->required_cpu_features != CPUID_FEATURE_SSE2)) {
+	if ((flags & PixFcFlag_SSE2Only) && (block->required_cpu_features != CPUID_FEATURE_SSE2)) {
 		dprintf("Enforcing FORCE_SSE2_ONLY flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
@@ -143,7 +143,7 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 	// Allocate and zero structure PixFcSSE
 	conv = (struct PixFcSSE *) malloc(sizeof(*conv));
 	if (! conv)
-		return -1;
+		return PIXFC_OOM;
 	memset(conv, 0x0, sizeof(*conv));
 
 	// Initialise members

@@ -78,34 +78,60 @@ struct PixFcSSE{
 	uint32_t					pixel_count;
 	uint32_t					width;
 	uint32_t					height;
-	uint32_t					uses_sse;	// set to 1 if this converter uses
-											// the SSE implementation, 0 if not.
+	uint32_t					uses_sse;	// set to 1 if the conversion function
+											// uses SSE, 0 if not.
 };
+
+/*
+ * Flags that can be passed to create_pixfc() to modify
+ * the conversion routine selection process.
+ */
+typedef enum {
+	PixFcFlag_Default = 0,
+
+	//
+	// Force the use of a non-SSE conversion routine
+	PixFcFlag_NoSSE	=				(1 << 0),
+	// Force the use of a SSE2-only conversion routine
+	PixFcFlag_SSE2Only =			(1 << 1),
+
+	//
+	// By default, PixFC performs a full-range conversion, unless one of the
+	// following two flags is used.
+	//
+	// Force the use of conversion equations suitable for SD image formats,
+	// as defined in ITU-R Rec. BT.601
+	PixFcFlag_BT601Conversion =		(1 << 7),
+	// Force the use of conversion equations suitable for HD image formats,
+	// as defined in ITU-R Rec. BT.709
+	PixFcFlag_BT709Conversion =		(1 << 8),
+
+	//
+	// Force the use of a conversion routine which uses nearest neighbour
+	// resampling. This means:
+	// - upsampling creates missing chromas by duplicating existing ones, and
+	// - downsampling simply drops unused chromas.
+	// This is the fastest form of resampling, but converted images are
+	// of lower quality and prone to all sorts of conversion artifacts
+	// (aliasing). This flag can only be used when converting from:
+	// {YUYV , UYVY} to {ARGB, BGRA, RGB24, BGR24}
+	PixFcFlag_NNbResampling	=		(1 << 14),
+} PixFcFlag;
+
+
 
 /*
  * This function creates a struct PixFcSSE and sets it up
  * for a conversion from the given source format to the destination
  * one if supported. See macros further down for returned error codes.
  */
-uint32_t		create_pixfc(struct PixFcSSE**,	// out - returns a struct PixFcSSE
+uint32_t		create_pixfc(struct PixFcSSE**,		// out - returns a struct PixFcSSE
 								PixFcPixelFormat,  	// in  - source format
 								PixFcPixelFormat, 	// in  - destination format
-								uint32_t,				// in  - width
-								uint32_t, 				// in  - height
-								uint32_t				// in  - flags (see #define below)
+								uint32_t,			// in  - width
+								uint32_t, 			// in  - height
+								PixFcFlag			// in  - see enum above - tune the selection of the conversion function
 );
-
-/*
- * List of flags that can be passed to create_pixfc() to modify
- * the conversion block selection process.
- */
-#define			PIXFC_DEFAULT_FLAGS					0
-#define			PIXFC_NO_SSE_FLAG					(1 << 0)	// Force the use of a non-SSE conversion routine
-#define			PIXFC_SSE2_ONLY_FLAG				(1 << 1)	// Force the use of a SSE2-only conversion routine
-#define			PIXFC_AVG_UPSAMPLING_FLAG			(1 << 2)	// Force the use of a conversion routine which recreates missing components from existing ones (using average upsampling)
-#define			PIXFC_BT601_CONVERSION_FLAG			(1 << 3)	// Force the use of conversion equations suitable for SD image formats, as defined in bt.601
-#define			PIXFC_BT709_CONVERSION_FLAG			(1 << 4)	// Force the use of conversion equations suitable for HD image formats, as defined in bt.709
-
 
 
 /*
@@ -120,10 +146,10 @@ void			destroy_pixfc(struct PixFcSSE*);
 #define			PIXFC_OK								0
 
 // Generic error code
-#define			PIXFC_ERROR							-1
+#define			PIXFC_ERROR								-1
 
 // Conversion from source to destination format not supported
-#define			PIXFC_CONVERSION_NOT_SUPPORTED		-2
+#define			PIXFC_CONVERSION_NOT_SUPPORTED			-2
 
 // Out of memory
 #define 		PIXFC_OOM								-3
