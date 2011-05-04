@@ -47,7 +47,7 @@
  */
 EXTERN_INLINE void unpack_yuyv_to_y_uv_vectors_sse2(__m128i* in_1_v8i_yuyv_vector, __m128i* out_2_v16i_y_uv_vectors)
 {
-	CONST_M128I(mask_off_chromas, 0x5C4600785F692350LL, 0x780063402A520043LL);
+	CONST_M128I(mask_off_chromas, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
     // Y unpacking
 	out_2_v16i_y_uv_vectors[0] = _mm_and_si128(*in_1_v8i_yuyv_vector, _M(mask_off_chromas));
     // Y1 0     Y2 0    Y3 0    Y4 0    Y5 0    Y6 0    Y7 0    Y8 0		// PAND             2   2
@@ -117,8 +117,8 @@ EXTERN_INLINE void unpack_yuyv_to_y_uv_vectors_sse2_ssse3(__m128i* in_1_v8i_yuyv
  */
 EXTERN_INLINE void unpack_yuyv_to_y_u_v_vectors_sse2(__m128i* in_1_v8i_yuyv_vector, __m128i* out_3_v16i_y_u_v_vectors)
 {
-	CONST_M128I(mask_off_chromas, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
-	CONST_M128I(mask_cb, 0x0000FF000000FF00LL, 0x0000FF000000FF00LL);
+	CONST_M128I(mask_off_chromas, 0x5C4600785F692350LL, 0x780063402A520043LL);
+	CONST_M128I(mask_cb, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
 	__m128i uv, uLo, uHi, vLo, vHi;
 
     // Y unpacking

@@ -189,4 +189,23 @@ void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, voi
 	}
 }
 
-
+/*
+ * Original yuv to rgb conversion - left here for ref
+ */
+void 		convert_yuyv_to_rgb_original(const struct PixFcSSE* conv, void* in, void* out){
+	__m128i*	yuyv_8pixels = (__m128i *) in;
+	__m128i*	rgb_out_buf = (__m128i *) out;
+	uint32_t	pixel_count = conv->pixel_count;
+	__m128i		unpack_out[2];
+	__m128i		convert_out[6];
+	while(pixel_count > 0) {
+		unpack_yuyv_to_y_u_v_vectors_sse2(yuyv_8pixels, unpack_out);
+		nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(unpack_out, convert_out);
+		unpack_yuyv_to_y_u_v_vectors_sse2(&yuyv_8pixels[1], unpack_out);
+		nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(unpack_out, &convert_out[3]);
+		pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking(convert_out, rgb_out_buf);
+		yuyv_8pixels += 2;
+		rgb_out_buf += 3;
+		pixel_count -= 16;
+	};
+}
