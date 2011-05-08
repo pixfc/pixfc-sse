@@ -35,7 +35,7 @@
  * Uses nearest neighbour upsampling:
  * U12 & V12 are created from chromas value for pixel 1 only.
  *
- * Total latency: 			53 cycles
+ * Total latency: 			94 cycles
  * Num of pixel handled:	8
  *
  * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
@@ -73,20 +73,24 @@
  * uvVect
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  */
-EXTERN_INLINE void nnb_downsample_n_convert_r_gb_vectors_to_y_uv_vectors_sse2(__m128i* in_3_v16i_r_gb_vectors, __m128i* out_2_v16i_y_uv_vectors)
+EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__m128i* in_3_v16i_r_gb_vectors, __m128i* out_2_v16i_y_uv_vectors)
 {
 	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
 	CONST_M128I(rYCoeffs, 0x4C8B4C8B4C8B4C8BLL, 0x4C8B4C8B4C8B4C8BLL);
 	CONST_M128I(rUCoeffs, 0xD4BDD4BDD4BDD4BDLL, 0xD4BDD4BDD4BDD4BDLL);
 	CONST_M128I(rVCoeffs, 0xFFFFFFFFFFFFFFFFLL, 0xFFFFFFFFFFFFFFFFLL);
+	CONST_M128I(rUVCoeffsInterleaved, 0xFFFFD4BDFFFFD4BDLL, 0xFFFFD4BDFFFFD4BDLL);
 	CONST_M128I(gbYCoeffs, 0x001D0096001D0096LL, 0x001D0096001D0096LL);
 	CONST_M128I(gbUCoeffs, 0x0080FFAC0080FFACLL, 0x0080FFAC0080FFACLL);
 	CONST_M128I(gbVCoeffs, 0xFFEBFF95FFEBFF95LL, 0xFFEBFF95FFEBFF95LL);
+	CONST_M128I(zeroHiWord, 0x0000FFFF0000FFFFLL, 0x0000FFFF0000FFFFLL);
+	CONST_M128I(zeroLoWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
 
 	M128I(rScratch, 0x0LL, 0x0LL);
 	M128I(gb1Scratch, 0x0LL, 0x0LL);
 	M128I(gb2Scratch, 0x0LL, 0x0LL);
 	M128I(gbOdd, 0x0LL, 0x0LL);
+	M128I(rOdd, 0x0LL, 0x0LL);
 
 	//
 	// Y
@@ -123,7 +127,7 @@ EXTERN_INLINE void nnb_downsample_n_convert_r_gb_vectors_to_y_uv_vectors_sse2(__
 	// C1 C2		C3 C4		C5 C6		C7 C8		(8 16-bit values)
 
 	out_2_v16i_y_uv_vectors[0] = _mm_add_epi16(_M(rScratch), _M(gb1Scratch));		// PADDW		2	2
-	// Y1 Y2		Y3 R4		Y5 Y6		Y7 Y8
+	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
 
 
 	//
@@ -133,50 +137,60 @@ EXTERN_INLINE void nnb_downsample_n_convert_r_gb_vectors_to_y_uv_vectors_sse2(__
 	// together and  then do the conversion.
 	_M(gbOdd) = _mm_unpacklo_epi64(_mm_shuffle_epi32(in_3_v16i_r_gb_vectors[1], 0x08), _mm_shuffle_epi32(in_3_v16i_r_gb_vectors[2], 0x08));
 	// G1 B1	G3 B3	G5 B5	G7 B7
-	//																				  	PSHUFD		4 4 2 2
-	//																				  	PSHUFD		4 4 2 2
-	//																				  	PUNPCKLQDQ	4 4 1 1
+	//																				   PSHUFD		4 4 2 2
+	//																				   PSHUFD		4 4 2 2
+	//																				   PUNPCKLQDQ	4 4 1 1
+
+	_M(rOdd) = _mm_shufflehi_epi16(in_3_v16i_r_gb_vectors[0], 0xA0);				// PSHUFHW		2	2
+	// R1 0 0 0		R3 0 0 0	R5 0 R5 0	R7 0 R7 0
+
+	_M(rOdd) = _mm_shufflelo_epi16(_M(rOdd), 0xA0);									// PSHUFLW		2	2
+	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
+
 
 	//
 	// U
-	// R coeffs
-	_M(rScratch) = _mm_mulhi_epi16(_M(gbOdd), _M(rUCoeffs));						// PMULHW		9 8 2 2
 
 	// G and B odd coefficients
-	_M(gb2Scratch) = _mm_madd_epi16(_M(gbOdd), _M(gbUCoeffs));						// PMADDWD		9 8 2 2
+	_M(gb1Scratch) = _mm_madd_epi16(_M(gbOdd), _M(gbUCoeffs));						// PMADDWD		9 8 2 2
 	// C1				C3				C5				C7		(4 * 32-bits values)
 
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(gb2Scratch) = _mm_srai_epi32(_M(gb2Scratch), 8);								// PSRAD		2	2
+	_M(gb1Scratch) = _mm_srai_epi32(_M(gb1Scratch), 8);								// PSRAD		2	2
 	// C1 Sb Sb Sb		C3 Sb Sb Sb		C5 Sb Sb Sb		C7 Sb Sb Sb
 
-	// add R and GB coeffs
-	_M(gb2Scratch) = _mm_add_epi16(_M(rScratch), _M(gb2Scratch));					// PADDW		2	2
-
-	// U + 128
-	_M(gb1Scratch) = _mm_add_epi16(_M(gb2Scratch), _M(add128));						// PADDW		2	2
-	//
+	// zero hi word
+	_M(gb1cratch) = _mm_and_si128(_M(gb1Scratch), _M(zeroHiWord));					// PAND			2   2
+	// C1 Sb 0 0		C3 Sb 0 0		C5 Sb 0 0		C7 Sb 0 0
 
 	//
 	// V
-	// R coeffs
-	_M(rScratch) = _mm_mulhi_epi16(_M(gbOdd), _M(rVCoeffs));						// PMULHW		9 8 2 2
-
 	// G and B odd coefficients
 	_M(gb2Scratch) = _mm_madd_epi16(_M(gbOdd), _M(gbVCoeffs));						// PMADDWD		9 8 2 2
 	// C1				C3				C5				C7		(4 * 32-bits values)
 
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(gb2Scratch) = _mm_srai_epi32(_M(gb2Scratch), 8);								// PSRAD		2	2
-	// C1 Sb Sb Sb		C3 Sb Sb Sb		C5 Sb Sb Sb		C7 Sb Sb Sb
+	// here we shift left since we need to place the coeffs in the right spot
+	_M(gb2Scratch) = _mm_slli_epi32(_M(gb2Scratch), 8);								// PSLLD		2	2
+
+	// zero lo word
+	_M(gb2Scratch) = _mm_and_si128(_M(gb2Scratch), _M(zeroLoWord));					// PAND			2   2
+	// 0 0 C1 Sb	0 0 C3 Sb		0 0 C5 Sb		0 0 C7 Sb
+
+
+	// OR both U & V scratch vars
+	_M(gb1Scratch) = _mm_or_si128(_M(gb1Scratch), _M(gb2Scratch));					// POR			2   2
+	// U12 V12			U34 V34			U56 V56			U78 V78
+
+	// Calculate R coeffs
+	_M(rScratch) = _mm_mulhi_epi16(_M(rOdd), _M(rUVCoeffsInterleaved));				// PMULHW		9 8 2 2
 
 	// add R and GB coeffs
-	_M(gb2scratch) = _mm_add_epi16(_M(rScratch), _M(gb2scratch));					// PADDW		2	2
+	_M(gb2Scratch) = _mm_add_epi16(_M(rScratch), _M(gb1Scratch));					// PADDW		2	2
 
-	// V + 128
-	_M(gb1Scratch) = _mm_add_epi16(_M(gb2Scratch), _M(add128));						// PADDW		2	2
-	//
-
+	// U,V + 128
+	out_2_v16i_y_uv_vectors[0] = _mm_add_epi16(_M(gb2Scratch), _M(add128));			// PADDW		2	2
+	// U12 V12			U34 V34			U56 V56			U78 V78
 };
 
 
