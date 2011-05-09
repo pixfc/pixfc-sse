@@ -24,6 +24,7 @@
 #include "conversion_blocks.h"
 #include "conversion_routines_from_yuyv.h"
 #include "conversion_routines_from_uyvy.h"
+#include "conversion_routines_from_argb.h"
 
 
 /*
@@ -35,6 +36,22 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	/*
 	 *	S O U R C E   F O R M A T :
 	 *	
+	 *	A R G B
+	 *
+	 */
+	// ARGB to YUYV
+	{
+		convert_argb_to_yuyv_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - SSE2 - fast downsampling",
+	},
+
+	/*
+	 *	S O U R C E   F O R M A T :
+	 *
 	 *	Y U Y V
 	 *
 	 */

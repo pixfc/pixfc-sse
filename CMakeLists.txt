@@ -32,6 +32,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_uyvy.c
 	conversion_routines_from_uyvy_bt601.c
 	conversion_routines_from_uyvy_bt709.c
+	conversion_routines_from_argb.c
 )
 
 # Source files for test apps
@@ -54,6 +55,9 @@ list(APPEND EXTERN_INLINE_HEADER_LIST
 	yuv_to_rgb_convert_bt601
 	yuv_to_rgb_convert_bt709
 	rgb_pack
+	rgb_unpack
+	rgb_to_yuv_convert
+	yuv_pack
 )
 function(GenerateExternInlines)
 	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
@@ -79,7 +83,7 @@ if(DEBUG)
 
 	# Add extern inline definitions to source file list
 	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
-		list(APPEND PIXCONV_SRC_LIST "${CUR_FILE}.c")
+		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}.c")
 	endforeach(CUR_FILE)
 
 	# Add compiler specific flags	
