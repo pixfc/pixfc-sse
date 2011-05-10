@@ -77,7 +77,7 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
 {
 	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
 	CONST_M128I(rYCoeffs, 0x4C8B4C8B4C8B4C8BLL, 0x4C8B4C8B4C8B4C8BLL);
-	CONST_M128I(rUVCoeffsInterleaved, 0xFFFFD4BDFFFFD4BDLL, 0xFFFFD4BDFFFFD4BDLL);
+	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BD7FFFD4BDLL, 0x7FFFD4BD7FFFD4BDLL);
 	CONST_M128I(gbYCoeffs, 0x001D0096001D0096LL, 0x001D0096001D0096LL);
 	CONST_M128I(gbUCoeffs, 0x0080FFAC0080FFACLL, 0x0080FFAC0080FFACLL);
 	CONST_M128I(gbVCoeffs, 0xFFEBFF95FFEBFF95LL, 0xFFEBFF95FFEBFF95LL);
@@ -90,9 +90,6 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
 	M128I(gbOdd, 0x0LL, 0x0LL);
 	M128I(rOdd, 0x0LL, 0x0LL);
 
-	print_xmm16("R", in_3_v16i_r_gb_vectors);
-	print_xmm16("GB1", &in_3_v16i_r_gb_vectors[1]);
-	print_xmm16("GB2", &in_3_v16i_r_gb_vectors[2]);
 	//
 	// Y
 	// R coeffs
@@ -130,8 +127,6 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
 	out_2_v16i_y_uv_vectors[0] = _mm_add_epi16(_M(rScratch), _M(gb1Scratch));		// PADDW		2	2
 	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
 
-	print_xmm16("Y 1-8", out_2_v16i_y_uv_vectors);
-
 	//
 	// Since we are going doing nearest neighbour downsampling, lets only
 	// do calculation for chroma values U and V we are going to keep, which are
@@ -148,7 +143,6 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
 
 	_M(rOdd) = _mm_shufflelo_epi16(_M(rOdd), 0xA0);									// PSHUFLW		2	2
 	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
-
 
 	//
 	// U
@@ -193,8 +187,6 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
 	// U,V + 128
 	out_2_v16i_y_uv_vectors[1] = _mm_add_epi16(_M(gb2Scratch), _M(add128));			// PADDW		2	2
 	// U12 V12			U34 V34			U56 V56			U78 V78
-
-	print_xmm16("UV", &out_2_v16i_y_uv_vectors[1]);
 };
 
 
