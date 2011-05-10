@@ -41,6 +41,14 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	 */
 	// ARGB to YUYV
 	{
+		convert_argb_to_yuyv_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - SSE2 / SSSE3- fast downsampling",
+	},
+	{
 		convert_argb_to_yuyv_sse2,
 		PixFcARGB, PixFcYUYV,
 		CPUID_FEATURE_SSE2,

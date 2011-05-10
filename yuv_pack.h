@@ -65,7 +65,7 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_
 	_M(scratch1) = _mm_packus_epi16(in_4_y_uv_422_vectors[0], in_4_y_uv_422_vectors[2]);	// PACKUSWB		4 4 2 2
 	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16
 
-	_M(scratch2) = _mm_packus_epi16(in_4_y_uv_422_vectors[2], in_4_y_uv_422_vectors[3]);	// PACKUSWB		4 4 2 2
+	_M(scratch2) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);	// PACKUSWB		4 4 2 2
 	// U12 V12	U34 V34	U56 V56	U78 V78	U910 V910	U1112 V1112	U1314 V1314	U1516 V1516
 
 	out_2_yuyv_vectors[0] = _mm_unpacklo_epi8(_M(scratch1), _M(scratch2));				// PUNPCKLBW	2	2

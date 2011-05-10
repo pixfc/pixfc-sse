@@ -30,5 +30,8 @@ void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *pixfc, void* source_buffe
 	CONVERT_TO_YUV(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
+void		convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
+}
 
 
