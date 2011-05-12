@@ -198,7 +198,7 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
  * Uses nearest neighbour upsampling:
  * U12 & V12 are created from chromas value for pixel 1 only.
  *
- * Total latency: 			78 cycles
+ * Total latency: 			76 cycles
  * Num of pixel handled:	8
  *
  * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
@@ -206,9 +206,9 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2(__
  * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
  *
  *				All coeffs are left-shifted by 16 bits
- * 					[  19595	38469		7471	]
- * 					[ -11075	-21692		32767	]
- * 					[  32767	-27459		-5308	]
+ * 					[  19595	 38470		 7471	]
+ * 					[ -11076	-21692		 32767	]
+ * 					[  32767	-27460		-5308	]
  *
  *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
  *			a 16-bit signed integer, they have been capped to the maximum value for this
@@ -241,10 +241,10 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_sse2(_
 {
 	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
 	CONST_M128I(rYCoeffs, 0x4C8B4C8B4C8B4C8BLL, 0x4C8B4C8B4C8B4C8BLL);
-	CONST_M128I(gYCoeffs, 0x9645964596459645LL, 0x9645964596459645LL);
+	CONST_M128I(gYCoeffs, 0x9646964696469646LL, 0x9646964696469646LL);
 	CONST_M128I(bYCoeffs, 0x1D2F1D2F1D2F1D2FLL, 0x1D2F1D2F1D2F1D2FLL);
-	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BD7FFFD4BDLL, 0x7FFFD4BD7FFFD4BDLL);
-	CONST_M128I(gUVCoeffsInterleaved, 0x94BDAB4494BDAB44LL, 0x94BDAB4494BDAB44LL);
+	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
+	CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
 	CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
 	
 	M128I(rScratch, 0x0LL, 0x0LL);
@@ -254,25 +254,24 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_sse2(_
 	M128I(gOdd, 0x0LL, 0x0LL);
 	M128I(bOdd, 0x0LL, 0x0LL);
 
-	print_xmm16u("R", in_3_v16i_r_g_b_vectors);
 	//
 	// Y
 	// R coeffs
 	// Multiply R values by 16-bit left-shifted Y coeffs and keep highest 16 bits
 	_M(rScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[0], _M(rYCoeffs));		// PMULHUW		9 8 2 2
-	print_xmm16u("R scratch", &rScratch);
+
 	// G coeffs
 	// Multiply G values by 16-bit left-shifted Y coeffs and keep highest 16 bits
 	_M(gScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[1], _M(gYCoeffs));		// PMULHUW		9 8 2 2
-	print_xmm16u("G scratch", &gScratch);
+
 	// B coeffs
 	// Multiply B values by 16-bit left-shifted Y coeffs and keep highest 16 bits
 	_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));		// PMULHUW		9 8 2 2
-	print_xmm16u("B scratch", &bScratch);
+
 	out_2_v16i_y_uv_vectors[0] = _mm_add_epi16(_M(rScratch), _M(gScratch));			// PADDW		2	2
 	out_2_v16i_y_uv_vectors[0] = _mm_add_epi16(out_2_v16i_y_uv_vectors[0], _M(bScratch));// PADDW	2	2
 	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
-	print_xmm16u("Y", out_2_v16i_y_uv_vectors);
+
 	
 	//
 	// Since we are going doing nearest neighbour downsampling, lets only
@@ -280,13 +279,10 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_sse2(_
 	// the ones from odd pixels (1, 3, 5 and 7). So we first gather those pixels
 	// together and  then do the conversion.
 	_M(rOdd) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[0], 0xA0);				// PSHUFHW		2	2
-	// 0 R1 0 0		0 R3 0 0	0 R5 0 R5	0 R7 0 R7
+	// R1 0 0 0		R3 0 0 0	R5 0 R5 0	R7 0 R7 0
 	
 	_M(rOdd) = _mm_shufflelo_epi16(_M(rOdd), 0xA0);									// PSHUFLW		2	2
-	// 0 R1 0 R1	0 R3 0 R3	0 R5 0 R5	0 R7 0 R7
-	
-	_M(rOdd) = _mm_srli_epi32(_M(rOdd), 8);											// PSRLD		2	2
-	// R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
+	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
 							  
 	_M(gOdd) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[1], 0xA0);				// PSHUFHW		2	2
 	// G1 0 0 0		G3 0 0 0	G5 0 G5	0	G7 0 G7	0
@@ -299,7 +295,6 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_sse2(_
 	
 	_M(bOdd) = _mm_shufflelo_epi16(_M(bOdd), 0xA0);									// PSHUFLW		2	2
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0	
-	
 	
 	//
 	// r UV 
@@ -496,9 +491,9 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_gb_vectors_to_y_uv_vectors_sse2_ss
  * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
  *
  *				All coeffs are left-shifted by 16 bits
- * 					[  19595	38469		7471	]
- * 					[ -11075	-21692		32767	]
- * 					[  32767	-27459		-5308	]
+* 					[  19595	 38470		 7471	]
+ * 					[ -11076	-21692		 32767	]
+ * 					[  32767	-27460		-5308	]
  *
  *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
  *			a 16-bit signed integer, they have been capped to the maximum value for this
@@ -531,10 +526,10 @@ EXTERN_INLINE void convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_sse2_s
 {
 	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
 	CONST_M128I(rYCoeffs, 0x4C8B4C8B4C8B4C8BLL, 0x4C8B4C8B4C8B4C8BLL);
-	CONST_M128I(gYCoeffs, 0x9645964596459645LL, 0x9645964596459645LL);
+	CONST_M128I(gYCoeffs, 0x9646964696469646LL, 0x9646964696469646LL);
 	CONST_M128I(bYCoeffs, 0x1D2F1D2F1D2F1D2FLL, 0x1D2F1D2F1D2F1D2FLL);
-	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BD7FFFD4BDLL, 0x7FFFD4BD7FFFD4BDLL);
-	CONST_M128I(gUVCoeffsInterleaved, 0x94BDAB4494BDAB44LL, 0x94BDAB4494BDAB44LL);
+	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
+	CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
 	CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
 	CONST_M128I(shuf_odd, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
 

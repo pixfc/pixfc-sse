@@ -160,7 +160,7 @@ EXTERN_INLINE void unpack_argb_to_r_gb_vectors_sse2_ssse3(__m128i* in_2_v8i_argb
 /*
  * Convert 2 vectors of 16 char ARGB to 3 vectors of 8 short:
  *
- * Total latency:				34
+ * Total latency:				36
  * Number of pixels handled:	8
  *
  * INPUT
@@ -205,7 +205,6 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 
 
 
-	
 	out_3_v16i_r_g_b_vectors[1] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arb));// PAND		2	2
 	// 0 0		G1 0	0 0		G2 0	0 0		G3 0	0 0		G4 0
 	
@@ -225,19 +224,18 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 
 	out_3_v16i_r_g_b_vectors[2] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arg));// PAND		2	2
 	// 0 0		0 B1	0 0		0 B2	0 0		0 B3	0 0		0 B4
-	print_xmm8u("B1-4", &out_3_v16i_r_g_b_vectors[2]);
+
 	out_3_v16i_r_g_b_vectors[2] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[2], 24);			// PSRLD	2   2
 	// B1 0 	0 0		B2 0	0 0		B3 0	0 0		B4 0 	0 0
-	print_xmm8u("B1-4 << 24", &out_3_v16i_r_g_b_vectors[2]);	
-	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arb));				// PAND		2	2
+
+	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arg));				// PAND		2	2
 	// 0 0		0 B5	0 0		0 B6	0 0		0 B7	0 0		0 B8
-	print_xmm8u("B5-8", &scratch1);
+
 	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 24);										// PSRLD	2   2
 	// B5 0 	0 0		B6 0	0 0		B7 0	0 0		B8 0 	0 0
-	print_xmm8u("B5-8 << 24", &scratch1);	
+
 	out_3_v16i_r_g_b_vectors[2] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[2], _M(scratch1));//PACKSSDW	4 4 2 2
 	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
-	print_xmm8u("B 1-8", &out_3_v16i_r_g_b_vectors[2]);
 };
 
 
