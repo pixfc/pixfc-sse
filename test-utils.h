@@ -67,10 +67,10 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void *buffer);
 int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void **buffer);
 
 /*
- * Write pixels from rgb_buffer in any RGB formats to A PPM file
- * rgb_buf_size is the size of the buffer in bytes.
+ * Write pixels from in to a file.
+ * If the buffer is in an RGB format, it will be saved in a PPM file. Otherwise the raw bytes are saved
  */
-void 		write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * rgb_buffer);
+void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer);
 
 
 #endif /* _TEST_UTILS_H_ */

@@ -160,13 +160,17 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 
 
 
-void 		write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void *rgb_buffer) {
+static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void *rgb_buffer) {
 	uint32_t 						rgb_buf_size = IMG_SIZE(fmt, width, height);
 	uint8_t *						buffer = rgb_buffer;
 	char	 						header[1024] = {0};
+	char							filename_fixed[128] = {0};
 	int32_t							fd;
 	uint32_t						stride = ((fmt == PixFcARGB) || (fmt == PixFcBGRA)) ? 4 * 16 : 3 * 16;
-	// above values multipled by 16 bc we handle 16 pixels in one iteration
+	// above values multiplied by 16 bc we handle 16 pixels in one iteration
+
+	snprintf(filename_fixed, sizeof(filename_fixed), "%.120s.ppm", filename);
+	dprint("Writing file '%s'...\n", filename_fixed);
 
 	if (rgb_buf_size % stride != 0) {
 		dprint("Error saving to PPM: the RGB buffer size not multiple of %u\n", stride);
@@ -182,7 +186,7 @@ void 		write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width, uin
 	}
 
 	// open file
-	fd = OPEN(filename, WR_CREATE_FLAG, RW_PERM);
+	fd = OPEN(filename_fixed, WR_CREATE_FLAG, RW_PERM);
 	if (fd == -1) {
 		dprint("Error opening the PPM file for writing\n");
 		return;
@@ -309,8 +313,50 @@ void 		write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width, uin
 	}
 
 	CLOSE(fd);
+
+	dprint("done\n");
 }
 
+static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
+	int32_t			fd;
+	uint32_t		count = 0;
+	uint8_t			*buffer = (uint8_t *) in;
+	uint32_t 		buf_size = IMG_SIZE(fmt, width, height);
+	char			filename_fixed[128] = {0};
+
+	// append the extension to the given file name
+	snprintf(filename_fixed, sizeof(filename_fixed), "%.120s.%s", filename, pixfmt_descriptions[fmt].name);
+
+	dprint("Writing file '%s'...\n", filename_fixed);
+
+	fd = OPEN(filename_fixed, WR_CREATE_FLAG, RW_PERM);
+	if (fd == -1) {
+		dprint("Error opening the file for writing\n");
+		return;
+	}
+
+	while (count < buf_size) {
+		int ret = WRITE(fd, (buffer + count), (buf_size - count));
+		if (ret < 0) {
+			dprint("Error writing PPM file contents\n");
+			break;
+		}
+		count += ret;
+	}
+
+	CLOSE(fd);
+
+	dprint("done\n");
+}
+
+void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer) {
+
+	// if the buffer is in an RGB format, save it as a PPM file
+	if ((fmt == PixFcARGB) || (fmt == PixFcBGRA) || (fmt == PixFcRGB24) || (fmt == PixFcBGR24))
+		write_anyrgb_buffer_to_ppm_file(fmt, width, height, filename, buffer);
+	else
+		write_raw_buffer_to_file(fmt, width, height, filename, buffer);
+}
 
 
 

@@ -145,7 +145,7 @@ int 		main(int argc, char **argv) {
 		strcat(out_filename, ".ppm");
 		while ( (r = strchr(out_filename, '/')) != NULL)
 			   r[0] = '-';
-		write_anyrgb_buffer_to_ppm_file(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, out_filename, out);
+		write_buffer_to_file(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, out_filename, out);
 		
 		// Add a blank line if the next conversion block uses different
 		// source or destinaton format

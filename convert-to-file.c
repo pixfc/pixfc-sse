@@ -41,7 +41,6 @@
 PixFcPixelFormat		src_fmt = PixFcYUYV;
 PixFcPixelFormat		dst_fmt = PixFcARGB;
 char *					src_filename = NULL;
-char *					dst_filename = "test.ppm";
 uint32_t				w = 1280;
 uint32_t				h = 1024;
 
@@ -96,7 +95,7 @@ static uint32_t		parse_args(int argc, char **argv){
 }
 
 int 		main(int argc, char **argv) {
-	struct PixFcSSE * 	pixfc;
+	struct PixFcSSE * 		pixfc;
 	struct timings			timings;
 	// In / out buffers
 	__m128i	*				in;
@@ -126,6 +125,9 @@ int 		main(int argc, char **argv) {
 			return 1;
 		}
 		fill_image(src_fmt, IMG_SIZE(src_fmt, w, h), in);
+
+		// save input buffer
+		write_buffer_to_file(src_fmt, w, h, "input", in);
 	}
 
 	// allocate out buffer
@@ -162,9 +164,8 @@ int 		main(int argc, char **argv) {
 			(double)((double)(timings.vcs + timings.ivcs))
 	);
 
-	dprint("Writing PPM file '%s'...\n", dst_filename);
-	write_anyrgb_buffer_to_ppm_file(dst_fmt, w, h, dst_filename, out);
-	dprint("Done\n");
+	// save output buffer
+	write_buffer_to_file(dst_fmt, w, h, "output", out);
 
 	// Free data structures
 	destroy_pixfc(pixfc);
