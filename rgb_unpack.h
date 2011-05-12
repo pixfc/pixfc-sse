@@ -190,15 +190,19 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 	
 	out_3_v16i_r_g_b_vectors[0] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_agb));// PAND		2	2
 	// 0 R1 	0 0		0 R2	0 0		0 R3 	0 0		0 R4 	0 0
+
+	out_3_v16i_r_g_b_vectors[0] = _mm_srli_epi16(out_3_v16i_r_g_b_vectors[0], 8);			// PSRLW	2   2
+	// R1  0	0 0		R2 0	0 0		R3 0	0 0		R4 0	0 0
 	
 	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_agb));				// PAND		2	2
 	// 0 R5 	0 0		0 R6	0 0		0 R7 	0 0		0 R8 	0 0
+
+	_M(scratch1) = _mm_srli_epi16(_M(scratch1), 8);											// PSRLW	2   2
+	// R5  0	0 0		R6 0	0 0		R7 0	0 0		R8 0	0 0
 	
 	out_3_v16i_r_g_b_vectors[0] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[0], _M(scratch1));//PACKSSDW	4 4 2 2
 	// 0 R1 	0 R2	0 R3 	0 R4 	0 R5	0 R6	0 R7	0 R8
-	
-	out_3_v16i_r_g_b_vectors[0] = _mm_srli_epi16(out_3_v16i_r_g_b_vectors[0], 8);			// PSRLW	2   2
-	// R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+
 
 
 	
@@ -218,21 +222,22 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 	// G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
 	
 	
-	
+
 	out_3_v16i_r_g_b_vectors[2] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arg));// PAND		2	2
 	// 0 0		0 B1	0 0		0 B2	0 0		0 B3	0 0		0 B4
-	
+	print_xmm8u("B1-4", &out_3_v16i_r_g_b_vectors[2]);
 	out_3_v16i_r_g_b_vectors[2] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[2], 24);			// PSRLD	2   2
 	// B1 0 	0 0		B2 0	0 0		B3 0	0 0		B4 0 	0 0
-	
+	print_xmm8u("B1-4 << 24", &out_3_v16i_r_g_b_vectors[2]);	
 	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arb));				// PAND		2	2
 	// 0 0		0 B5	0 0		0 B6	0 0		0 B7	0 0		0 B8
-	
+	print_xmm8u("B5-8", &scratch1);
 	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 24);										// PSRLD	2   2
 	// B5 0 	0 0		B6 0	0 0		B7 0	0 0		B8 0 	0 0
-	
+	print_xmm8u("B5-8 << 24", &scratch1);	
 	out_3_v16i_r_g_b_vectors[2] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[2], _M(scratch1));//PACKSSDW	4 4 2 2
 	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+	print_xmm8u("B 1-8", &out_3_v16i_r_g_b_vectors[2]);
 };
 
 

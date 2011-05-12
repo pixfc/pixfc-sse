@@ -71,6 +71,9 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_
 	out_2_yuyv_vectors[0] = _mm_unpacklo_epi8(_M(scratch1), _M(scratch2));				// PUNPCKLBW	2	2
 
 	out_2_yuyv_vectors[1] = _mm_unpackhi_epi8(_M(scratch1), _M(scratch2));				// PUNPCKHBW	2	2
+	
+	print_xmm8u("YUYV1-8", out_2_yuyv_vectors);
+	print_xmm8u("YUYV9-16", &out_2_yuyv_vectors[1]);
 }
 
 #endif /* YUV_PACK_H_ */

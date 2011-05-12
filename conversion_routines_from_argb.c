@@ -23,7 +23,7 @@
 #include "argb_conversion_common.h"
 
 #define CONVERT_TO_YUV(pack_fn, instr_set)\
-	CONVERT_RGB_TO_YUV(unpack_argb_to_0r_g_b_vectors_, convert_n_nnb_downsample_0r_g_b_vectors_to_y_uv_vectors_, pack_fn, instr_set)
+	CONVERT_RGB_TO_YUV(unpack_argb_to_r_g_b_vectors_, convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_, pack_fn, instr_set)
 
 
 void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {

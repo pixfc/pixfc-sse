@@ -29,9 +29,9 @@
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion// | PIXFC_AVG_UPSAMPLING_FLAG
-//#define PIXFC_FLAGS	PixFcFlag_SSE2Only
+#define PIXFC_FLAGS	PixFcFlag_SSE2Only
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE
-#define PIXFC_FLAGS	PixFcFlag_Default
+//#define PIXFC_FLAGS	PixFcFlag_Default
 
 
 
