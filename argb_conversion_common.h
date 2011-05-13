@@ -33,9 +33,13 @@
 	__m128i		convert_out[4];\
 	while(pixel_count > 0) {\
 		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
-		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		convert_r_g_b_vectors_to_y_vector_##instr_set(unpack_out, convert_out);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		convert_downsampled_r_g_b_vectors_to_uv_vector_##instr_set(unpack_out, &convert_out[1]);\
 		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
-		conv_fn_prefix##instr_set(unpack_out, &convert_out[2]);\
+		convert_r_g_b_vectors_to_y_vector_##instr_set(unpack_out, &convert_out[2]);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		convert_downsampled_r_g_b_vectors_to_uv_vector_##instr_set(unpack_out, &convert_out[3]);\
 		pack_fn(convert_out, yuv_out);\
 		rgb_in += 4;\
 		yuv_out += 2;\

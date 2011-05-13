@@ -257,10 +257,10 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
  * rVect
  * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
  *
- * gb1Vect
+ * gVect
  * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
  *
- * gb2Vect
+ * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
 EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_argb_vectors, __m128i* out_3_v16i_r_g_b_vectors)
@@ -303,5 +303,105 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_arg
 	out_3_v16i_r_g_b_vectors[2] = _mm_or_si128(out_3_v16i_r_g_b_vectors[2], _M(scratch1));	// POR		2   2
 	// B1  0	B2 0	B3  0	B4  0	B5  0	B6  0	B7  0	B8  0
 };
+
+
+
+
+
+
+/*
+ * Create 3 422 downsampled R, G, B vectors from 3 422 R, G, B vectors
+ * using nearest neighbour interpolation
+ *
+ * TOTAL LATENCY:	12
+ *
+ * INPUT:
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gb1Vect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * gb2Vect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * OUTPUT:
+ * 3 vectors of 8 short
+ * rVect
+ * R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
+ *
+ * gVect
+ * G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
+ *
+ * bVect
+ * B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0	
+ */
+EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i *out_3_v16i_nnb_422_r_g_b_vectors) {
+	M128I(scratch1, 0x0LL, 0x0LL);
+
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[0], 0xA0);			//	PSHUFHW		2	2
+	// R1 0 R2 0	R3 0 R4 0	R5 0 R5 0	R7 0 R7 0
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
+	
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[1], 0xA0);			//	PSHUFHW		2	2
+	// G1 0 G2 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	// G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
+	
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[2], 0xA0);			//	PSHUFHW		2	2
+	// B1 0 B2 0	B3 0 B4 0	B5 0 B5	0	B7 0 B7	0
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0
+}
+
+
+/*
+ * Create 3 422 downsampled R, G, B vectors from 3 422 R, G, B vectors
+ * using nearest neighbour interpolation
+ *
+ * TOTAL LATENCY:	3
+ *
+ * INPUT:
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gb1Vect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * gb2Vect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * OUTPUT:
+ * 3 vectors of 8 short
+ * rVect
+ * R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
+ *
+ * gVect
+ * G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
+ *
+ * bVect
+ * B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0	
+ */
+EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16i_r_g_b_vectors, __m128i *out_3_v16i_nnb_422_r_g_b_vectors)
+{
+	CONST_M128I(shuf_odd, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[0], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	// R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[1], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	// G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
+	
+	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[2], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0	
+}
+
+
 
 #endif /* RGB_UNPACK_H_ */
