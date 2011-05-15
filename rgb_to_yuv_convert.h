@@ -44,7 +44,8 @@
  *				All coeffs are left-shifted by 16 bits
  * 					[  19595	 38470		 7471	]
  *
- * Note: the Y calculation involves only positive values and coefficients and thus uses only unsigned math.
+ * Note: the Y calculation involves only positive values and coefficients and
+ * thus uses only unsigned math.
  *
  * INPUT:
  *
@@ -92,12 +93,8 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2(__m128i* in_3_v16i_r_g
 	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
 }
 
-EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2_ssse3(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {
-	convert_r_g_b_vectors_to_y_vector_sse2(in_3_v16i_r_g_b_vectors, out_1_v16i_y_vector);
-}
-
 /*
- * Convert 3 vectors of 8 short downsampled R, G, B into 1 vector of 8 short U-V
+ * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
  * using full range RGB to YCbCr conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
@@ -112,7 +109,7 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2_ssse3(__m128i* in_3_v1
  * 					[  32767	-27460		-5308	]
  *
  *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
- *			a 16-bit signed integer, they have been capped to the maximum value for this
+ *			16-bit signed integers, they have been capped to the maximum value for this
  *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
  *			approximation.
  *
@@ -135,7 +132,7 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2_ssse3(__m128i* in_3_v1
  *
  */
 
-EXTERN_INLINE void convert_downsampled_r_g_b_vectors_to_uv_vector_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
+EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
 	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
 	CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
 	CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
@@ -150,7 +147,7 @@ EXTERN_INLINE void convert_downsampled_r_g_b_vectors_to_uv_vector_sse2(__m128i* 
 	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	9 8 2 2
 	
 	// g UV 
-	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	9 8 2 2
+	_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	9 8 2 2
 	
 	// b UV 
 	_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	9 8 2 2
@@ -162,10 +159,6 @@ EXTERN_INLINE void convert_downsampled_r_g_b_vectors_to_uv_vector_sse2(__m128i* 
 	// U,V + 128
 	*out_1_v16i_uv_vector = _mm_add_epi16(*out_1_v16i_uv_vector, _M(add128));			//	PADDW	2	2
 	// U12 V12			U34 V34			U56 V56			U78 V78
-};
-
-EXTERN_INLINE void convert_downsampled_r_g_b_vectors_to_uv_vector_sse2_ssse3(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
-	convert_downsampled_r_g_b_vectors_to_uv_vector_sse2(in_3_v16i_r_g_b_vectors, out_1_v16i_uv_vector);
 };
 
 #endif /* RGB_TO_YUV_CONVERT_H_ */

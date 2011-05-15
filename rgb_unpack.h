@@ -310,7 +310,7 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_arg
 
 
 /*
- * Create 3 422 downsampled R, G, B vectors from 3 422 R, G, B vectors
+ * Create 3 422 downsampled R, G, B vectors from 3 R, G, B vectors
  * using nearest neighbour interpolation
  *
  * TOTAL LATENCY:	12

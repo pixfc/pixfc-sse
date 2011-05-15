@@ -25,7 +25,7 @@
 #include "rgb_to_yuv_convert.h"
 #include "yuv_pack.h"
 
-#define CONVERT_RGB_TO_YUV(unpack_fn_prefix, conv_fn_prefix, pack_fn, instr_set) \
+#define CONVERT_RGB_TO_YUV422(unpack_fn_prefix, downsample_fn_prefix, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -33,13 +33,13 @@
 	__m128i		convert_out[4];\
 	while(pixel_count > 0) {\
 		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
-		convert_r_g_b_vectors_to_y_vector_##instr_set(unpack_out, convert_out);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		convert_downsampled_r_g_b_vectors_to_uv_vector_##instr_set(unpack_out, &convert_out[1]);\
+		y_conv_fn(unpack_out, convert_out);\
+		downsample_fn_prefix##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[1]);\
 		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
-		convert_r_g_b_vectors_to_y_vector_##instr_set(unpack_out, &convert_out[2]);\
-		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
-		convert_downsampled_r_g_b_vectors_to_uv_vector_##instr_set(unpack_out, &convert_out[3]);\
+		y_conv_fn(unpack_out, &convert_out[2]);\
+		downsample_fn_prefix##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[3]);\
 		pack_fn(convert_out, yuv_out);\
 		rgb_in += 4;\
 		yuv_out += 2;\

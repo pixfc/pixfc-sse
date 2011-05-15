@@ -22,16 +22,23 @@
 #include "pixfc-sse.h"
 #include "argb_conversion_common.h"
 
-#define CONVERT_TO_YUV(pack_fn, instr_set)\
-	CONVERT_RGB_TO_YUV(unpack_argb_to_r_g_b_vectors_, convert_n_nnb_downsample_r_g_b_vectors_to_y_uv_vectors_, pack_fn, instr_set)
+#define CONVERT_TO_YUV422(pack_fn, instr_set)\
+			CONVERT_RGB_TO_YUV422(\
+						unpack_argb_to_r_g_b_vectors_,\
+						nnb_422_downsample_r_g_b_vectors_,\
+						convert_r_g_b_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+						pack_fn,\
+						instr_set\
+			)
 
 
 void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
+	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
 void		convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
+	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
 
