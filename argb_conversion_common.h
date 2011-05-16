@@ -21,11 +21,12 @@
 #ifndef ARGB_CONVERSION_COMMON_H_
 #define ARGB_CONVERSION_COMMON_H_
 
+#include "common.h"
 #include "rgb_unpack.h"
 #include "rgb_to_yuv_convert.h"
 #include "yuv_pack.h"
 
-#define CONVERT_RGB_TO_YUV422(unpack_fn_prefix, downsample_fn_prefix, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+#define CONVERT_RGB_TO_YUV422(unpack_fn_prefix, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -34,11 +35,45 @@
 	while(pixel_count > 0) {\
 		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
 		y_conv_fn(unpack_out, convert_out);\
-		downsample_fn_prefix##instr_set(unpack_out, unpack_out);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
 		uv_conv_fn(unpack_out, &convert_out[1]);\
 		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
 		y_conv_fn(unpack_out, &convert_out[2]);\
-		downsample_fn_prefix##instr_set(unpack_out, unpack_out);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[3]);\
+		pack_fn(convert_out, yuv_out);\
+		rgb_in += 4;\
+		yuv_out += 2;\
+		pixel_count -= 16;\
+	};\
+
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB_TO_YUV422(unpack_fn_prefix, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	__m128i*	rgb_in = (__m128i *) source_buffer;\
+	__m128i*	yuv_out = (__m128i *) dest_buffer;\
+	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i		previous[3];\
+	__m128i		unpack_out[3];\
+	__m128i		convert_out[4];\
+	unpack_fn_prefix##instr_set(rgb_in, previous);\
+	y_conv_fn(previous, convert_out);\
+	avg_422_downsample_first_r_g_b_vectors_##instr_set(previous, unpack_out);\
+	uv_conv_fn(unpack_out, &convert_out[1]);\
+	unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+	y_conv_fn(unpack_out, &convert_out[2]);\
+	avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+	uv_conv_fn(unpack_out, &convert_out[3]);\
+	pack_fn(convert_out, yuv_out);\
+	rgb_in += 4;\
+	yuv_out += 2;\
+	pixel_count -= 16;\
+	while(pixel_count > 0) {\
+		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
+		y_conv_fn(unpack_out, convert_out);\
+		avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[1]);\
+		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+		y_conv_fn(unpack_out, &convert_out[2]);\
+		avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
 		uv_conv_fn(unpack_out, &convert_out[3]);\
 		pack_fn(convert_out, yuv_out);\
 		rgb_in += 4;\
