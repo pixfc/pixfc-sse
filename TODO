@@ -1,6 +1,6 @@
 PixFC-SSE TODO list:
 
-* Investigate where to place prefecting instructions and check its 
+* Investigate where to place prefetching instructions and check its 
   platform dependency
 * Investigate if using static xmm intermediate buffers instead of 
   stack-allocated ones significantly improves conversion performance.
@@ -9,5 +9,9 @@ PixFC-SSE TODO list:
   - planar formats (YUV420, YVU420, YUV410, YVU410)
   - packed RGB, grey and bayer formats.
 * Create subdirectories to sort source files (lib, test, common, include, ...)
+* Add SSE4.1 version of routines which use blending (up/down sampling for 
+  instance)
+* Fix latency/throughput values displayed in inlines (use only values for 
+  i5 / xeon CPUs as they are the CPUs used for testing)
 * Some other things I cant think of.
 
