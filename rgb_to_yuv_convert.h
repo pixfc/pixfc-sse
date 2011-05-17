@@ -45,7 +45,7 @@
  *
  * INPUT:
  *
- * 3 vectors of 8 short:
+ * 4 vectors of 8 short:
  * agVect1
  * A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
  *
@@ -244,7 +244,7 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m12
  * using full range RGB to YCbCr conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			33 cycles
+ * Total latency: 			18 cycles
  * Num of pixel handled:	8
  *
  * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
@@ -261,15 +261,12 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m12
  *
  * INPUT:
  *
- * 3 vectors of 8 short:
- * rVect
- * R12 0	R12 0	R34 0	R34 0	R56 0	R56 0	R78 0	R78 0
+ * 2 vectors of 8 short:
+ * agVect
+ * A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
  *
- * gVect
- * G12 0	G12 0	G34 0	G34 0	G56 0	G56 0	G78 0	G78 0
- *
- * bVect
- * B12 0	B12 0	B34 0	B34 0	B56 0	B56 0	B78 0	B78 0
+ * rbVect
+ * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
  *
  * OUTPUT:
  *
@@ -278,33 +275,54 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m12
  *
  */
 
-EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_uv_vector) {
+EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m128i* in_2_v16i_ag_rb_vectors, __m128i* out_1_v16i_uv_vector) {
 	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
 	CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
 	CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
 	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
 	
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
+	CONST_M128I(agUCoeffs, 0xAB440000AB440000LL, 0xAB440000AB440000LL);
+	CONST_M128I(rbUCoeffs, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
+	CONST_M128I(agVCoeffs, 0x94BC000094BC0000LL, 0xAB440000AB440000LL);
+	CONST_M128I(rbVCoeffs, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
+
+	M128I(rbScratch, 0x0LL, 0x0LL);
+	M128I(agScratch, 0x0LL, 0x0LL);
+	M128I(uScratch, 0x0LL, 0x0LL);
+
 	
 	//
-	// r UV 
-	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	9 8 2 2
+	// U
+	// Multiply A & G values by 16-bit left-shifted U coeffs
+	_M(agScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[0], _M(agUCoeffs));		// PMADDWD		3	1
+	// Multiply R & B values by 16-bit left-shifted U coeffs
+	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbUCoeffs));		// PMADDWD		3	1
 	
-	// g UV 
-	_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	9 8 2 2
+	// Add both of the above and shift right by 16
+	*out_1_v16i_uv_vector = _mm_add_epi32(_M(agScratch), _M(rbScratch));			// PADDD		1	0.5
+	*out_1_v16i_uv_vector = _mm_srli_epi32 (*out_1_v16i_uv_vector, 16);				// PSRLD		1	1
+	// U12		0		U34		0		U56		0		U78		0
 	
-	// b UV 
-	_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	9 8 2 2
+	//
+	// V
+	// Multiply A & G values by 16-bit left-shifted V coeffs
+	_M(agScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[0], _M(agVCoeffs));		// PMADDWD		3	1
+	// Multiply R & B values by 16-bit left-shifted V coeffs
+	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbVCoeffs));		// PMADDWD		3	1
 	
-	// r UV + g UV + b UV
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(gScratch));					//	PADDW	2	2
-	*out_1_v16i_uv_vector = _mm_add_epi16(*out_1_v16i_uv_vector, _M(bScratch));			//	PADDW	2	2
+	// Add both of the above and shift right by 16 (here we shift left to place
+	// the bits in the right place for the following OR)
+	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
+	_M(agScratch) = _mm_slli_epi32 (_M(agScratch), 16);								// PSLLD		1	1
+	// 0		V12		0		V34		0		V56		0		V78
+
+	// combine U and V
+	*out_1_v16i_uv_vector = _mm_or_si128(*out_1_v16i_uv_vector, _M(agScratch));		// POR			1	0.33
+	// U12		V12		U34		V34		U56		V56		U78		V78
 	
 	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(*out_1_v16i_uv_vector, _M(add128));			//	PADDW	2	2
-	// U12 V12			U34 V34			U56 V56			U78 V78
+	*out_1_v16i_uv_vector = _mm_add_epi16(*out_1_v16i_uv_vector, _M(add128));		//PADDW			1	0.5
+	// U12 		V12		U34 	V34		U56 	V56		U78 	V78
 };
 
 
