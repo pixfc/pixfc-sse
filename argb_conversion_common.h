@@ -81,4 +81,42 @@
 		pixel_count -= 16;\
 	};\
 
+
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB_TO_YUV422(unpack_fn_prefix, y_conv_fn, uv_conv_fn, pack_fn, instr_set) \
+	__m128i*	rgb_in = (__m128i *) source_buffer;\
+	__m128i*	yuv_out = (__m128i *) dest_buffer;\
+	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i		previous[2];\
+	__m128i		unpack_out[4];\
+	__m128i		downsample_out[2];\
+	__m128i		convert_out[4];\
+	unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
+	y_conv_fn(unpack_out, convert_out);\
+	avg_422_downsample_first_ag_rb_vectors_##instr_set(unpack_out, downsample_out);\
+	uv_conv_fn(downsample_out, &convert_out[1]);\
+	previous[0] = _mm_load_si128(unpack_out[3]);\
+	previous[1] = _mm_load_si128(unpack_out[4]);\
+	unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+	y_conv_fn(unpack_out, &convert_out[2]);\
+	avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+	uv_conv_fn(unpack_out, &convert_out[3]);\
+	pack_fn(convert_out, yuv_out);\
+	rgb_in += 4;\
+	yuv_out += 2;\
+	pixel_count -= 16;\
+	while(pixel_count > 0) {\
+		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
+		y_conv_fn(unpack_out, convert_out);\
+		avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[1]);\
+		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+		y_conv_fn(unpack_out, &convert_out[2]);\
+		avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[3]);\
+		pack_fn(convert_out, yuv_out);\
+		rgb_in += 4;\
+		yuv_out += 2;\
+		pixel_count -= 16;\
+	};\
+
 #endif /* ARGB_CONVERSION_COMMON_H_ */

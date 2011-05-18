@@ -522,7 +522,7 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
  * using a simple 3-tap average filter. Also, copy the contents of the
  * current vectors in the previous ones
  *
- * TOTAL LATENCY:	63
+ * TOTAL LATENCY:	18
  *
  * INPUT:
  * 6 vectors of 8 short
@@ -557,98 +557,76 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
 
-
 	//
-	// construct a vector of R samples at t = {-1, 1, 3, 5}
+	// construct a vector of samples at t = {-1, 1, 3, 5}
 	// so we can then average it with R samples at t = {1, 3, 5, 7}.
 	// The result is then averaged with R samples at t = {0, 2, 4, 6}
 	// Since we are doing 422 downsampling, each sample at time t has
 	// a value equal to S-1 / 4 + S0 / 2 + S1 / 4
-	_M(scratch1) = _mm_srli_si128(in_2_v16i_previous_ag_rb_vectors[0], 12);			// PSRLDQ		1	0.5
-	// A8 0		R8 0	0 0		0 0		0 0		0 0		0 0		0 0
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[0], 0x8D);			//	PSHUFD		1	0.5
+	// A2 0		G2 0	A4 0	G4 0	A1 0	G1 0	A3 0	G3 0
 
-	_M(scratch2) = _mm_slli_si128(in_4_v16i_current_ag_rb_vectors[0], 4);			// PSLLDQ		1	0.5
-	// 0 0		0 0 	A1 0	G1 0	A2 0	G2 0	A3 0	G3 0
+	_M(scratch1) = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[2], 0x8D);									//	PSHUFD		1	0.5
+	// A6 0		G6 0	A8 0	G8 0	A5 0	G5 0	A7 0	G7 0
 
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch2));						// POR			1	0.33
-	// A8 0		R8 0	A1 0	G1 0	A2 0	G2 0	A3 0	G3 0
-	// (A8 & R8 belong to the previous pixel)
+	_M(scratch1) = _mm_unpacklo_epi64(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch1));						// PUNPCKLQDQ	1	0.5
+	// A2 0		G2 0	A4 0	G4 0	A6 0	G6 0	A8 0	G8 0
 
-	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_4_v16i_current_ag_rb_vectors[0]);	// PAVGW		1	0.5
-	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[0]);	// PAVGW		1	0.5
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_unpackhi_epi64(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch1));// PUNPCKHQDQ	1	0.5
+	// A1 0		G1 0	A3 0	G3 0	A5 0	G5 0	A7 0	G7 0
 
-	// save current vector to previous
-	in_3_v16i_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);//MOVDQA	1	0.33
+	_M(scratch2) = _mm_srli_si128(in_2_v16i_previous_ag_rb_vectors[0], 12);										// PSRLDQ		1	0.5
+	// A8 0		G8 0	0 0		0 0		0 0		0 0		0 0		0 0
 
-	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
-	// R1 0 xx 0	R3 0 xx 0	R5 0 R5 0	R7 0 R7 0
-	out_3_v16i_avg_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
-	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
+	// Save current to previous
+	in_2_v16i_previous_ag_rb_vectors[0] = _mm_load_si128(in_4_v16i_current_ag_rb_vectors[0]);					// MOVDQA		1	0.33
 
+	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
+	// 0 0		0 0 	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
 
-
-	//
-	// And repeat for G ...
-	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[1], 14);			// PSRLDQ		4	4
-	// G8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
-
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[1], 16);			// PSRLD		2	2
-	// G2 0		0 0		G4 0	0 0		G6 0	0 0		G8 0	0 0
-
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
-	// 0 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
-
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
-	// G8 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
-	// (G8 belongs to the previous pixel)
+	_M(scratch2) = _mm_or_si128(_M(scratch2), _M(scratch3));													// POR			1	0.33
+	// A8 0		G8 0	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
+	// (A8 & G8 belong to the previous pixel)
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch2) = _mm_avg_epu16(_M(scratch2), _M(scratch1));													// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[1]);	// PAVGW		2	2
-
-	// save current vector to previous
-	in_3_v16i_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);//MOVDQA	1	0.33
-
-	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
-	// G1 0 xx 0	G3 0 xx 0	G5 0 G5 0	G7 0 G7 0
-	out_3_v16i_avg_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
-	// G1 0 G1 0	G3 0 G3 0	G5 0 G5 0	G7 0 G7 0
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_avg_epu16(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch2));		// PAVGW		1	0.5
+	// A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
 
 
 
-	//
-	// And repeat for B
-	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[2], 14);			// PSRLDQ		4	4
-	// B8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[2], 16);			// PSRLD		2	2
-	// B2 0		0 0		B4 0	0 0		B6 0	0 0		B8 0	0 0
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[1], 0x8D);			//	PSHUFD		1	0.5
+	// R2 0		B2 0	R4 0	B4 0	R1 0	B1 0	R3 0	B3 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
-	// 0 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
+	_M(scratch1) = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[3], 0x8D);									//	PSHUFD		1	0.5
+	// R6 0		B6 0	R8 0	B8 0	R5 0	B5 0	R7 0	B7 0
 
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
-	// B8 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
-	// (B8 belongs to the previous pixel)
+	_M(scratch1) = _mm_unpacklo_epi64(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch1));						// PUNPCKLQDQ	1	0.5
+	// R2 0		B2 0	R4 0	B4 0	R6 0	B6 0	R8 0	B8 0
+
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_unpackhi_epi64(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch1));// PUNPCKHQDQ	1	0.5
+	// R1 0		B1 0	R3 0	B3 0	R5 0	B5 0	R7 0	B7 0
+
+	_M(scratch2) = _mm_srli_si128(in_2_v16i_previous_ag_rb_vectors[1], 12);										// PSRLDQ		1	0.5
+	// R8 0		B8 0	0 0		0 0		0 0		0 0		0 0		0 0
+
+	// Save current to previous
+	in_2_v16i_previous_ag_rb_vectors[1] = _mm_load_si128(in_4_v16i_current_ag_rb_vectors[1]);					// MOVDQA		1	0.33
+
+	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
+	// 0 0		0 0 	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0
+
+	_M(scratch2) = _mm_or_si128(_M(scratch2), _M(scratch3));													// POR			1	0.33
+	// R8 0		B8 0	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0
+	// (R8 & B8 belong to the previous pixel)
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch2) = _mm_avg_epu16(_M(scratch2), _M(scratch1));													// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[2]);	// PAVGW		2	2
-
-	// save current vector to previous
-	in_3_v16i_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);//MOVDQA	1	0.33
-
-	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
-	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
-	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
-	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_avg_epu16(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch2));		// PAVGW		1	0.5
+	// R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
 }
 
 
@@ -1182,4 +1160,104 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
+
+/*
+ * Create 3 422 downsampled R, G, B vectors from 4 AG, RB vectors
+ * using a simple 3-tap average filter. Since there is not previous pixel to average with,
+ * this method uses the first pixel as the previous one.
+ *
+ * TOTAL LATENCY:	18
+ *
+ * INPUT:
+ * 6 vectors of 8 short
+ *
+ * current agVect1
+ * A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
+ *
+ * current rbVect1
+ * R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0
+ *
+ * current agVect2
+ * A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0
+ *
+ * current rbVect3
+ * R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0
+ *
+ * OUTPUT:
+ * 2 vectors of 8 short
+ * agVect
+ * A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
+ *
+ * rbVect
+ * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
+ */
+EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+	CONST_M128I(keep_1st, 0x000000000000FFFFLL, 0x0000000000000000LL);
+	M128I(scratch1, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+
+	//
+	// construct a vector of samples at t = {1, 1, 3, 5}
+	// so we can then average it with R samples at t = {1, 3, 5, 7}.
+	// The result is then averaged with R samples at t = {0, 2, 4, 6}
+	// Since we are doing 422 downsampling, each sample at time t has
+	// a value equal to S-1 / 4 + S0 / 2 + S1 / 4
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[0], 0x8D);			//	PSHUFD		1	0.5
+	// A2 0		G2 0	A4 0	G4 0	A1 0	G1 0	A3 0	G3 0
+
+	_M(scratch1) = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[2], 0x8D);									//	PSHUFD		1	0.5
+	// A6 0		G6 0	A8 0	G8 0	A5 0	G5 0	A7 0	G7 0
+
+	_M(scratch1) = _mm_unpacklo_epi64(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch1));						// PUNPCKLQDQ	1	0.5
+	// A2 0		G2 0	A4 0	G4 0	A6 0	G6 0	A8 0	G8 0
+
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_unpackhi_epi64(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch1));// PUNPCKHQDQ	1	0.5
+	// A1 0		G1 0	A3 0	G3 0	A5 0	G5 0	A7 0	G7 0
+
+	_M(scratch2) = _mm_and_si128(in_4_v16i_current_ag_rb_vectors[0], _M(keep_1st));								// PAND			1	0.5
+	// A1 0		G1 0	0 0		0 0		0 0		0 0		0 0		0 0
+
+	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
+	// 0 0		0 0 	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
+
+	_M(scratch2) = _mm_or_si128(_M(scratch2), _M(scratch3));													// POR			1	0.33
+	// A1 0		G1 0	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
+
+	// Average S-1 and S1
+	_M(scratch2) = _mm_avg_epu16(_M(scratch2), _M(scratch1));													// PAVGW		1	0.5
+	// Average the previous result with S0
+	out_2_v16i_avg_422_ag_rb_vectors[0] = _mm_avg_epu16(out_2_v16i_avg_422_ag_rb_vectors[0], _M(scratch2));		// PAVGW		1	0.5
+	// A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
+
+
+
+
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[1], 0x8D);			//	PSHUFD		1	0.5
+	// R2 0		B2 0	R4 0	B4 0	R1 0	B1 0	R3 0	B3 0
+
+	_M(scratch1) = _mm_shuffle_epi32(in_4_v16i_current_ag_rb_vectors[3], 0x8D);									//	PSHUFD		1	0.5
+	// R6 0		B6 0	R8 0	B8 0	R5 0	B5 0	R7 0	B7 0
+
+	_M(scratch1) = _mm_unpacklo_epi64(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch1));						// PUNPCKLQDQ	1	0.5
+	// R2 0		B2 0	R4 0	B4 0	R6 0	B6 0	R8 0	B8 0
+
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_unpackhi_epi64(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch1));// PUNPCKHQDQ	1	0.5
+	// R1 0		B1 0	R3 0	B3 0	R5 0	B5 0	R7 0	B7 0
+
+	_M(scratch2) = _mm_and_si128(in_4_v16i_current_ag_rb_vectors[1], _M(keep_1st));								// PAND			1	0.5
+	// R1 0		B1 0	0 0		0 0		0 0		0 0		0 0		0 0
+
+	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
+	// 0 0		0 0 	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0
+
+	_M(scratch2) = _mm_or_si128(_M(scratch2), _M(scratch3));													// POR			1	0.33
+	// R1 0		B1 0	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0
+
+	// Average S-1 and S1
+	_M(scratch2) = _mm_avg_epu16(_M(scratch2), _M(scratch1));													// PAVGW		1	0.5
+	// Average the previous result with S0
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_avg_epu16(out_2_v16i_avg_422_ag_rb_vectors[1], _M(scratch2));		// PAVGW		1	0.5
+	// R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
+}
 #endif /* RGB_UNPACK_H_ */
