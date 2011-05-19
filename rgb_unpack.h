@@ -62,15 +62,14 @@ EXTERN_INLINE void unpack_argb_to_ag_rb_vectors_sse2(__m128i* in_2_v8i_argb_vect
 	out_4_v16i_ag_rb_vectors[0] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_rg));	// PAND		1	0.33
 	// A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
 
-	out_4_v16i_ag_rb_vectors[1] = _mm_srli_epi16(in_2_v8i_argb_vectors[0], 16);				//  PSRLW	1	1
+	out_4_v16i_ag_rb_vectors[1] = _mm_srli_epi16(in_2_v8i_argb_vectors[0], 16);				// PSRLW	1	1
 	// R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0
 
 	out_4_v16i_ag_rb_vectors[2] = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_rg));	// PAND		1	0.33
 	// A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0
 
-	out_4_v16i_ag_rb_vectors[3] = _mm_srli_epi16(in_2_v8i_argb_vectors[1], 16);				//  PSRLW	1	1
+	out_4_v16i_ag_rb_vectors[3] = _mm_srli_epi16(in_2_v8i_argb_vectors[1], 16);				// PSRLW	1	1
 	// R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0
-
 };
 
 
@@ -107,22 +106,22 @@ EXTERN_INLINE void unpack_argb_to_r_gb_vectors_sse2(__m128i* in_2_v8i_argb_vecto
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 
-	_M(scratch1) = _mm_srli_epi32(in_2_v8i_argb_vectors[0], 8);								// PSRLD	2	2
+	_M(scratch1) = _mm_srli_epi32(in_2_v8i_argb_vectors[0], 8);								// PSRLD	1	1
 	// R1 G1	B1 0	R2 G2	B2 0	R3 G3	B3 0	R4 G4	B4 0
 
-	out_3_v16i_r_gb_vectors[0] = _mm_and_si128(_M(scratch1), _M(mask_off_gb));				// PAND		2   2
+	out_3_v16i_r_gb_vectors[0] = _mm_and_si128(_M(scratch1), _M(mask_off_gb));				// PAND		1	0.33
 	// R1 0		0 0		R2 0	0 0		R3 0	0 0		R4 0	0 0
 
-	out_3_v16i_r_gb_vectors[1] = _mm_and_si128(_M(scratch1), _M(mask_off_rb));				// PAND		2   2
+	out_3_v16i_r_gb_vectors[1] = _mm_and_si128(_M(scratch1), _M(mask_off_rb));				// PAND		1	0.33
 	// 0 G1 	0 0		0 G2	0 0		0 G3	0 0		0 G4 	0 0
 
-	out_3_v16i_r_gb_vectors[1] = _mm_srli_epi32(out_3_v16i_r_gb_vectors[1], 8);				// PSRLD	2	2
+	out_3_v16i_r_gb_vectors[1] = _mm_srli_epi32(out_3_v16i_r_gb_vectors[1], 8);				// PSRLD	1	1
 	// G1 0 	0 0		G2 0	0 0		G3 0	0 0		G4 0 	0 0
 
-	_M(scratch1) = _mm_and_si128(_M(scratch1), _M(mask_off_rg));							// PAND		2   2
+	_M(scratch1) = _mm_and_si128(_M(scratch1), _M(mask_off_rg));							// PAND		1	0.33
 	// 0 0		B1 0	0 0		B2 0	0 0		B3 0	0 0		B4 0
 
-	out_3_v16i_r_gb_vectors[1] = _mm_or_si128(out_3_v16i_r_gb_vectors[1], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_gb_vectors[1] = _mm_or_si128(out_3_v16i_r_gb_vectors[1], _M(scratch1));	// POR		1	0.33
 	// G1 0		B1 0	G2 0	B2 0	G3 0	B3 0	G4 0	B4 0
 
 	_M(scratch1) = _mm_srli_epi32(in_2_v8i_argb_vectors[1], 8);								// PSRLD	2	2
@@ -579,7 +578,7 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
 	// A8 0		G8 0	0 0		0 0		0 0		0 0		0 0		0 0
 
 	// Save current to previous
-	in_2_v16i_previous_ag_rb_vectors[0] = _mm_load_si128(in_4_v16i_current_ag_rb_vectors[0]);					// MOVDQA		1	0.33
+	in_2_v16i_previous_ag_rb_vectors[0] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[0]);					// MOVDQA		1	0.33
 
 	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
 	// 0 0		0 0 	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
@@ -613,7 +612,7 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
 	// R8 0		B8 0	0 0		0 0		0 0		0 0		0 0		0 0
 
 	// Save current to previous
-	in_2_v16i_previous_ag_rb_vectors[1] = _mm_load_si128(in_4_v16i_current_ag_rb_vectors[1]);					// MOVDQA		1	0.33
+	in_2_v16i_previous_ag_rb_vectors[1] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[1]);					// MOVDQA		1	0.33
 
 	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
 	// 0 0		0 0 	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0

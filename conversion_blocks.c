@@ -57,6 +57,14 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"ARGB to YUYV - SSE2 - fast downsampling",
 	},
 	{
+		convert2_argb_to_yuyv_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2)- SSE2 - fast downsampling",
+	},
+	{
 		downsample_n_convert_argb_to_yuyv_sse2_ssse3,
 		PixFcARGB, PixFcYUYV,
 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
@@ -74,6 +82,16 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"ARGB to YUYV - SSE2",
 		
 	},
+	{
+		downsample_n_convert2_argb_to_yuyv_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2)- SSE2",
+
+	},
+
 
 	/*
 	 *	S O U R C E   F O R M A T :
