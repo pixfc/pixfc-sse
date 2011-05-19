@@ -35,7 +35,7 @@
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			53 cycles
+ * Total latency: 			22 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1		0		1.4		]	( Y )
@@ -77,13 +77,13 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
 	M128I(uvBCoeffs, 0x000001C4000001C4LL, 0x000001C4000001C4LL);
 	
 	// U - 128	V - 128
-	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		2	2
+	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
-	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*358	U34*0 + V34*358	U56*0 + V56*358	U78*0 + V78*358
 	// C12				C34				C56				C78		(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
@@ -93,16 +93,16 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
 	//					358*-128= 2's(45824) (45824 fits in 16 bits)
 	
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(uvRCoeffs) = _mm_srai_epi32(_M(uvRCoeffs), 8);								// PSRAD		2	2
+	_M(uvRCoeffs) = _mm_srai_epi32(_M(uvRCoeffs), 8);								// PSRAD		1	1
 	// C12 0 0 0		C34 0 0 0		C56 0 0 0		C78 0 0 0
 	
-	_M(uvRCoeffs) = _mm_shufflehi_epi16(_M(uvRCoeffs), 0xA0);						// PSHUFHW		2	2
+	_M(uvRCoeffs) = _mm_shufflehi_epi16(_M(uvRCoeffs), 0xA0);						// PSHUFHW		1	0.5
 	// C12 0 0 0		C34 0 0 0		C56 0 C56 0		C78 0 C78 0
 	
-	_M(uvRCoeffs) = _mm_shufflelo_epi16(_M(uvRCoeffs), 0xA0);						// PSHUFLW		2	2
+	_M(uvRCoeffs) = _mm_shufflelo_epi16(_M(uvRCoeffs), 0xA0);						// PSHUFLW		1	0.5
 	// C12 0 C12 0		C34 0 C34 0		C56 0 C56 0		C78 0 C78 0
 	
-	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvRCoeffs)); // PADDW	2	2
+	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvRCoeffs)); // PADDW	1	0.5
 	//
 	
 	
@@ -110,42 +110,42 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	// C12					C34					C56					C78
 	
 	// shift right by 8
-	_M(uvGCoeffs) = _mm_srai_epi32(_M(uvGCoeffs), 8);								// PSRAD		2	2
+	_M(uvGCoeffs) = _mm_srai_epi32(_M(uvGCoeffs), 8);								// PSRAD		1	1
 	// C12 0 0 0		C34 0 0 0		C56 0 0 0		C78 0 0 0
 	
-	_M(uvGCoeffs) = _mm_shufflehi_epi16(_M(uvGCoeffs), 0xA0);						// PSHUFHW		2	2
+	_M(uvGCoeffs) = _mm_shufflehi_epi16(_M(uvGCoeffs), 0xA0);						// PSHUFHW		1	0.5
 	// C12 0 0 0		C34 0 0 0		C56 0 C56 0		C78 0 C78 0
 	
-	_M(uvGCoeffs) = _mm_shufflelo_epi16(_M(uvGCoeffs), 0xA0);						// PSHUFLW		2	2
+	_M(uvGCoeffs) = _mm_shufflelo_epi16(_M(uvGCoeffs), 0xA0);						// PSHUFLW		1	0.5
 	// C12 0 C12 0		C34 0 C34 0		C56 0 C56 0		C78 0 C78 0
 	
-	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvGCoeffs));// PADDW	2	2
+	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvGCoeffs));// PADDW	1	0.5
 	//
 	
 	//
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	// C12					C34					C56					C78
 	
 	// shift right by 8
-	_M(uvBCoeffs) = _mm_srai_epi32(_M(uvBCoeffs), 8);								// PSRAD		2	2
+	_M(uvBCoeffs) = _mm_srai_epi32(_M(uvBCoeffs), 8);								// PSRAD		1	1
 	// C12	0		C34	 0		C56	 0		C78	 0
 	
-	_M(uvBCoeffs) = _mm_shufflehi_epi16(_M(uvBCoeffs), 0xA0);						// PSHUFHW		2	2
+	_M(uvBCoeffs) = _mm_shufflehi_epi16(_M(uvBCoeffs), 0xA0);						// PSHUFHW		1	0.5
 	// C12 0 0 0		C34 0 0 0		C56 0 C56 0		C78 0 C78 0
 	
-	_M(uvBCoeffs) = _mm_shufflelo_epi16(_M(uvBCoeffs), 0xA0);						// PSHUFLW		2	2
+	_M(uvBCoeffs) = _mm_shufflelo_epi16(_M(uvBCoeffs), 0xA0);						// PSHUFLW		1	0.5
 	// C12 0 C12 0		C34 0 C12 0		C56 0 C56 0		C78 0 C78 0
 	
-	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0],  _M(uvBCoeffs));// PADDW	2	2
+	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0],  _M(uvBCoeffs));// PADDW	1	0.5
 	//
 	
 };
@@ -157,7 +157,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
  * http://www.equasys.de/colorconversion.html
  *
  *
- * Total latency: 			97 cycles
+ * Total latency: 			38 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1		0		1.4		]	( Y )
@@ -207,16 +207,16 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_3_v16i_y
 	
 	// U - 128	V - 128
 	in_3_v16i_y_uvOdd_uyEven_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(sub128));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	in_3_v16i_y_uvOdd_uyEven_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(sub128));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
 	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvRCoeffs));
-	// U1*0 + V1*358	U3*0 + V3*358	U5*0 + V5*358	U7*0 + V7*358				// PMADDWD		9 8 2 2
+	// U1*0 + V1*358	U3*0 + V3*358	U5*0 + V5*358	U7*0 + V7*358				// PMADDWD		3	1
 	// C1		C3		C5		C7			(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
 	//					max value with 8bit left shift of coeffs:
@@ -225,44 +225,44 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_3_v16i_y
 	//					452*-128= 2's(57856) (57856 fits in 16 bit wide)
 	
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8), _M(zeroHiWord));		// PSRAD		2	2
-	// C1 0			C3  0		C5 0		C7 0									// PAND			2	2
+	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8), _M(zeroHiWord));		// PSRAD		1	1
+	// C1 0			C3  0		C5 0		C7 0									// PAND			1	0.33
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvRCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8 2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		2	2
-	// 0 C2			0 C4		0 C6		0 C8									// PAND			2	2
+	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		1	1
+	// 0 C2			0 C4		0 C6		0 C8									// PAND			1	0.33
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	//
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvGCoeffs));	// PMADDWD		9 8 2 2
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvGCoeffs));	// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	// C12		C34		C56		C78
 	
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8),  _M(zeroHiWord));		// PSRAD		2	2
-	// C1 0			C3  0		C5 0		C7 0									// PAND			2	2
+	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8),  _M(zeroHiWord));		// PSRAD		1	0.5
+	// C1 0			C3  0		C5 0		C7 0									// PAND			1	0.33
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvGCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8 2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		2	2
-	// 0 C2			0 C4		0 C6		0 C8									// PAND			2	2
+	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		1	1
+	// 0 C2			0 C4		0 C6		0 C8									// PAND			1	0.33
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	
 	
@@ -270,25 +270,25 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_3_v16i_y
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvBCoeffs));	// PMADDWD		9 8 2 2
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvBCoeffs));	// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	// 0 C12		0 C34		0 C56		0 C78
 	
 	// shift right by 8 to account for left shift by 8 of coefficients
-	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8),  _M(zeroHiWord));		// PSRAD		2	2
-	// C1 0			C3  0		C5 0		C7 0									// PAND			2	2
+	_M(uvOdd) = _mm_and_si128(_mm_srai_epi32(_M(uvOdd), 8),  _M(zeroHiWord));		// PSRAD		1	1
+	// C1 0			C3  0		C5 0		C7 0									// PAND			1	0.33
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvBCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8 2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		2	2
-	// 0 C2			0 C4		0 C6		0 C8									// PAND			2	2
+	_M(uvEven) = _mm_and_si128(_mm_slli_epi32(_M(uvEven), 8),  _M(zeroLoWord));		// PSLLD		1	1
+	// 0 C2			0 C4		0 C6		0 C8									// PAND			1	0.33
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 };
 
 
@@ -300,7 +300,7 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_3_v16i_y
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			38 cycles
+ * Total latency: 			16 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1		0		1.4		]	( Y )
@@ -343,13 +343,13 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
 	M128I(uvBCoeffs, 0x000001C4000001C4LL, 0x000001C4000001C4LL);
 	
 	// U - 128	V - 128
-	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		2	2
+	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
-	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*358	U34*0 + V34*358	U56*0 + V56*358	U78*0 + V78*358
 	// C12		C34		C56		C78			(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
@@ -361,10 +361,10 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
 	// Shuffle bytes:
 	// shift right by 8 to account for left shift by 8 of coefficients,
 	// keep next signed byte and duplicate in the hi word
-	_M(uvRCoeffs) = _mm_shuffle_epi8 (_M(uvRCoeffs), _M(shuffMask));				// PSHUFB		1 1 3   0.5 1 2
+	_M(uvRCoeffs) = _mm_shuffle_epi8 (_M(uvRCoeffs), _M(shuffMask));				// PSHUFB		1	0.5
 	// C12 C12		C34 C34 	C56 C56		C78 C78
 	
-	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvRCoeffs)); // PADDW	2	2
+	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvRCoeffs)); // PADDW	1	0.5
 	//
 	
 	
@@ -372,28 +372,28 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	// C12		C34		C56		C78
 	
-	_M(uvGCoeffs) = _mm_shuffle_epi8 (_M(uvGCoeffs), _M(shuffMask));				// PSHUFB		1 1 3   0.5 1 2
+	_M(uvGCoeffs) = _mm_shuffle_epi8 (_M(uvGCoeffs), _M(shuffMask));				// PSHUFB		1	0.5
 	// C12 C12		C34 C34 	C56 C56		C78 C78
 	
-	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvGCoeffs));// PADDW	2	2
+	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvGCoeffs));// PADDW	1	0.5
 	//
 	
 	//
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		9 8 2 2
+	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	// 0 C12		0 C34		0 C56		0 C78
 	
-	_M(uvBCoeffs) = _mm_shuffle_epi8 (_M(uvBCoeffs), _M(shuffMask));				// PSHUFB		1 1 3   0.5 1 2
+	_M(uvBCoeffs) = _mm_shuffle_epi8 (_M(uvBCoeffs), _M(shuffMask));				// PSHUFB		1	0.5
 	// C12 C12		C34 C34 	C56 C56		C78 C78
 	
-	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvBCoeffs));// PADDW	2	2
+	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_2_v16i_y_uv_vectors[0], _M(uvBCoeffs));// PADDW	1	0.5
 	//
 };
 
@@ -403,7 +403,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
  * http://www.equasys.de/colorconversion.html
  *
  *
- * Total latency: 			76 cycles
+ * Total latency: 			32 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1		0		1.4		]	( Y )
@@ -453,16 +453,16 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(__m128i* in_3_
 	
 	// U - 128	V - 128
 	in_3_v16i_y_uvOdd_uyEven_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(sub128));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	in_3_v16i_y_uvOdd_uyEven_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(sub128));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
 	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvRCoeffs));
-	// U1*0 + V1*358	U3*0 + V3*358	U5*0 + V5*358	U7*0 + V7*358				// PMADDWD		9 8		2 2
+	// U1*0 + V1*358	U3*0 + V3*358	U5*0 + V5*358	U7*0 + V7*358				// PMADDWD		3	1
 	// C1		C3		C5		C7			(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
 	//					max value with 8bit left shift of coeffs:
@@ -471,43 +471,43 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(__m128i* in_3_
 	//					452*-128= 2's(57856) (57856 fits in 16 bit wide)
 	
 	// shuffle bytes: shift right by 8 to account for left shift by 8 of coefficients, keep next signed byte and zero rest of dword
-	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1	0.5
 	// C1 0			C3  0		C5 0		C7 0
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvRCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8		2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1	0.5
 	// 0 C2			0 C4		0 C6		0 C8
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	//
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvGCoeffs));	// PMADDWD		9 8		2 2
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvGCoeffs));	// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	
 	// shuffle bytes: shift right by 8 to account for left shift by 8 of coefficients, keep next signed byte and zero rest of dword
-	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1	0.5
 	// C1 0			C3  0		C5 0		C7 0
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvGCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8		2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1	0.5
 	// 0 C2			0 C4		0 C6		0 C8
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 	
 	
 	
@@ -515,24 +515,24 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(__m128i* in_3_
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvBCoeffs));	// PMADDWD		9 8 2 2
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[1], _M(uvBCoeffs));	// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	
 	// shuffle bytes: shift right by 8 to account for left shift by 8 of coefficients, keep next signed byte and zero rest of dword
-	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));							// PSHUFB		1	0.5
 	// C1 0			C3  0		C5 0		C7 0
 	
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[2], _M(uvBCoeffs));
-	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		9 8 2 2
+	// U2*0 + V2*358	U4*0 + V4*358	U6*0 + V6*358	U8*0 + V8*358				// PMADDWD		3	1
 	
-	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1 1 3   0.5 1 2
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));							// PSHUFB		1	0.5
 	// 0 C2			0 C4		0 C6		0 C8
 	
-	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			2	2
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));								// POR			1	0.33
 	// C1 C2		C3 C4		C5 C6		C7 C8
 	
 	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uyEven_vectors[0], _M(uvEven));
-	// 																					PADDW		2	2
+	// 																					PADDW		1	0.5
 };
 
 

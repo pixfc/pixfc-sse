@@ -77,7 +77,7 @@ EXTERN_INLINE void unpack_argb_to_ag_rb_vectors_sse2(__m128i* in_2_v8i_argb_vect
 /*
  * Convert 2 vectors of 16 char ARGB to 3 vectors of 8 short:
  *
- * Total latency:				28
+ * Total latency:				13
  * Number of pixels handled:	8
  *
  * INPUT
@@ -124,25 +124,25 @@ EXTERN_INLINE void unpack_argb_to_r_gb_vectors_sse2(__m128i* in_2_v8i_argb_vecto
 	out_3_v16i_r_gb_vectors[1] = _mm_or_si128(out_3_v16i_r_gb_vectors[1], _M(scratch1));	// POR		1	0.33
 	// G1 0		B1 0	G2 0	B2 0	G3 0	B3 0	G4 0	B4 0
 
-	_M(scratch1) = _mm_srli_epi32(in_2_v8i_argb_vectors[1], 8);								// PSRLD	2	2
+	_M(scratch1) = _mm_srli_epi32(in_2_v8i_argb_vectors[1], 8);								// PSRLD	1	1
 	// R5 G5	B5 0	R6 G6	B6 0	R7 G7	B7 0	R8 G8	B8 0
 
-	_M(scratch2) = _mm_and_si128(_M(scratch1), _M(mask_off_gb));							// PAND		2   2
+	_M(scratch2) = _mm_and_si128(_M(scratch1), _M(mask_off_gb));							// PAND		1	0.33
 	// R5 0		0 0		R6 0	0 0		R7 0	0 0		R8 0	0 0
 
-	out_3_v16i_r_gb_vectors[0] = _mm_packs_epi32(out_3_v16i_r_gb_vectors[0], _M(scratch2));//  PACKSSDW	4 4 2 2
+	out_3_v16i_r_gb_vectors[0] = _mm_packs_epi32(out_3_v16i_r_gb_vectors[0], _M(scratch2));//  PACKSSDW	1	0.5
 	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
 
-	out_3_v16i_r_gb_vectors[2] = _mm_and_si128(_M(scratch1), _M(mask_off_rb));				// PAND		2   2
+	out_3_v16i_r_gb_vectors[2] = _mm_and_si128(_M(scratch1), _M(mask_off_rb));				// PAND		1	0.33
 	// 0 G5 	0 0		0 G6	0 0		0 G7	0 0		0 G8 	0 0
 
-	out_3_v16i_r_gb_vectors[2] = _mm_srli_epi32(out_3_v16i_r_gb_vectors[2], 8);				// PSRLD	2	2
+	out_3_v16i_r_gb_vectors[2] = _mm_srli_epi32(out_3_v16i_r_gb_vectors[2], 8);				// PSRLD	1	1
 	// G5 0 	0 0		G6 0	0 0		G7 0	0 0		G8 0 	0 0
 
-	_M(scratch1) = _mm_and_si128(_M(scratch1), _M(mask_off_rg));							// PAND 	2   2
+	_M(scratch1) = _mm_and_si128(_M(scratch1), _M(mask_off_rg));							// PAND 	1	0.33
 	// 0 0		B5 0	0 0		B6 0	0 0		B7 0	0 0		B8 0
 
-	out_3_v16i_r_gb_vectors[2] = _mm_or_si128(out_3_v16i_r_gb_vectors[2], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_gb_vectors[2] = _mm_or_si128(out_3_v16i_r_gb_vectors[2], _M(scratch1));	// POR		1	0.33
 	// G5 0		B5 0	G6 0	B6 0	G7 0	B7 0	G8 0	B8 0
 };
 
@@ -179,19 +179,19 @@ EXTERN_INLINE void unpack_argb_to_r_gb_vectors_sse2_ssse3(__m128i* in_2_v8i_argb
 
 	M128I(scratch1, 0x0LL, 0x0LL);
 
-	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_r1));					// PSHUFB	1 1 3 0 1 2
+	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_r1));					// PSHUFB	1	0.5
 	// R1 0		R2 0	R3 0	R4 0	0 0		0 0		0 0		0 0
 
-	out_3_v16i_r_gb_vectors[0] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_r2));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_gb_vectors[0] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_r2));	// PSHUFB	1	0.5
 	// 0 0		0 0		0 0		0 0		R5 0	R6 0	R7 0	R8 0
 
-	out_3_v16i_r_gb_vectors[0] = _mm_or_si128(out_3_v16i_r_gb_vectors[0], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_gb_vectors[0] = _mm_or_si128(out_3_v16i_r_gb_vectors[0], _M(scratch1));	// POR		1	0.33
 	// R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
 
-	out_3_v16i_r_gb_vectors[1] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_gb));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_gb_vectors[1] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_gb));	// PSHUFB	1	0.5
 	// G1 0		B1 0	G2 0	B2 0	G3 0	B3 0	G4 0	B4 0
 
-	out_3_v16i_r_gb_vectors[2] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_gb));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_gb_vectors[2] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_gb));	// PSHUFB	1	0.5
 	// G5 0		B5 0	G6 0	B6 0	G7 0	B7 0	G8 0	B8 0
 };
 
@@ -206,7 +206,7 @@ EXTERN_INLINE void unpack_argb_to_r_gb_vectors_sse2_ssse3(__m128i* in_2_v8i_argb
 /*
  * Convert 2 vectors of 16 char ARGB to 3 vectors of 8 short:
  *
- * Total latency:				36
+ * Total latency:				15
  * Number of pixels handled:	8
  *
  * INPUT
@@ -234,53 +234,53 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 	CONST_M128I(mask_off_arg, 0xFF000000FF000000LL, 0xFF000000FF000000LL);
 	M128I(scratch1, 0x0LL, 0x0LL);
 	
-	out_3_v16i_r_g_b_vectors[0] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_agb));// PAND		2	2
+	out_3_v16i_r_g_b_vectors[0] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_agb));// PAND		1	0.33
 	// 0 R1 	0 0		0 R2	0 0		0 R3 	0 0		0 R4 	0 0
 
-	out_3_v16i_r_g_b_vectors[0] = _mm_srli_epi16(out_3_v16i_r_g_b_vectors[0], 8);			// PSRLW	2   2
+	out_3_v16i_r_g_b_vectors[0] = _mm_srli_epi16(out_3_v16i_r_g_b_vectors[0], 8);			// PSRLW	1	1
 	// R1  0	0 0		R2 0	0 0		R3 0	0 0		R4 0	0 0
 	
-	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_agb));				// PAND		2	2
+	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_agb));				// PAND		1	0.33
 	// 0 R5 	0 0		0 R6	0 0		0 R7 	0 0		0 R8 	0 0
 
-	_M(scratch1) = _mm_srli_epi16(_M(scratch1), 8);											// PSRLW	2   2
+	_M(scratch1) = _mm_srli_epi16(_M(scratch1), 8);											// PSRLW	1	1
 	// R5  0	0 0		R6 0	0 0		R7 0	0 0		R8 0	0 0
 	
-	out_3_v16i_r_g_b_vectors[0] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[0], _M(scratch1));//PACKSSDW	4 4 2 2
+	out_3_v16i_r_g_b_vectors[0] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[0], _M(scratch1));//PACKSSDW	1	0.5
 	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
 
 
 
-	out_3_v16i_r_g_b_vectors[1] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arb));// PAND		2	2
+	out_3_v16i_r_g_b_vectors[1] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arb));// PAND		1	0.33
 	// 0 0		G1 0	0 0		G2 0	0 0		G3 0	0 0		G4 0
 	
-	out_3_v16i_r_g_b_vectors[1] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[1], 16);			// PSRLD	2   2
+	out_3_v16i_r_g_b_vectors[1] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[1], 16);			// PSRLD	1	1
 	// G1 0 	0 0		G2 0	0 0		G3 0	0 0		G4 0 	0 0
 	
-	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arb));				// PAND		2	2
+	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arb));				// PAND		1	0.33
 	// 0 0		G5 0	0 0		G6 0	0 0		G7 0	0 0		G8 0
 	
-	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 16);										// PSRLD	2   2
+	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 16);										// PSRLD	1	1
 	// G5 0 	0 0		G6 0	0 0		G7 0	0 0		G8 0 	0 0
 	
-	out_3_v16i_r_g_b_vectors[1] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[1], _M(scratch1));//PACKSSDW	4 4 2 2
+	out_3_v16i_r_g_b_vectors[1] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[1], _M(scratch1));//PACKSSDW	1	0.5
 	// G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
 	
 	
 
-	out_3_v16i_r_g_b_vectors[2] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arg));// PAND		2	2
+	out_3_v16i_r_g_b_vectors[2] = _mm_and_si128(in_2_v8i_argb_vectors[0], _M(mask_off_arg));// PAND		1	0.33
 	// 0 0		0 B1	0 0		0 B2	0 0		0 B3	0 0		0 B4
 
-	out_3_v16i_r_g_b_vectors[2] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[2], 24);			// PSRLD	2   2
+	out_3_v16i_r_g_b_vectors[2] = _mm_srli_epi32(out_3_v16i_r_g_b_vectors[2], 24);			// PSRLD	1	1
 	// B1 0 	0 0		B2 0	0 0		B3 0	0 0		B4 0 	0 0
 
-	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arg));				// PAND		2	2
+	_M(scratch1) = _mm_and_si128(in_2_v8i_argb_vectors[1], _M(mask_off_arg));				// PAND		1	0.33
 	// 0 0		0 B5	0 0		0 B6	0 0		0 B7	0 0		0 B8
 
-	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 24);										// PSRLD	2   2
+	_M(scratch1) = _mm_srli_epi32(_M(scratch1), 24);										// PSRLD	1	1
 	// B5 0 	0 0		B6 0	0 0		B7 0	0 0		B8 0 	0 0
 
-	out_3_v16i_r_g_b_vectors[2] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[2], _M(scratch1));//PACKSSDW	4 4 2 2
+	out_3_v16i_r_g_b_vectors[2] = _mm_packs_epi32(out_3_v16i_r_g_b_vectors[2], _M(scratch1));//PACKSSDW	1	0.5
 	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
 };
 
@@ -288,7 +288,7 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2(__m128i* in_2_v8i_argb_vect
 /*
  * Convert 2 vectors of 16 char ARGB to 3 vectors of 8 short:
  *
- * Total latency:				12
+ * Total latency:				9
  * Number of pixels handled:	8
  *
  * INPUT
@@ -320,33 +320,33 @@ EXTERN_INLINE void unpack_argb_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_arg
 	
 	M128I(scratch1, 0x0LL, 0x0LL);
 	
-	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_r1));					// PSHUFB	1 1 3 0 1 2
+	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_r1));					// PSHUFB	1	0.5
 	// R1 0		R2 0	R3 0	R4 0	0 0		0 0		0 0		0 0
 	
-	out_3_v16i_r_g_b_vectors[0] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_r2));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_g_b_vectors[0] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_r2));	// PSHUFB	1	0.5
 	// 0 0		0 0		0 0		0 0		R5 0	R6 0	R7 0	R8 0
 	
-	out_3_v16i_r_g_b_vectors[0] = _mm_or_si128(out_3_v16i_r_g_b_vectors[0], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_g_b_vectors[0] = _mm_or_si128(out_3_v16i_r_g_b_vectors[0], _M(scratch1));	// POR		1	0.33
 	// R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
 
 	
-	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_g1));					// PSHUFB	1 1 3 0 1 2
+	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_g1));					// PSHUFB	1	0.5
 	// G1 0		G2 0	G3 0	G4 0	0 0		0 0		0 0		0 0
 	
-	out_3_v16i_r_g_b_vectors[1] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_g2));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_g_b_vectors[1] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_g2));	// PSHUFB	1	0.5
 	// 0 0		0 0		0 0		0 0		G5 0	G6 0	G7 0	G8 0
 	
-	out_3_v16i_r_g_b_vectors[1] = _mm_or_si128(out_3_v16i_r_g_b_vectors[1], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_g_b_vectors[1] = _mm_or_si128(out_3_v16i_r_g_b_vectors[1], _M(scratch1));	// POR		1	0.33
 	// G1  0	G2 0	G3  0	G4  0	G5  0	G6  0	G7  0	G8  0
 
 	
-	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_b1));					// PSHUFB	1 1 3 0 1 2
+	_M(scratch1) = _mm_shuffle_epi8(in_2_v8i_argb_vectors[0], _M(shuf_b1));					// PSHUFB	1	0.5
 	// B1 0		B2 0	B3 0	B4 0	0 0		0 0		0 0		0 0
 	
-	out_3_v16i_r_g_b_vectors[2] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_b2));	// PSHUFB	1 1 3 0 1 2
+	out_3_v16i_r_g_b_vectors[2] = _mm_shuffle_epi8(in_2_v8i_argb_vectors[1], _M(shuf_b2));	// PSHUFB	1	0.5
 	// 0 0		0 0		0 0		0 0		B5 0	B6 0	B7 0	B8 0
 	
-	out_3_v16i_r_g_b_vectors[2] = _mm_or_si128(out_3_v16i_r_g_b_vectors[2], _M(scratch1));	// POR		2   2
+	out_3_v16i_r_g_b_vectors[2] = _mm_or_si128(out_3_v16i_r_g_b_vectors[2], _M(scratch1));	// POR		1	0.33
 	// B1  0	B2 0	B3  0	B4  0	B5  0	B6  0	B7  0	B8  0
 };
 
@@ -411,7 +411,7 @@ EXTERN_INLINE void	nnb_422_downsample_ag_rb_vectors_sse2(__m128i* in_4_v16i_ag_r
  * Create 3 422 downsampled R, G, B vectors from 3 R, G, B vectors
  * using nearest neighbour interpolation
  *
- * TOTAL LATENCY:	12
+ * TOTAL LATENCY:	6
  *
  * INPUT:
  * 3 vectors of 8 short
@@ -438,22 +438,22 @@ EXTERN_INLINE void	nnb_422_downsample_ag_rb_vectors_sse2(__m128i* in_4_v16i_ag_r
 EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i *out_3_v16i_nnb_422_r_g_b_vectors) {
 	M128I(scratch1, 0x0LL, 0x0LL);
 
-	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[0], 0xA0);			//	PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[0], 0xA0);			//	PSHUFHW		1	0.5
 	// R1 0 R2 0	R3 0 R4 0	R5 0 R5 0	R7 0 R7 0
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		1	0.5
 	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
 	
-	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[1], 0xA0);			//	PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[1], 0xA0);			//	PSHUFHW		1	0.5
 	// G1 0 G2 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		1	0.5
 	// G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
 	
-	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[2], 0xA0);			//	PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(in_3_v16i_r_g_b_vectors[2], 0xA0);			//	PSHUFHW		1	0.5
 	// B1 0 B2 0	B3 0 B4 0	B5 0 B5	0	B7 0 B7	0
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		2	2
+	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	//	PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0
 }
 
@@ -490,13 +490,13 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
 {
 	CONST_M128I(shuf_odd, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[0], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[0], _M(shuf_odd));// PSHUFB		1	0.5
 	// R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[1], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	out_3_v16i_nnb_422_r_g_b_vectors[1] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[1], _M(shuf_odd));// PSHUFB		1	0.5
 	// G1 0 G1 0	G3 0 G3 0	G5 0 G5	0	G7 0 G7	0
 	
-	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[2], _M(shuf_odd));// PSHUFB		1 1 3 0 1 2
+	out_3_v16i_nnb_422_r_g_b_vectors[2] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[2], _M(shuf_odd));// PSHUFB		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0	
 }
 
@@ -521,7 +521,7 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
  * using a simple 3-tap average filter. Also, copy the contents of the
  * current vectors in the previous ones
  *
- * TOTAL LATENCY:	18
+ * TOTAL LATENCY:	20
  *
  * INPUT:
  * 6 vectors of 8 short
@@ -635,7 +635,7 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
  * using a simple 3-tap average filter. Also, copy the contents of the
  * current vectors in the previous ones
  *
- * TOTAL LATENCY:	63
+ * TOTAL LATENCY:	27
  *
  * INPUT:
  * 3 vectors of 8 short
@@ -681,93 +681,93 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2(__m128i
 	// The result is then averaged with R samples at t = {0, 2, 4, 6}
 	// Since we are doing 422 downsampling, each sample at time t has
 	// a value equal to S-1 / 4 + S0 / 2 + S1 / 4
-	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[0], 14);			// PSRLDQ		4	4
+	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[0], 14);			// PSRLDQ		1	0.5
 	// R8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[0], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[0], 16);			// PSRLD		1	1
 	// R2 0		0 0		R4 0	0 0		R6 0	0 0		R8 0	0 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
 
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// R8 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
 	// (R8 belongs to the previous pixel)
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[0]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[0]);	// PAVGW		1	0.5
 
 	// save current vector to previous
 	in_3_v16i_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);//MOVDQA	1	0.33
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// R1 0 xx 0	R3 0 xx 0	R5 0 R5 0	R7 0 R7 0
-	out_3_v16i_avg_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
 
 
 
 	//
 	// And repeat for G ...
-	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[1], 14);			// PSRLDQ		4	4
+	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[1], 14);			// PSRLDQ		1	0.5
 	// G8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[1], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[1], 16);			// PSRLD		1	1
 	// G2 0		0 0		G4 0	0 0		G6 0	0 0		G8 0	0 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
 
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// G8 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
 	// (G8 belongs to the previous pixel)
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[1]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[1]);	// PAVGW		1	0.5
 
 	// save current vector to previous
 	in_3_v16i_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);//MOVDQA	1	0.33
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// G1 0 xx 0	G3 0 xx 0	G5 0 G5 0	G7 0 G7 0
-	out_3_v16i_avg_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// G1 0 G1 0	G3 0 G3 0	G5 0 G5 0	G7 0 G7 0
 
 	
 	
 	//
 	// And repeat for B
-	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[2], 14);			// PSRLDQ		4	4
+	_M(scratch1) = _mm_srli_si128(in_3_v16i_previous_r_g_b_vectors[2], 14);			// PSRLDQ		1	0.5
 	// B8 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[2], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[2], 16);			// PSRLD		1	1
 	// B2 0		0 0		B4 0	0 0		B6 0	0 0		B8 0	0 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
 
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// B8 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
 	// (B8 belongs to the previous pixel)
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[2]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[2]);	// PAVGW		1	0.5
 
 	// save current vector to previous
 	in_3_v16i_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);//MOVDQA	1	0.33
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
-	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
@@ -919,7 +919,7 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
  * using a simple 3-tap average filter. Since there is not previous pixel to average with,
  * this method uses the first pixel as the previous one.
  *
- * TOTAL LATENCY:	54
+ * TOTAL LATENCY:	24
  *
  * INPUT:
  *
@@ -959,81 +959,81 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2(__m128i* in_3_v16
 	// Since we are doing 422 downsampling, each sample at time t has
 	// a value equal to S-1 / 4 + S0 / 2 + S1 / 4, except for the first one
 	// which has a value equal to S0 * 3/4 + S1 / 4
-	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[0], _M(mask));		// PAND			2	2
+	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[0], _M(mask));		// PAND			1	0.33
 	// R1 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[0], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[0], 16);			// PSRLD		1	1
 	// R2 0		0 0		R4 0	0 0		R6 0	0 0		R8 0	0 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
 	
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// R1 0		0 0		R2 0	0 0		R4 0	0 0		R6 0	0 0
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[0]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[0]);	// PAVGW		1	0.5
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// R1 0 xx 0	R3 0 xx 0	R5 0 R5 0	R7 0 R7 0
-	out_3_v16i_avg_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[0] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// R1 0 R1 0	R3 0 R3 0	R5 0 R5 0	R7 0 R7 0
 
 	
 	
 	//
 	// And repeat for G ...
-	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[1], _M(mask));		// PAND			2	2
+	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[1], _M(mask));		// PAND			1	0.33
 	// G1 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 	
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[1], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[1], 16);			// PSRLD		1	1
 	// G2 0		0 0		G4 0	0 0		G6 0	0 0		G8 0	0 0
 	
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
 	
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// G1 0		0 0		G2 0	0 0		G4 0	0 0		G6 0	0 0
 	
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[1]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[1]);	// PAVGW		1	0.5
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// G1 0 xx 0	G3 0 xx 0	G5 0 G5 0	G7 0 G7 0
-	out_3_v16i_avg_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[1] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// G1 0 G1 0	G3 0 G3 0	G5 0 G5 0	G7 0 G7 0
 
 	
 	
 	//
 	// And repeat for B
-	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[2], _M(mask));		// PAND			2	2
+	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[2], _M(mask));		// PAND			1	0.33
 	// B1 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 
-	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[2], 16);			// PSRLD		2	2
+	_M(scratch2) = _mm_srli_epi32(in_3_v16i_current_r_g_b_vectors[2], 16);			// PSRLD		1	1
 	// B2 0		0 0		B4 0	0 0		B6 0	0 0		B8 0	0 0
 
-	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		4	4
+	_M(scratch3) = _mm_slli_si128(_M(scratch2), 4);									// PSLLDQ		1	0.5
 	// 0 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
 	
-	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			2	2
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch3));						// POR			1	0.33
 	// B1 0		0 0		B2 0	0 0		B4 0	0 0		B6 0	0 0
 
 	// Average S-1 and S1
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), _M(scratch2));						// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[2]);	// PAVGW		2	2
+	_M(scratch1) = _mm_avg_epu16(_M(scratch1), in_3_v16i_current_r_g_b_vectors[2]);	// PAVGW		1	0.5
 	
 	// Duplicate samples at t = {0,2,4,6}
-	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		2	2
+	_M(scratch1) = _mm_shufflehi_epi16(_M(scratch1), 0xA0);							// PSHUFHW		1	0.5
 	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
-	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		2	2
+	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
@@ -1112,7 +1112,7 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
 	
 	//
 	// And repeat for G ...
-	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[1], _M(mask));				// PAND			2	2
+	_M(scratch1) = _mm_and_si128(in_3_v16i_current_r_g_b_vectors[1], _M(mask));				// PAND		1	0.33
 	// G1 0		0 0		0 0		0 0		0 0		0 0		0 0		0 0
 	
 	_M(scratch2) = _mm_shuffle_epi8(in_3_v16i_current_r_g_b_vectors[1],  _M(shuf_current));	// PSHUFB	1	0.5

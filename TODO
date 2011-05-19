@@ -11,7 +11,5 @@ PixFC-SSE TODO list:
 * Create subdirectories to sort source files (lib, test, common, include, ...)
 * Add SSE4.1 version of routines which use blending (up/down sampling for 
   instance)
-* Fix latency/throughput values displayed in inlines (use only values for 
-  i5 / xeon CPUs as they are the CPUs used for testing)
 * Some other things I cant think of.
 
