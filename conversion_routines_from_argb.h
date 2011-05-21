@@ -24,14 +24,32 @@
 
 #include "pixfc-sse.h"
 
-// ARGB to YUYV			SSE2
-void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
-void		convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
-void		downsample_n_convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
-void		downsample_n_convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void* , void*);
+/*
+ *
+ *
+ *	F U L L   R A N G E
+ *
+ *  C O N V E R S I O N S
+ *
+ *
+ */
 
+/*
+ * Original implementation
+ */
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+// ARGB to YUYV			SSE2
+void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
+
+
+
+/*
+ * Alternate faster implementation (to be tested !!)
+ */
+void		convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void* , void*);
 
 #endif /* CONVERSION_ROUTINES_FROM_ARGB_H_ */
