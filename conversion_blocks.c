@@ -87,6 +87,10 @@ DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3, 	src_fmt, dst_fmt, 		CP
  * - Average resampling SSE2 full range
  * - Average resampling SSE2 bt.601
  * - Average resampling SSE2 bt.709
+ *
+ * - Fast Nearest NeighBour resampling NON-SSE full range
+ * - Fast Nearest NeighBour resampling NON-SSE bt.601
+ * - Fast Nearest NeighBour resampling NON-SSE bt.709
  */
 #define		DECLARE_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)\
 DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix),\
