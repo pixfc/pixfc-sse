@@ -115,8 +115,8 @@
 	y_conv_fn(unpack_out, convert_out);\
 	avg_422_downsample_first_ag_rb_vectors_##instr_set(unpack_out, downsample_out);\
 	uv_conv_fn(downsample_out, &convert_out[1]);\
-	previous[0] = _mm_load_si128(unpack_out[3]);\
-	previous[1] = _mm_load_si128(unpack_out[4]);\
+	previous[0] = _mm_load_si128(&unpack_out[3]);\
+	previous[1] = _mm_load_si128(&unpack_out[4]);\
 	unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
 	avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out);\

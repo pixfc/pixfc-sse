@@ -49,7 +49,75 @@ void		downsample_n_convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, voi
 /*
  * Alternate faster implementation (to be tested !!)
  */
+// ARGB to YUYV			SSE2 SSSE3
+void		convert2_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void* , void*);
+// ARGB to YUYV			SSE2
 void		convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert2_argb_to_yuyv_sse2(const struct PixFcSSE *, void* , void*);
+
+
+/*
+ *
+ *
+ *	S T A N D A R D   D E F I N I T I O N
+ *
+ *  C O N V E R S I O N S
+ *
+ *  ( BT 601 )
+ *
+ *
+ */
+
+// ARGB to YUYV		SSE2 SSSE3
+void		convert_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+// ARGB to YUYV			SSE2
+void		convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *, void*, void*);
+
+
+/*
+ * Alternate faster implementation (to be tested !!)
+ */
+// ARGB to YUYV			SSE2 SSSE3
+void		convert2_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void* , void*);
+// ARGB to YUYV			SSE2
+void		convert2_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *, void* , void*);
+
+
+/*
+ *
+ *
+ *	H I G H   D E F I N I T I O N
+ *
+ *  C O N V E R S I O N S
+ *
+ *  ( BT 709 )
+ *
+ *
+ */
+
+// ARGB to YUYV			SSE2 SSSE3
+void		convert_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+// ARGB to YUYV			SSE2
+void		convert_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void*, void*);
+
+/*
+ * Alternate faster implementation (to be tested !!)
+ */
+// ARGB to YUYV			SSE2 SSSE3
+void		convert2_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void* , void*);
+// ARGB to YUYV			SSE2
+void		convert2_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert2_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void* , void*);
+
 
 #endif /* CONVERSION_ROUTINES_FROM_ARGB_H_ */

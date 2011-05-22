@@ -133,6 +133,14 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"ARGB to YUYV - SSE2 / SSSE3- fast downsampling",
 	},
 	{
+		convert2_argb_to_yuyv_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2) - SSE2 / SSSE3- fast downsampling",
+	},
+	{
 		convert_argb_to_yuyv_sse2,
 		PixFcARGB, PixFcYUYV,
 		CPUID_FEATURE_SSE2,
@@ -158,6 +166,15 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		
 	},
 	{
+		downsample_n_convert2_argb_to_yuyv_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2) - SSE2 / SSSE3",
+
+	},
+	{
 		downsample_n_convert_argb_to_yuyv_sse2,
 		PixFcARGB, PixFcYUYV,
 		CPUID_FEATURE_SSE2,
@@ -175,6 +192,150 @@ const struct  ConversionBlock		conversion_blocks[] = {
 		"ARGB to YUYV (2)- SSE2",
 
 	},
+
+
+	// BT601
+	{
+		convert_argb_to_yuyv_bt601_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - bt601 - SSE2 / SSSE3- fast downsampling",
+	},
+	{
+		convert2_argb_to_yuyv_bt601_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2) - bt601 - SSE2 / SSSE3- fast downsampling",
+	},
+	{
+		convert_argb_to_yuyv_bt601_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - bt601 - SSE2 - fast downsampling",
+	},
+	{
+		convert2_argb_to_yuyv_bt601_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2) - bt601 - SSE2 - fast downsampling",
+	},
+	{
+		downsample_n_convert_argb_to_yuyv_bt601_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV - bt601 - SSE2 / SSSE3",
+
+	},
+	{
+		downsample_n_convert2_argb_to_yuyv_bt601_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2) - bt601 - SSE2 / SSSE3",
+
+	},
+	{
+		downsample_n_convert_argb_to_yuyv_bt601_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV - bt601 - SSE2",
+
+	},
+	{
+		downsample_n_convert2_argb_to_yuyv_bt601_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2) - bt601 - SSE2",
+
+	},
+
+
+
+	// BT709
+	{
+		convert_argb_to_yuyv_bt709_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - bt709 - SSE2 / SSSE3- fast downsampling",
+	},
+	{
+		convert2_argb_to_yuyv_bt709_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2) - bt709 - SSE2 / SSSE3- fast downsampling",
+	},
+	{
+		convert_argb_to_yuyv_bt709_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV - bt709 - SSE2 - fast downsampling",
+	},
+	{
+		convert2_argb_to_yuyv_bt709_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		NNB_RESAMPLING,
+		16,
+		"ARGB to YUYV (2) - bt709 - SSE2 - fast downsampling",
+	},
+	{
+		downsample_n_convert_argb_to_yuyv_bt709_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV - bt709 - SSE2 / SSSE3",
+
+	},
+	{
+		downsample_n_convert2_argb_to_yuyv_bt709_sse2_ssse3,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2) - bt709 - SSE2 / SSSE3",
+
+	},
+	{
+		downsample_n_convert_argb_to_yuyv_bt709_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV - bt709 - SSE2",
+
+	},
+	{
+		downsample_n_convert2_argb_to_yuyv_bt709_sse2,
+		PixFcARGB, PixFcYUYV,
+		CPUID_FEATURE_SSE2,
+		DEFAULT_ATTRIBUTE,
+		16,
+		"ARGB to YUYV (2) - bt709 - SSE2",
+
+	},
+
 
 	// YUYV to ARGB
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuyv_to_any_rgb, PixFcYUYV, PixFcARGB, "YUYV to ARGB"),

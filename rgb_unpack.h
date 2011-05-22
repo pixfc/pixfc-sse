@@ -1363,6 +1363,6 @@ EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2(__m128i* in_4_v16
  *
  */
 EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
-	avg_422_downsample_first_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors, *out_2_v16i_avg_422_ag_rb_vectors);
+	avg_422_downsample_first_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors, out_2_v16i_avg_422_ag_rb_vectors);
 }
 #endif /* RGB_UNPACK_H_ */
