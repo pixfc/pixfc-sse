@@ -132,6 +132,8 @@ void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in,
 		} else {
 			printf("Unknown output format in non-SSE conversion from RGB\n");
 		}
+
+		pixel_num += 2; // 2 pixels processed per loop
 	}
 }
 
