@@ -4,6 +4,7 @@ PixFC-SSE TODO list:
   platform dependency
 * Investigate if using static xmm intermediate buffers instead of 
   stack-allocated ones significantly improves conversion performance.
+* Update non-SSE conversion routines to perform resampling.
 * Add support for more pixel formats:
   - VYUY, YVYU
   - planar formats (YUV420, YVU420, YUV410, YVU410)

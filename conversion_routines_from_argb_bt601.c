@@ -60,9 +60,6 @@
 
 
 
-/*
- * Original implementation
- */
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
@@ -75,33 +72,67 @@ void		downsample_n_convert_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *
 
 // ARGB to YUYV			SSE2
 void		convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
-}
-
-void		downsample_n_convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
-}
-
-
-/*
- * Alternate faster implementation (to be tested !!)
- */
-// ARGB to YUYV			SSE2 SSSE3
-void		convert2_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
-}
-
-void		downsample_n_convert2_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
-}
-
-// ARGB to YUYV			SSE2
-void		convert2_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
-void		downsample_n_convert2_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+void		downsample_n_convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
+}
+
+
+void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out)
+{
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
+	PixFcPixelFormat 	src_fmt = conv->source_fmt;
+	uint32_t 			which_y = 0;
+	uint32_t 			pixel_num = 0;
+	uint32_t			pixel_count = conv->pixel_count;
+	uint8_t*			src = (uint8_t *) in;
+	uint8_t*			dst = (uint8_t *) out;
+	int32_t				r1, g1, b1, r2, g2, b2;
+	int32_t				y1, y2, u, v;
+
+	while(pixel_num++ < pixel_count){
+		if (src_fmt == PixFcARGB) {
+			src++;	// A
+			r1 = *(src++);
+			g1 = *(src++);
+			b1 = *(src++);
+			src++;	// A
+			r2 = *(src++);
+			g2 = *(src++);
+			b2 = *(src++);
+		} else if (src_fmt == PixFcBGRA) {
+			b1 = *(src++);
+			g1 = *(src++);
+			r1 = *(src++);
+			src++;	// A
+			b2 = *(src++);
+			g2 = *(src++);
+			r2 = *(src++);
+			src++;	// A
+		}
+
+		//
+		y1 = (66 * r1 + 129 * g1 + 25 * b1) >> 8 + 16;
+		u = ((-38 * r1 - 74 * g1 + 112 * b1) >> 8) + 128;
+		v = ((112 * r1 - 94  * g1 - 18 * b1) >> 8) + 128;
+		y2 = (66 * r2 + 129 * g2 + 25 * b2) >> 8 + 16;
+
+		if (dest_fmt == PixFcYUYV) {
+			*(dst++) = CLIP_PIXEL(y1);
+			*(dst++) = CLIP_PIXEL(u);
+			*(dst++) = CLIP_PIXEL(y2);
+			*(dst++) = CLIP_PIXEL(v);
+		} else if (dest_fmt == PixFcUYVY) {
+			*(dst++) = CLIP_PIXEL(u);
+			*(dst++) = CLIP_PIXEL(y1);
+			*(dst++) = CLIP_PIXEL(v);
+			*(dst++) = CLIP_PIXEL(y2);
+		} else {
+			printf("Unknown output format in non-SSE conversion from RGB\n");
+		}
+	}
 }
 
 
