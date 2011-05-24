@@ -119,7 +119,6 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
 	PixFcPixelFormat 	src_fmt = conv->source_fmt;
-	uint32_t 			which_y = 0;
 	uint32_t 			pixel_num = 0;
 	uint32_t			pixel_count = conv->pixel_count;
 	uint8_t*			src = (uint8_t *) in;

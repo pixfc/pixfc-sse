@@ -84,7 +84,6 @@ void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in,
 {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
 	PixFcPixelFormat 	src_fmt = conv->source_fmt;
-	uint32_t 			which_y = 0;
 	uint32_t 			pixel_num = 0;
 	uint32_t			pixel_count = conv->pixel_count;
 	uint8_t*			src = (uint8_t *) in;
@@ -114,10 +113,10 @@ void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in,
 		}
 
 		//
-		y1 = (66 * r1 + 129 * g1 + 25 * b1) >> 8 + 16;
+		y1 = ((66 * r1 + 129 * g1 + 25 * b1) >> 8) + 16;
 		u = ((-38 * r1 - 74 * g1 + 112 * b1) >> 8) + 128;
 		v = ((112 * r1 - 94  * g1 - 18 * b1) >> 8) + 128;
-		y2 = (66 * r2 + 129 * g2 + 25 * b2) >> 8 + 16;
+		y2 = ((66 * r2 + 129 * g2 + 25 * b2) >> 8) + 16;
 
 		if (dest_fmt == PixFcYUYV) {
 			*(dst++) = CLIP_PIXEL(y1);

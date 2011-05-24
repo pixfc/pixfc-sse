@@ -284,7 +284,6 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m12
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
-	M128I(uScratch, 0x0LL, 0x0LL);
 
 	
 	//
@@ -571,7 +570,6 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
-	M128I(uScratch, 0x0LL, 0x0LL);
 
 
 	//
@@ -859,7 +857,6 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
-	M128I(uScratch, 0x0LL, 0x0LL);
 
 
 	//
