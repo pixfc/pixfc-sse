@@ -28,10 +28,11 @@
 
 
 // PIXFC FLAGS
-//#define PIXFC_FLAGS	PixFcFlag_BT601Conversion// | PIXFC_AVG_UPSAMPLING_FLAG
+//#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
 //#define PIXFC_FLAGS	PixFcFlag_SSE2Only //| PixFcFlag_NNbResampling
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE
-#define PIXFC_FLAGS	PixFcFlag_Default
+//#define PIXFC_FLAGS	PixFcFlag_Default
+#define PIXFC_FLAGS		PixFcFlag_NNbResampling
 
 
 
@@ -124,7 +125,8 @@ int 		main(int argc, char **argv) {
 			dprint("Error allocating in buffer");
 			return 1;
 		}
-		fill_image(src_fmt, IMG_SIZE(src_fmt, w, h), in);
+		//fill_image(src_fmt, w, h, in);
+		fill_argb_image_with_rgb_buffer(src_fmt, w, h, in);
 
 		// save input buffer
 		write_buffer_to_file(src_fmt, w, h, "input", in);

@@ -24,6 +24,7 @@
 
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
+#include "rgb_image.h"
 #include "test-utils.h"
 
 
@@ -102,6 +103,35 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 	}
 }
 
+
+uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void * buf) {
+	uint32_t		pixel_count = width * height;
+	uint8_t*		dest = (uint8_t *) buf;
+	uint8_t			pixel[3] = {0};
+
+	// expect ARGB buffer for now
+	if (fmt != PixFcARGB) {
+		dprint("Expected ARGB buffer\n");
+		return -1;
+	}
+
+	if ((width != rgb_img_width) || (height != rgb_img_height)) {
+		dprint("ARGB buffer dimensions are different from RGB image in header file\n");
+		return -1;
+	}
+
+	// Fill the buffer
+	while (pixel_count > 0) {
+		HEADER_PIXEL(header_data,  pixel);
+		*dest++ = 0;
+		*dest++ = pixel[0];
+		*dest++ = pixel[1];
+		*dest++ = pixel[2];
+		pixel_count--;
+	}
+
+	return 0;
+}
 
 
 int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void **buffer) {
