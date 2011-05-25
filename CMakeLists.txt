@@ -92,12 +92,12 @@ if(DEBUG)
 	if(APPLE)
 		add_definitions(-gdwarf-2 -Wall -Winline)
 	elseif(UNIX)
-		add_definitions(-gdwarf-2 -Wall -Winline)
+		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs)
 	endif(APPLE)
 else(DEBUG)
 	if(WIN32)
 	else(WIN32)
-		add_definitions(-O3)
+		add_definitions(-O3 -Wno-trigraphs)
 
 		# On Mac OS, memcpy is re-defined as a macro which introduces an "if" statement
 		# and kills performance of RGB24 slower-repacking routines. To disable this
