@@ -34,6 +34,14 @@ typedef struct {
 	char *				filename;
 } InputFile;
 
+// mplayer is a useful tool to read and display / save in JPEG/PNM/PNg raw yuv file:
+//
+// to display a raw yuyv file:
+// mplayer -demuxer rawvideo -rawvideo format=yuy2:w=1920:h=1080 output.YUYV -loop 0
+//
+// to convert a raw yuyv file to PNG
+// mplayer -demuxer rawvideo -rawvideo format=yuy2:w=1920:h=1080 output.YUYV -vo png:z=0
+
 
 /*
  * Global variables
@@ -49,6 +57,26 @@ const static InputFile		input_files[] = {
 		PixFcUYVY,
 		1920, 1080,
 		"test-images/1920x1080.uyvy",
+	},
+	{
+		PixFcARGB,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcBGRA,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcRGB24,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcBGR24,
+		1920, 1080,
+		NULL,
 	},
 };
 const static uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
@@ -118,9 +146,25 @@ int 		main(int argc, char **argv) {
 				return 1;
 			}
 			
-			if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_file->filename, (void **)&in) < 0) {
-				dprint("Error getting buffer from input file '%s'\n", in_file->filename);
-				return 1;
+			if (in_file->filename != NULL) {
+				// Load buffer from specified file
+				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_file->filename, (void **)&in) < 0) {
+					dprint("Error getting buffer from input file '%s'\n", in_file->filename);
+					return 1;
+				}
+			} else {
+				// no input file, assume its an RGB format
+				// try to generate the image from RGB buffer from GIMP
+
+				// allocate buffer
+				if (allocate_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
+					dprint("Error allocating memory\n");
+					return -1;
+				}
+				if (fill_argb_image_with_rgb_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in) != 0) {
+					dprint("Error getting buffer from RGB GIMP image\n");
+					return 1;
+				}
 			}
 		}
 		
@@ -139,10 +183,9 @@ int 		main(int argc, char **argv) {
 			return -1;
 		
 		// Save output buffer
-		strcpy(out_filename, in_file->filename);
+		strcpy(out_filename, (in_file->filename) ? in_file->filename : "rgb_buffer");
 		strcat(out_filename, " - ");
 		strcat(out_filename, conversion_blocks[index].name);
-		strcat(out_filename, ".ppm");
 		while ( (r = strchr(out_filename, '/')) != NULL)
 			   r[0] = '-';
 		write_buffer_to_file(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, out_filename, out);

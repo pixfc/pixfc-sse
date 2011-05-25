@@ -109,24 +109,47 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 	uint8_t*		dest = (uint8_t *) buf;
 	uint8_t			pixel[3] = {0};
 
-	// expect ARGB buffer for now
-	if (fmt != PixFcARGB) {
-		dprint("Expected ARGB buffer\n");
+	// Make sure we are converting the image into an RGB buffer
+	if ((fmt != PixFcARGB) && (fmt != PixFcBGRA) && (fmt != PixFcRGB24) && (fmt != PixFcBGR24)){
+		dprint("Expected RGB buffer\n");
 		return -1;
 	}
 
 	if ((width != rgb_img_width) || (height != rgb_img_height)) {
-		dprint("ARGB buffer dimensions are different from RGB image in header file\n");
+		dprint("RGB buffer dimensions are different from RGB image in header file\n");
 		return -1;
 	}
 
 	// Fill the buffer
 	while (pixel_count > 0) {
 		HEADER_PIXEL(header_data,  pixel);
-		*dest++ = 0;
-		*dest++ = pixel[0];
-		*dest++ = pixel[1];
-		*dest++ = pixel[2];
+
+		switch (fmt) {
+		case PixFcARGB:
+			*dest++ = 0;
+			*dest++ = pixel[0];
+			*dest++ = pixel[1];
+			*dest++ = pixel[2];
+			break;
+		case PixFcBGRA:
+			*dest++ = pixel[2];
+			*dest++ = pixel[1];
+			*dest++ = pixel[0];
+			*dest++ = 0;
+			break;
+		case PixFcRGB24:
+			*dest++ = pixel[0];
+			*dest++ = pixel[1];
+			*dest++ = pixel[2];
+			break;
+		case PixFcBGR24:
+		default:
+			*dest++ = pixel[2];
+			*dest++ = pixel[1];
+			*dest++ = pixel[0];
+			break;
+		}
+
 		pixel_count--;
 	}
 
@@ -346,7 +369,6 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 
 	dprint("done\n");
 }
-
 static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
 	int32_t			fd;
 	uint32_t		count = 0;

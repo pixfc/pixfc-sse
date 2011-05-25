@@ -73,7 +73,7 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 
 /*
  * Write pixels from in to a file.
- * If the buffer is in an RGB format, it will be saved in a PPM file. Otherwise the raw bytes are saved
+ * If the buffer is in an RGB format, it will be saved in a PPM file. Otherwise the raw bytes are saved (using the next function)
  */
 void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer);
 
