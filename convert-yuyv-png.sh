@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 if [ $# -ne 3 ]; then
 	echo "Usage: $0 <yuv_in_format> <width> <height>"
