@@ -216,7 +216,7 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 	uint32_t						stride = ((fmt == PixFcARGB) || (fmt == PixFcBGRA)) ? 4 * 16 : 3 * 16;
 	// above values multiplied by 16 bc we handle 16 pixels in one iteration
 
-	snprintf(filename_fixed, sizeof(filename_fixed), "%.120s.ppm", filename);
+	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%.120s.ppm", filename);
 	dprint("Writing file '%s'...\n", filename_fixed);
 
 	if (rgb_buf_size % stride != 0) {
@@ -371,7 +371,7 @@ static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint3
 	char			filename_fixed[128] = {0};
 
 	// append the extension to the given file name
-	snprintf(filename_fixed, sizeof(filename_fixed), "%.120s.%s", filename, pixfmt_descriptions[fmt].name);
+	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%.120s.%s", filename, pixfmt_descriptions[fmt].name);
 
 	dprint("Writing file '%s'...\n", filename_fixed);
 

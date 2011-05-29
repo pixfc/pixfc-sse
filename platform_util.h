@@ -38,6 +38,7 @@
 #define RW_PERM									S_IRWXU
 #define READ									read
 #define WRITE									write
+#define	SNPRINTF								snprintf
 #define CLOSE									close
 
 // Aligned allocation
@@ -74,6 +75,7 @@
 #define RW_PERM									_S_IWRITE
 #define READ									_read
 #define WRITE									_write
+#define SNPRINTF								_snprintf
 #define CLOSE									_close
 
 // Aligned allocation
@@ -85,7 +87,7 @@
  */
 #define CONST_M128I_ARRAY(var, num_elem)		__declspec(align(16)) const __int64 var[2][(num_elem)]
 #define CONST_M128I(var, val64_1, val64_2)		__declspec(align(16)) static const __int64 var[] = { (val64_1), (val64_2) }
-#define M128I(var, val64_1, val64_2)			__declspec(align(16)) static __int64 var[] = { (val64_1), (val64_2)}
+#define M128I(var, val64_1, val64_2)			__declspec(align(16)) __int64 var[] = { (val64_1), (val64_2)}
 #define	_M(var)									(*((__m128i *)(var)))
 #define EXTERN_INLINE							__forceinline
 #define INLINE									__inline
