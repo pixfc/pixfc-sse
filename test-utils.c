@@ -116,7 +116,8 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 	}
 
 	if ((width != rgb_img_width) || (height != rgb_img_height)) {
-		dprint("RGB buffer dimensions are different from RGB image in header file\n");
+		dprint("RGB buffer dimensions (%dx%d) are different from RGB image in header file (%dx%d)\n",
+				width, height, rgb_img_width, rgb_img_height);
 		return -1;
 	}
 
@@ -127,26 +128,19 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 		switch (fmt) {
 		case PixFcARGB:
 			*dest++ = 0;
-			*dest++ = pixel[0];
-			*dest++ = pixel[1];
-			*dest++ = pixel[2];
-			break;
-		case PixFcBGRA:
-			*dest++ = pixel[2];
-			*dest++ = pixel[1];
-			*dest++ = pixel[0];
-			*dest++ = 0;
-			break;
 		case PixFcRGB24:
 			*dest++ = pixel[0];
 			*dest++ = pixel[1];
 			*dest++ = pixel[2];
 			break;
-		case PixFcBGR24:
 		default:
+		case PixFcBGRA:
+		case PixFcBGR24:
 			*dest++ = pixel[2];
 			*dest++ = pixel[1];
 			*dest++ = pixel[0];
+			if (fmt == PixFcBGRA)
+				*dest++ = 0;
 			break;
 		}
 

@@ -34,6 +34,7 @@ typedef struct {
 	char *				filename;
 } InputFile;
 
+//
 // mplayer is a useful tool to read and display / save in JPEG/PNM/PNg raw yuv file:
 //
 // to display a raw yuyv file:
@@ -41,7 +42,7 @@ typedef struct {
 //
 // to convert a raw yuyv file to PNG
 // mplayer -demuxer rawvideo -rawvideo format=yuy2:w=1920:h=1080 output.YUYV -vo png:z=0
-
+//
 
 /*
  * Global variables
@@ -120,12 +121,23 @@ int 		main(int argc, char **argv) {
 	const InputFile*		in_file = NULL;
 	char 					out_filename[128] = {0};
 	char					*r;
+	PixFcPixelFormat		src_fmt;
 	// In / out buffers
 	__m128i	*				in = NULL;
 	__m128i	*				out = NULL;	
 	
+	// Check if we should restrict to a single source format
+	if (argc == 2) {
+		src_fmt = find_matching_pixel_format(argv[1]);
+		if (src_fmt != PixFcFormatCount)
+			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
+	}
+
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
+		// Check if we have to restrict to the specified source format
+		if ((src_fmt != PixFcFormatCount) && (src_fmt != conversion_blocks[index].source_fmt))
+			continue;
 		
 		// Make sure the CPU has the required features
 		if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
