@@ -35,6 +35,9 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_argb.c
 	conversion_routines_from_argb_bt601.c
 	conversion_routines_from_argb_bt709.c
+	conversion_routines_from_bgra.c
+	conversion_routines_from_bgra_bt601.c
+	conversion_routines_from_bgra_bt709.c
 )
 
 # Source files for test apps

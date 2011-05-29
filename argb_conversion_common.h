@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "rgb_unpack.h"
+#include "rgb_downsample.h"
 #include "rgb_to_yuv_convert.h"
 #include "yuv_pack.h"
 

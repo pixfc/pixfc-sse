@@ -25,6 +25,7 @@
 #include "conversion_routines_from_yuyv.h"
 #include "conversion_routines_from_uyvy.h"
 #include "conversion_routines_from_argb.h"
+#include "conversion_routines_from_bgra.h"
 
 #define 	DECLARE_CONV_BLOCK(convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, desc)\
 { convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, desc }
@@ -118,6 +119,9 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
 const struct  ConversionBlock		conversion_blocks[] = {
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, "ARGB to YUYV"),
+
+	// BGRA to YUYV
+	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, "BGRA to YUYV"),
 
 	// YUYV to ARGB
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuyv_to_any_rgb, PixFcYUYV, PixFcARGB, "YUYV to ARGB"),
