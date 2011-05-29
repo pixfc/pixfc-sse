@@ -91,7 +91,7 @@ void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in,
 	int32_t				r1, g1, b1, r2, g2, b2;
 	int32_t				y1, y2, u, v;
 
-	while(pixel_num++ < pixel_count){
+	while(pixel_num < pixel_count){
 		if (src_fmt == PixFcARGB) {
 			src++;	// A
 			r1 = *(src++);
