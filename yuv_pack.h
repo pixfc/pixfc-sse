@@ -36,7 +36,7 @@
  *
  * INPUT:
  *
- * 2 vectors of 8 short
+ * 4 vectors of 8 short
  *
  * yVect1
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
@@ -73,4 +73,49 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_
 	out_2_yuyv_vectors[1] = _mm_unpackhi_epi8(_M(scratch1), _M(scratch2));				// PUNPCKHBW	1	0.5
 }
 
+
+/*
+ * Pack 2 pairs of 422 downsampled Y, UV vectors to 2 vectors UYVY
+ *
+ * Total latency:			4 cycles
+ * Num of pixel handled:	16
+ *
+ * INPUT:
+ *
+ * 4 vectors of 8 short
+ *
+ * yVect1
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect1
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * yVect2
+ * Y9 0		Y10 0	Y11 0	Y12 0	Y13 0	Y14 0	Y15 0	Y16 0
+ *
+ * uvVect2
+ * U910 0	V910 0	U1112 0	V1112 0	U1314 0	V1314 0	U1516 0	V1516 0
+ *
+ * OUTPUT:
+ *
+ * 2 vectors of 16 char
+ *
+ * U12 Y1 	V12 Y2		U34 Y3 		V34 Y4		U56 Y5		V56 Y6		U78 Y7		V78 Y8
+ * U910 Y9	V910 Y10	U1112 Y11	V1112 Y12	U1314 Y13	V1314 Y14	U1516 Y15	V1516 Y16
+ *
+ */
+EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2(__m128i* in_4_y_uv_422_vectors, __m128i* out_2_uyvy_vectors) {
+	M128I(scratch1, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+
+	_M(scratch1) = _mm_packus_epi16(in_4_y_uv_422_vectors[0], in_4_y_uv_422_vectors[2]);// PACKUSWB		1	0.5
+	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16
+
+	_M(scratch2) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);// PACKUSWB		1	0.5
+	// U12 V12	U34 V34	U56 V56	U78 V78	U910 V910	U1112 V1112	U1314 V1314	U1516 V1516
+
+	out_2_uyvy_vectors[0] = _mm_unpacklo_epi8(_M(scratch2), _M(scratch1));				// PUNPCKLBW	1	0.5
+
+	out_2_uyvy_vectors[1] = _mm_unpackhi_epi8(_M(scratch2), _M(scratch1));				// PUNPCKHBW	1	0.5
+}
 #endif /* YUV_PACK_H_ */

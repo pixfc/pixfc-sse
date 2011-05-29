@@ -42,6 +42,13 @@ void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_argb_to_yuyv_sse2(const struct PixFcSSE *, void*, void*);
 
 
+// ARGB to UYVY			SSE2 SSSE3
+void		convert_argb_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+// ARGB to UYVY			SSE2
+void		convert_argb_to_uyvy_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_sse2(const struct PixFcSSE *, void*, void*);
+
 /*
  *
  *
@@ -64,6 +71,14 @@ void		downsample_n_convert_argb_to_yuyv_bt601_sse2(const struct PixFcSSE *, void
 
 
 
+// ARGB to UYVY		SSE2 SSSE3
+void		convert_argb_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+// ARGB to UYVY			SSE2
+void		convert_argb_to_uyvy_bt601_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_bt601_sse2(const struct PixFcSSE *, void*, void*);
+
 /*
  *
  *
@@ -84,6 +99,15 @@ void		downsample_n_convert_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *
 void		convert_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *, void*, void*);
 
+
+
+// ARGB to UYVY			SSE2 SSSE3
+void		convert_argb_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+// ARGB to UYVY			SSE2
+void		convert_argb_to_uyvy_bt709_sse2(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_argb_to_uyvy_bt709_sse2(const struct PixFcSSE *, void*, void*);
 
 
 

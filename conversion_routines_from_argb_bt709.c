@@ -80,6 +80,28 @@ void		downsample_n_convert_argb_to_yuyv_bt709_sse2(const struct PixFcSSE *pixfc,
 }
 
 
+
+// ARGB to UYVY			SSE2 SSSE3
+void		convert_argb_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
+
+void		downsample_n_convert_argb_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
+
+
+// ARGB to UYVY			SSE2
+void		convert_argb_to_uyvy_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+}
+
+void		downsample_n_convert_argb_to_uyvy_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+}
+
+
+
 void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out)
 {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
@@ -110,7 +132,23 @@ void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in,
 			g2 = *(src++);
 			r2 = *(src++);
 			src++;	// A
-		}
+		} else if (src_fmt == PixFcRGB24) {
+			r1 = *(src++);
+			g1 = *(src++);
+			b1 = *(src++);
+			r2 = *(src++);
+			g2 = *(src++);
+			b2 = *(src++);
+		} else if (src_fmt == PixFcBGR24) {
+			b1 = *(src++);
+			g1 = *(src++);
+			r1 = *(src++);
+			b2 = *(src++);
+			g2 = *(src++);
+			r2 = *(src++);
+		} else
+			printf("Unknown source pixel format in non-SSE conversion from RGB\n");
+
 
 		//
 		y1 = ((47 * r1 + 157 * g1 + 16 * b1) >> 8) + 16;
