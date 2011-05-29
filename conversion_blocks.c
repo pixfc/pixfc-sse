@@ -117,15 +117,22 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
+	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, "ARGB to YUYV"),
 
 	// ARGB to UYVY
 	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, "ARGB to UYVY"),
 
+
+	//
 	// BGRA to YUYV
 	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, "BGRA to YUYV"),
 
+	// BGRA to UYVY
+	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, "BGRA to UYVY"),
+
+	//
 	// YUYV to ARGB
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuyv_to_any_rgb, PixFcYUYV, PixFcARGB, "YUYV to ARGB"),
 
@@ -138,6 +145,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// YUYV to BGR24
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgr24, upsample_n_convert_yuyv_to_bgr24, convert_yuyv_to_any_rgb, PixFcYUYV, PixFcBGR24, "YUYV to BGR24"),
 
+
+	//
 	// UYVY to ARGB
 	DECLARE_CONV_BLOCKS(convert_uyvy_to_argb, upsample_n_convert_uyvy_to_argb, convert_uyvy_to_any_rgb, PixFcUYVY, PixFcARGB, "UYVY to ARGB"),
 

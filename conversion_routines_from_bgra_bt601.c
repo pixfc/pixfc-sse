@@ -82,3 +82,22 @@ void		downsample_n_convert_bgra_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc,
 
 
 
+
+// BGRA to UYVV			SSE2 SSSE3
+void		convert_bgra_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
+
+void		downsample_n_convert_bgra_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
+
+
+// BGRA to UYVY			SSE2
+void		convert_bgra_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+}
+
+void		downsample_n_convert_bgra_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+}
