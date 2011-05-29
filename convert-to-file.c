@@ -29,10 +29,10 @@
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
-//#define PIXFC_FLAGS	PixFcFlag_SSE2Only //| PixFcFlag_NNbResampling
+#define PIXFC_FLAGS	PixFcFlag_SSE2Only | PixFcFlag_NNbResampling
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE
 //#define PIXFC_FLAGS	PixFcFlag_Default
-#define PIXFC_FLAGS		PixFcFlag_NNbResampling
+//#define PIXFC_FLAGS		PixFcFlag_NNbResampling
 
 
 
@@ -122,11 +122,14 @@ int 		main(int argc, char **argv) {
 		// Otherwise, allocate a buffer of the given width and height
 		// and fill in buffer with predefined pattern
 		if (allocate_buffer(src_fmt, w, h, (void **)&in) != 0) {
-			dprint("Error allocating in buffer");
+			dprint("Error allocating in buffer\n");
 			return 1;
 		}
-		//fill_image(src_fmt, w, h, in);
-		fill_argb_image_with_rgb_buffer(src_fmt, w, h, in);
+
+		// First, try to fill in buffer from GIMP image - if that fails,
+		// then use the pixel values from pixfmt_description
+		if (fill_argb_image_with_rgb_buffer(src_fmt, w, h, in) != 0)
+			fill_image(src_fmt, IMG_SIZE(src_fmt, w, h), in);
 
 		// save input buffer
 		write_buffer_to_file(src_fmt, w, h, "input", in);

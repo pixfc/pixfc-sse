@@ -37,11 +37,13 @@
  *
  * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
  *
- *				All coeffs are left-shifted by 16 bits
- * 					[  19595	 38470		 7471	]
+ *				All coeffs are left-shifted by 15 bits
+ * 					[  9798	 	19325		 3736	]
  *
- * Note: the Y calculation involves only positive values and coefficients and
- * thus uses only unsigned math.
+ * Note: the Y calculation involves only positive values and coefficients but
+ * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
+ * shift (instead of 16, which would cause the yG coefficient to go over the
+ * 32767 limit).
  *
  * INPUT:
  *
@@ -65,8 +67,8 @@
  *
  */
 EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(agYCoeffs, 0x9646000096460000LL, 0x9646000096460000LL);
-	CONST_M128I(rbYCoeffs, 0x1D2F4C8B1D2F4C8BLL, 0x1D2F4C8B1D2F4C8BLL);
+	CONST_M128I(agYCoeffs, 0x4B7D00004B7D0000LL, 0x4B7D00004B7D0000LL);
+	CONST_M128I(rbYCoeffs, 0x0E9826460E982646LL, 0x0E9826460E982646LL);
 	
 	M128I(y1Scratch, 0x0LL, 0x0LL);
 	M128I(y2Scratch, 0x0LL, 0x0LL);
@@ -76,31 +78,31 @@ EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_sse2(__m128i* in_4_v16i_ag_
 	//
 	// Y 1-4
 	// AG coeffs
-	// Multiply A & G values by 16-bit left-shifted Y coeffs
+	// Multiply A & G values by 15-bit left-shifted Y coeffs
 	_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[0], _M(agYCoeffs));		// PMADDWD		3	1
 	
 	// RB coeffs
-	// Multiply R & B values by 16-bit left-shifted Y coeffs
+	// Multiply R & B values by 15-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));		// PMADDWD		3	1
 	
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 16);								// PSRLD		1	1
+	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
 	
 	
 	//
 	// Y 5-8
 	// AG coeffs
-	// Multiply A & G values by 16-bit left-shifted Y coeffs
+	// Multiply A & G values by 15-bit left-shifted Y coeffs
 	_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[2], _M(agYCoeffs));		// PMADDWD		3	1
 	
 	// RB coeffs
-	// Multiply R & B values by 16-bit left-shifted Y coeffs
+	// Multiply R & B values by 15-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));		// PMADDWD		3	1
 	
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 16);								// PSRLD		1	1
+	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
 	
 	
 	// pack both sets of Y values (32 bit to 16 bit values)
@@ -281,6 +283,7 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m12
 	CONST_M128I(rbUCoeffs, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
 	CONST_M128I(agVCoeffs, 0x94BC000094BC0000LL, 0xAB440000AB440000LL);
 	CONST_M128I(rbVCoeffs, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
+	CONST_M128I(zeroLowWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
@@ -297,7 +300,7 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m12
 	*out_1_v16i_uv_vector = _mm_add_epi32(_M(agScratch), _M(rbScratch));			// PADDD		1	0.5
 	*out_1_v16i_uv_vector = _mm_srli_epi32 (*out_1_v16i_uv_vector, 16);				// PSRLD		1	1
 	// U12		0		U34		0		U56		0		U78		0
-	
+
 	//
 	// V
 	// Multiply A & G values by 16-bit left-shifted V coeffs
@@ -305,10 +308,10 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m12
 	// Multiply R & B values by 16-bit left-shifted V coeffs
 	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbVCoeffs));		// PMADDWD		3	1
 	
-	// Add both of the above and shift right by 16 (here we shift left to place
-	// the bits in the right place for the following OR)
+	// Add both of the above and zero low word(to account for 16-bit shift of
+	// coefficients and place the bits in the right place for the following OR)
 	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
-	_M(agScratch) = _mm_slli_epi32 (_M(agScratch), 16);								// PSLLD		1	1
+	_M(agScratch) = _mm_and_si128 (_M(agScratch), _M(zeroLowWord));					// PAND			1	0.33
 	// 0		V12		0		V34		0		V56		0		V78
 
 	// combine U and V
@@ -460,8 +463,13 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2
  *
  * Y = 	[  16  ] + [  0.257		 0.504		 0.098	]	( R )
  *
- *				All coeffs are left-shifted by 16 bits
- * 					[  16843	 33030		 6423	]
+ *				All coeffs are left-shifted by 15 bits
+ * 					[  8421	 	16515		 3211	]
+ *
+ * Note: the Y calculation involves only positive values and coefficients but
+ * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
+ * shift (instead of 16, which would cause the yG coefficient to go over the
+ * 32767 limit).
  *
  * INPUT:
  *
@@ -485,8 +493,8 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2
  *
  */
 EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_bt601_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(agYCoeffs, 0x8106000081060000LL, 0x8106000081060000LL);
-	CONST_M128I(rbYCoeffs, 0x191741CB191741CBLL, 0x191741CB191741CBLL);
+	CONST_M128I(agYCoeffs, 0x4083000040830000LL, 0x4083000040830000LL);
+	CONST_M128I(rbYCoeffs, 0x0C8B20E50C8B20E5LL, 0x0C8B20E50C8B20E5LL);
 	CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);
 
 	M128I(y1Scratch, 0x0LL, 0x0LL);
@@ -497,31 +505,31 @@ EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_bt601_sse2(__m128i* in_4_v1
 	//
 	// Y 1-4
 	// AG coeffs
-	// Multiply A & G values by 16-bit left-shifted Y coeffs
+	// Multiply A & G values by 15-bit left-shifted Y coeffs
 	_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[0], _M(agYCoeffs));		// PMADDWD		3	1
 
 	// RB coeffs
-	// Multiply R & B values by 16-bit left-shifted Y coeffs
+	// Multiply R & B values by 15-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 16);								// PSRLD		1	1
+	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
 
 
 	//
 	// Y 5-8
 	// AG coeffs
-	// Multiply A & G values by 16-bit left-shifted Y coeffs
+	// Multiply A & G values by 15-bit left-shifted Y coeffs
 	_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[2], _M(agYCoeffs));		// PMADDWD		3	1
 
 	// RB coeffs
-	// Multiply R & B values by 16-bit left-shifted Y coeffs
+	// Multiply R & B values by 15-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 16);								// PSRLD		1	1
+	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
 
 
 	// pack both sets of Y values (32 bit to 16 bit values) and add 16
@@ -567,6 +575,7 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2
 	CONST_M128I(rbUCoeffs, 0x7062DA1D7062DA1DLL, 0x7062DA1D7062DA1DLL);
 	CONST_M128I(agVCoeffs, 0xA1CB0000A1CB0000LL, 0xA1CB0000A1CB0000LL);
 	CONST_M128I(rbVCoeffs, 0xEDD37062EDD37062LL, 0xEDD37062EDD37062LL);
+	CONST_M128I(zeroLowWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
@@ -591,10 +600,10 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2
 	// Multiply R & B values by 16-bit left-shifted V coeffs
 	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbVCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16 (here we shift left to place
-	// the bits in the right place for the following OR)
+	// Add both of the above and zero low word(to account for 16-bit shift of
+	// coefficients and place the bits in the right place for the following OR)
 	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
-	_M(agScratch) = _mm_slli_epi32 (_M(agScratch), 16);								// PSLLD		1	1
+	_M(agScratch) = _mm_and_si128 (_M(agScratch), _M(zeroLowWord));					// PAND			1	0.33
 	// 0		V12		0		V34		0		V56		0		V78
 
 	// combine U and V
@@ -744,11 +753,13 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2
  *
  * Y = 	[  16  ] + [  0.183		 0.614		 0.062	]	( R )
  *
- *				All coeffs are left-shifted by 16 bits
- * 					[  11993	 40239		 4063	]
+ *				All coeffs are left-shifted by 15 bits
+ * 					[  5997	 	20119		 2032	]
  *
- * Note: the Y calculation involves only positive values and coefficients and
- * thus uses only unsigned math.
+ * Note: the Y calculation involves only positive values and coefficients but
+ * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
+ * shift (instead of 16, which would cause the yG coefficient to go over the
+ * 32767 limit).
  *
  * INPUT:
  *
@@ -772,8 +783,8 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2
  *
  */
 EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_bt709_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(agYCoeffs, 0x9D2F00009D2F0000LL, 0x9D2F00009D2F0000LL);
-	CONST_M128I(rbYCoeffs, 0x0FDF2ED90FDF2ED9LL, 0x0FDF2ED90FDF2ED9LL);
+	CONST_M128I(agYCoeffs, 0x4E9700004E970000LL, 0x4E9700004E970000LL);
+	CONST_M128I(rbYCoeffs, 0x07F0176D07F0176DLL, 0x07F0176D07F0176DLL);
 	CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);
 
 	M128I(y1Scratch, 0x0LL, 0x0LL);
@@ -791,9 +802,9 @@ EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_bt709_sse2(__m128i* in_4_v1
 	// Multiply R & B values by 16-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 16);								// PSRLD		1	1
+	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
 
 
 	//
@@ -806,9 +817,9 @@ EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_bt709_sse2(__m128i* in_4_v1
 	// Multiply R & B values by 16-bit left-shifted Y coeffs
 	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16
+	// Add both of the above and shift right by 15
 	_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 16);								// PSRLD		1	1
+	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
 
 
 	// pack both sets of Y values (32 bit to 16 bit values) and add 16
@@ -854,6 +865,7 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2
 	CONST_M128I(rbUCoeffs, 0x7062E6257062E625LL, 0x7062DA1D7062DA1DLL);
 	CONST_M128I(agVCoeffs, 0x99DB000099DB0000LL, 0x99DB000099DB0000LL);
 	CONST_M128I(rbVCoeffs, 0xF5C37062F5C37062LL, 0xF5C37062F5C37062LL);
+	CONST_M128I(zeroLowWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
 
 	M128I(rbScratch, 0x0LL, 0x0LL);
 	M128I(agScratch, 0x0LL, 0x0LL);
@@ -878,10 +890,10 @@ EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2
 	// Multiply R & B values by 16-bit left-shifted V coeffs
 	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbVCoeffs));		// PMADDWD		3	1
 
-	// Add both of the above and shift right by 16 (here we shift left to place
-	// the bits in the right place for the following OR)
+	// Add both of the above and zero low word(to account for 16-bit shift of
+	// coefficients and place the bits in the right place for the following OR)
 	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
-	_M(agScratch) = _mm_slli_epi32 (_M(agScratch), 16);								// PSLLD		1	1
+	_M(agScratch) = _mm_and_si128 (_M(agScratch), _M(zeroLowWord));					// PAND			1	0.33
 	// 0		V12		0		V34		0		V56		0		V78
 
 	// combine U and V
