@@ -583,14 +583,14 @@ EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_rgb24_ve
 	__m128i		argb_vectors[8];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
+	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
 
 	// Unpack to ARGB first, then to AG / RB
 	while (index < 16) {
-		*dest++ = 0;
-		memcpy(dest, in_3_v8i_rgb24_vectors, 3);
-
-		in_3_v8i_rgb24_vectors += 3;
-		dest += 3;
+		*dest++ = 0;		// A
+		*dest++ = *src++; 	// R
+		*dest++ = *src++;	// G
+		*dest++ = *src++;	// B
 		index++;
 	}
 
@@ -738,14 +738,14 @@ EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_rgb24_ve
 	__m128i		argb_vectors[8];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
+	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
 	
 	// Unpack to ARGB first, then to AG / RB
 	while (index < 16) {
-		*dest++ = 0;
-		memcpy(dest, in_3_v8i_rgb24_vectors, 3);
-		
-		in_3_v8i_rgb24_vectors += 3;
-		dest += 3;
+		*dest++ = 0;		// A
+		*dest++ = *src++;	// R
+		*dest++ = *src++;	// G
+		*dest++ = *src++;	// B
 		index++;
 	}
 	
@@ -912,14 +912,14 @@ EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_bgr24_ve
 	__m128i		bgra_vectors[8];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
+	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
 	
 	// Unpack to BGRA first, then to AG / RB
 	while (index < 16) {
-		memcpy(dest, in_3_v8i_bgr24_vectors, 3);
-		*(dest+3) = 0;
-		
-		in_3_v8i_bgr24_vectors += 3;
-		dest += 4;
+		*dest++ = *src++;	// B
+		*dest++ = *src++;	// G
+		*dest++ = *src++;	// R
+		*dest++ = 0;		// A
 		index++;
 	}
 	
@@ -1067,14 +1067,14 @@ EXTERN_INLINE void unpack_bgr24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_bgr24_ve
 	__m128i		bgra_vectors[8];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
-	
+	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
+
 	// Unpack to BGRA first, then to AG / RB
 	while (index < 16) {
-		memcpy(dest, in_3_v8i_bgr24_vectors, 3);
-		*(dest + 3) = 0;
-		
-		in_3_v8i_bgr24_vectors += 3;
-		dest += 4;
+		*dest++ = *src++;	// B
+		*dest++ = *src++;	// G
+		*dest++ = *src++;	// R
+		*dest++ = 0;		// A
 		index++;
 	}
 	
