@@ -25,7 +25,9 @@
 #ifndef RGB_DOWNSAMPLE_H_
 #define RGB_DOWNSAMPLE_H_
 
-
+#include <emmintrin.h>
+#include <tmmintrin.h>
+#include "platform_util.h"
 
 /*
  * Create 3 422 downsampled R, G, B vectors from 3 R, G, B vectors

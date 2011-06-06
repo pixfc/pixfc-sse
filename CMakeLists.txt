@@ -66,6 +66,7 @@ list(APPEND EXTERN_INLINE_HEADER_LIST
 	yuv_to_rgb_convert_bt601
 	yuv_to_rgb_convert_bt709
 	rgb_pack
+	rgb_downsample
 	rgb_unpack
 	rgb_to_yuv_convert
 	yuv_pack

@@ -596,6 +596,14 @@ EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_rgb24_ve
 
 	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[0], &out_8_v16i_ag_rb_vectors[0]);
 	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[4], &out_8_v16i_ag_rb_vectors[4]);
+	print_xmm16u("ag 1-4", &out_8_v16i_ag_rb_vectors[0]);
+	print_xmm16u("rb 1-4", &out_8_v16i_ag_rb_vectors[1]);
+	print_xmm16u("ag 5-8", &out_8_v16i_ag_rb_vectors[2]);
+	print_xmm16u("rb 5-8", &out_8_v16i_ag_rb_vectors[3]);
+	print_xmm16u("ag 9-12", &out_8_v16i_ag_rb_vectors[4]);
+	print_xmm16u("rb 9-12", &out_8_v16i_ag_rb_vectors[5]);
+	print_xmm16u("ag 13-16", &out_8_v16i_ag_rb_vectors[6]);
+	print_xmm16u("rb 13-16", &out_8_v16i_ag_rb_vectors[7]);
 };
 
 
