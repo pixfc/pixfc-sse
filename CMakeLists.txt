@@ -38,6 +38,12 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_bgra.c
 	conversion_routines_from_bgra_bt601.c
 	conversion_routines_from_bgra_bt709.c
+	conversion_routines_from_rgb24.c
+	conversion_routines_from_rgb24_bt601.c
+	conversion_routines_from_rgb24_bt709.c
+	conversion_routines_from_bgr24.c
+	conversion_routines_from_bgr24_bt601.c
+	conversion_routines_from_bgr24_bt709.c
 )
 
 # Source files for test apps

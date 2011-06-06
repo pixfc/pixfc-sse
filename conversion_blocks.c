@@ -26,6 +26,8 @@
 #include "conversion_routines_from_uyvy.h"
 #include "conversion_routines_from_argb.h"
 #include "conversion_routines_from_bgra.h"
+#include "conversion_routines_from_rgb24.h"
+#include "conversion_routines_from_bgr24.h"
 
 #define 	DECLARE_CONV_BLOCK(convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, desc)\
 { convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, desc }
@@ -131,6 +133,23 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// BGRA to UYVY
 	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, "BGRA to UYVY"),
+
+
+	//
+	// RGB24 to YUYV
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, "RGB24 to YUYV"),
+
+	// RGB24 to UYVY
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_uyvy, downsample_n_convert_rgb24_to_uyvy, convert_rgb_to_yuv422, PixFcRGB24, PixFcUYVY, "RGB24 to UYVY"),
+
+
+	//
+	// BGR24 to YUYV
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, "BGR24 to YUYV"),
+
+	// BGGR24 to UYVY
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_uyvy, downsample_n_convert_bgr24_to_uyvy, convert_rgb_to_yuv422, PixFcBGR24, PixFcUYVY, "BGR24 to UYVY"),
+
 
 	//
 	// YUYV to ARGB

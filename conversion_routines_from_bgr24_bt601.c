@@ -1,5 +1,5 @@
 /*
- * conversion_routines_from_bgra_bt601.c
+ * conversion_routines_from_bgr24_bt601.c
  *
  * Copyright (C) 2011 PixFC Team (pixelfc@gmail.com)
  *
@@ -24,8 +24,8 @@
 #include "argb_conversion_common.h"
 
 #define CONVERT_TO_YUV422(pack_fn, instr_set)\
-			CONVERT_RGB32_TO_YUV422(\
-						unpack_bgra_to_r_g_b_vectors_,\
+			CONVERT_RGB24_TO_YUV422(\
+						unpack_bgr24_to_r_g_b_vectors_,\
 						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
 						pack_fn,\
@@ -33,8 +33,8 @@
 			)
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
-			CONVERT2_RGB32_TO_YUV422(\
-						unpack_bgra_to_ag_rb_vectors_,\
+			CONVERT2_RGB24_TO_YUV422(\
+						unpack_bgr24_to_ag_rb_vectors_,\
 						convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\
 						pack_fn,\
@@ -42,8 +42,8 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
-			AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422(\
-						unpack_bgra_to_r_g_b_vectors_,\
+			AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422(\
+						unpack_bgr24_to_r_g_b_vectors_,\
 						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
 						pack_fn,\
@@ -51,8 +51,8 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
-			AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422(\
-						unpack_bgra_to_ag_rb_vectors_,\
+			AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422(\
+						unpack_bgr24_to_ag_rb_vectors_,\
 						convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\
 						pack_fn,\
@@ -61,43 +61,43 @@
 
 
 
-// BGRA to YUYV			SSE2 SSSE3
-void		convert_bgra_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+// BGR24 to YUYV			SSE2 SSSE3
+void		convert_bgr24_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
-void		downsample_n_convert_bgra_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+void		downsample_n_convert_bgr24_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
 
-// BGRA to YUYV			SSE2
-void		convert_bgra_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+// BGR24 to YUYV			SSE2
+void		convert_bgr24_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
-void		downsample_n_convert_bgra_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+void		downsample_n_convert_bgr24_to_yuyv_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
 
 
 
-// BGRA to UYVV			SSE2 SSSE3
-void		convert_bgra_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+// BGR24 to UYVV			SSE2 SSSE3
+void		convert_bgr24_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
 }
 
-void		downsample_n_convert_bgra_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+void		downsample_n_convert_bgr24_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
 }
 
 
-// BGRA to UYVY			SSE2
-void		convert_bgra_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+// BGR24 to UYVY			SSE2
+void		convert_bgr24_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
 }
 
-void		downsample_n_convert_bgra_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+void		downsample_n_convert_bgr24_to_uyvy_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
 }
