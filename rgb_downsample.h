@@ -301,8 +301,10 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
 	_M(scratch2) = _mm_srli_si128(in_2_v16i_previous_ag_rb_vectors[0], 12);										// PSRLDQ		1	0.5
 	// A8 0		G8 0	0 0		0 0		0 0		0 0		0 0		0 0
 
-	// Save current to previous
-	in_2_v16i_previous_ag_rb_vectors[0] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[0]);					// MOVDQA		1	0.33
+	// Save current to previous (we dont really save the current vector, just one
+	// containing the last pixel in the last position, as it is going to be 12-byte 
+	// right-shifted as above anyway.
+	in_2_v16i_previous_ag_rb_vectors[0] = _mm_load_si128(scratch1);												// MOVDQA		1	0.33
 
 	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
 	// 0 0		0 0 	A2 0	G2 0	A4 0	G4 0	A6 0	G6 0
@@ -335,8 +337,10 @@ EXTERN_INLINE void	avg_422_downsample_ag_rb_vectors_n_save_previous_sse2(__m128i
 	_M(scratch2) = _mm_srli_si128(in_2_v16i_previous_ag_rb_vectors[1], 12);										// PSRLDQ		1	0.5
 	// R8 0		B8 0	0 0		0 0		0 0		0 0		0 0		0 0
 
-	// Save current to previous
-	in_2_v16i_previous_ag_rb_vectors[1] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[1]);					// MOVDQA		1	0.33
+	// Save current to previous (we dont really save the current vector, just one
+	// containing the last pixel in the last position, as it is going to be 12-byte 
+	// right-shifted as above anyway.
+	in_2_v16i_previous_ag_rb_vectors[1] = _mm_load_si128(scratch1);												// MOVDQA		1	0.33
 
 	_M(scratch3) = _mm_slli_si128(_M(scratch1), 4);																// PSLLDQ		1	0.5
 	// 0 0		0 0 	R2 0	B2 0	R4 0	B4 0	R6 0	B6 0
