@@ -193,7 +193,7 @@
 		nnb_422_downsample_ag_rb_vectors_##instr_set(unpack_out, unpack_out);\
 		uv_conv_fn(unpack_out, &convert_out[1]);\
 		y_conv_fn(&unpack_out[4], &convert_out[2]);\
-		nnb_422_downsample_ag_rb_vectors_##instr_set(&unpack_out[3], &unpack_out[4]);\
+		nnb_422_downsample_ag_rb_vectors_##instr_set(&unpack_out[4], &unpack_out[4]);\
 		uv_conv_fn(&unpack_out[4], &convert_out[3]);\
 		pack_fn(convert_out, yuv_out);\
 		rgb_in += 3;\
@@ -249,11 +249,11 @@
 	y_conv_fn(unpack_out, convert_out);\
 	avg_422_downsample_first_ag_rb_vectors_##instr_set(unpack_out, downsample_out);\
 	uv_conv_fn(downsample_out, &convert_out[1]);\
-	previous[0] = _mm_load_si128(&unpack_out[3]);\
-	previous[1] = _mm_load_si128(&unpack_out[4]);\
+	previous[0] = _mm_load_si128(&unpack_out[2]);\
+	previous[1] = _mm_load_si128(&unpack_out[3]);\
 	y_conv_fn(&unpack_out[4], &convert_out[2]);\
-	avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(&unpack_out[4], previous, unpack_out);\
-	uv_conv_fn(unpack_out, &convert_out[3]);\
+	avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(&unpack_out[4], previous, downsample_out);\
+	uv_conv_fn(downsample_out, &convert_out[3]);\
 	pack_fn(convert_out, yuv_out);\
 	rgb_in += 3;\
 	yuv_out += 2;\
@@ -263,6 +263,7 @@
 		y_conv_fn(unpack_out, convert_out);\
 		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out);\
 		uv_conv_fn(downsample_out, &convert_out[1]);\
+		y_conv_fn(&unpack_out[4], &convert_out[2]);\
 		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(&unpack_out[4], previous, unpack_out);\
 		uv_conv_fn(unpack_out, &convert_out[3]);\
 		pack_fn(convert_out, yuv_out);\

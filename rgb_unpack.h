@@ -580,7 +580,7 @@ EXTERN_INLINE void unpack_bgra_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_arg
  */
 EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_rgb24_vectors, __m128i* out_8_v16i_ag_rb_vectors)
 {
-	__m128i		argb_vectors[8];
+	__m128i		argb_vectors[4];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
@@ -595,15 +595,7 @@ EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_rgb24_ve
 	}
 
 	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[0], &out_8_v16i_ag_rb_vectors[0]);
-	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[4], &out_8_v16i_ag_rb_vectors[4]);
-	print_xmm16u("ag 1-4", &out_8_v16i_ag_rb_vectors[0]);
-	print_xmm16u("rb 1-4", &out_8_v16i_ag_rb_vectors[1]);
-	print_xmm16u("ag 5-8", &out_8_v16i_ag_rb_vectors[2]);
-	print_xmm16u("rb 5-8", &out_8_v16i_ag_rb_vectors[3]);
-	print_xmm16u("ag 9-12", &out_8_v16i_ag_rb_vectors[4]);
-	print_xmm16u("rb 9-12", &out_8_v16i_ag_rb_vectors[5]);
-	print_xmm16u("ag 13-16", &out_8_v16i_ag_rb_vectors[6]);
-	print_xmm16u("rb 13-16", &out_8_v16i_ag_rb_vectors[7]);
+	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[2], &out_8_v16i_ag_rb_vectors[4]);
 };
 
 
@@ -743,7 +735,7 @@ EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2_ssse3(__m128i* in_3_v8i_rg
  */
 EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_rgb24_vectors, __m128i* out_6_v16i_r_g_b_vectors)
 {
-	__m128i		argb_vectors[8];
+	__m128i		argb_vectors[4];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
@@ -758,7 +750,7 @@ EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_rgb24_ve
 	}
 	
 	unpack_argb_to_r_g_b_vectors_sse2(&argb_vectors[0], &out_6_v16i_r_g_b_vectors[0]);
-	unpack_argb_to_r_g_b_vectors_sse2(&argb_vectors[4], &out_6_v16i_r_g_b_vectors[3]);
+	unpack_argb_to_r_g_b_vectors_sse2(&argb_vectors[2], &out_6_v16i_r_g_b_vectors[3]);
 };
 
 
@@ -917,7 +909,7 @@ EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v8i_rg
  */
 EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_8_v16i_ag_rb_vectors)
 {
-	__m128i		bgra_vectors[8];
+	__m128i		bgra_vectors[4];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
@@ -932,7 +924,7 @@ EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_bgr24_ve
 	}
 	
 	unpack_bgra_to_ag_rb_vectors_sse2(&bgra_vectors[0], &out_8_v16i_ag_rb_vectors[0]);
-	unpack_bgra_to_ag_rb_vectors_sse2(&bgra_vectors[4], &out_8_v16i_ag_rb_vectors[4]);
+	unpack_bgra_to_ag_rb_vectors_sse2(&bgra_vectors[2], &out_8_v16i_ag_rb_vectors[4]);
 };
 
 
@@ -1072,7 +1064,7 @@ EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2_ssse3(__m128i* in_3_v8i_bg
  */
 EXTERN_INLINE void unpack_bgr24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_6_v16i_r_g_b_vectors)
 {
-	__m128i		bgra_vectors[8];
+	__m128i		bgra_vectors[4];
 	uint32_t	index = 0;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
@@ -1087,7 +1079,7 @@ EXTERN_INLINE void unpack_bgr24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_bgr24_ve
 	}
 	
 	unpack_bgra_to_r_g_b_vectors_sse2(&bgra_vectors[0], &out_6_v16i_r_g_b_vectors[0]);
-	unpack_bgra_to_r_g_b_vectors_sse2(&bgra_vectors[4], &out_6_v16i_r_g_b_vectors[3]);
+	unpack_bgra_to_r_g_b_vectors_sse2(&bgra_vectors[2], &out_6_v16i_r_g_b_vectors[3]);
 };
 
 
