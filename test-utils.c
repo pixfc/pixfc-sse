@@ -316,7 +316,7 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 					buffer[9], buffer[10], buffer[11],
 					buffer[12], buffer[13], buffer[14],
 					buffer[15], buffer[16], buffer[17],
-					buffer[28], buffer[19], buffer[20],
+					buffer[18], buffer[19], buffer[20],
 					buffer[21], buffer[22], buffer[23],
 					buffer[24], buffer[25], buffer[26],
 					buffer[27], buffer[28], buffer[29],
