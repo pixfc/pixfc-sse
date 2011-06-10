@@ -135,8 +135,8 @@
 	pixel_count -= 16;\
 	while(pixel_count > 0) {\
 		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
-		y_conv_fn(unpack_out, convert_out);\
 		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out);\
+		y_conv_fn(unpack_out, convert_out);\
 		uv_conv_fn(downsample_out, &convert_out[1]);\
 		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
 		y_conv_fn(unpack_out, &convert_out[2]);\
