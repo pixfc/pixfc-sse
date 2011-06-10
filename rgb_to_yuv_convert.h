@@ -27,173 +27,6 @@
 
 #include "platform_util.h"
 
-/*
- * Convert 4 vectors of 8 short AG, RB into 1 vector of 8 short Y
- * using full range RGB to YCbCr conversion equations from
- * http://www.equasys.de/colorconversion.html
- *
- * Total latency: 			17 cycles
- * Num of pixel handled:	8
- *
- * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
- *
- *				All coeffs are left-shifted by 15 bits
- * 					[  9798	 	19325		 3736	]
- *
- * Note: the Y calculation involves only positive values and coefficients but
- * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
- * shift (instead of 16, which would cause the yG coefficient to go over the
- * 32767 limit).
- *
- * INPUT:
- *
- * 4 vectors of 8 short:
- * agVect1
- * A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
- *
- * rbVect1
- * R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0
- *
- * agVect2
- * A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0
- *
- * rbVect3
- * R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0
- *
- * OUTPUT:
- *
- * yVect
- * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
- *
- */
-EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(agYCoeffs, 0x4B7D00004B7D0000LL, 0x4B7D00004B7D0000LL);
-	CONST_M128I(rbYCoeffs, 0x0E9826460E982646LL, 0x0E9826460E982646LL);
-	
-	M128I(y1Scratch, 0x0LL, 0x0LL);
-	M128I(y2Scratch, 0x0LL, 0x0LL);
-	M128I(scratch, 0x0LL, 0x0LL);
-
-	
-	//
-	// Y 1-4
-	// AG coeffs
-	// Multiply A & G values by 15-bit left-shifted Y coeffs
-	_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[0], _M(agYCoeffs));		// PMADDWD		3	1
-	
-	// RB coeffs
-	// Multiply R & B values by 15-bit left-shifted Y coeffs
-	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 15
-	_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
-	
-	
-	//
-	// Y 5-8
-	// AG coeffs
-	// Multiply A & G values by 15-bit left-shifted Y coeffs
-	_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[2], _M(agYCoeffs));		// PMADDWD		3	1
-	
-	// RB coeffs
-	// Multiply R & B values by 15-bit left-shifted Y coeffs
-	_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 15
-	_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
-	
-	
-	// pack both sets of Y values (32 bit to 16 bit values)
-	*out_1_v16i_y_vector = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));			// PACKSSDW		1	0.5
-	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
-}
-
-
-/*
- * Convert 4 vectors of 8 short GA, BR into 1 vector of 8 short Y
- * using full range RGB to YCbCr conversion equations from
- * http://www.equasys.de/colorconversion.html
- *
- * Total latency: 			17 cycles
- * Num of pixel handled:	8
- *
- * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
- *
- *				All coeffs are left-shifted by 15 bits
- * 					[  9798	 	19325		 3736	]
- *
- * Note: the Y calculation involves only positive values and coefficients but
- * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
- * shift (instead of 16, which would cause the yG coefficient to go over the
- * 32767 limit).
- *
- * INPUT:
- *
- * 4 vectors of 8 short:
- * gaVect1
- * G1 0		A1 0	G2 0	A2 0	G3 0	A3 0	G4 0	A4 0
- *
- * brVect1
- * B1 0		R1 0	B2 0	R2 0	B3 0	R3 0	B4 0	R4 0
- *
- * gaVect2
- * G5 0		A5 0	G6 0	A6 0	G7 0	A7 0	G8 0	A8 0
- *
- * brVect3
- * B5 0		R5 0	B6 0	R6 0	B7 0	R7 0	B8 0	R8 0
- *
- * OUTPUT:
- *
- * yVect
- * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
- *
- */
-EXTERN_INLINE void convert_ga_br_vectors_to_y_vector_sse2(__m128i* in_4_v16i_ga_br_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(gaYCoeffs, 0x00004B7D00004B7DLL, 0x00004B7D00004B7DLL);
-	CONST_M128I(brYCoeffs, 0x26460E9826460E98LL, 0x26460E9826460E98LL);
-	
-	M128I(y1Scratch, 0x0LL, 0x0LL);
-	M128I(y2Scratch, 0x0LL, 0x0LL);
-	M128I(scratch, 0x0LL, 0x0LL);
-	
-	
-	//
-	// Y 1-4
-	// GA coeffs
-	// Multiply A & G values by 15-bit left-shifted Y coeffs
-	_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[0], _M(gaYCoeffs));		// PMADDWD		3	1
-	
-	// BR coeffs
-	// Multiply R & B values by 15-bit left-shifted Y coeffs
-	_M(scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[1], _M(brYCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 15
-	_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
-	
-	
-	//
-	// Y 5-8
-	// GA coeffs
-	// Multiply A & G values by 15-bit left-shifted Y coeffs
-	_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[2], _M(gaYCoeffs));		// PMADDWD		3	1
-	
-	// BR coeffs
-	// Multiply R & B values by 15-bit left-shifted Y coeffs
-	_M(scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[3], _M(brYCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 15
-	_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
-	_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
-	
-	
-	// pack both sets of Y values (32 bit to 16 bit values)
-	*out_1_v16i_y_vector = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));			// PACKSSDW		1	0.5
-	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
-}
-
 
 /*
  * Convert 3 vectors of 8 short R, G, B into 1 vector of 8 short Y
@@ -257,241 +90,60 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2(__m128i* in_3_v16i_r_g
 	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
 }
 
-/*
- * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
- * using full range RGB to YCbCr conversion equations from
- * http://www.equasys.de/colorconversion.html
- *
- * Total latency: 			12 cycles
- * Num of pixel handled:	8
- *
- * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
- * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
- *
- *				All coeffs are left-shifted by 16 bits
- * 					[ -11076	-21692		 32767	]
- * 					[  32767	-27460		-5308	]
- *
- *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
- *			16-bit signed integers, they have been capped to the maximum value for this
- *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
- *			approximation.
- *
- * INPUT:
- *
- * 3 vectors of 8 short:
- * rVect
- * R12 0	R12 0	R34 0	R34 0	R56 0	R56 0	R78 0	R78 0
- *
- * gVect
- * G12 0	G12 0	G34 0	G34 0	G56 0	G56 0	G78 0	G78 0
- *
- * bVect
- * B12 0	B12 0	B34 0	B34 0	B56 0	B56 0	B78 0	B78 0
- *
- * OUTPUT:
- *
- * uvVect
- * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
- *
- */
-
-EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
-	CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
-	CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
-	CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
-	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
-	
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
-	
-	//
-	// r UV 
-	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	3	1
-	
-	// g UV 
-	_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	3	1
-	
-	// b UV 
-	_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	3	1
-	
-	// r UV + g UV + b UV
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));							//	PADDW	1	0.5
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));							//	PADDW	1	0.5
-	
-	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));					//	PADDW	1	0.5
-	// U12 V12			U34 V34			U56 V56			U78 V78
-};
-
 
 /*
- * Convert 4 vectors of 8 short downsampled 422 AG, RB into 1 vector of 8 short U-V
- * using full range RGB to YCbCr conversion equations from
- * http://www.equasys.de/colorconversion.html
- *
- * Total latency: 			18 cycles
- * Num of pixel handled:	8
- *
- * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
- * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
- *
- *				All coeffs are left-shifted by 16 bits
- * 					[ -11076	-21692		 32767	]
- * 					[  32767	-27460		-5308	]
- *
- *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
- *			16-bit signed integers, they have been capped to the maximum value for this
- *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
- *			approximation.
- *
- * INPUT:
- *
- * 2 vectors of 8 short:
- * agVect
- * A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
- *
- * rbVect
- * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
- *
- * OUTPUT:
- *
- * uvVect
- * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
- *
+ * R, G, B vectors to Y vector - bt{601,709}
  */
-
-EXTERN_INLINE void convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2(__m128i* in_2_v16i_ag_rb_vectors, __m128i* out_1_v16i_uv_vector) {
-	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
-	CONST_M128I(agUCoeffs, 0xAB440000AB440000LL, 0xAB440000AB440000LL);
-	CONST_M128I(rbUCoeffs, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
-	CONST_M128I(agVCoeffs, 0x94BC000094BC0000LL, 0x94BC000094BC0000L);
-	CONST_M128I(rbVCoeffs, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
-	CONST_M128I(zeroLowWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
-
-	M128I(rbScratch, 0x0LL, 0x0LL);
-	M128I(agScratch, 0x0LL, 0x0LL);
-
-	
-	//
-	// U
-	// Multiply A & G values by 16-bit left-shifted U coeffs
-	_M(agScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[0], _M(agUCoeffs));		// PMADDWD		3	1
-	// Multiply R & B values by 16-bit left-shifted U coeffs
-	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbUCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 16
-	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
-	*out_1_v16i_uv_vector = _mm_srli_epi32 (_M(agScratch), 16);						// PSRLD		1	1
-	// U12		0		U34		0		U56		0		U78		0
-
-	//
-	// V
-	// Multiply A & G values by 16-bit left-shifted V coeffs
-	_M(agScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[0], _M(agVCoeffs));		// PMADDWD		3	1
-	// Multiply R & B values by 16-bit left-shifted V coeffs
-	_M(rbScratch) = _mm_madd_epi16(in_2_v16i_ag_rb_vectors[1], _M(rbVCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and zero low word(to account for 16-bit shift of
-	// coefficients and place the bits in the right place for the following OR)
-	_M(agScratch) = _mm_add_epi32(_M(agScratch), _M(rbScratch));					// PADDD		1	0.5
-	_M(agScratch) = _mm_and_si128 (_M(agScratch), _M(zeroLowWord));					// PAND			1	0.33
-	// 0		V12		0		V34		0		V56		0		V78
-
-	// combine U and V
-	_M(agScratch) = _mm_or_si128(*out_1_v16i_uv_vector, _M(agScratch));				// POR			1	0.33
-	// U12		V12		U34		V34		U56		V56		U78		V78
-	
-	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(agScratch), _M(add128));				//PADDW			1	0.5
-	// U12 		V12		U34 	V34		U56 	V56		U78 	V78
-};
-
-
-
+#define DEFINE_R_G_B_TO_Y_INLINE(fn_name, rCoeffVal, gCoeffVal, bCoeffVal)\
+	EXTERN_INLINE void fn_name(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {\
+		CONST_M128I(rYCoeffs, rCoeffVal, rCoeffVal);\
+		CONST_M128I(gYCoeffs, gCoeffVal, gCoeffVal);\
+		CONST_M128I(bYCoeffs, bCoeffVal, bCoeffVal);\
+		CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);\
+		M128I(rScratch, 0x0LL, 0x0LL);\
+		M128I(gScratch, 0x0LL, 0x0LL);\
+		M128I(bScratch, 0x0LL, 0x0LL);\
+		_M(rScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[0], _M(rYCoeffs));\
+		_M(gScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[1], _M(gYCoeffs));\
+		_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));\
+		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));\
+		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));\
+		*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(add_16));\
+	}
 /*
- * Convert 4 vectors of 8 short downsampled 422 AG, RB into 1 vector of 8 short U-V
- * using full range RGB to YCbCr conversion equations from
- * http://www.equasys.de/colorconversion.html
+ * The previous macro expands to:
  *
- * Total latency: 			18 cycles
- * Num of pixel handled:	8
+ * 	EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_bt709_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {
+ *		CONST_M128I(rYCoeffs, 0x2ED92ED92ED92ED9LL, 0x2ED92ED92ED92ED9LL);
+ *		CONST_M128I(gYCoeffs, 0x9D2F9D2F9D2F9D2FLL, 0x9D2F9D2F9D2F9D2FLL);
+ *		CONST_M128I(bYCoeffs, 0x0FDF0FDF0FDF0FDFLL, 0x0FDF0FDF0FDF0FDFLL);
+ *		CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);
  *
- * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
- * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
+ *		M128I(rScratch, 0x0LL, 0x0LL);
+ *		M128I(gScratch, 0x0LL, 0x0LL);
+ *		M128I(bScratch, 0x0LL, 0x0LL);
  *
- *				All coeffs are left-shifted by 16 bits
- * 					[ -11076	-21692		 32767	]
- * 					[  32767	-27460		-5308	]
+ *		//
+ *		// Y
+ *		// R coeffs
+ *		// Multiply R values by 16-bit left-shifted Y coeffs and keep highest 16 bits
+ *		_M(rScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[0], _M(rYCoeffs));		// PMULHUW		3	1
  *
- *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
- *			16-bit signed integers, they have been capped to the maximum value for this
- *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
- *			approximation.
+ *		// G coeffs
+ *		// Multiply G values by 16-bit left-shifted Y coeffs and keep highest 16 bits
+ *		_M(gScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[1], _M(gYCoeffs));		// PMULHUW		3	1
  *
- * INPUT:
+ *		// B coeffs
+ *		// Multiply B values by 16-bit left-shifted Y coeffs and keep highest 16 bits
+ *		_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));		// PMULHUW		3	1
  *
- * 2 vectors of 8 short:
- * gaVect
- * G12 0	A12 0	G34 0	A34 0	G56 0	A56 0	G78 0	A78 0
- *
- * rbVect
- * B12 0	R12 0	B34 0	R34 0	B56 0	R56 0	B78 0	R78 0
- *
- * OUTPUT:
- *
- * uvVect
- * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));						// PADDW		1	0.5
+ *		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));						// PADDW		1	0.5
+ *		*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(add_16));					// PADDW		1	0.5
+ *		// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
+ *	}
  *
  */
-
-EXTERN_INLINE void convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2(__m128i* in_2_v16i_ga_br_vectors, __m128i* out_1_v16i_uv_vector) {
-	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
-	CONST_M128I(gaUCoeffs, 0x0000AB440000AB44LL, 0x0000AB440000AB44LL);
-	CONST_M128I(brUCoeffs, 0xD4BC7FFFD4BC7FFFLL, 0xD4BC7FFFD4BC7FFFLL);
-	CONST_M128I(gaVCoeffs, 0x000094BC000094BCLL, 0x000094BC000094BCL);
-	CONST_M128I(brVCoeffs, 0x7FFFEB447FFFEB44LL, 0x7FFFEB447FFFEB44LL);
-	CONST_M128I(zeroLowWord, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);
-	
-	M128I(brScratch, 0x0LL, 0x0LL);
-	M128I(gaScratch, 0x0LL, 0x0LL);
-	
-	
-	//
-	// U
-	// Multiply A & G values by 16-bit left-shifted U coeffs
-	_M(gaScratch) = _mm_madd_epi16(in_2_v16i_ga_br_vectors[0], _M(gaUCoeffs));		// PMADDWD		3	1
-	// Multiply R & B values by 16-bit left-shifted U coeffs
-	_M(brScratch) = _mm_madd_epi16(in_2_v16i_ga_br_vectors[1], _M(brUCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and shift right by 16
-	_M(gaScratch) = _mm_add_epi32(_M(gaScratch), _M(brScratch));					// PADDD		1	0.5
-	*out_1_v16i_uv_vector = _mm_srli_epi32 (_M(gaScratch), 16);						// PSRLD		1	1
-	// U12		0		U34		0		U56		0		U78		0
-	
-	//
-	// V
-	// Multiply A & G values by 16-bit left-shifted V coeffs
-	_M(gaScratch) = _mm_madd_epi16(in_2_v16i_ga_br_vectors[0], _M(gaVCoeffs));		// PMADDWD		3	1
-	// Multiply R & B values by 16-bit left-shifted V coeffs
-	_M(brScratch) = _mm_madd_epi16(in_2_v16i_ga_br_vectors[1], _M(brVCoeffs));		// PMADDWD		3	1
-	
-	// Add both of the above and zero low word(to account for 16-bit shift of
-	// coefficients and place the bits in the right place for the following OR)
-	_M(gaScratch) = _mm_add_epi32(_M(gaScratch), _M(brScratch));					// PADDD		1	0.5
-	_M(gaScratch) = _mm_and_si128 (_M(gaScratch), _M(zeroLowWord));					// PAND			1	0.33
-	// 0		V12		0		V34		0		V56		0		V78
-	
-	// combine U and V
-	_M(gaScratch) = _mm_or_si128(*out_1_v16i_uv_vector, _M(gaScratch));				// POR			1	0.33
-	// U12		V12		U34		V34		U56		V56		U78		V78
-	
-	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(gaScratch), _M(add128));				//PADDW			1	0.5
-	// U12 		V12		U34 	V34		U56 	V56		U78 	V78
-};
-
 
 
 /*
@@ -528,101 +180,7 @@ EXTERN_INLINE void convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2(__m12
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_bt601_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(rYCoeffs, 0x41CB41CB41CB41CBLL, 0x41CB41CB41CB41CBLL);
-	CONST_M128I(gYCoeffs, 0x8106810681068106LL, 0x8106810681068106LL);
-	CONST_M128I(bYCoeffs, 0x1917191719171917LL, 0x1917191719171917LL);
-	CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);
-
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
-
-	//
-	// Y
-	// R coeffs
-	// Multiply R values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(rScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[0], _M(rYCoeffs));		// PMULHUW		3	1
-
-	// G coeffs
-	// Multiply G values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(gScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[1], _M(gYCoeffs));		// PMULHUW		3	1
-
-	// B coeffs
-	// Multiply B values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));		// PMULHUW		3	1
-
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));						// PADDW		1	0.5
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));						// PADDW		1	0.5
-	*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(add_16));					// PADDW		1	0.5
-	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
-}
-
-/*
- * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
- * using BT601 YCbCr to RGB conversion equations from
- * http://www.equasys.de/colorconversion.html
- *
- * Total latency: 			12 cycles
- * Num of pixel handled:	8
- *
- * U = 	[ 128 ] + [ -0.148		-0.291		 0.439	]	( G )
- * V = 	[ 128 ] + [  0.439		-0.368		-0.071	]	( B )
- *
- *				All coeffs are left-shifted by 16 bits
- * 					[ -9699		-19071		 28770	]
- * 					[  28770	-24117		-4653	]
- *
- *
- * INPUT:
- *
- * 3 vectors of 8 short:
- * rVect
- * R12 0	R12 0	R34 0	R34 0	R56 0	R56 0	R78 0	R78 0
- *
- * gVect
- * G12 0	G12 0	G34 0	G34 0	G56 0	G56 0	G78 0	G78 0
- *
- * bVect
- * B12 0	B12 0	B34 0	B34 0	B56 0	B56 0	B78 0	B78 0
- *
- * OUTPUT:
- *
- * uvVect
- * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
- *
- */
-
-EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
-	CONST_M128I(rUVCoeffsInterleaved, 0x7062DA1D7062DA1DLL, 0x7062DA1D7062DA1DLL);
-	CONST_M128I(gUVCoeffsInterleaved, 0xA1CBB581A1CBB581LL, 0xA1CBB581A1CBB581LL);
-	CONST_M128I(bUVCoeffsInterleaved, 0xEDD37062EDD37062LL, 0xEDD37062EDD37062LL);
-	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
-
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
-
-	//
-	// r UV
-	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	3	1
-
-	// g UV
-	_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	3	1
-
-	// b UV
-	_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	3	1
-
-	// r UV + g UV + b UV
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));							//	PADDW	1	0.5
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));							//	PADDW	1	0.5
-
-	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));					//	PADDW	1	0.5
-	// U12 V12			U34 V34			U56 V56			U78 V78
-};
-
-
+DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt601_sse2, 0x41CB41CB41CB41CBLL, 0x8106810681068106LL, 0x1917191719171917LL);
 
 /*
  * Convert 3 vectors of 8 short R, G, B into 1 vector of 8 short Y
@@ -658,35 +216,142 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_bt709_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {
-	CONST_M128I(rYCoeffs, 0x2ED92ED92ED92ED9LL, 0x2ED92ED92ED92ED9LL);
-	CONST_M128I(gYCoeffs, 0x9D2F9D2F9D2F9D2FLL, 0x9D2F9D2F9D2F9D2FLL);
-	CONST_M128I(bYCoeffs, 0x0FDF0FDF0FDF0FDFLL, 0x0FDF0FDF0FDF0FDFLL);
-	CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);
+DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED92ED92ED9LL, 0x9D2F9D2F9D2F9D2FLL, 0x0FDF0FDF0FDF0FDFLL);
 
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
 
-	//
-	// Y
-	// R coeffs
-	// Multiply R values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(rScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[0], _M(rYCoeffs));		// PMULHUW		3	1
 
-	// G coeffs
-	// Multiply G values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(gScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[1], _M(gYCoeffs));		// PMULHUW		3	1
 
-	// B coeffs
-	// Multiply B values by 16-bit left-shifted Y coeffs and keep highest 16 bits
-	_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));		// PMULHUW		3	1
+/*
+ * R, G, B vectors to UV vectors - full range, bt{601, 709}
+ */
+#define DEFINE_R_G_B_TO_UV_INLINE(fn_name, rUVCoeffVal, gUVCoeffVal, bUVCoeffVal)\
+	EXTERN_INLINE void fn_name(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {\
+		CONST_M128I(rUVCoeffsInterleaved, rUVCoeffVal, rUVCoeffVal);\
+		CONST_M128I(gUVCoeffsInterleaved, gUVCoeffVal, gUVCoeffVal);\
+		CONST_M128I(bUVCoeffsInterleaved, bUVCoeffVal, bUVCoeffVal);\
+		CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);\
+		M128I(rScratch, 0x0LL, 0x0LL);\
+		M128I(gScratch, 0x0LL, 0x0LL);\
+		M128I(bScratch, 0x0LL, 0x0LL);\
+		_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));\
+		_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));\
+		_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));\
+		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));\
+		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));\
+		*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));\
+	}
+/*
+ * The previous macro expands to
+ *
+ * EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
+ *		CONST_M128I(rUVCoeffsInterleaved, 0x7FFFD4BC7FFFD4BCLL, 0x7FFFD4BC7FFFD4BCLL);
+ *		CONST_M128I(gUVCoeffsInterleaved, 0x94BCAB4494BCAB44LL, 0x94BCAB4494BCAB44LL);
+ *		CONST_M128I(bUVCoeffsInterleaved, 0xEB447FFFEB447FFFLL, 0xEB447FFFEB447FFFLL);
+ *		CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
+ *
+ *		M128I(rScratch, 0x0LL, 0x0LL);
+ *		M128I(gScratch, 0x0LL, 0x0LL);
+ *		M128I(bScratch, 0x0LL, 0x0LL);
+ *
+ *		//
+ *		// r UV
+ *		_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	3	1
+ *
+ *		// g UV
+ *		_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	3	1
+ *
+ *		// b UV
+ *		_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	3	1
+ *
+ *		// r UV + g UV + b UV
+ *		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));							//	PADDW	1	0.5
+ *		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));							//	PADDW	1	0.5
+ *
+ *		// U,V + 128
+ *		*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));					//	PADDW	1	0.5
+ *		// U12 V12			U34 V34			U56 V56			U78 V78
+ *	};
+ *
+ */
 
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));						// PADDW		1	0.5
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));						// PADDW		1	0.5
-	*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(add_16));					// PADDW		1	0.5
-	// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
-}
+
+/*
+ * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
+ * using full range RGB to YCbCr conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			12 cycles
+ * Num of pixel handled:	8
+ *
+ * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
+ * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
+ *
+ *				All coeffs are left-shifted by 16 bits
+ * 					[ -11076	-21692		 32767	]
+ * 					[  32767	-27460		-5308	]
+ *
+ *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
+ *			16-bit signed integers, they have been capped to the maximum value for this
+ *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
+ *			approximation.
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R12 0	R12 0	R34 0	R34 0	R56 0	R56 0	R78 0	R78 0
+ *
+ * gVect
+ * G12 0	G12 0	G34 0	G34 0	G56 0	G56 0	G78 0	G78 0
+ *
+ * bVect
+ * B12 0	B12 0	B34 0	B34 0	B56 0	B56 0	B78 0	B78 0
+ *
+ * OUTPUT:
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ */
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2, 0x7FFFD4BC7FFFD4BCLL, 0x94BCAB4494BCAB44LL, 0xEB447FFFEB447FFFLL);
+
+
+/*
+ * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
+ * using BT601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			12 cycles
+ * Num of pixel handled:	8
+ *
+ * U = 	[ 128 ] + [ -0.148		-0.291		 0.439	]	( G )
+ * V = 	[ 128 ] + [  0.439		-0.368		-0.071	]	( B )
+ *
+ *				All coeffs are left-shifted by 16 bits
+ * 					[ -9699		-19071		 28770	]
+ * 					[  28770	-24117		-4653	]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R12 0	R12 0	R34 0	R34 0	R56 0	R56 0	R78 0	R78 0
+ *
+ * gVect
+ * G12 0	G12 0	G34 0	G34 0	G56 0	G56 0	G78 0	G78 0
+ *
+ * bVect
+ * B12 0	B12 0	B34 0	B34 0	B56 0	B56 0	B78 0	B78 0
+ *
+ * OUTPUT:
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ */
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2, 0x7062DA1D7062DA1DLL, 0xA1CBB581A1CBB581LL, 0xEDD37062EDD37062LL);
+
 
 /*
  * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
@@ -722,38 +387,126 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_bt709_sse2(__m128i* in_3_v1
  *
  */
 
-EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {
-	CONST_M128I(rUVCoeffsInterleaved, 0x7062E6257062E625LL, 0x7062E6257062E625LL);
-	CONST_M128I(gUVCoeffsInterleaved, 0x99DBA93799DBA937LL, 0x99DBA93799DBA937LL);
-	CONST_M128I(bUVCoeffsInterleaved, 0xF5C37062F5C37062LL, 0xF5C37062F5C37062LL);
-	CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);
-
-	M128I(rScratch, 0x0LL, 0x0LL);
-	M128I(gScratch, 0x0LL, 0x0LL);
-	M128I(bScratch, 0x0LL, 0x0LL);
-
-	//
-	// r UV
-	_M(rScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[0], _M(rUVCoeffsInterleaved));// PMULHW	3	1
-
-	// g UV
-	_M(gScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[1], _M(gUVCoeffsInterleaved));// PMULHW	3	1
-
-	// b UV
-	_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));// PMULHW	3	1
-
-	// r UV + g UV + b UV
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));							//	PADDW	1	0.5
-	_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));							//	PADDW	1	0.5
-
-	// U,V + 128
-	*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));					//	PADDW	1	0.5
-	// U12 V12			U34 V34			U56 V56			U78 V78
-};
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2, 0x7062E6257062E625LL, 0x99DBA93799DBA937LL, 0xF5C37062F5C37062LL);
 
 
+/*
+ * AG, RB vectors to Y vector - full range
+ */
+#define DEFINE_AG_RB_TO_Y_FR(fn_name, agYCoeffVal, rbYCoeffVal)\
+	EXTERN_INLINE void fn_name(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {\
+		CONST_M128I(agYCoeffs, agYCoeffVal, agYCoeffVal);\
+		CONST_M128I(rbYCoeffs, rbYCoeffVal, rbYCoeffVal);\
+		M128I(y1Scratch, 0x0LL, 0x0LL);\
+		M128I(y2Scratch, 0x0LL, 0x0LL);\
+		M128I(scratch, 0x0LL, 0x0LL);\
+		_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[0], _M(agYCoeffs));\
+		_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));\
+		_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));\
+		_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);\
+		_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[2], _M(agYCoeffs));\
+		_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));\
+		_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));\
+		_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);\
+		*out_1_v16i_y_vector = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));\
+	}
+
+/*
+ * The previous macro expands to:
+ *
+ *	EXTERN_INLINE void convert_ag_rb_vectors_to_y_vector_sse2(__m128i* in_4_v16i_ag_rb_vectors, __m128i* out_1_v16i_y_vector) {
+ *		CONST_M128I(agYCoeffs, 0x4B7D00004B7D0000LL, 0x4B7D00004B7D0000LL);
+ *		CONST_M128I(rbYCoeffs, 0x0E9826460E982646LL, 0x0E9826460E982646LL);
+ *
+ *		M128I(y1Scratch, 0x0LL, 0x0LL);
+ *		M128I(y2Scratch, 0x0LL, 0x0LL);
+ *		M128I(scratch, 0x0LL, 0x0LL);
+ *
+ *
+ *		//
+ *		// Y 1-4
+ *		// AG coeffs
+ *		// Multiply A & G values by 15-bit left-shifted Y coeffs
+ * 		_M(y1Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[0], _M(agYCoeffs));		// PMADDWD		3	1
+ *
+ *		// RB coeffs
+ *		// Multiply R & B values by 15-bit left-shifted Y coeffs
+ *		_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[1], _M(rbYCoeffs));		// PMADDWD		3	1
+ *
+ *		// Add both of the above and shift right by 15
+ * 		_M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
+ *		_M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
+ *
+ *
+ *		//
+ *		// Y 5-8
+ *		// AG coeffs
+ *		// Multiply A & G values by 15-bit left-shifted Y coeffs
+ *		_M(y2Scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[2], _M(agYCoeffs));		// PMADDWD		3	1
+ *
+ *		// RB coeffs
+ *		// Multiply R & B values by 15-bit left-shifted Y coeffs
+ *		_M(scratch) = _mm_madd_epi16(in_4_v16i_ag_rb_vectors[3], _M(rbYCoeffs));		// PMADDWD		3	1
+ *
+ *		// Add both of the above and shift right by 15
+ *		_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
+ *		_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
+ *
+ *
+ *		// pack both sets of Y values (32 bit to 16 bit values)
+ *		*out_1_v16i_y_vector = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));			// PACKSSDW		1	0.5
+ *		// Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
+ *	}
+ */
+
+/*
+ * Convert 4 vectors of 8 short AG, RB into 1 vector of 8 short Y
+ * using full range RGB to YCbCr conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			17 cycles
+ * Num of pixel handled:	8
+ *
+ * Y = 	[  0  ] + [  0.299		 0.587		 0.114	]	( R )
+ *
+ *				All coeffs are left-shifted by 15 bits
+ * 					[  9798	 	19325		 3736	]
+ *
+ * Note: the Y calculation involves only positive values and coefficients but
+ * the SSE2 instruction (PMADDWD) uses 16-bit signed operands. Hence the 15-bit
+ * shift (instead of 16, which would cause the yG coefficient to go over the
+ * 32767 limit).
+ *
+ * INPUT:
+ *
+ * 4 vectors of 8 short:
+ * agVect1
+ * A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
+ *
+ * rbVect1
+ * R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0
+ *
+ * agVect2
+ * A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0
+ *
+ * rbVect3
+ * R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0
+ *
+ * OUTPUT:
+ *
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ */
+DEFINE_AG_RB_TO_Y_FR(convert_ag_rb_vectors_to_y_vector_sse2, 0x4B7D00004B7D0000LL, 0x0E9826460E982646LL);
+
+DEFINE_AG_RB_TO_Y_FR(convert_ga_br_vectors_to_y_vector_sse2, 0x00004B7D00004B7DLL, 0x26460E9826460E98LL);
 
 
+
+/*
+ * AG, RB vectors to Y vector - bt{601,709}
+ */
 #define DEFINE_AG_RB_TO_Y_INLINE(fn_name, gaYCoeffVal, brYCoeffVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_4_v16i_ga_br_vectors, __m128i* out_1_v16i_y_vector) {\
 		CONST_M128I(gaYCoeffs, gaYCoeffVal, gaYCoeffVal);\
@@ -798,8 +551,8 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2
  *		 _M(scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[1], _M(brYCoeffs));		// PMADDWD		3	1
  *		 
  *		 // Add both of the above and shift right by 15
- *		 _M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));						// PADDD		1	0.5
- *		 _M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);								// PSRLD		1	1
+ *		 _M(y1Scratch) = _mm_add_epi32 (_M(y1Scratch), _M(scratch));					// PADDD		1	0.5
+ *		 _M(y1Scratch) = _mm_srli_epi32 (_M(y1Scratch), 15);							// PSRLD		1	1
  *		 
  *		 
  *		 //
@@ -813,13 +566,13 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2
  *		 _M(scratch) = _mm_madd_epi16(in_4_v16i_ga_br_vectors[3], _M(brYCoeffs));		// PMADDWD		3	1
  *		 
  *		 // Add both of the above and shift right by 15
- *		 _M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));						// PADDD		1	0.5
- *		 _M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);								// PSRLD		1	1
+ *		 _M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));					// PADDD		1	0.5
+ *		 _M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);							// PSRLD		1	1
  *		 
  *		 
  *		 // pack both sets of Y values (32 bit to 16 bit values) and add 16
  *		 _M(y1Scratch) = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));					// PACKSSDW		1	0.5
- *		 *out_1_v16i_y_vector = _mm_add_epi16(_M(y1Scratch), _M(add_16));				//	PADDW		1	0.5
+ *		 *out_1_v16i_y_vector = _mm_add_epi16(_M(y1Scratch), _M(add_16));				// PADDW		1	0.5
  *		 // Y1 0 Y2 0	Y3 0 Y4 0	Y5 0 Y6 0	Y7 0 Y8 0
  *	}
  */
@@ -829,7 +582,7 @@ EXTERN_INLINE void convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2
  * using BT601 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			12 cycles
+ * Total latency: 			18 cycles
  * Num of pixel handled:	8
  *
  * Y = 	[  16  ] + [  0.257		 0.504		 0.098	]	( R )
@@ -873,7 +626,7 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt601_sse2, 0x0000408
  * using BT709 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			12 cycles
+ * Total latency: 			18 cycles
  * Num of pixel handled:	8
  *
  * Y = 	[  16  ] + [  0.183		 0.614		 0.062	]	( R )
@@ -909,13 +662,15 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt601_sse2, 0x0000408
  */
 DEFINE_AG_RB_TO_Y_INLINE(convert_ag_rb_vectors_to_y_vector_bt709_sse2, 0x4E9700004E970000LL, 0x07F0176D07F0176DLL);
 
-DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x176D07F0176D07F0LL, 0x176D07F0176D07F0LL);
+DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9700004E97LL, 0x176D07F0176D07F0LL);
 
 
 
 
 
-
+/*
+ * AG, RB vectors to UV vector - FR and bt{601,709}
+ */
 #define DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(fn_name, gaUCoeffVal, brUCoeffVal, gaVCoeffVal, brVCoeffVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_2_v16i_ga_br_vectors, __m128i* out_1_v16i_uv_vector) {\
 		CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);\
@@ -989,12 +744,59 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x176D07F
  */
 
 
+
+/*
+ * Convert 4 vectors of 8 short downsampled 422 AG, RB (or GA, BR) into 1 vector of 8 short U-V
+ * using full range RGB to YCbCr conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			18 cycles
+ * Num of pixel handled:	8
+ *
+ * U = 	[ 128 ] + [ -0.169		-0.331		 0.500	]	( G )
+ * V = 	[ 128 ] + [  0.500		-0.419		-0.081	]	( B )
+ *
+ *				All coeffs are left-shifted by 16 bits
+ * 					[ -11076	-21692		 32767	]
+ * 					[  32767	-27460		-5308	]
+ *
+ *	Note: the R-V & B-U coeffs (32767) should really be 32768 but because we need them to be
+ *			16-bit signed integers, they have been capped to the maximum value for this
+ *			type. 32767 maps to 0.499985 instead of 0.500 which is an acceptable
+ *			approximation.
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * agVect
+ * A12 0	G12 0	A34 0	G34 0	A56 0	G56 0	A78 0	G78 0
+ *
+ * rbVect
+ * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
+ *
+ * OUTPUT:
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ */
+
+DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,
+										0xAB440000AB440000LL, 0x7FFFD4BC7FFFD4BCLL,
+										0x94BC000094BC0000LL, 0xEB447FFFEB447FFFLL);
+
+DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2,
+										0x0000AB440000AB44LL, 0xD4BC7FFFD4BC7FFFLL,
+										0x000094BC000094BCLL, 0x7FFFEB447FFFEB44LL);
+
+
+
 /*
  * Convert 2 vectors of 8 short downsampled 422 AG, RB (or GA, BR) into 1 vector of 8 short U-V
  * using BT601 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			12 cycles
+ * Total latency: 			18 cycles
  * Num of pixel handled:	8
  *
  * U = 	[ 128 ] + [ -0.148		-0.291		 0.439	]	( G )
@@ -1033,7 +835,7 @@ DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_u
  * using BT709 YCbCr to RGB conversion equations from
  * http://www.equasys.de/colorconversion.html
  *
- * Total latency: 			12 cycles
+ * Total latency: 			18 cycles
  * Num of pixel handled:	8
  *
  * U = 	[ 128 ] + [ -0.101		-0.339		 0.439	]	( G )

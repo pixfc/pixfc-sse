@@ -859,31 +859,31 @@ EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v8i_rg
  * OUTPUT:
  *
  * 8 vectors of 8 short
- * agVect1
- * A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0
+ * gaVect1
+ * G1 0		A1 0	G2 0	A2 0	G3 0	A3 0	G4 0	A4 0
  *
- * rbVect1
- * R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0
+ * brVect1
+ * B1 0		R1 0	B2 0	R2 0	B3 0	R3 0	B4 0	R4 0
  *
- * agVect2
- * A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0
+ * gaVect2
+ * G5 0		A5 0	G6 0	A6 0	G7 0	A7 0	G8 0	A8 0
  *
- * rbVect2
- * R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0
+ * brVect2
+ * B5 0		R5 0	B6 0	R6 0	B7 0	R7 0	B8 0	R8 0
  *
  * agVect3
- * A9 0		G9 0	A10 0	G10 0	A11 0	G11 0	A12 0	G12 0
+ * G9 0		A9 0	G10 0	A10 0	G11 0	A11 0	G12 0	A12 0
  *
- * rbVect3
- * R9 0		B9 0	R10 0	B10 0	R11 0	B11 0	R12 0	B12 0
+ * brVect3
+ * B9 0		R9 0	B10 0	R10 0	B11 0	R11 0	B12 0	R12 0
  *
- * agVect4
- * A13 0	G13 0	A14 0	G14 0	A15 0	G15 0	A16 0	G16 0
+ * gaVect4
+ * G13 0	A13 0	G14 0	A14 0	G15 0	A15 0	G16 0	A16 0
  *
- * rbVect4
- * R13 0	B13 0	R14 0	B14 0	R15 0	B15 0	R16 0	B16 0
+ * brVect4
+ * B13 0	R13 0	B14 0	R14 0	B15 0	R15 0	B16 0	R16 0
  */
-EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_8_v16i_ag_rb_vectors)
+EXTERN_INLINE void unpack_bgr24_to_ga_br_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_8_v16i_ga_br_vectors)
 {
 	__m128i		bgra_vectors[4];
 	uint32_t	index = 0;
@@ -899,8 +899,8 @@ EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_bgr24_ve
 		index++;
 	}
 	
-	unpack_bgra_to_ag_rb_vectors_sse2(&bgra_vectors[0], &out_8_v16i_ag_rb_vectors[0]);
-	unpack_bgra_to_ag_rb_vectors_sse2(&bgra_vectors[2], &out_8_v16i_ag_rb_vectors[4]);
+	unpack_bgra_to_ga_br_vectors_sse2(&bgra_vectors[0], &out_8_v16i_ga_br_vectors[0]);
+	unpack_bgra_to_ga_br_vectors_sse2(&bgra_vectors[2], &out_8_v16i_ga_br_vectors[4]);
 };
 
 

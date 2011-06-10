@@ -121,10 +121,10 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
 const struct  ConversionBlock		conversion_blocks[] = {
 	//
 	// ARGB to YUYV
-//	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, "ARGB to YUYV"),
-//
-//	// ARGB to UYVY
-//	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, "ARGB to UYVY"),
+	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, "ARGB to YUYV"),
+
+	// ARGB to UYVY
+	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, "ARGB to UYVY"),
 
 
 	//
@@ -137,20 +137,20 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// RGB24 to YUYV
-//	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, "RGB24 to YUYV"),
-//
-//	// RGB24 to UYVY
-//	DECLARE_CONV_BLOCKS(convert_rgb24_to_uyvy, downsample_n_convert_rgb24_to_uyvy, convert_rgb_to_yuv422, PixFcRGB24, PixFcUYVY, "RGB24 to UYVY"),
-//
-//
-//	//
-//	// BGR24 to YUYV
-//	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, "BGR24 to YUYV"),
-//
-//	// BGGR24 to UYVY
-//	DECLARE_CONV_BLOCKS(convert_bgr24_to_uyvy, downsample_n_convert_bgr24_to_uyvy, convert_rgb_to_yuv422, PixFcBGR24, PixFcUYVY, "BGR24 to UYVY"),
-//
-//
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, "RGB24 to YUYV"),
+
+	// RGB24 to UYVY
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_uyvy, downsample_n_convert_rgb24_to_uyvy, convert_rgb_to_yuv422, PixFcRGB24, PixFcUYVY, "RGB24 to UYVY"),
+
+
+	//
+	// BGR24 to YUYV
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, "BGR24 to YUYV"),
+
+	// BGGR24 to UYVY
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_uyvy, downsample_n_convert_bgr24_to_uyvy, convert_rgb_to_yuv422, PixFcBGR24, PixFcUYVY, "BGR24 to UYVY"),
+
+
 //	//
 //	// YUYV to ARGB
 //	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuyv_to_any_rgb, PixFcYUYV, PixFcARGB, "YUYV to ARGB"),

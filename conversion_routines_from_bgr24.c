@@ -34,9 +34,9 @@
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
 			CONVERT2_RGB24_TO_YUV422(\
-						unpack_bgr24_to_ag_rb_vectors_,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+						unpack_bgr24_to_ga_br_vectors_,\
+						convert_ga_br_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2,\
 						pack_fn,\
 						instr_set\
 			)
@@ -52,9 +52,9 @@
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
 			AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422(\
-						unpack_bgr24_to_ag_rb_vectors_,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+						unpack_bgr24_to_ga_br_vectors_,\
+						convert_ga_br_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2,\
 						pack_fn,\
 						instr_set\
 			)
