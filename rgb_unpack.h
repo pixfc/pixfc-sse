@@ -557,17 +557,21 @@ EXTERN_INLINE void unpack_bgra_to_r_g_b_vectors_sse2_ssse3(__m128i* in_2_v8i_arg
 EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2(__m128i* in_3_v8i_rgb24_vectors, __m128i* out_8_v16i_ag_rb_vectors)
 {
 	__m128i		argb_vectors[4];
-	uint32_t	index = 0;
+	uint32_t	num_pixels = 16;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
 
+	argb_vectors[0] = _mm_setzero_si128();
+	argb_vectors[1] = _mm_setzero_si128();
+	argb_vectors[2] = _mm_setzero_si128();
+	argb_vectors[3] = _mm_setzero_si128();
+	dest++;
+
 	// Unpack to ARGB first, then to AG / RB
-	while (index < 16) {
-		*dest++ = 0;		// A
-		*dest++ = *src++; 	// R
-		*dest++ = *src++;	// G
-		*dest++ = *src++;	// B
-		index++;
+	while (num_pixels-- > 0) {
+		memcpy(dest, src, 3);
+		dest += 4;
+		src += 3;
 	}
 
 	unpack_argb_to_ag_rb_vectors_sse2(&argb_vectors[0], &out_8_v16i_ag_rb_vectors[0]);
@@ -712,17 +716,21 @@ EXTERN_INLINE void unpack_rgb24_to_ag_rb_vectors_sse2_ssse3(__m128i* in_3_v8i_rg
 EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_rgb24_vectors, __m128i* out_6_v16i_r_g_b_vectors)
 {
 	__m128i		argb_vectors[4];
-	uint32_t	index = 0;
+	uint32_t	index = 16;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
 	
+	argb_vectors[0] = _mm_setzero_si128();
+	argb_vectors[1] = _mm_setzero_si128();
+	argb_vectors[2] = _mm_setzero_si128();
+	argb_vectors[3] = _mm_setzero_si128();
+	dest++;
+
 	// Unpack to ARGB first, then to AG / RB
 	while (index < 16) {
-		*dest++ = 0;		// A
-		*dest++ = *src++;	// R
-		*dest++ = *src++;	// G
-		*dest++ = *src++;	// B
-		index++;
+		memcpy(dest, src, 3);
+		dest += 4;
+		src += 3;
 	}
 	
 	unpack_argb_to_r_g_b_vectors_sse2(&argb_vectors[0], &out_6_v16i_r_g_b_vectors[0]);
@@ -886,17 +894,20 @@ EXTERN_INLINE void unpack_rgb24_to_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v8i_rg
 EXTERN_INLINE void unpack_bgr24_to_ga_br_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_8_v16i_ga_br_vectors)
 {
 	__m128i		bgra_vectors[4];
-	uint32_t	index = 0;
+	uint32_t	num_pixels = 16;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
-	
-	// Unpack to BGRA first, then to AG / RB
-	while (index < 16) {
-		*dest++ = *src++;	// B
-		*dest++ = *src++;	// G
-		*dest++ = *src++;	// R
-		*dest++ = 0;		// A
-		index++;
+
+	bgra_vectors[0] = _mm_setzero_si128();
+	bgra_vectors[1] = _mm_setzero_si128();
+	bgra_vectors[2] = _mm_setzero_si128();
+	bgra_vectors[3] = _mm_setzero_si128();
+
+	// Unpack to BGRA first, then to GA / BR
+	while (num_pixels-- > 0) {
+		memcpy(dest, src, 3);
+		dest += 4;
+		src += 3;
 	}
 	
 	unpack_bgra_to_ga_br_vectors_sse2(&bgra_vectors[0], &out_8_v16i_ga_br_vectors[0]);
@@ -1041,17 +1052,20 @@ EXTERN_INLINE void unpack_bgr24_to_ag_rb_vectors_sse2_ssse3(__m128i* in_3_v8i_bg
 EXTERN_INLINE void unpack_bgr24_to_r_g_b_vectors_sse2(__m128i* in_3_v8i_bgr24_vectors, __m128i* out_6_v16i_r_g_b_vectors)
 {
 	__m128i		bgra_vectors[4];
-	uint32_t	index = 0;
+	uint32_t	num_pixels = 16;
 	uint8_t*	dest = (uint8_t *) bgra_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_bgr24_vectors;
 
-	// Unpack to BGRA first, then to AG / RB
-	while (index < 16) {
-		*dest++ = *src++;	// B
-		*dest++ = *src++;	// G
-		*dest++ = *src++;	// R
-		*dest++ = 0;		// A
-		index++;
+	bgra_vectors[0] = _mm_setzero_si128();
+	bgra_vectors[1] = _mm_setzero_si128();
+	bgra_vectors[2] = _mm_setzero_si128();
+	bgra_vectors[3] = _mm_setzero_si128();
+
+	// Unpack to BGRA first, then to GA / BR
+	while (num_pixels-- > 0) {
+		memcpy(dest, src, 3);
+		dest +=4;
+		src += 3;
 	}
 	
 	unpack_bgra_to_r_g_b_vectors_sse2(&bgra_vectors[0], &out_6_v16i_r_g_b_vectors[0]);
