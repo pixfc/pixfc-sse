@@ -108,6 +108,7 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 	uint32_t		pixel_count = width * height;
 	uint8_t*		dest = (uint8_t *) buf;
 	uint8_t			pixel[3] = {0};
+	char*			rgb_image = header_data;
 
 	// Make sure we are converting the image into an RGB buffer
 	if ((fmt != PixFcARGB) && (fmt != PixFcBGRA) && (fmt != PixFcRGB24) && (fmt != PixFcBGR24)){
@@ -123,7 +124,7 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 
 	// Fill the buffer
 	while (pixel_count > 0) {
-		HEADER_PIXEL(header_data,  pixel);
+		HEADER_PIXEL(rgb_image,  pixel);
 
 		switch (fmt) {
 		case PixFcARGB:

@@ -121,7 +121,7 @@ int 		main(int argc, char **argv) {
 	const InputFile*		in_file = NULL;
 	char 					out_filename[128] = {0};
 	char					*r;
-	PixFcPixelFormat		src_fmt;
+	PixFcPixelFormat		src_fmt = PixFcFormatCount;
 	// In / out buffers
 	__m128i	*				in = NULL;
 	__m128i	*				out = NULL;	
@@ -131,6 +131,11 @@ int 		main(int argc, char **argv) {
 		src_fmt = find_matching_pixel_format(argv[1]);
 		if (src_fmt != PixFcFormatCount)
 			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
+		else
+		{
+			printf("Unknown pixel format '%s'\n", argv[1]);
+			exit(1);
+		}
 	}
 
 	// Loop over all conversion blocks
