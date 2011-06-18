@@ -18,14 +18,38 @@
  *
  */
 
-#ifndef YUV_PACK_H_
-#define YUV_PACK_H_
-
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
 #include "platform_util.h"
+
+
+#ifndef GENERATE_UNALIGNED_INLINES
+#error "The GENERATE_UNALIGNED_INLINES macro is not defined"
+#endif
+
+/*
+ * This header file expects the GENERATE_UNALIGNED_INLINES macro to be set to 1
+ * to generate inlines for unaligned input buffers.
+ * This header file does not have the usual #ifndef / #define / #endif barrier
+ * preventing it from being included multiple times in a single source file.
+ * This is done so this header file CAN be included multiple times, once with
+ * GENERATE_UNALIGNED_INLINES set to 0 to generate inlines for aligned input buffers
+ * and once with GENERATE_UNALIGNED_INLINES set to 1 to generate inlines for
+ * unaligned input buffers
+ */
+
+#undef INLINE_NAME
+#undef M128_STORE
+
+#if GENERATE_UNALIGNED_INLINES == 1
+	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
+	#define M128_STORE(src, dst)					_mm_storeu_si128(&dst, (src))
+#else
+	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
+	#define M128_STORE(src, dst)					(dst) = (src)
+#endif
 
 
 /*
@@ -58,7 +82,7 @@
  * Y9 U910	Y10 V910	Y11 U1112	Y12 V1112	Y13 U1314	Y14 V1314	Y15 U1516	Y16 V1516
  *
  */
-EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_y_uv_422_vectors, __m128i* out_2_yuyv_vectors) {
+INLINE_NAME(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, __m128i* in_4_y_uv_422_vectors, __m128i* out_2_yuyv_vectors) {
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 
@@ -68,9 +92,9 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_
 	_M(scratch2) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);// PACKUSWB		1	0.5
 	// U12 V12	U34 V34	U56 V56	U78 V78	U910 V910	U1112 V1112	U1314 V1314	U1516 V1516
 
-	out_2_yuyv_vectors[0] = _mm_unpacklo_epi8(_M(scratch1), _M(scratch2));				// PUNPCKLBW	1	0.5
+	M128_STORE(_mm_unpacklo_epi8(_M(scratch1), _M(scratch2)), out_2_yuyv_vectors[0]);	// PUNPCKLBW	1	0.5
 
-	out_2_yuyv_vectors[1] = _mm_unpackhi_epi8(_M(scratch1), _M(scratch2));				// PUNPCKHBW	1	0.5
+	M128_STORE(_mm_unpackhi_epi8(_M(scratch1), _M(scratch2)), out_2_yuyv_vectors[1]);	// PUNPCKHBW	1	0.5
 }
 
 
@@ -104,7 +128,7 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2(__m128i* in_4_
  * U910 Y9	V910 Y10	U1112 Y11	V1112 Y12	U1314 Y13	V1314 Y14	U1516 Y15	V1516 Y16
  *
  */
-EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2(__m128i* in_4_y_uv_422_vectors, __m128i* out_2_uyvy_vectors) {
+INLINE_NAME(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, __m128i* in_4_y_uv_422_vectors, __m128i* out_2_uyvy_vectors) {
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 
@@ -114,8 +138,9 @@ EXTERN_INLINE void pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2(__m128i* in_4_
 	_M(scratch2) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);// PACKUSWB		1	0.5
 	// U12 V12	U34 V34	U56 V56	U78 V78	U910 V910	U1112 V1112	U1314 V1314	U1516 V1516
 
-	out_2_uyvy_vectors[0] = _mm_unpacklo_epi8(_M(scratch2), _M(scratch1));				// PUNPCKLBW	1	0.5
+	M128_STORE(_mm_unpacklo_epi8(_M(scratch2), _M(scratch1)), out_2_uyvy_vectors[0]);	// PUNPCKLBW	1	0.5
 
-	out_2_uyvy_vectors[1] = _mm_unpackhi_epi8(_M(scratch2), _M(scratch1));				// PUNPCKHBW	1	0.5
+	M128_STORE(_mm_unpackhi_epi8(_M(scratch2), _M(scratch1)), out_2_uyvy_vectors[1]);	// PUNPCKHBW	1	0.5
 }
-#endif /* YUV_PACK_H_ */
+
+

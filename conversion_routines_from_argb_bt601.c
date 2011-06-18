@@ -23,7 +23,8 @@
 #include "argb_conversion_common.h"
 
 #define CONVERT_TO_YUV422(pack_fn, instr_set)\
-			CONVERT_RGB32_TO_YUV422(\
+			DO_CONVERSION(\
+						CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
 						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
@@ -32,7 +33,8 @@
 			)
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
-			CONVERT2_RGB32_TO_YUV422(\
+			DO_CONVERSION(\
+						CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
 						convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\
@@ -41,7 +43,8 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
-			AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422(\
+			DO_CONVERSION(\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
 						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
@@ -50,7 +53,8 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
-			AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422(\
+			DO_CONVERSION(\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
 						convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\

@@ -30,6 +30,33 @@
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
 
+// Run the given conversion macro with the appropriate packing & unpacking
+// inlines (aligned or unaligned) based on whether the source and destination
+// buffer's alignment
+#define DO_CONVERSION(conversion_macro, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+		} else {\
+			conversion_macro(unpack_fn, unaligned_##pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unaligned_##unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+		} else {\
+			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+		}\
+	}
+
+
+// Declare an array of 2 __m128i elements, and load 2 unaligned __m128i vectors from the unaligned buffer
+#define	DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
+		__m128i (var)[2]; (var)[0] = _mm_loadu_si128(unaligned_buffer_ptr); (var)[1] = _mm_loadu_si128(&unaligned_buffer_ptr[1]);
+
+// Same as above with 3 elements
+#define	DECLARE_VECT_ARRAY3_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
+		__m128i (var)[3]; (var)[0] = _mm_loadu_si128(unaligned_buffer_ptr); (var)[1] = _mm_loadu_si128(&unaligned_buffer_ptr[1]); (var)[2] = _mm_loadu_si128(&unaligned_buffer_ptr[2]);
+
 /*
  * This function returns the features supported by the cpu
  * as returned by the CPUID instructions. (ECX is in the higher
