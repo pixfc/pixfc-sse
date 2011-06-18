@@ -10,6 +10,14 @@ guarantees the conversion will always happen.
 The latest version of PixFC-SSE can be found at 
 http://pixfc-sse.googlecode.com
 
+== HOWTO ==
+Using PixFC in your own application is simple:
+- you first build PixFC as a static library,
+- which you then link to your application.
+
+The next two sections explain both of these steps.
+
+
 == BUILD ==
 PixFC-SSE uses CMake to support cross-platform builds. PixFC-SSE currently
 builds as a static library which you then link to your application. Building
@@ -28,27 +36,26 @@ the PixFC-SSE static library depends on the target platform:
 More generators are available depending on the target platform. Run 
 'cmake --help' for more information.
 
-== EXAMPLE ==
-Using PixFC-SSE in your own application is extremely simple. First, build the 
-PixFC-SSE static library as described in the previous section. Then, include 
-the PixFC-SSE API header file 'pifc-sse.h', and create a struct pixfc to 
-perform pixel format conversions. Last, link the PixFC static library to 
-your application.
+== LINKING ==
+Using PixFC-SSE in your own application is extremely simple. Once, you have
+built the PixFC-SSE static library as described in the previous section,
+include the PixFC-SSE API header file 'pifc-sse.h' in your program, and 
+create a struct pixfc to perform pixel format conversions. Last, link the
+PixFC static library to your application.
  
 example.c shows how to use the PixFC-SSE API.
 
 On Linux, you must also link your executable with -lrt.
 
-== USAGE ==
-See pixf-sse.h for details on the PixFC-SSE API, example.c shows how to use
-it. Also, you can run timing tests to see how well PixFC-SSE performs on your 
+== PERFORMANCE TESTING ==
+You can run timing tests to see how well PixFC-SSE performs on your 
 platform: build and run the 'unit-test' target. Please take the time to 
 submit unit testing information to the PixFC-SSE mailing list at 
 http://groups.google.com/group/pixfc-sse
 along with details of your platform (OS version, CPU name & model), compiler 
 version and IDE version.
 
-== CONTACT ==
+== SUPPORT / CONTACT ==
 Feedback, comments and suggestions are greatly appreciated.
 Please, use the mailing list at 
 http://groups.google.com/group/pixfc-sse
