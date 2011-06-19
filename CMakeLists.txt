@@ -61,14 +61,21 @@ file(GLOB PIXFC_HDR_LIST *.h)
 # be copied into C files and have their "extern" keyword removed in
 # order to do a debug build with no optimisation 
 list(APPEND EXTERN_INLINE_HEADER_LIST
-	yuv_unpack
+	yuv_upsample
 	yuv_to_rgb_convert
 	yuv_to_rgb_convert_bt601
 	yuv_to_rgb_convert_bt709
-	rgb_pack
 	rgb_downsample
-	rgb_unpack
 	rgb_to_yuv_convert
+)
+# List of header files containing extern inlines definitions that must
+# be copied into C files, have their "extern" keyword removed and have
+# the GENERATE_UNALIGNED_INLINES macro defined in order to do a debug 
+# build with no optimisation 
+list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
+	yuv_unpack
+	rgb_pack
+	rgb_unpack
 	yuv_pack
 )
 function(GenerateExternInlines)
@@ -76,6 +83,15 @@ function(GenerateExternInlines)
 		file(READ ${CUR_FILE}.h FILE_CONTENTS)
 		string(REPLACE "EXTERN_INLINE " "inline " NEW_CONTENTS "${FILE_CONTENTS}")
 		file(WRITE ${CUR_FILE}.c "${NEW_CONTENTS}")
+	endforeach(CUR_FILE)
+
+	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+		file(READ ${CUR_FILE}.h FILE_CONTENTS)
+		string(REPLACE "EXTERN_INLINE " "inline " NEW_CONTENTS "${FILE_CONTENTS}")
+		file(WRITE ${CUR_FILE}_unaligned.c "#define GENERATE_UNALIGNED_INLINES 1")
+		file(APPEND ${CUR_FILE}_unaligned.c "${NEW_CONTENTS}")
+		file(WRITE ${CUR_FILE}_aligned.c "#define GENERATE_UNALIGNED_INLINES 0")
+		file(APPEND ${CUR_FILE}_aligned.c "${NEW_CONTENTS}")
 	endforeach(CUR_FILE)
 endfunction(GenerateExternInlines)
 
@@ -97,6 +113,10 @@ if(DEBUG)
 	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
 		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}.c")
 	endforeach(CUR_FILE)
+	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}_aligned.c" "${CUR_FILE}_unaligned.c")
+	endforeach(CUR_FILE)
+
 
 	# Add compiler specific flags	
 	if(APPLE)
@@ -178,5 +198,9 @@ endif(WIN32 OR APPLE)
 foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
 	list(APPEND EXTERN_INLINE_SRC_LIST "${CUR_FILE}.c")
 endforeach(CUR_FILE)
+foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+	list(APPEND EXTERN_INLINE_SRC_LIST "${CUR_FILE}_aligned.c" "${CUR_FILE}_unaligned.c")
+endforeach(CUR_FILE)
+
 add_custom_target(cleanup COMMAND rm -Rf CMakeFiles/ CMakeCache.txt cmake_install.cmake Makefile PixFC.xcodeproj/ PixFC.build/ CMakeScripts/ Debug/ build/ svn-* *~ libpixfc.a *.o *.ppm unit-testing convert-to-file visual-check ${EXTERN_INLINE_SRC_LIST})
 

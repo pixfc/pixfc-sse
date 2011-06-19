@@ -25,17 +25,45 @@
 #include "yuyv_conversion_common.h"
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\
-	UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_uyvy_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_bt709_, 4, pack_fn, instr_set)
+		DO_CONVERSION(\
+				UPSAMPLE_AND_CONVERT_YUV_TO_RGB,\
+				unpack_uyvy_to_y_uv_vectors_,\
+				pack_fn,\
+				convert_y_uv_vectors_to_rgb_vectors_bt709_,\
+				4,\
+				instr_set\
+		)
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB24(pack_fn, instr_set)\
-	UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_uyvy_to_y_uv_vectors_, convert_y_uv_vectors_to_rgb_vectors_bt709_, 3, pack_fn, instr_set)
+		DO_CONVERSION(\
+				UPSAMPLE_AND_CONVERT_YUV_TO_RGB,\
+				unpack_uyvy_to_y_uv_vectors_,\
+				pack_fn,\
+				convert_y_uv_vectors_to_rgb_vectors_bt709_,\
+				3,\
+				instr_set\
+		)
 
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB(unpack_uyvy_to_y_uv_vectors_, nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, 4, pack_fn, instr_set)
+		DO_CONVERSION(\
+				CONVERT_YUV_TO_RGB,\
+				unpack_uyvy_to_y_uv_vectors_,\
+				pack_fn,\
+				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_,\
+				4,\
+				instr_set\
+		)
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
-	CONVERT_YUV_TO_RGB(unpack_uyvy_to_y_uv_vectors_, nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, 3, pack_fn, instr_set)
+		DO_CONVERSION(\
+				CONVERT_YUV_TO_RGB,\
+				unpack_uyvy_to_y_uv_vectors_,\
+				pack_fn,\
+				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_,\
+				3,\
+				instr_set\
+		)
 
 
 void		upsample_n_convert_uyvy_to_argb_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {

@@ -22,6 +22,7 @@
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
+#include "common.h"
 #include "platform_util.h"
 
 
@@ -45,7 +46,7 @@
 
 #if GENERATE_UNALIGNED_INLINES == 1
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
-	#define M128_STORE(src, dst)					_mm_storeu_si128(&dst, (src))
+	#define M128_STORE(src, dst)					_mm_storeu_si128(&(dst), (src))
 #else
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
 	#define M128_STORE(src, dst)					(dst) = (src)

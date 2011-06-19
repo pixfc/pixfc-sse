@@ -26,9 +26,9 @@
 			DO_CONVERSION(\
 						CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
+						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
@@ -36,9 +36,9 @@
 			DO_CONVERSION(\
 						CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
+						pack_fn,\
 						convert_ag_rb_vectors_to_y_vector_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
@@ -46,9 +46,9 @@
 			DO_CONVERSION(\
 						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
+						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
@@ -56,9 +56,9 @@
 			DO_CONVERSION(\
 						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
+						pack_fn,\
 						convert_ag_rb_vectors_to_y_vector_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 

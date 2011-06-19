@@ -26,36 +26,36 @@
 #define CONVERT_TO_YUV422(pack_fn, instr_set)\
 			CONVERT_RGB24_TO_YUV422(\
 						unpack_rgb24_to_r_g_b_vectors_,\
+						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
 			CONVERT2_RGB24_TO_YUV422(\
 						unpack_rgb24_to_ag_rb_vectors_,\
+						pack_fn,\
 						convert_ag_rb_vectors_to_y_vector_bt709_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
 			AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422(\
 						unpack_rgb24_to_r_g_b_vectors_,\
+						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
 						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
 			AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422(\
 						unpack_rgb24_to_ag_rb_vectors_,\
+						pack_fn,\
 						convert_ag_rb_vectors_to_y_vector_bt709_sse2,\
 						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2,\
-						pack_fn,\
 						instr_set\
 			)
 

@@ -32,22 +32,25 @@
 
 // Run the given conversion macro with the appropriate packing & unpacking
 // inlines (aligned or unaligned) based on whether the source and destination
-// buffer's alignment
-#define DO_CONVERSION(conversion_macro, unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set)\
+// buffers' alignment
+#define DO_CONVERSION(conversion_macro, unpack_fn, pack_fn, ...)\
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			conversion_macro(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+			conversion_macro(unpack_fn, pack_fn, ## __VA_ARGS__)\
 		} else {\
-			conversion_macro(unpack_fn, unaligned_##pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+			conversion_macro(unpack_fn, unaligned_##pack_fn, ## __VA_ARGS__)\
 		}\
 	} else {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			conversion_macro(unaligned_##unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+			conversion_macro(unaligned_##unpack_fn, pack_fn, ## __VA_ARGS__)\
 		} else {\
-			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, y_conv_fn, uv_conv_fn, instr_set)\
+			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, ## __VA_ARGS__)\
 		}\
 	}
 
+// Declare a __m128i variable, and load one unaligned __m128i vector from the unaligned buffer
+#define	DECLARE_VECT_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
+			__m128i (var) = _mm_loadu_si128(unaligned_buffer_ptr);
 
 // Declare an array of 2 __m128i elements, and load 2 unaligned __m128i vectors from the unaligned buffer
 #define	DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\

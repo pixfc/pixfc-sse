@@ -23,6 +23,7 @@
 #include <string.h>
 #include <tmmintrin.h>
 
+#include "common.h"
 #include "platform_util.h"
 
 #ifndef GENERATE_UNALIGNED_INLINES

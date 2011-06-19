@@ -91,15 +91,28 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 
 	// Fill in the buffer 16 pixels at a time
 	// while alternating the fill patterns
-	while (buffer_size > 0) {
-		*buffer = _mm_load_si128(&(_M(desc->fill_patterns[index])));
+	if (((uintptr_t) buffer & 0x0F) == 0) {
+		while (buffer_size > 0) {
+			_mm_store_si128(buffer, _M(desc->fill_patterns[index]));
 
-		// move on to next fill buffer
-		index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
+			// move on to next fill buffer
+			index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
 
-		// copy 16 pixels at a time
-		buffer++;
-		buffer_size -= 16;
+			// copy 16 pixels at a time
+			buffer++;
+			buffer_size -= 16;
+		}
+	} else {
+		while (buffer_size > 0) {
+			_mm_storeu_si128(buffer, _M(desc->fill_patterns[index]));
+
+			// move on to next fill buffer
+			index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
+
+			// copy 16 pixels at a time
+			buffer++;
+			buffer_size -= 16;
+		}
 	}
 }
 

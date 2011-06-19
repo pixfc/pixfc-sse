@@ -21,11 +21,24 @@
 #ifndef YUYV_CONVERSION_COMMON_H_
 #define YUYV_CONVERSION_COMMON_H_
 
+
+/*
+ * Include the unpack & pack routines twice to generate both aligned & unaligned versions
+ */
+#undef  GENERATE_UNALIGNED_INLINES
+#define GENERATE_UNALIGNED_INLINES 0
 #include "rgb_pack.h"
+#include "yuv_unpack.h"
+
+#undef  GENERATE_UNALIGNED_INLINES
+#define GENERATE_UNALIGNED_INLINES 1
+#include "rgb_pack.h"
+#include "yuv_unpack.h"
+
+#include "yuv_upsample.h"
 #include "yuv_to_rgb_convert.h"
 #include "yuv_to_rgb_convert_bt601.h"
 #include "yuv_to_rgb_convert_bt709.h"
-#include "yuv_unpack.h"
 
 /*
  * Convert YUYV to RGB with upsampling
@@ -96,7 +109,7 @@
  *	pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
  *
  */
-#define UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
+#define UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
@@ -164,7 +177,7 @@
  *	}
  *
  */
-#define CONVERT_YUV_TO_RGB(unpack_fn_prefix, conv_fn_prefix, output_stride, pack_fn, instr_set) \
+#define CONVERT_YUV_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
