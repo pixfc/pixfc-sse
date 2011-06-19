@@ -80,40 +80,10 @@ INLINE uint64_t		get_cpu_features();
 uint32_t			does_cpu_support(uint64_t);
 
 
-
-
-/*
- *  This function returns the current system's uptime
- *  in nanoseconds (64 bit unsigned)
- */
-typedef uint64_t	ticks;
-ticks				getticks();
-
-/*
- * Call the first time with timings = NULL to get the current process timing profile.
- * Next, call with a valid stuct timings pointer to store the difference between
- * current process timing profile and previous one. The difference is added to the
- * members in the given struct timings.
- */
-struct timings {
-	uint64_t	total_time_ns;
-	uint64_t	user_time_ns;
-	uint64_t	sys_time_ns;
-	uint64_t	vcs;
-	uint64_t	ivcs;
-};
-void				do_timing(struct timings *timings);
-
-
-
 /*
  * Various debugging functions
  */
 #ifdef DEBUG
-
-#define dprintf(fmt, ...) 	do { fprintf (stderr, "[ %s:%d ]\t" fmt,\
-		__FILE__, __LINE__, ## __VA_ARGS__);\
-		fflush(stderr); } while(0)
 
 void 						print_xmm32(char *name, __m128i *reg);
 void 						print_xmm16(char *name, __m128i *reg);
@@ -122,7 +92,6 @@ void						print_xmm8u(char *name, __m128i *reg);
 
 #else
 
-#define	dprintf(...)
 #define print_xmm32(...)
 #define print_xmm16(...)
 #define print_xmm16u(...)

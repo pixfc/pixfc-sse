@@ -21,6 +21,21 @@
 #include <emmintrin.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
+#ifdef WIN32
+	#include <windows.h>
+	#include <intrin.h>
+#else
+	#include <sys/resource.h>
+	#include <sys/time.h>
+
+	#ifdef __APPLE__
+		#include <mach/mach.h>
+		#include <mach/clock.h>
+		#include <mach/mach_time.h>
+	#endif
+#endif
 
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
@@ -419,4 +434,98 @@ void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t heigh
 }
 
 
+
+// Return the amount of ticks in nanoseconds elapsed since startup
+ticks		getticks() {
+#ifdef __linux__
+
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (ticks) (ts.tv_sec * 1000000000LL + (ticks)ts.tv_nsec);
+
+#elif defined(__APPLE__)
+
+	static clock_serv_t		clock_server;
+	static uint32_t			valid_clock_server = 0;
+	static uint32_t			has_asked_for_clock_server = 0;
+	ticks					result = 0;
+
+	// Get clock server if not already done
+	if (has_asked_for_clock_server == 0) {
+		if (host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &clock_server) == KERN_SUCCESS)
+			valid_clock_server = 1;
+		else
+			dprintf("Error getting clock server\n");
+
+		has_asked_for_clock_server = 1;
+	}
+
+	// Get time
+	if (valid_clock_server == 1) {
+		mach_timespec_t ts;
+		if (clock_get_time(clock_server, &ts) == KERN_SUCCESS)
+			result = ts.tv_sec * 1000000000LL + (ticks) ts.tv_nsec;
+		else
+			dprintf("Error getting time\n");
+	}
+	return result;
+
+#else	// WIN32
+
+	static LARGE_INTEGER	frequency = { 0 };
+	static uint32_t			has_asked_for_frequency = 0;
+	LARGE_INTEGER			counter;
+	uint64_t				result = 0;
+
+	if (has_asked_for_frequency == 0) {
+		if (QueryPerformanceFrequency(&frequency) != TRUE) {
+			dprintf("Error getting timer frequency\n");
+			frequency.QuadPart = 0;
+		}
+		has_asked_for_frequency = 1;
+	}
+
+	if ((frequency.QuadPart != 0) && (QueryPerformanceCounter(&counter) == TRUE))
+		result = (uint64_t)(counter.QuadPart * 1000000000LL/ frequency.QuadPart);
+
+	return result;
+
+#endif
+}
+
+// Not thread safe !!
+#ifndef WIN32
+static struct rusage            last_rusage;
+#endif
+
+static ticks					last_ticks;
+#define TV_TO_NS(tv)			((tv).tv_sec * 1000000000ULL + (uint64_t)(tv).tv_usec * 1000)
+
+void			do_timing(struct timings *timings) {
+	if (! timings) {
+#ifndef WIN32
+		getrusage(RUSAGE_SELF, &last_rusage);
+#endif
+		last_ticks = getticks();
+	} else {
+		timings->total_time_ns += getticks() - last_ticks;
+#ifndef WIN32
+		struct rusage   now;
+
+		if (getrusage(RUSAGE_SELF, &now) == 0) {
+			struct timeval user_time;
+			struct timeval sys_time;
+
+			timersub(&now.ru_stime, &last_rusage.ru_stime, &sys_time);
+			timersub(&now.ru_utime, &last_rusage.ru_utime, &user_time);
+
+			timings->user_time_ns += TV_TO_NS(user_time);
+			timings->sys_time_ns += TV_TO_NS(sys_time);
+			timings->vcs += (now.ru_nvcsw - last_rusage.ru_nvcsw);
+			timings->ivcs += (now.ru_nivcsw - last_rusage.ru_nivcsw);
+		} else
+			dprintf("Error calling getrusage()\n");
+#endif
+	}
+}
 

@@ -21,7 +21,10 @@
 #ifndef _TEST_UTILS_H_
 #define _TEST_UTILS_H_
 
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "pixfc-sse.h"
 
@@ -76,6 +79,74 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
  * If the buffer is in an RGB format, it will be saved in a PPM file. Otherwise the raw bytes are saved (using the next function)
  */
 void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer);
+
+/*
+ *  This function returns the current system's uptime
+ *  in nanoseconds (64 bit unsigned)
+ */
+typedef uint64_t	ticks;
+ticks				getticks();
+
+/*
+ * Call the first time with timings = NULL to get the current process timing profile.
+ * Next, call with a valid stuct timings pointer to store the difference between
+ * current process timing profile and previous one. The difference is added to the
+ * members in the given struct timings.
+ */
+struct timings {
+	uint64_t	total_time_ns;
+	uint64_t	user_time_ns;
+	uint64_t	sys_time_ns;
+	uint64_t	vcs;
+	uint64_t	ivcs;
+};
+void				do_timing(struct timings *timings);
+
+
+
+#if defined(__linux__) || defined(__APPLE__)
+
+#include <unistd.h>
+
+#define MSSLEEP(ms)								usleep((ms)*1000)
+
+// File IO
+#define OPEN									open
+#define RD_ONLY_FLAG							O_RDONLY
+#define WR_CREATE_FLAG							O_WRONLY | O_CREAT | O_TRUNC
+#define RW_PERM									S_IRWXU
+#define READ									read
+#define WRITE									write
+#define	SNPRINTF								snprintf
+#define CLOSE									close
+
+// Aligned allocation
+#define ALIGN_MALLOC(var, size, alignment)		do { int ret = posix_memalign((void **) &(var), (alignment), (size)); if (ret != 0) var = NULL; }while(0)
+#define ALIGN_FREE(var)							do { if (var) free(var); } while(0)
+
+#else
+
+#include <malloc.h>
+#include <io.h>
+#include <windows.h>
+
+#define MSSLEEP(ms)								Sleep(ms)
+
+// File IO
+#define OPEN									_open
+#define RD_ONLY_FLAG							_O_RDONLY | _O_BINARY
+#define	WR_CREATE_FLAG							_O_WRONLY | _O_CREAT | _O_TRUNC
+#define RW_PERM									_S_IWRITE
+#define READ									_read
+#define WRITE									_write
+#define SNPRINTF								_snprintf
+#define CLOSE									_close
+
+// Aligned allocation
+#define ALIGN_MALLOC(var, size, alignment)		(var) = _aligned_malloc((size), (alignment))
+#define ALIGN_FREE(var)							_aligned_free(var)
+
+#endif
 
 
 #endif /* _TEST_UTILS_H_ */

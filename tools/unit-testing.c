@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common.h"
 #include "conversion_blocks.h"
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"

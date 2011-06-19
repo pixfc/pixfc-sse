@@ -29,8 +29,10 @@
  * - we release resources.
  *
  * On Linux, compile with :
- * gcc example.c libpixfc-sse.a -o example -lrt
+ * gcc example.c BUILD_DIR/libpixfc-sse.a -I include -o example -lrt
+ * (replace BUILD_DIR with the path to the actual build directory)
  */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

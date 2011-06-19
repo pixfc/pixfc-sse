@@ -20,11 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common.h"
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
-#include "platform_util.h"
 #include "test-utils.h"
+#include "platform_util.h"
 
 
 // PIXFC FLAGS

@@ -22,7 +22,6 @@
 #include "common.h"
 #include "conversion_blocks.h"
 #include "pixfc-sse.h"
-#include "pixfmt_descriptions.h"
 
 /*
  * Check if the given conversion block:
