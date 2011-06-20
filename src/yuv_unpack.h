@@ -153,8 +153,8 @@ INLINE_NAME(unpack_yuyv_to_y_u_v_vectors_sse2, __m128i* input, __m128i* out_3_v1
 {
 	CONST_M128I(mask_off_chromas, 0x5C4600785F692350LL, 0x780063402A520043LL);
 	CONST_M128I(mask_cb, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
-	UNALIGNED_YUV422_INPUT_PREAMBLE;
 	__m128i uv, uLo, uHi, vLo, vHi;
+	UNALIGNED_YUV422_INPUT_PREAMBLE;
 
     // Y unpacking
     out_3_v16i_y_u_v_vectors[0] = _mm_and_si128(*INPUT_VECT, _M(mask_off_chromas));

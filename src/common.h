@@ -34,18 +34,23 @@
 // Run the given conversion macro with the appropriate packing & unpacking
 // inlines (aligned or unaligned) based on whether the source and destination
 // buffers' alignment
+
+// Visual Studio's handling of variadic macros is buggy at best.
+// We need the following in order to have __VA_ARGS__ handled properly.
+#define LeftParenthesis (
+#define RightParenthesis )
 #define DO_CONVERSION(conversion_macro, unpack_fn, pack_fn, ...)\
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			conversion_macro(unpack_fn, pack_fn, ## __VA_ARGS__)\
+			conversion_macro LeftParenthesis unpack_fn, pack_fn, __VA_ARGS__ RightParenthesis\
 		} else {\
-			conversion_macro(unpack_fn, unaligned_##pack_fn, ## __VA_ARGS__)\
+			conversion_macro LeftParenthesis unpack_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
 		}\
 	} else {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
-			conversion_macro(unaligned_##unpack_fn, pack_fn, ## __VA_ARGS__)\
+			conversion_macro LeftParenthesis unaligned_##unpack_fn, pack_fn, __VA_ARGS__ RightParenthesis\
 		} else {\
-			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, ## __VA_ARGS__)\
+			conversion_macro LeftParenthesis unaligned_##unpack_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
 		}\
 	}
 
