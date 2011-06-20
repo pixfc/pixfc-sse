@@ -104,7 +104,7 @@ static int		do_image_conversion(const struct ConversionBlock *block, void* in, v
 	
 	// Create struct pixfc
 	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
-		dprint("Error create struct pixfc\n");
+		log("Error create struct pixfc\n");
 		return -1;
 	}
 	
@@ -158,7 +158,7 @@ int 		main(int argc, char **argv) {
 			
 			in_file = find_input_file_for_format(conversion_blocks[index].source_fmt);
 			if (in_file == NULL) {
-				dprint("Error looking for input file for format '%s'\n",
+				log("Error looking for input file for format '%s'\n",
 					   pixfmt_descriptions[conversion_blocks[index].source_fmt].name);
 				return 1;
 			}
@@ -166,7 +166,7 @@ int 		main(int argc, char **argv) {
 			if (in_file->filename != NULL) {
 				// Load buffer from specified file
 				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_file->filename, (void **)&in) < 0) {
-					dprint("Error getting buffer from input file '%s'\n", in_file->filename);
+					log("Error getting buffer from input file '%s'\n", in_file->filename);
 					return 1;
 				}
 			} else {
@@ -175,11 +175,11 @@ int 		main(int argc, char **argv) {
 
 				// allocate buffer
 				if (allocate_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
-					dprint("Error allocating memory\n");
+					log("Error allocating memory\n");
 					return -1;
 				}
 				if (fill_argb_image_with_rgb_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in) != 0) {
-					dprint("Error getting buffer from RGB GIMP image\n");
+					log("Error getting buffer from RGB GIMP image\n");
 					return 1;
 				}
 			}
@@ -189,7 +189,7 @@ int 		main(int argc, char **argv) {
 		ALIGN_FREE(out);
 		
 		if (allocate_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
-			dprint("Error allocating output buffer");
+			log("Error allocating output buffer");
 			return 1;
 		}
 

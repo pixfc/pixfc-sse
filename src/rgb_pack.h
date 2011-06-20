@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "common.h"
+#include "debug_support.h"
 #include "platform_util.h"
 
 

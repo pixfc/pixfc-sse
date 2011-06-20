@@ -114,14 +114,14 @@ int 		main(int argc, char **argv) {
 	// If we were given an input file name, get its contents
 	if (src_filename != NULL) {
 		if (get_buffer_from_file(src_fmt, w, h, src_filename, (void **)&in) < 0) {
-			dprint("Error getting buffer from file\n");
+			log("Error getting buffer from file\n");
 			return 1;
 		}
 	} else {
 		// Otherwise, allocate a buffer of the given width and height
 		// and fill in buffer with predefined pattern
 		if (allocate_buffer(src_fmt, w, h, (void **)&in) != 0) {
-			dprint("Error allocating in buffer\n");
+			log("Error allocating in buffer\n");
 			return 1;
 		}
 
@@ -136,32 +136,32 @@ int 		main(int argc, char **argv) {
 
 	// allocate out buffer
 	if (allocate_buffer(dst_fmt, w, h, (void **)&out) != 0) {
-		dprint("Error allocating out buffer");
+		log("Error allocating out buffer");
 		free(in);
 		return 1;
 	}
 
-	dprint("Image size:\t%d x %d\n", w, h);
-	dprint("Input format:\t%s\n", pixfmt_descriptions[src_fmt].name);
-	dprint("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
+	log("Image size:\t%d x %d\n", w, h);
+	log("Input format:\t%s\n", pixfmt_descriptions[src_fmt].name);
+	log("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
 
 	// create struct pixfc
 	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, PIXFC_FLAGS) != 0)
 	{
-		dprint("error creating struct pixfc\n");
+		log("error creating struct pixfc\n");
 		free(in);
 		free(out);
 		return 1;
 	}
 
-	dprint("%10s\t%10s\t%10s\t%5s\n", "Avg Time", "Avg User Time", "Avg Sys Time", "Ctx Sw");
+	log("%10s\t%10s\t%10s\t%5s\n", "Avg Time", "Avg User Time", "Avg Sys Time", "Ctx Sw");
 
 	// Run conversion function
 	do_timing(NULL);
 	pixfc->convert(pixfc, in, out);
 	do_timing(&timings);
 
-	dprint("%10f\t%10f\t%10f\t%5.1f\n",
+	log("%10f\t%10f\t%10f\t%5.1f\n",
 			(double)((double)timings.total_time_ns / 1000000.0),
 			(double)((double)timings.user_time_ns / 1000000.0),
 			(double)((double)timings.sys_time_ns / 1000000.0),

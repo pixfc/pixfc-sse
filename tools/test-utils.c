@@ -62,13 +62,13 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 
 	// make sure the number of pixels is multiple of 16
 	if ((width * height) % 16 != 0) {
-		dprint("pixel count is not multiple of 16\n");
+		log("pixel count is not multiple of 16\n");
 		return -1;
 	}
 
 	// make sure the buffer size has no decimal part
 	if (((width * height) * desc->bytes_per_pix_num) % desc->bytes_per_pix_denom != 0) {
-		dprint("buffer size error: (%d * %d) * %d %% %d != 0\n",
+		log("buffer size error: (%d * %d) * %d %% %d != 0\n",
 				width, height, desc->bytes_per_pix_num, desc->bytes_per_pix_denom);
 		return -1;
 	}
@@ -82,14 +82,14 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 uint32_t	allocate_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer) {
 	// validate buffer dimensions
 	if (validate_image_dimensions(fmt, width, height) != 0) {
-		dprint("buffer size error\n");
+		log("buffer size error\n");
 		return -1;
 	}
 
 	//  allocate image buffer
 	ALIGN_MALLOC(*buffer, IMG_SIZE(fmt, width, height), 16);
 	if (! buffer) {
-		dprint("Unable to allocate memory for in buffer\n");
+		log("Unable to allocate memory for in buffer\n");
 		return -1;
 	}
 
@@ -140,12 +140,12 @@ uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, 
 
 	// Make sure we are converting the image into an RGB buffer
 	if ((fmt != PixFcARGB) && (fmt != PixFcBGRA) && (fmt != PixFcRGB24) && (fmt != PixFcBGR24)){
-		dprint("Expected RGB buffer\n");
+		log("Expected RGB buffer\n");
 		return -1;
 	}
 
 	if ((width != rgb_img_width) || (height != rgb_img_height)) {
-		dprint("RGB buffer dimensions (%dx%d) are different from RGB image in header file (%dx%d)\n",
+		log("RGB buffer dimensions (%dx%d) are different from RGB image in header file (%dx%d)\n",
 				width, height, rgb_img_width, rgb_img_height);
 		return -1;
 	}
@@ -188,20 +188,20 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 
 	// validate width, height and pixel format
 	if (validate_image_dimensions(fmt, width, height) != 0) {
-		dprint("Error validating image dimensions\n");
+		log("Error validating image dimensions\n");
 		return -1;
 	}
 
 	// open file
 	fd = OPEN(filename, RD_ONLY_FLAG);
 	if (fd == -1) {
-		dprint("Error opening input file '%s'\n", filename);
+		log("Error opening input file '%s'\n", filename);
 		return -1;
 	}
 
 	// get file size
 	if (fstat(fd, &file_stat) != 0) {
-		dprint("Error stat'ing file\n");
+		log("Error stat'ing file\n");
 		CLOSE(fd);
 		return -1;
 	}
@@ -209,7 +209,7 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 	// ensure file size is consistent with width, height and pixel format
 	if (file_stat.st_size != IMG_SIZE(fmt, width, height))
 	{
-		dprint("file size not consistent with width, height and image "
+		log("file size not consistent with width, height and image "
 				"format: file size %u - expected: %u\n", 
 				(uint32_t) file_stat.st_size, IMG_SIZE(fmt, width, height));
 		CLOSE(fd);
@@ -219,7 +219,7 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 	// allocate buffer
 	ALIGN_MALLOC(file_buffer, file_stat.st_size * sizeof(char), 16);
 	if (! file_buffer) {
-		dprint("Error allocating memory\n");
+		log("Error allocating memory\n");
 		CLOSE(fd);
 		return -1;
 	}
@@ -246,10 +246,10 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 	// above values multiplied by 16 bc we handle 16 pixels in one iteration
 
 	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%.120s.ppm", filename);
-	dprint("Writing file '%s'...\n", filename_fixed);
+	log("Writing file '%s'...\n", filename_fixed);
 
 	if (rgb_buf_size % stride != 0) {
-		dprint("Error saving to PPM: the RGB buffer size not multiple of %u\n", stride);
+		log("Error saving to PPM: the RGB buffer size not multiple of %u\n", stride);
 		return;
 	}
 
@@ -257,21 +257,21 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 	// since all conversion routines require input buffers to have
 	// a multiple of 16 pixels.
 	if (rgb_buf_size % 16 != 0) {
-		dprint("Error saving to PPM: the RGB buffer size not multiple of %u\n", stride);
+		log("Error saving to PPM: the RGB buffer size not multiple of %u\n", stride);
 		return;
 	}
 
 	// open file
 	fd = OPEN(filename_fixed, WR_CREATE_FLAG, RW_PERM);
 	if (fd == -1) {
-		dprint("Error opening the PPM file for writing\n");
+		log("Error opening the PPM file for writing\n");
 		return;
 	}
 
 	// write header
 	sprintf(header, "P3\n%d %d\n255\n", width, height);
 	if (WRITE(fd, header, strlen(header)) == -1) {
-		dprint("Error writing header to PPM file\n");
+		log("Error writing header to PPM file\n");
 		CLOSE(fd);
 		return;
 	}
@@ -375,12 +375,12 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 					buffer[47], buffer[46], buffer[45]
 					);
 		else {
-			dprint("Error saving PPM file: Unknown RGB format %d\n", fmt);
+			log("Error saving PPM file: Unknown RGB format %d\n", fmt);
 			break;
 		}
 
 		if (WRITE(fd, pixel, count) == -1) {
-			dprint("Error writing PPM file contents\n");
+			log("Error writing PPM file contents\n");
 			break;
 		}
 
@@ -390,7 +390,7 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 
 	CLOSE(fd);
 
-	dprint("done\n");
+	log("done\n");
 }
 static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
 	int32_t			fd;
@@ -402,18 +402,18 @@ static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint3
 	// append the extension to the given file name
 	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%.120s.%s", filename, pixfmt_descriptions[fmt].name);
 
-	dprint("Writing file '%s'...\n", filename_fixed);
+	log("Writing file '%s'...\n", filename_fixed);
 
 	fd = OPEN(filename_fixed, WR_CREATE_FLAG, RW_PERM);
 	if (fd == -1) {
-		dprint("Error opening the file for writing\n");
+		log("Error opening the file for writing\n");
 		return;
 	}
 
 	while (count < buf_size) {
 		int ret = WRITE(fd, (buffer + count), (buf_size - count));
 		if (ret < 0) {
-			dprint("Error writing PPM file contents\n");
+			log("Error writing PPM file contents\n");
 			break;
 		}
 		count += ret;
@@ -421,7 +421,7 @@ static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint3
 
 	CLOSE(fd);
 
-	dprint("done\n");
+	log("done\n");
 }
 
 void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer) {
@@ -455,7 +455,7 @@ ticks		getticks() {
 		if (host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &clock_server) == KERN_SUCCESS)
 			valid_clock_server = 1;
 		else
-			dprintf("Error getting clock server\n");
+			log("Error getting clock server\n");
 
 		has_asked_for_clock_server = 1;
 	}
@@ -466,7 +466,7 @@ ticks		getticks() {
 		if (clock_get_time(clock_server, &ts) == KERN_SUCCESS)
 			result = ts.tv_sec * 1000000000LL + (ticks) ts.tv_nsec;
 		else
-			dprintf("Error getting time\n");
+			log("Error getting time\n");
 	}
 	return result;
 
@@ -479,7 +479,7 @@ ticks		getticks() {
 
 	if (has_asked_for_frequency == 0) {
 		if (QueryPerformanceFrequency(&frequency) != TRUE) {
-			dprintf("Error getting timer frequency\n");
+			log("Error getting timer frequency\n");
 			frequency.QuadPart = 0;
 		}
 		has_asked_for_frequency = 1;
@@ -524,7 +524,7 @@ void			do_timing(struct timings *timings) {
 			timings->vcs += (now.ru_nvcsw - last_rusage.ru_nvcsw);
 			timings->ivcs += (now.ru_nivcsw - last_rusage.ru_nivcsw);
 		} else
-			dprintf("Error calling getrusage()\n");
+			log("Error calling getrusage()\n");
 #endif
 	}
 }

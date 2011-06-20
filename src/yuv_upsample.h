@@ -18,15 +18,13 @@
  *
  */
 
-
 #ifndef YUV_UPSAMPLE_H_
 #define YUV_UPSAMPLE_H_
-
-
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
+#include "debug_support.h"
 #include "platform_util.h"
 
 

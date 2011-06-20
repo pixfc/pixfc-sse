@@ -45,14 +45,14 @@ static int		time_conversion_block(const struct ConversionBlock *block, struct ti
 
 	// Create struct pixfc
 	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
-		dprint("Error create struct pixfc\n");
+		log("Error create struct pixfc\n");
 		return -1;
 	}
 
 	// Allocate the source and destination buffers
 	for ( i = 0; i < NUM_IN_BUF; i++) {
 		if (allocate_buffer(block->source_fmt, w, h, &input[i]) != 0) {
-			dprint("Error allocating input buffer\n");
+			log("Error allocating input buffer\n");
 			i = NUM_IN_BUF;
 			while (i-- > 0) {
 				if (input[i] != NULL)
@@ -62,7 +62,7 @@ static int		time_conversion_block(const struct ConversionBlock *block, struct ti
 		}
 	}
 	if (allocate_buffer(block->dest_fmt, w, h, &output) != 0){
-		dprint("Error allocating out buffer\n");
+		log("Error allocating out buffer\n");
 		i = NUM_IN_BUF;
 		while (i-- > 0) {
 			if (input[i] != NULL)
@@ -103,7 +103,7 @@ static uint32_t		time_conversion_blocks() {
 	uint32_t	index;
 	struct timings	timings;
 
-	dprint("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
+	log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
 	printf("%-80s\t%10s\t%10s\t%10s\t%5s\n","Conversion Block Name", "Avg Time", "Avg User Time",
 			"Avg Sys Time", "Ctx Sw");
 
@@ -156,7 +156,7 @@ static uint32_t			check_formats_enum() {
 		// descriptions array must be sorted according to the
 		// PixFcPixelFormat enum. Here we enforce this rule.
 		if (pixfmt_descriptions[index].pixFcFormat != index) {
-			dprint("Element at index %d in pixel format description does not"
+			log("Element at index %d in pixel format description does not"
 					" match the expected PixFcPixelFormat enum entry (it "
 					"matches entry %d)\n", index, pixfmt_descriptions[index].pixFcFormat);
 			result = -1;
@@ -166,7 +166,7 @@ static uint32_t			check_formats_enum() {
 
 	// Check that both arrays have the same number of elements
 	if (index != PixFcFormatCount) {
-		dprint("The number of pixel format descriptions (%d does not"
+		log("The number of pixel format descriptions (%d does not"
 				" match the number of PixFcPixelFormat entries (%d)).\n",
 				index, PixFcFormatCount);
 		result = -1;
@@ -181,24 +181,24 @@ static uint32_t			check_formats_enum() {
  */
 int 				main(int argc, char **argv) {
 
-	dprint("\n");
-	dprint("\t\tU N I T   T E S T I N G\n");
-	dprint("\n");
-	dprint("Checking PixFcPixelFormat enum and description arrays...\n");
+	log("\n");
+	log("\t\tU N I T   T E S T I N G\n");
+	log("\n");
+	log("Checking PixFcPixelFormat enum and description arrays...\n");
 	if (check_formats_enum() == 0)
-		dprint("PASSED\n");
+		log("PASSED\n");
 	else
-		dprint("FAILED\n");
+		log("FAILED\n");
 
-	dprint("\n");
-	dprint("\n");
-	dprint("Checking conversion block timing ... \n");
+	log("\n");
+	log("\n");
+	log("Checking conversion block timing ... \n");
 	if (time_conversion_blocks() == 0)
-		dprint("PASSED\n");
+		log("PASSED\n");
 	else
-		dprint("FAILED\n");
+		log("FAILED\n");
 
-	dprint("\n");
+	log("\n");
 	return 0;
 }
 

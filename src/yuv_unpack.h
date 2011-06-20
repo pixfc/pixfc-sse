@@ -21,6 +21,7 @@
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
+#include "debug_support.h"
 #include "common.h"
 #include "platform_util.h"
 

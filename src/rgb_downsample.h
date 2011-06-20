@@ -18,15 +18,13 @@
  *
  */
 
-
-
-
-
 #ifndef RGB_DOWNSAMPLE_H_
 #define RGB_DOWNSAMPLE_H_
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
+
+#include "debug_support.h"
 #include "platform_util.h"
 
 /*

@@ -22,6 +22,8 @@
 #define ARGB_CONVERSION_COMMON_H_
 
 #include "common.h"
+
+#ifndef DEBUG
 /*
  * Include the unpack & pack routines twice to generate both aligned & unaligned versions
  */
@@ -37,6 +39,7 @@
 
 #include "rgb_downsample.h"
 #include "rgb_to_yuv_convert.h"
+#endif
 
 /*
  * We have 2 RGB32 to YUV422 conversion implementations:

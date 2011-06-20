@@ -77,24 +77,37 @@ endif(NOT WIN32)
 
 # Check if we are building in debug mode
 if(DEBUG)
+	include_directories(AFTER .)
 	add_definitions(-DDEBUG)
-	GenerateExternInlines()
-
-	# Add extern inline definitions to source file list
-	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
-		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}.c")
-	endforeach(CUR_FILE)
-	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
-		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}_aligned.c" "${CUR_FILE}_unaligned.c")
-	endforeach(CUR_FILE)
-
 
 	# Add compiler specific flags	
 	if(APPLE)
-		add_definitions(-gdwarf-2 -Wall -Winline)
+		add_definitions(-gdwarf-2 -Wall -Winline -Wno-implicit-function-declaration )
 	elseif(UNIX)
-		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs)
+		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
+	elseif(WIN32)
+		add_definitions(-Wno-implicit-function-declaration)
 	endif(APPLE)
+
+	# For each header file containing extern inlines, copy it to the binary dir into a source file
+	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
+		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c)
+		list(APPEND PIXFC_SRC_LIST "${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c")
+	endforeach(CUR_FILE)
+
+
+	# For each header file containing extern inlines that define aligned & unaligned pack/unpack, 
+	# copy it to the binary dir into 2 source files (aligned & unaligned) and define the 
+	# GENERATE_UNALIGNED_INLINES macro appropriately on each generated source file.
+	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_aligned.c DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_aligned.c)
+		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_unaligned.c DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_unaligned.c)
+		
+		set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_aligned.c PROPERTIES COMPILE_DEFINITIONS GENERATE_UNALIGNED_INLINES=0)
+		set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_unaligned.c PROPERTIES COMPILE_DEFINITIONS GENERATE_UNALIGNED_INLINES=1)
+
+		list(APPEND PIXFC_SRC_LIST "${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_aligned.c" "${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_unaligned.c")
+	endforeach(CUR_FILE)
 else(DEBUG)
 	if(WIN32)
 	else(WIN32)

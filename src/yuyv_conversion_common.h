@@ -21,7 +21,7 @@
 #ifndef YUYV_CONVERSION_COMMON_H_
 #define YUYV_CONVERSION_COMMON_H_
 
-
+#ifndef DEBUG
 /*
  * Include the unpack & pack routines twice to generate both aligned & unaligned versions
  */
@@ -39,6 +39,7 @@
 #include "yuv_to_rgb_convert.h"
 #include "yuv_to_rgb_convert_bt601.h"
 #include "yuv_to_rgb_convert_bt709.h"
+#endif
 
 /*
  * Convert YUYV to RGB with upsampling

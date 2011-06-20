@@ -18,8 +18,6 @@
  *
  */
 
-#include <emmintrin.h>
-
 #include "common.h"
 #include "pixfc-sse.h"
 #include "yuyv_conversion_common.h"

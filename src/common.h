@@ -26,6 +26,7 @@
 #include <emmintrin.h>
 
 #include "platform_util.h"
+#include "debug_support.h"
 
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))

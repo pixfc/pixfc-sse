@@ -25,6 +25,7 @@
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
+#include "debug_support.h"
 #include "platform_util.h"
 
 /*

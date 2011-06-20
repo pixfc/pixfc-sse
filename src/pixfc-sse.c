@@ -32,61 +32,61 @@
 static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const struct ConversionBlock *block,
 		PixFcPixelFormat src_fmt, PixFcPixelFormat dest_fmt, uint32_t flags) {
 
-	dprintf("Checking conversion block '%s'\n", block->name);
-	dprintf("Block src / dst fmt: %s\t%s\n", pixfmt_descriptions[block->source_fmt].name,
+	dprint("Checking conversion block '%s'\n", block->name);
+	dprint("Block src / dst fmt: %s\t%s\n", pixfmt_descriptions[block->source_fmt].name,
 			pixfmt_descriptions[block->dest_fmt].name);
 
 	// If this block does not handle the requested conversion, error out.
 	if ((block->source_fmt != src_fmt) || (block->dest_fmt != dest_fmt)) {
-		dprintf("Source / Destination mismatch\n");
+		dprint("Source / Destination mismatch\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If we were told to require conversion blocks performing NNB resampling,
 	// enforce it.
 	if (((flags & PixFcFlag_NNbResampling) == 0 ) != ((block->attributes & NNB_RESAMPLING) == 0)) {
-		dprintf("Enforcing NNbResampling flag\n");
+		dprint("Enforcing NNbResampling flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 	
 	// If we were told to disable SSE conversion blocks, make sure this block
 	// does not require any SSE features.
 	if ((flags & PixFcFlag_NoSSE) && (block->required_cpu_features != CPUID_FEATURE_NONE)) {
-		dprintf("Enforcing FORCE_NO_SSE flag\n");
+		dprint("Enforcing FORCE_NO_SSE flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If we were told to use ITU-R Rec. BT601 conversion, make sure this block
 	// uses these equations.
 	if ((flags & PixFcFlag_BT601Conversion) && ! (block->attributes & BT601_CONVERSION)) {
-		dprintf("Enforcing SD_FORMAT_CONVERSION flag\n");
+		dprint("Enforcing SD_FORMAT_CONVERSION flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If we were told to use ITU-R Rec. BT709 conversion, make sure this block
 	// uses these equations.
 	if ((flags & PixFcFlag_BT709Conversion) && ! (block->attributes & BT709_CONVERSION)) {
-		dprintf("Enforcing HD_FORMAT_CONVERSION flag\n");
+		dprint("Enforcing HD_FORMAT_CONVERSION flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If the cpu does not have the required features, error out.
 	if (does_cpu_support(block->required_cpu_features) != 0) {
-		dprintf("CPU feature mismatch:\n");
-		dprintf("Required CPU features:  %#08llx\n", (long long unsigned int)block->required_cpu_features);
-		dprintf("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
+		dprint("CPU feature mismatch:\n");
+		dprint("Required CPU features:  %#08llx\n", (long long unsigned int)block->required_cpu_features);
+		dprint("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If we were told to use an SSE2-only routine, make sure that's the case
 	if ((flags & PixFcFlag_SSE2Only) && (block->required_cpu_features != CPUID_FEATURE_SSE2)) {
-		dprintf("Enforcing FORCE_SSE2_ONLY flag\n");
+		dprint("Enforcing FORCE_SSE2_ONLY flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
 	// If the number of pixels is not multiple of the required value, error out.
 	if (conv->pixel_count % block->pixel_count_multiple != 0) {
-		dprintf("Pixel count (%u) not multiple of %u\n", conv->pixel_count, block->pixel_count_multiple);
+		dprint("Pixel count (%u) not multiple of %u\n", conv->pixel_count, block->pixel_count_multiple);
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
@@ -118,7 +118,7 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 			conv->convert = block->convert_fn;
 			conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
 
-			dprintf("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
+			dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
 
 			return PIXFC_OK;
 		}
@@ -153,9 +153,9 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 	conv->height = height;
 	conv->pixel_count = width * height;
 
-	dprintf("Requested src / dst fmt:\t%s\t%s\n", pixfmt_descriptions[src_fmt].name,
+	dprint("Requested src / dst fmt:\t%s\t%s\n", pixfmt_descriptions[src_fmt].name,
 			pixfmt_descriptions[dest_fmt].name);
-	dprintf("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
+	dprint("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
 
 	// Look for a conversion block to do the requested conversion
 	result = look_for_matching_conversion_block(conv, src_fmt, dest_fmt, flags);

@@ -18,11 +18,8 @@
  *
  */
 
-#include <emmintrin.h>
-
 #include "common.h"
 #include "pixfc-sse.h"
-#include "platform_util.h"
 #include "yuyv_conversion_common.h"
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\

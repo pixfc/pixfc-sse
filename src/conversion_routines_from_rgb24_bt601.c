@@ -18,7 +18,6 @@
  *
  */
 
-
 #include "common.h"
 #include "pixfc-sse.h"
 #include "argb_conversion_common.h"
