@@ -2,13 +2,11 @@
 # Source files for test apps
 set(TEST_UTIL_SRC_LIST
 	test-utils.c
-	pixfmt_descriptions.c
 )
 
 # Header files for test apps
 set(TEST_UTIL_HDR_LIST
 	test-utils.h
-	pixfmt_descriptions.h
 	rgb_image.h
 )
 

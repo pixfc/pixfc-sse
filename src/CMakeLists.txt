@@ -4,6 +4,7 @@ list(APPEND PIXFC_SRC_LIST
 	pixfc-sse.c
 	common.c
    	conversion_blocks.c
+	pixfmt_descriptions.c
 	conversion_routines_from_yuyv.c
 	conversion_routines_from_yuyv_bt601.c
 	conversion_routines_from_yuyv_bt709.c
