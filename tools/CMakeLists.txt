@@ -14,7 +14,7 @@ set(TEST_UTIL_HDR_LIST
 include_directories(AFTER include ../src)
 
 if(NOT WIN32)
-	add_definitions(-Wno-trigraphs)
+	add_definitions(-Wno-trigraphs -msse2)
 endif(NOT WIN32)
 
 #

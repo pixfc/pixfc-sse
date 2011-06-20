@@ -35,6 +35,7 @@
 // inlines (aligned or unaligned) based on whether the source and destination
 // buffers' alignment
 
+#ifdef WIN32
 // Visual Studio's handling of variadic macros is buggy at best.
 // We need the following in order to have __VA_ARGS__ handled properly.
 #define LeftParenthesis (
@@ -53,6 +54,23 @@
 			conversion_macro LeftParenthesis unaligned_##unpack_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
 		}\
 	}
+#else
+#define DO_CONVERSION(conversion_macro, unpack_fn, pack_fn, ...)\
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unpack_fn, pack_fn, __VA_ARGS__)\
+		} else {\
+			conversion_macro(unpack_fn, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unaligned_##unpack_fn, pack_fn, __VA_ARGS__)\
+		} else {\
+			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	}
+
+#endif
 
 // Declare a __m128i variable, and load one unaligned __m128i vector from the unaligned buffer
 #define	DECLARE_VECT_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
