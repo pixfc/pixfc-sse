@@ -1,0 +1,135 @@
+
+# PixFC source files
+list(APPEND PIXFC_SRC_LIST
+	pixfc-sse.c
+	common.c
+   	conversion_blocks.c
+	conversion_routines_from_yuyv.c
+	conversion_routines_from_yuyv_bt601.c
+	conversion_routines_from_yuyv_bt709.c
+	conversion_routines_from_uyvy.c
+	conversion_routines_from_uyvy_bt601.c
+	conversion_routines_from_uyvy_bt709.c
+	conversion_routines_from_argb.c
+	conversion_routines_from_argb_bt601.c
+	conversion_routines_from_argb_bt709.c
+	conversion_routines_from_bgra.c
+	conversion_routines_from_bgra_bt601.c
+	conversion_routines_from_bgra_bt709.c
+	conversion_routines_from_rgb24.c
+	conversion_routines_from_rgb24_bt601.c
+	conversion_routines_from_rgb24_bt709.c
+	conversion_routines_from_bgr24.c
+	conversion_routines_from_bgr24_bt601.c
+	conversion_routines_from_bgr24_bt709.c
+)
+
+# header files
+file(GLOB PIXFC_HDR_LIST *.h)	
+
+
+
+# List of header files containing extern inlines definitions that must
+# be copied into C files and have their "extern" keyword removed in
+# order to do a debug build with no optimisation 
+list(APPEND EXTERN_INLINE_HEADER_LIST
+	yuv_upsample
+	yuv_to_rgb_convert
+	yuv_to_rgb_convert_bt601
+	yuv_to_rgb_convert_bt709
+	rgb_downsample
+	rgb_to_yuv_convert
+)
+# List of header files containing extern inlines definitions that must
+# be copied into C files, have their "extern" keyword removed and have
+# the GENERATE_UNALIGNED_INLINES macro defined in order to do a debug 
+# build with no optimisation 
+list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
+	yuv_unpack
+	rgb_pack
+	rgb_unpack
+	yuv_pack
+)
+function(GenerateExternInlines)
+	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
+		file(READ ${CUR_FILE}.h FILE_CONTENTS)
+		string(REPLACE "EXTERN_INLINE " "inline " NEW_CONTENTS "${FILE_CONTENTS}")
+		file(WRITE ${CUR_FILE}.c "${NEW_CONTENTS}")
+	endforeach(CUR_FILE)
+
+	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+		file(READ ${CUR_FILE}.h FILE_CONTENTS)
+		string(REPLACE "EXTERN_INLINE " "inline " NEW_CONTENTS "${FILE_CONTENTS}")
+		file(WRITE ${CUR_FILE}_unaligned.c "#define GENERATE_UNALIGNED_INLINES 1")
+		file(APPEND ${CUR_FILE}_unaligned.c "${NEW_CONTENTS}")
+		file(WRITE ${CUR_FILE}_aligned.c "#define GENERATE_UNALIGNED_INLINES 0")
+		file(APPEND ${CUR_FILE}_aligned.c "${NEW_CONTENTS}")
+	endforeach(CUR_FILE)
+endfunction(GenerateExternInlines)
+
+
+# Add compiler options
+if(NOT WIN32)
+	add_definitions(-msse2 -mssse3)
+endif(NOT WIN32)
+
+
+# Check if we are building in debug mode
+if(DEBUG)
+	add_definitions(-DDEBUG)
+	GenerateExternInlines()
+
+	# Add extern inline definitions to source file list
+	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
+		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}.c")
+	endforeach(CUR_FILE)
+	foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+		list(APPEND PIXFC_SRC_LIST "${CUR_FILE}_aligned.c" "${CUR_FILE}_unaligned.c")
+	endforeach(CUR_FILE)
+
+
+	# Add compiler specific flags	
+	if(APPLE)
+		add_definitions(-gdwarf-2 -Wall -Winline)
+	elseif(UNIX)
+		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs)
+	endif(APPLE)
+else(DEBUG)
+	if(WIN32)
+	else(WIN32)
+		add_definitions(-O3 -Wno-trigraphs)
+
+		# On Mac OS, memcpy is re-defined as a macro which introduces an "if" statement
+		# and kills performance of RGB24 slower-repacking routines. To disable this
+		# re-definition, we need to define the following:
+		if(APPLE)
+			add_definitions(-D_FORTIFY_SOURCE=0)
+		endif(APPLE)
+
+	endif(WIN32)
+endif(DEBUG)
+
+#
+# LIBPIXFC-SSE TARGET
+#
+# Create groups for XCode and VS
+source_group("source files" FILES ${PIXFC_SRC_LIST})
+source_group("header files" FILES ${PIXFC_HDR_LIST})
+# Create static library
+add_library(pixfc-sse STATIC ${PIXFC_SRC_LIST} ${PIXFC_HDR_LIST})
+
+
+
+#
+# CLEAN TARGET
+#
+foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
+	list(APPEND EXTERN_INLINE_SRC_LIST "${CUR_FILE}.c")
+endforeach(CUR_FILE)
+foreach(CUR_FILE ${EXTERN_INLINE_ALIGN_HEADER_LIST})
+	list(APPEND EXTERN_INLINE_SRC_LIST "${CUR_FILE}_aligned.c" "${CUR_FILE}_unaligned.c")
+endforeach(CUR_FILE)
+
+add_custom_target(cleanup COMMAND rm -Rf CMakeFiles/ CMakeCache.txt cmake_install.cmake Makefile PixFC.xcodeproj/ PixFC.build/ CMakeScripts/ Debug/ build/ svn-* *~ libpixfc.a *.o *.ppm unit-testing convert-to-file visual-check ${EXTERN_INLINE_SRC_LIST})
+
+	

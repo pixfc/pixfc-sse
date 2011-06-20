@@ -21,17 +21,20 @@ The next two sections explain both of these steps.
 == BUILD ==
 PixFC-SSE uses CMake to support cross-platform builds. PixFC-SSE currently
 builds as a static library which you then link to your application. Building
-the PixFC-SSE static library depends on the target platform: 
-- On Linux platforms, run 'cmake .' to generate a Makefile first. Then run
-  'make' to build the static library and test applications.
+the PixFC-SSE static library depends on the target platform. First go to the 
+build/ directory, then:
+- On Linux platforms, run 'cmake ..' to generate a Makefile. Then run 'make' 
+  to build the static library (libpixfc-sse.a).
 - On Windows, run 'create_VS_proj.bat' to create a Visual Studio 2010 64-bit
   solution. Then, open the solution file (pixfc-sse.sln) to build the static
-  library and test applications.
-- On Mac, run 'cmake .' to generate a Makefile like on Linux, or run
- 'cmake -G "Xcode" .' to generate an XCode project which you then open to build
- the static library and test applications.
+  library. Make sure you select 'Release' as build configuration in Visual
+  Studio before starting the build. The library (libpixfc-sse.lib) can be 
+  found in Release/ .
+- On Mac, run 'cmake ..' to generate a Makefile like on Linux, or run
+  'cmake -G Xcode ..' to generate an XCode project which you then open to build
+  the static library (libpixfc-sse.a).
 - On all platforms, you can generate Eclipse project files by running
- 'cmake -G "Eclipse CDT4 - Unix Makefiles" .'
+  'cmake -G "Eclipse CDT4 - Unix Makefiles" ..'
  
 More generators are available depending on the target platform. Run 
 'cmake --help' for more information.
@@ -39,7 +42,7 @@ More generators are available depending on the target platform. Run
 == LINKING ==
 Using PixFC-SSE in your own application is extremely simple. Once, you have
 built the PixFC-SSE static library as described in the previous section,
-include the PixFC-SSE API header file 'pifc-sse.h' in your program, and 
+include the PixFC-SSE API header file 'pifc-sse.h' found in include/ , and 
 create a struct pixfc to perform pixel format conversions. Last, link the
 PixFC static library to your application.
  
