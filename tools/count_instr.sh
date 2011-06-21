@@ -3,6 +3,7 @@
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "$0 <symbol name> [instruction]"
 	echo "If [instruction] is not provided, 'movdqa' is assumed'"
+	echo "If [instruction] is @, then all instructions are counted"
     exit 1
 fi
 
@@ -23,6 +24,9 @@ else # assume Mac
     pattern="/$1:/,/^_/ p"
 fi
 
-${cmd} unit-testing | sed -n "${pattern}" | grep -i "${instr}" | wc -l
-
+if [ "$instr" = "@" ]; then
+	${cmd} unit-testing | sed -n "${pattern}" | wc -l
+else
+	${cmd} unit-testing | sed -n "${pattern}" | grep -i "${instr}" | wc -l
+fi
 
