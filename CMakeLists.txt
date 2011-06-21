@@ -27,5 +27,10 @@ if(WIN32)
 endif(WIN32)
 
 
+IF(NOT CMAKE_BUILD_TYPE)
+	SET(CMAKE_BUILD_TYPE Release CACHE STRING "If not already specified, set the type of build to Release"
+				      FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
 add_subdirectory(src)
 add_subdirectory(tools)

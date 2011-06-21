@@ -57,6 +57,7 @@ typedef enum {
 /*
  * A conversion block function converts pixels from an input buffer in a specific
  * format to a different format and places them in an output buffer.
+ * To achieve higher conversion speeds, both buffers should be 16-byte aligned.
  *
  * Prototype for conversion block functions 
  */
@@ -111,9 +112,8 @@ typedef enum {
 	// resampling. This means:
 	// - upsampling creates missing chromas by duplicating existing ones, and
 	// - downsampling simply drops unused chromas.
-	// This is the fastest form of resampling, but converted images are
-	// of lower quality and prone to all sorts of conversion artifacts
-	// (aliasing). This flag can only be used when converting from:
+	// This is the fastest form of resampling, but converted images can be
+	// of lower quality and prone to conversion artifacts (aliasing).
 	// {YUYV , UYVY} to {ARGB, BGRA, RGB24, BGR24}
 	PixFcFlag_NNbResampling	=		(1 << 14),
 } PixFcFlag;
