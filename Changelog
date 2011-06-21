@@ -1,3 +1,7 @@
+v0.1.1:
+ - Added conversion from {ARGB, BGRA, RGB24, BGR24} to {YUYV, UYVY}
+ - Added support for unaligned buffers
+
 v0.01:
  - first working version
  - converts from {YUYV, UYVY} to {ARGB, BGRA, RGB24, BGR24}
