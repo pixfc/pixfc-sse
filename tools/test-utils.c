@@ -39,7 +39,6 @@
 
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
-#include "rgb_image.h"
 #include "test-utils.h"
 
 
@@ -129,54 +128,6 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 			buffer_size -= 16;
 		}
 	}
-}
-
-
-uint32_t		fill_argb_image_with_rgb_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void * buf) {
-	uint32_t		pixel_count = width * height;
-	uint8_t*		dest = (uint8_t *) buf;
-	uint8_t			pixel[3] = {0};
-	char*			rgb_image = header_data;
-
-	// Make sure we are converting the image into an RGB buffer
-	if ((fmt != PixFcARGB) && (fmt != PixFcBGRA) && (fmt != PixFcRGB24) && (fmt != PixFcBGR24)){
-		log("Expected RGB buffer\n");
-		return -1;
-	}
-
-	if ((width != rgb_img_width) || (height != rgb_img_height)) {
-		log("RGB buffer dimensions (%dx%d) are different from RGB image in header file (%dx%d)\n",
-				width, height, rgb_img_width, rgb_img_height);
-		return -1;
-	}
-
-	// Fill the buffer
-	while (pixel_count > 0) {
-		HEADER_PIXEL(rgb_image,  pixel);
-
-		switch (fmt) {
-		case PixFcARGB:
-			*dest++ = 0;
-		case PixFcRGB24:
-			*dest++ = pixel[0];
-			*dest++ = pixel[1];
-			*dest++ = pixel[2];
-			break;
-		default:
-		case PixFcBGRA:
-		case PixFcBGR24:
-			*dest++ = pixel[2];
-			*dest++ = pixel[1];
-			*dest++ = pixel[0];
-			if (fmt == PixFcBGRA)
-				*dest++ = 0;
-			break;
-		}
-
-		pixel_count--;
-	}
-
-	return 0;
 }
 
 

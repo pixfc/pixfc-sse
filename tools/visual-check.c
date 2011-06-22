@@ -25,6 +25,7 @@
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
+#include "rgb_image.h"
 #include "test-utils.h"
 
 typedef struct {

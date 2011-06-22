@@ -22,8 +22,9 @@
 
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
-#include "test-utils.h"
 #include "platform_util.h"
+#include "rgb_image.h"
+#include "test-utils.h"
 
 
 // PIXFC FLAGS
