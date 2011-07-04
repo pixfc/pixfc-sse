@@ -42,7 +42,7 @@
 #endif
 
 /*
- * Convert YUYV to RGB with upsampling
+ * Convert YUV422 interleaved to RGB with upsampling
  *
  *
  * Example of the expansion for a conversion to ARGB :
@@ -110,7 +110,7 @@
  *	pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
  *
  */
-#define UPSAMPLE_AND_CONVERT_YUV_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
@@ -138,6 +138,214 @@
 	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
 	pack_fn(convert_out, rgb_out_buf);\
 
+
+/*
+ * Convert YUV422 planar to RGB with upsampling
+ *
+ *
+ * Example of the expansion for a conversion to ARGB :
+ *
+ *   // content of the following array:
+ *   // 0: Y1-8
+ *   // 1: UV1-8 odd
+ *   // 2: UV1-8 upsampled
+ *   // 3: Y9-16
+ *   // 4: UV9-16 odd
+ *   // 5: UV9-16 upsampled
+ *   // 6: UV17-24 odd
+ *   // 7: UV25-32 odd
+ * 	__m128i		unpack_out[8];
+ *	__m128i		convert_out[6];
+ *	__m128i*    y_plane = (__m128i *) source_buffer;
+ *	__m128i*    u_plane = (uint8_t *) source_buffer + pixfc->pixel_count;
+ *	__m128i*    v_plane = (uint8_t *) source_buffer + pixfc->pixel_count * 3 / 2;
+ *	__m128i*	argb_4pixels = (__m128i *) dest_buffer;
+ *	int32_t	pixel_count = pixfc->pixel_count - 32; // handle the last 32 pixels outside the while loop
+ *
+ *
+ *	// Each iteration converts 32 pixel at a time
+ *
+ *	// unpack the 8 U / V samples for the first 16 pixels
+ *	unpack_low_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[1], &unpack_out[4]);
+ *
+ *	while(pixel_count > 0) {
+ *		//
+ *		// First set of 16 pix
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[3]);
+ *
+ *		// unpack the 8 U / V samples corresponding to the next 16 pixels
+ *		// (converted in the next set of 16 pixels, not this one. used here only
+ *		// to recreate missing chroma values for the current 16 pix)
+ *		unpack_high_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[6], &unpack_out[7]);
+ *
+ *		// reconstruct missing U-V values for first 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[1], &unpack_out[4], &unpack_out[2]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// reconstruct missing U-V values for next 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[4], &unpack_out[6], &unpack_out[5]);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(&unpack_out[3], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *
+ *		//
+ *		// Second set of 16 pix
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(&y_plane[1], unpack_out, &unpack_out[3]);
+ *
+ *		// Copy the previously-unpacked chromas for the next set fo 16 pix
+ *		unpack_out[1] = _mm_load_si128(&unpack_out[6]);
+ *		unpack_out[4] = _mm_load_si128(&unpack_out[7]);
+ *
+ *		// unpack the 8 U / V samples corresponding to the next 16 pixels
+ *		// (converted in the next set of 16 pixels, not this one. used here only
+ *		// to recreate missing chroma values for the current 16 pix)
+ *		unpack_low_yuv42Xp_to_uv_vector_sse2(&u_plane[1], &v_plane[1], &unpack_out[6], &unpack_out[7]);
+ *
+ *		// reconstruct missing U-V values for first 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[1], &unpack_out[4], &unpack_out[2]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// reconstruct missing U-V values for next 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[4], &unpack_out[6], &unpack_out[5]);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(&unpack_out[3], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *
+ *
+ *		// each iteration converts 32 pixels
+ *		y_plane += 2;
+ *		u_plane += 1;
+ *		v_plane += 1;
+ *		argb_4pixels += 8;
+ *		pixel_count -= 32;
+ *
+ *		// Copy the next iteration first 8 pix luma and chromas unpacked above
+ *		unpack_out[1] = _mm_load_si128(&unpack_out[6]);
+ *		unpack_out[4] = _mm_load_si128(&unpack_out[7]);
+ *	}
+ *
+ *	//
+ *	// convert the remaining pixels
+ *
+ *	// How many pixels are left ?
+ *	pixel_count += 32;
+ *
+ *	if (pixel_count == 32) {
+ *		// First set of 16 pix
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[3]);
+ *
+ *		// unpack the 8 U / V samples corresponding to the next 16 pixels
+ *		// (converted in the next set of 16 pixels, not this one. used here only
+ *		// to recreate missing chroma values for the current 16 pix)
+ *		unpack_high_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[6], &unpack_out[7]);
+ *
+ *		// reconstruct missing U-V values for first 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[1], &unpack_out[4], &unpack_out[2]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// reconstruct missing U-V values for next 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[4], &unpack_out[6], &unpack_out[5]);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(&unpack_out[3], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *
+ *		//
+ *		// Second set of 16 pix
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(&y_plane[1], unpack_out, &unpack_out[3]);
+ *
+ *		// Copy the previously-unpacked chromas for the next set fo 16 pix
+ *		unpack_out[1] = _mm_load_si128(&unpack_out[6]);
+ *		unpack_out[4] = _mm_load_si128(&unpack_out[7]);
+ *
+ *		// reconstruct missing U-V values for first 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[1], &unpack_out[4], &unpack_out[2]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// reconstruct missing U-V values for next 8 pix
+ *		reconstruct_last_missing_uv_sse2_ssse3(&unpack_out[4], &unpack_out[5]);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(&unpack_out[3], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *	} else {
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[3]);
+ *
+ *		// Copy the previously-unpacked chromas for the next set fo 16 pix
+ *		unpack_out[1] = _mm_load_si128(&unpack_out[6]);
+ *		unpack_out[4] = _mm_load_si128(&unpack_out[7]);
+ *
+ *		// reconstruct missing U-V values for first 8 pix
+ *		reconstruct_missing_uv_sse2_ssse3(&unpack_out[1], &unpack_out[4], &unpack_out[2]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// reconstruct missing U-V values for next 8 pix
+ *		reconstruct_last_missing_uv_sse2_ssse3(&unpack_out[4], &unpack_out[5]);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(&unpack_out[3], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *	}
+ *
+ */
+#define UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB(unpack_y_fn_prefix, unpack_uv_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	__m128i		unpack_out[8];\
+	__m128i		convert_out[6];\
+	__m128i*    yuv_8pixels = (__m128i *) source_buffer;\
+	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
+	uint32_t	pixel_count = pixfc->pixel_count - 16;\
+	unpack_y_fn_prefix##instr_set(yuv_8pixels, unpack_out, &unpack_out[3]);\
+	while(pixel_count > 0) {\
+		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
+		unpack_fn_prefix##instr_set(&yuyv_8pixels[2], &unpack_out[6]);\
+		reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+		conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+		pack_fn(convert_out, rgb_out_buf);\
+		yuyv_8pixels += 2;\
+		rgb_out_buf += output_stride;\
+		pixel_count -= 16;\
+		unpack_out[0] = _mm_load_si128(&unpack_out[6]);\
+		unpack_out[1] = _mm_load_si128(&unpack_out[7]);\
+	}\
+	unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
+	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+	reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+	pack_fn(convert_out, rgb_out_buf);\
 
 /*
  *
