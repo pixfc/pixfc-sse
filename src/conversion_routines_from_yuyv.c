@@ -45,7 +45,7 @@
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION(\
-				CONVERT_YUV_TO_RGB,\
+				CONVERT_YUV422I_TO_RGB,\
 				unpack_yuyv_to_y_uv_vectors_,\
 				pack_fn,\
 				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
@@ -55,7 +55,7 @@
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
 		DO_CONVERSION(\
-				CONVERT_YUV_TO_RGB,\
+				CONVERT_YUV422I_TO_RGB,\
 				unpack_yuyv_to_y_uv_vectors_,\
 				pack_fn,\
 				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
