@@ -142,6 +142,27 @@
 /*
  * Convert YUV422 planar to RGB with upsampling
  *
+ * We have the following constraints:
+ * - We expect the input buffer to contain a multiple of 16 pixels,
+ * - SSE instructions handle 16 bytes (ie. 16 values for a given component
+ *   Y, U or V) at once,
+ * - We have downsampled chromas at a ratio of 2:1 ie. 2 Y values for 1 U
+ *   and 1 V value,
+ * These constraints have the following implications:
+ * - Because each access to the U & V planes will consume 16 values (belonging to
+ *   32 pixels), the main loop must handle 32 pixels at a time. This means doing
+ *   2 reads (of 16 pixels each) in the Y plane and 1 read in the U and V planes.
+ * - Because I want to maintain an input buffer containing a multiple of 16 pixels,
+ *   instead of 32 which would be more convenient, AND because the main loop handles
+ *   32 pixels at a time, the main loop must exit when the pixel count is less
+ *   than 32, so we can handle the remaining pixels (either 32 or 16) appropriately.
+ * - Lastly, the most important implication is that the input buffer size MUST
+ *   be a multiple of the size of 32 pixels (ie. 64 bytes). Otherwise, the last
+ *   read in the V plane will be 8 bytes past the end of the input buffer, which
+ *   is not good. (The last read in the U plane will be 8 bytes into the V plane
+ *   but that's ok because we are using only the first 8 bytes). Note that this
+ *   limitation is imposed on the buffer SIZE (multiple of 32 pixels or 64 bytes),
+ *   not the number of pixels (it only needs to be multiple of 16).
  *
  * Example of the expansion for a conversion to ARGB :
  *
@@ -331,8 +352,8 @@
  	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    y_plane = (__m128i *) source_buffer;\
-	__m128i*    u_plane = (uint8_t *) source_buffer + pixfc->pixel_count;\
-	__m128i*    v_plane = (uint8_t *) source_buffer + pixfc->pixel_count / 2;\
+	__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
+	__m128i*    v_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count / 2);\
 	__m128i*	rgb_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[4]);\
@@ -453,6 +474,27 @@
  * Convert YUV422 planar to RGB using Nearest Neighbour upsampling
  * ie. re-create the missing chromas by duplicating the previous existing ones.
  *
+ * We have the following constraints:
+ * - We expect the input buffer to contain a multiple of 16 pixels,
+ * - SSE instructions handle 16 bytes (ie. 16 values for a given component
+ *   Y, U or V) at once,
+ * - We have downsampled chromas at a ratio of 2:1 ie. 2 Y values for 1 U
+ *   and 1 V value,
+ * These constraints have the following implications:
+ * - Because each access to the U & V planes will consume 16 values (belonging to
+ *   32 pixels), the main loop must handle 32 pixels at a time. This means doing
+ *   2 reads (of 16 pixels each) in the Y plane and 1 read in the U and V planes.
+ * - Because I want to maintain an input buffer containing a multiple of 16 pixels,
+ *   instead of 32 which would be more convenient, AND because the main loop handles
+ *   32 pixels at a time, the main loop must exit when the pixel count is less
+ *   than 32, so we can handle the remaining pixels (either 32 or 16) appropriately.
+ * - Lastly, the most important implication is that the input buffer size MUST
+ *   be a multiple of the size of 32 pixels (ie. 64 bytes). Otherwise, the last
+ *   read in the V plane will be 8 bytes past the end of the input buffer, which
+ *   is not good. (The last read in the U plane will be 8 bytes into the V plane
+ *   but that's ok because we are using only the first 8 bytes). Note that this
+ *   limitation is imposed on the buffer SIZE (multiple of 32 pixels or 64 bytes),
+ *   not the number of pixels (it only needs to be multiple of 16).
  *
  * Expansion for a conversion to ARGB:
  *
@@ -480,7 +522,7 @@
  *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(&unpack_out[2], &convert_out[3]);
  *
  *		// pack both sets of 8 pixels
- *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb)out);
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb_out);
  *
  *		// Move on to next set of 16 Y samples
  *		y_plane++;
@@ -500,16 +542,7 @@
  *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(&unpack_out[2], &convert_out[3]);
  *
  *		// pack both sets of 8 pixels
- *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, &argb_4pixels);
- *
- *		// unpack next 8 pixels
- *		unpack_yuyv_to_y_uv_vectors_sse2_ssse3(&yuyv_8pixels[1], unpack_out);
- *
- *		// convert next 8 pixels
- *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(unpack_out, &convert_out[3]);
- *
- *		// pack both sets of 8 pixels
- *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb_out);
  *
  *		// Move on to next set of 16 Y, U , V samples
  *		y_plane++;
@@ -519,23 +552,112 @@
  *		pixel_count -= 32;
  *	}
  *
+ *	if (pixel_count == 32) {
+ *		// We have 32 pixels left, same code as in main loop
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[2]);
+ *
+ *		// unpack first 8 U / V samples
+ *		unpack_low_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(&unpack_out[2], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb_out);
+ *
+ *		// Move on to next set of 16 Y samples
+ *		y_plane++;
+ *		// U and V stay where they are
+ *		rgb_out += 4;
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[2]);
+ *
+ *		// unpack next 8 U / V samples
+ *		unpack_hi_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(&unpack_out[2], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb_out);
+ *	} else { // pixel_count == 16
+ *		// we have 16 pixels
+ *
+ *		// unpack 16 Y samples
+ *		unpack_yuv42Xp_to_2_y_vectors_sse2(y_plane, unpack_out, &unpack_out[2]);
+ *
+ *		// unpack 8 U / V samples
+ *		unpack_low_yuv42Xp_to_uv_vector_sse2(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);
+ *
+ *		// convert first 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(unpack_out, convert_out);
+ *
+ *		// convert next 8 pixels
+ *		convert_y_uv_vectors_to_rgb_vectors_no_interpolation_sse2_ssse3(&unpack_out[2], &convert_out[3]);
+ *
+ *		// pack both sets of 8 pixels
+ *		pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, rgb_out);
+ *	}
+ *
  */
-#define CONVERT_YUV422P_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
-	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
-	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
-	uint32_t	pixel_count = pixfc->pixel_count;\
-	__m128i		unpack_out[2];\
-	__m128i		convert_out[6];\
-	while(pixel_count > 0) {\
-		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
-		conv_fn_prefix##instr_set(unpack_out, convert_out);\
-		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], unpack_out);\
-		conv_fn_prefix##instr_set(unpack_out, &convert_out[3]);\
-		pack_fn(convert_out, rgb_out_buf);\
-		yuyv_8pixels += 2;\
-		rgb_out_buf += output_stride;\
-		pixel_count -= 16;\
-	};\
+#define CONVERT_YUV422P_TO_RGB(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+		__m128i*    y_plane = (__m128i *) source_buffer;\
+		__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
+		__m128i*    v_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count / 2);\
+		__m128i*	rgb_out = (__m128i *) dest_buffer;\
+		uint32_t	pixel_count = pixfc->pixel_count;\
+		__m128i		unpack_out[4];\
+		__m128i		convert_out[6];\
+		while(pixel_count > 32) {\
+			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out);\
+			y_plane++;\
+			rgb_out += output_stride;\
+			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out);\
+			y_plane++;\
+			u_plane++;\
+			v_plane++;\
+			rgb_out += 4;\
+			pixel_count -= 32;\
+		}\
+		if (pixel_count == 32) {\
+			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out);\
+			y_plane++;\
+			rgb_out += 4;\
+			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out);\
+		} else {\
+			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out);\
+		}
+
+
 
 
 #endif /* YUYV_CONVERSION_COMMON_H_ */

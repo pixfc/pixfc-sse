@@ -23,7 +23,7 @@
 #include "yuyv_conversion_common.h"
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\
-		DO_CONVERSION(\
+		DO_CONVERSION_1U_1P(\
 				UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
@@ -33,7 +33,7 @@
 		)
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB24(pack_fn, instr_set)\
-		DO_CONVERSION(\
+		DO_CONVERSION_1U_1P(\
 				UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
@@ -44,7 +44,7 @@
 
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
-		DO_CONVERSION(\
+		DO_CONVERSION_1U_1P(\
 				CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
@@ -54,7 +54,7 @@
 		)
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
-		DO_CONVERSION(\
+		DO_CONVERSION_1U_1P(\
 				CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\

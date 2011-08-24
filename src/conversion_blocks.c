@@ -24,6 +24,7 @@
 #include "conversion_blocks.h"
 #include "conversion_routines_from_yuyv.h"
 #include "conversion_routines_from_uyvy.h"
+#include "conversion_routines_from_yuv422p.h"
 #include "conversion_routines_from_argb.h"
 #include "conversion_routines_from_bgra.h"
 #include "conversion_routines_from_rgb24.h"
@@ -177,6 +178,20 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to BGR24
 	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgr24, upsample_n_convert_uyvy_to_bgr24, convert_uyvy_to_any_rgb, PixFcUYVY, PixFcBGR24, "UYVY to BGR24"),
+
+
+	//
+	// YUV422P to ARGB
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_argb, upsample_n_convert_yuv422p_to_argb, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcARGB, "YUV422P to ARGB"),
+
+	// YUV422P to BGRA
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgra, upsample_n_convert_yuv422p_to_bgra, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGRA, "YUV422P to BGRA"),
+
+	// YUV422P to RGB24
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_rgb24, upsample_n_convert_yuv422p_to_rgb24, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcRGB24, "YUV422P to RGB24"),
+
+	// YUV422P to BGR24
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, "YUV422P to BGR24"),
 };
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);

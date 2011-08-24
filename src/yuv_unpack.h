@@ -322,7 +322,7 @@ INLINE_NAME(unpack_yuv42Xp_to_2_y_vectors_sse2, __m128i* y_input, __m128i* out_1
  * Convert the first 8 chroma values in 2 vectors of 16 char UV
  * (as found in YUV422P / YUV420P) to 2 vectors of 8 interleaved short UV
  *
- * Total latency:				1
+ * Total latency:				3
  *
  * INPUT
  * 2 vectors of 16 char
@@ -344,7 +344,7 @@ INLINE_NAME(unpack_yuv42Xp_to_2_y_vectors_sse2, __m128i* y_input, __m128i* out_1
 INLINE_NAME(unpack_low_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_input, __m128i* out_1_v16i_uv_vector1, __m128i* out_1_v16i_uv_vector2)
 {
 	CONST_M128I(zero_vect, 0x0LL, 0x0LL);
-	M128(scratch, 0x0LL, 0x0LL);
+	M128I(scratch, 0x0LL, 0x0LL);
 	UNALIGNED_YUVP_UV_INPUT_PREAMBLE;
 
 	_M(scratch) = _mm_unpacklo_epi8(*YUVP_U_INPUT_VECT, *YUVP_V_INPUT_VECT);
@@ -362,7 +362,7 @@ INLINE_NAME(unpack_low_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_i
  * Convert the last 8 chroma values in 2 vectors of 16 char UV
  * (as found in YUV422P / YUV420P) to 1 vector of 8 interleaved short UV
  *
- * Total latency:				1
+ * Total latency:				3
  *
  * INPUT
  * 2 vectors of 16 char
@@ -384,7 +384,7 @@ INLINE_NAME(unpack_low_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_i
 INLINE_NAME(unpack_high_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_input, __m128i* out_1_v16i_uv_vector1, __m128i* out_1_v16i_uv_vector2)
 {
 	CONST_M128I(zero_vect, 0x0LL, 0x0LL);
-	M128(scratch, 0x0LL, 0x0LL);
+	M128I(scratch, 0x0LL, 0x0LL);
 	UNALIGNED_YUVP_UV_INPUT_PREAMBLE;
 
     _M(scratch) = _mm_unpackhi_epi8(*YUVP_U_INPUT_VECT, *YUVP_V_INPUT_VECT);

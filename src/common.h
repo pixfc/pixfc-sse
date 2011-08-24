@@ -31,16 +31,22 @@
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
 
-// Run the given conversion macro with the appropriate packing & unpacking
-// inlines (aligned or unaligned) based on whether the source and destination
-// buffers' alignment
-
+//
+// The following DO_CONVERSION_* macros help us detect whether the input and
+// output buffers are aligned / unaligned and run the conversion macro (1st arg)
+// with the right aligned / unaligned pack & unpack routines.
+//
+// The variations of the DO_CONVERSION_* macros are there to accept different
+// numbers of pack / unpack routines, as indicated by the _Px_Uy suffix
 #ifdef WIN32
+
 // Visual Studio's handling of variadic macros is buggy at best.
 // We need the following in order to have __VA_ARGS__ handled properly.
 #define LeftParenthesis (
 #define RightParenthesis )
-#define DO_CONVERSION(conversion_macro, unpack_fn, pack_fn, ...)\
+
+
+#define DO_CONVERSION_1U_1P(conversion_macro, unpack_fn, pack_fn, ...)\
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
 			conversion_macro LeftParenthesis unpack_fn, pack_fn, __VA_ARGS__ RightParenthesis\
@@ -54,8 +60,25 @@
 			conversion_macro LeftParenthesis unaligned_##unpack_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
 		}\
 	}
-#else
-#define DO_CONVERSION(conversion_macro, unpack_fn, pack_fn, ...)\
+
+#define DO_CONVERSION_3U_1P(conversion_macro, unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, ...)\
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro LeftParenthesis unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			conversion_macro LeftParenthesis unpack1_fn, unpack2_fn, unpack3_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro LeftParenthesis unaligned_##unpack1_fn, unaligned_##unpack2_fn, unaligned_##unpack3_fn, pack_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			conversion_macro LeftParenthesis unaligned_##unpack1_fn, unaligned_##unpack2_fn, unaligned_##unpack3_fn, unaligned_##pack_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	}
+
+#else // ! Windows
+
+#define DO_CONVERSION_1U_1P(conversion_macro, unpack_fn, pack_fn, ...)\
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
 			conversion_macro(unpack_fn, pack_fn, __VA_ARGS__)\
@@ -69,6 +92,22 @@
 			conversion_macro(unaligned_##unpack_fn, unaligned_##pack_fn, __VA_ARGS__)\
 		}\
 	}
+
+#define DO_CONVERSION_3U_1P(conversion_macro, unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, ...)\
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, __VA_ARGS__)\
+		} else {\
+			conversion_macro(unpack1_fn, unpack2_fn, unpack3_fn, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro(unaligned_##unpack1_fn, unaligned_##unpack2_fn, unaligned_##unpack3_fn, pack_fn, __VA_ARGS__)\
+		} else {\
+			conversion_macro(unaligned_##unpack1_fn, unaligned_##unpack2_fn, unaligned_##unpack3_fn, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	}
+
 
 #endif
 

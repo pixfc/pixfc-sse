@@ -23,7 +23,7 @@
 #include "argb_conversion_common.h"
 
 #define CONVERT_TO_YUV422(pack_fn, instr_set)\
-			DO_CONVERSION(\
+			DO_CONVERSION_1U_1P(\
 						CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
 						pack_fn,\
@@ -33,7 +33,7 @@
 			)
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
-			DO_CONVERSION(\
+			DO_CONVERSION_1U_1P(\
 						CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
 						pack_fn,\
@@ -43,7 +43,7 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
-			DO_CONVERSION(\
+			DO_CONVERSION_1U_1P(\
 						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422,\
 						unpack_argb_to_r_g_b_vectors_,\
 						pack_fn,\
@@ -53,7 +53,7 @@
 			)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
-			DO_CONVERSION(\
+			DO_CONVERSION_1U_1P(\
 						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422,\
 						unpack_argb_to_ag_rb_vectors_,\
 						pack_fn,\
