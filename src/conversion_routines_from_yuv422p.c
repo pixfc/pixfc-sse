@@ -27,7 +27,7 @@
 				UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
-				unpack_hi_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
 				convert_y_uv_vectors_to_rgb_vectors_,\
 				4,\
@@ -39,7 +39,7 @@
 				UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
-				unpack_hi_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
 				convert_y_uv_vectors_to_rgb_vectors_,\
 				3,\
@@ -53,9 +53,9 @@
 				CONVERT_YUV422P_TO_RGB,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
-				unpack_hi_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
-				convert_y_uv_vectors_to_rgb_vectors_,\
+				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
 				4,\
 				instr_set\
 		)
@@ -65,9 +65,9 @@
 				CONVERT_YUV422P_TO_RGB,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
-				unpack_hi_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
-				convert_y_uv_vectors_to_rgb_vectors_,\
+				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
 				3,\
 				instr_set\
 		)

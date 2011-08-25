@@ -620,15 +620,15 @@
 		while(pixel_count > 32) {\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
-			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			pack_fn(convert_out, rgb_out);\
 			y_plane++;\
 			rgb_out += output_stride;\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
-			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			pack_fn(convert_out, rgb_out);\
 			y_plane++;\
 			u_plane++;\
@@ -639,21 +639,21 @@
 		if (pixel_count == 32) {\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
-			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			pack_fn(convert_out, rgb_out);\
 			y_plane++;\
 			rgb_out += 4;\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
-			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			pack_fn(convert_out, rgb_out);\
 		} else {\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-			conv_fn_prefix_##instr_set(unpack_out, convert_out);\
-			conv_fn_prefix_##instr_set(&unpack_out[2], &convert_out[3]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			pack_fn(convert_out, rgb_out);\
 		}
 
