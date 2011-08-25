@@ -60,8 +60,8 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 	const PixelFormatDescription *desc = &pixfmt_descriptions[fmt];
 
 	// make sure the number of pixels is multiple of 16
-	if ((width * height) % 16 != 0) {
-		log("pixel count is not multiple of 16\n");
+	if ((width * height) % desc->pixel_count_multiple != 0) {
+		log("pixel count is not multiple of %u\n", desc->pixel_count_multiple);
 		return -1;
 	}
 
@@ -103,29 +103,82 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 	uint32_t						index = 0;
 
 
-	// Fill in the buffer 16 pixels at a time
-	// while alternating the fill patterns
-	if (((uintptr_t) buffer & 0x0F) == 0) {
-		while (buffer_size > 0) {
-			_mm_store_si128(buffer, _M(desc->fill_patterns[index]));
+	if (desc->is_planar) {
+		// Planar format
+		__m128i* y_plane, *u_plane, *v_plane;
 
-			// move on to next fill buffer
-			index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
+		// Only supports YUV422P for now - back out if any other format, as we
+		// dont know how to handle them yet.
+		if (fmt == PixFcYUV422P){
+			uint32_t pixel_count = buffer_size * desc->bytes_per_pix_denom / desc->bytes_per_pix_num;
 
-			// copy 16 pixels at a time
-			buffer++;
-			buffer_size -= 16;
+			y_plane = buffer;
+			u_plane = (__m128i*) (((uint8_t*) y_plane) + pixel_count);
+			v_plane = (__m128i*) (((uint8_t*) u_plane) + pixel_count / 2);
+
+			// Assume 4 fill vectors: 2 for Y plane, 1 for U plane and 1 for V plane
+			if (desc->fill_patterns_count != 4) {
+				log("FIXME !!!! Dont know how to fill '%s' buffer with %u fill pattern vectors\n",
+						desc->name, desc->fill_patterns_count);
+				return;
+			}
+
+			if (((uintptr_t) buffer & 0x0F) == 0) {
+				while (pixel_count > 0) {
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[0]));
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[1]));
+
+					_mm_store_si128(u_plane++, _M(desc->fill_patterns[2]));
+
+					_mm_store_si128(v_plane++, _M(desc->fill_patterns[3]));
+
+					// copy 32 pixels at a time
+					pixel_count -= 32;
+				}
+			} else {
+				while (buffer_size > 0) {
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[0]));
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[1]));
+
+					_mm_storeu_si128(u_plane++, _M(desc->fill_patterns[2]));
+
+					_mm_storeu_si128(v_plane++, _M(desc->fill_patterns[3]));
+
+					// copy 32 pixels at a time
+					buffer_size -= 32;
+				}
+			}
+		} else {
+			log("FIXME !!!! Dont know how to fill a buffer in '%s' planar image format\n", desc->name);
+			return;
 		}
 	} else {
-		while (buffer_size > 0) {
-			_mm_storeu_si128(buffer, _M(desc->fill_patterns[index]));
+		// Interleave pixel format
+		//
+		// Fill in the buffer 16 pixels at a time
+		// while alternating the fill patterns
+		if (((uintptr_t) buffer & 0x0F) == 0) {
+			while (buffer_size > 0) {
+				_mm_store_si128(buffer, _M(desc->fill_patterns[index]));
 
-			// move on to next fill buffer
-			index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
+				// move on to next fill buffer
+				index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
 
-			// copy 16 pixels at a time
-			buffer++;
-			buffer_size -= 16;
+				// copy 16 pixels at a time
+				buffer++;
+				buffer_size -= 16;
+			}
+		} else {
+			while (buffer_size > 0) {
+				_mm_storeu_si128(buffer, _M(desc->fill_patterns[index]));
+
+				// move on to next fill buffer
+				index = ((index+1) < desc->fill_patterns_count) ? (index + 1) : 0;
+
+				// copy 16 pixels at a time
+				buffer++;
+				buffer_size -= 16;
+			}
 		}
 	}
 }

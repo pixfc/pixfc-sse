@@ -50,6 +50,10 @@ typedef struct {
         uint32_t				bytes_per_pix_num;
         uint32_t				bytes_per_pix_denom;
 
+        // Is this format planar (1) or interleaved (0) ?
+        uint8_t					is_planar;
+
+        uint8_t					pixel_count_multiple;
 		
 		/*
 		 * An array of 16-byte vectors containing the fill pattern.
