@@ -113,10 +113,12 @@ int main (int argc, char **argv) {
 	uint8_t*			y_plane;
 	uint8_t*			u_plane;
 	uint8_t*			v_plane;
-	uint32_t			pixel_count = width * height;
+	uint32_t			pixel_count;
 
 	// Make sure we have the right args
 	parse_args(argc, argv);
+
+	pixel_count = width * height;
 
 	// Read the input file
 	input_size = get_buffer_from_file(input_file, (void **)&input);
