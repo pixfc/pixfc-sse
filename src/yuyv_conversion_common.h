@@ -595,7 +595,7 @@
 			y_plane++;\
 			u_plane++;\
 			v_plane++;\
-			rgb_out += 4;\
+			rgb_out += output_stride;\
 			pixel_count -= 32;\
 		}\
 		unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
@@ -604,7 +604,7 @@
 		conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 		pack_fn(convert_out, rgb_out);\
 		y_plane++;\
-		rgb_out += 4;\
+		rgb_out += output_stride;\
 		unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 		unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
