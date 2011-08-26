@@ -9,6 +9,8 @@ PixFC-SSE TODO list:
   - VYUY, YVYU
   - planar formats (YUV420, YVU420, YUV410, YVU410)
   - packed RGB, grey and bayer formats.
+* Hide internal functions so as not to pollute the namespace
+* Improve perf by distributing conversion over many threads (OpenMP)
 * Add SSE4.1 version of routines which use blending (up/down sampling for 
   instance)
 * Some other things I cant think of.
