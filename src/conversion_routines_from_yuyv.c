@@ -214,6 +214,18 @@ void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, voi
 	}
 }
 
+
+/*
+ *  	Y U Y V
+ *
+ * 		T O
+ *
+ * 		Y U V 4 2 2 P
+ */
+void		convert_yuyv_to_yuv422p_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK(REPACK_YUV422I_TO_YUV422P, repack_yuyv_to_yuv422p_, sse2);
+}
+
 /*
  * Original yuv to rgb conversion - left here for ref
  */

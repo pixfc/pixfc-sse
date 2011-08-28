@@ -76,6 +76,21 @@
 		}\
 	}
 
+#define DO_REPACK(repack_macro, repack_fn_suffix, ...) \
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro LeftParenthesis repack_fn_suffix, __VA_ARGS__ RightParenthesis\
+		} else {\
+			repack_macro LeftParenthesis unaligned_dst_##repack_fn_suffix, __VA_ARGS__ RightParenthesis\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro LeftParenthesis unaligned_src_##repack_fn_suffix, __VA_ARGS__ RightParenthesis\
+		} else {\
+			repack_macro LeftParenthesis unaligned_src_unaligned_dst_##repack_fn_suffix, __VA_ARGS__ RightParenthesis\
+		}\
+	}
+
 #else // ! Windows
 
 #define DO_CONVERSION_1U_1P(conversion_macro, unpack_fn, pack_fn, ...)\

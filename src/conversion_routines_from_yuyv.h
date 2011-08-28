@@ -170,5 +170,16 @@ void		convert_yuyv_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
 // YUYV to anyRGB		NON SSE
 void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
+
+
+/*
+ *  	Y U Y V
+ *
+ * 		T O
+ *
+ * 		Y U V 4 2 2 P
+ */
+void		convert_yuyv_to_yuyv422p_sse2(const struct PixFcSSE*, void*, void*);
+
 #endif 		// CONVERSION_ROUTINES_FROM_YUYV_H_
 

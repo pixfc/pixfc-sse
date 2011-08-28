@@ -37,6 +37,7 @@ file(GLOB PIXFC_HDR_LIST *.h)
 # be copied into C files and have their "extern" keyword removed in
 # order to do a debug build with no optimisation 
 list(APPEND EXTERN_INLINE_HEADER_LIST
+	yuv_repack
 	yuv_upsample
 	yuv_to_rgb_convert
 	yuv_to_rgb_convert_bt601

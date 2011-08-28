@@ -35,6 +35,7 @@
 #include "rgb_pack.h"
 #include "yuv_unpack.h"
 
+#include "yuv_repack.h"
 #include "yuv_upsample.h"
 #include "yuv_to_rgb_convert.h"
 #include "yuv_to_rgb_convert_bt601.h"
@@ -622,9 +623,24 @@
 		__m128i*	yuv422i_out = (__m128i *) dest_buffer;\
 		uint32_t	pixel_count = pixfc->pixel_count;\
 		while(pixel_count > 0) {\
-			repack_fn_##instr_set(y_plane, u_plane, v_plane, yuv422i_out);\
+			repack_fn##instr_set(y_plane, u_plane, v_plane, yuv422i_out);\
 			pixel_count -= 32;\
 		}
+
+/*
+ * Convert a YUV422 interleaved buffer to YUV422 planar.
+ */
+#define REPACK_YUV422I_TO_YUV422P(repack_fn, instr_set)	\
+		__m128i*    y_plane = (__m128i *) dest_buffer;\
+		__m128i*    u_plane = (__m128i*)((uint8_t *) dest_buffer + pixfc->pixel_count);\
+		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
+		__m128i*	yuv422i_in = (__m128i *) source_buffer;\
+		uint32_t	pixel_count = pixfc->pixel_count;\
+		while(pixel_count > 0) {\
+			repack_fn##instr_set(yuv422i_in, y_plane, u_plane, v_plane);\
+			pixel_count -= 32;\
+		}
+
 
 
 #endif /* YUYV_CONVERSION_COMMON_H_ */
