@@ -108,6 +108,21 @@
 		}\
 	}
 
+#define DO_REPACK(repack_macro, repack_fn_suffix, ...) \
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro(repack_fn_suffix, __VA_ARGS__)\
+		} else {\
+			repack_macro(unaligned_dst_##repack_fn_suffix, __VA_ARGS__)\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro(unaligned_src_##repack_fn_suffix, __VA_ARGS__)\
+		} else {\
+			repack_macro(unaligned_src_unaligned_dst_##repack_fn_suffix, __VA_ARGS__)\
+		}\
+	}
+
 
 #endif
 
@@ -122,6 +137,10 @@
 // Same as above with 3 elements
 #define	DECLARE_VECT_ARRAY3_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
 		__m128i (var)[3]; (var)[0] = _mm_loadu_si128(unaligned_buffer_ptr); (var)[1] = _mm_loadu_si128(&unaligned_buffer_ptr[1]); (var)[2] = _mm_loadu_si128(&unaligned_buffer_ptr[2]);
+
+// Same as above with 4 elements
+#define	DECLARE_VECT_ARRAY4_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
+		__m128i (var)[4]; (var)[0] = _mm_loadu_si128(unaligned_buffer_ptr); (var)[1] = _mm_loadu_si128(&unaligned_buffer_ptr[1]); (var)[2] = _mm_loadu_si128(&unaligned_buffer_ptr[2]); (var)[3] = _mm_loadu_si128(&unaligned_buffer_ptr[3]);
 
 /*
  * This function returns the features supported by the cpu

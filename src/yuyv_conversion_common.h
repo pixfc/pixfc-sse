@@ -612,6 +612,19 @@
 		pack_fn(convert_out, rgb_out);\
 
 
+/*
+ * Convert a YUV422 planar buffer to YUV422 interleaved.
+ */
+#define REPACK_YUV422P_TO_YUV422I(repack_fn, instr_set)	\
+		__m128i*    y_plane = (__m128i *) source_buffer;\
+		__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
+		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
+		__m128i*	yuv422i_out = (__m128i *) dest_buffer;\
+		uint32_t	pixel_count = pixfc->pixel_count;\
+		while(pixel_count > 0) {\
+			repack_fn_##instr_set(y_plane, u_plane, v_plane, yuv422i_out);\
+			pixel_count -= 32;\
+		}
 
 
 #endif /* YUYV_CONVERSION_COMMON_H_ */

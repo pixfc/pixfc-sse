@@ -224,3 +224,23 @@ void 		convert_yuv422p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, 
 }
 
 
+
+/*
+ * 		Y U V 4 2 2 P
+ *
+ * 		T O
+ *
+ * 		Y U Y V  /  U V Y V
+ *
+ */
+void		convert_yuyv422p_to_yuyv_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_yuyv, sse2);
+}
+
+void		convert_yuyv422p_to_uyvy_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_uyvy, sse2);
+}
+
+
+
+

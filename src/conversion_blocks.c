@@ -115,6 +115,22 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
 
 
 
+
+/*
+ * Repacking conversion blocks
+ */
+#define		DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, 	DEFAULT_ATTRIBUTE, pix_mult_count, desc_str_prefix " - SSE2 / SSSE3")
+#define		DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2, 	DEFAULT_ATTRIBUTE, pix_mult_count, desc_str_prefix " - SSE2")
+
+#define		DECLARE_REPACK_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, desc_str_prefix)\
+DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, desc_str_prefix),\
+DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, desc_str_prefix)
+
+
+
+
 /*
  * In this array, conversion blocks for a given pair of source and destination
  * formats must be sorted: fastest first, slowest last !!!
@@ -192,6 +208,12 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUV422P to BGR24
 	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, 32, "YUV422P to BGR24"),
+
+	// YUV422P to YUYV
+	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuyv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, "YUV422P to YUYV"),
+
+	// YUV422P to UYVY
+	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuyv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, "YUV422P to UYVY"),
 };
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);
