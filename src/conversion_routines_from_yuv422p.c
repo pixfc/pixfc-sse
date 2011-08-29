@@ -233,14 +233,48 @@ void 		convert_yuv422p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, 
  * 		Y U Y V  /  U V Y V
  *
  */
-void		convert_yuyv422p_to_yuyv_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+void		convert_yuv422p_to_yuyv_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
 	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_yuyv_, sse2);
 }
 
-void		convert_yuyv422p_to_uyvy_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+void		convert_yuv422p_to_yuyv_nonsse(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+	uint32_t 	pixel_count = pixfc->pixel_count;
+	uint8_t *	y_plane = (uint8_t *) source_buffer;
+	uint8_t *	u_plane = y_plane + pixel_count;
+	uint8_t *	v_plane = u_plane + pixel_count / 2;
+	uint8_t *	dst = (uint8_t *) dest_buffer;
+
+	// Do conversion
+	while(pixel_count > 0) {
+		*dst++ = *y_plane++;
+		*dst++ = *u_plane++;
+		*dst++ = *y_plane++;
+		*dst++ = *v_plane++;
+
+		pixel_count -= 2;
+	}
+}
+
+void		convert_yuv422p_to_uyvy_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
 	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_uyvy_, sse2);
 }
 
+void		convert_yuv422p_to_uyvy_nonsse(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
+	uint32_t 	pixel_count = pixfc->pixel_count;
+	uint8_t *	y_plane = (uint8_t *) source_buffer;
+	uint8_t *	u_plane = y_plane + pixel_count;
+	uint8_t *	v_plane = u_plane + pixel_count / 2;
+	uint8_t *	dst = (uint8_t *) dest_buffer;
 
+	// Do conversion
+	while(pixel_count > 0) {
+		*dst++ = *u_plane++;
+		*dst++ = *y_plane++;
+		*dst++ = *v_plane++;
+		*dst++ = *y_plane++;
+
+		pixel_count -= 2;
+	}
+}
 
 

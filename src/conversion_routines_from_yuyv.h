@@ -179,7 +179,9 @@ void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* s
  *
  * 		Y U V 4 2 2 P
  */
-void		convert_yuyv_to_yuyv422p_sse2(const struct PixFcSSE*, void*, void*);
+void		convert_yuyv_to_yuv422p_sse2(const struct PixFcSSE*, void*, void*);
+void		convert_yuyv_to_yuv422p_sse2_ssse3(const struct PixFcSSE*, void*, void*);
+void		convert_yuyv_to_yuv422p_nonsse(const struct PixFcSSE*, void*, void*);
 
 #endif 		// CONVERSION_ROUTINES_FROM_YUYV_H_
 

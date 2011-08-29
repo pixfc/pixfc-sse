@@ -624,6 +624,10 @@
 		uint32_t	pixel_count = pixfc->pixel_count;\
 		while(pixel_count > 0) {\
 			repack_fn##instr_set(y_plane, u_plane, v_plane, yuv422i_out);\
+			y_plane += 2;\
+			u_plane++;\
+			v_plane++;\
+			yuv422i_out += 4;\
 			pixel_count -= 32;\
 		}
 
@@ -638,6 +642,10 @@
 		uint32_t	pixel_count = pixfc->pixel_count;\
 		while(pixel_count > 0) {\
 			repack_fn##instr_set(yuv422i_in, y_plane, u_plane, v_plane);\
+			y_plane += 2;\
+			u_plane++;\
+			v_plane++;\
+			yuv422i_in += 4;\
 			pixel_count -= 32;\
 		}
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 if [ $# -ne 3 -a $# -ne 4 ]; then
 	echo "Usage: $0 <yuv_in_format> <width> <height> [filename]"
@@ -24,6 +24,8 @@ if [ "${ext}" = "YUYV" ]; then
 	type="yuy2"
 elif [ "${ext}" = "UYVY" ]; then
 	type="uyvy"
+elif [ "${ext}" = "YUV422p" ]; then
+	type="422p"
 else
 	echo "Unkown yuv format \'${ext}\'"
 	exit 1

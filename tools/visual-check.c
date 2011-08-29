@@ -28,6 +28,8 @@
 #include "rgb_image.h"
 #include "test-utils.h"
 
+#define		PATH_TO_TEST_IMG	"../test-images/"
+
 typedef struct {
 	PixFcPixelFormat	format;
 	uint32_t			width;
@@ -53,12 +55,17 @@ const static InputFile		input_files[] = {
 	{
 		PixFcYUYV,
 		1280, 1024,
-		"test-images/1280x1024.yuyv",
+		"1280x1024.yuyv",
 	},
 	{
 		PixFcUYVY,
 		1920, 1080,
-		"test-images/1920x1080.uyvy",
+		"1920x1080.uyvy",
+	},
+	{
+		PixFcYUV422P,
+		1280, 1024,
+		"1280x1024.yuv422p",
 	},
 	{
 		PixFcARGB,
@@ -165,8 +172,12 @@ int 		main(int argc, char **argv) {
 			}
 			
 			if (in_file->filename != NULL) {
+				char 	in_filename[128] = {0};
+				strcat(in_filename, PATH_TO_TEST_IMG);
+				strcat(in_filename, in_file->filename);
+
 				// Load buffer from specified file
-				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_file->filename, (void **)&in) < 0) {
+				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
 					log("Error getting buffer from input file '%s'\n", in_file->filename);
 					return 1;
 				}
