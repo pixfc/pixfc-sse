@@ -47,7 +47,7 @@
  * - The second one unpacks 8 pixels into 4 16bit AG & RB vectors.
  *
  */
-#define CONVERT_RGB32_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -68,7 +68,45 @@
 		pixel_count -= 16;\
 	};\
 
-#define CONVERT2_RGB32_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB32_TO_YUV422P(unpack_fn_prefix, y_pack_fn_prefix, uv_lo_pack_fn_prefix, uv_hi_pack_fn_prefix, y_conv_fn, uv_conv_fn, instr_set) \
+	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i*	rgb_in = (__m128i *) source_buffer;\
+	__m128i*	y_plane = (__m128i *) dest_buffer;\
+	__m128i*	u_plane = (__m128i *) ((uint8_t *)y_plane + pixel_count);\
+	__m128i*	v_plane = (__m128i *) ((uint8_t *)u_plane + pixel_count / 2);\
+	__m128i		unpack_out[3];\
+	__m128i		convert_out[4];\
+	while(pixel_count > 0) {\
+		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
+		y_conv_fn(unpack_out, convert_out);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[2]);\
+		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+		y_conv_fn(unpack_out, &convert_out[1]);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[3]);\
+		y_pack_fn_prefix##instr_set(convert_out, y_plane);\
+		uv_lo_pack_fn_prefix##instr_set(&convert_out[2], u_plane, v_plane);\
+		rgb_in += 4;\
+		y_plane += 1;\
+		unpack_fn_prefix##instr_set(rgb_in, unpack_out);\
+		y_conv_fn(unpack_out, convert_out);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[2]);\
+		unpack_fn_prefix##instr_set(&rgb_in[2], unpack_out);\
+		y_conv_fn(unpack_out, &convert_out[1]);\
+		nnb_422_downsample_r_g_b_vectors_##instr_set(unpack_out, unpack_out);\
+		uv_conv_fn(unpack_out, &convert_out[3]);\
+		y_pack_fn_prefix##instr_set(convert_out, y_plane);\
+		uv_hi_pack_fn_prefix##instr_set(&convert_out[2], u_plane, v_plane);\
+		rgb_in += 4;\
+		y_plane += 1;\
+		u_plane += 1;\
+		v_plane += 1;\
+		pixel_count -= 32;\
+	};\
+
+#define CONVERT2_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -89,7 +127,7 @@
 		pixel_count -= 16;\
 	};\
 
-#define AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -124,7 +162,7 @@
 	};\
 
 
-#define AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -172,7 +210,7 @@
  * - The second one unpacks 8 pixels into 4 16bit AG & RB vectors.
  *
  */
-#define CONVERT_RGB24_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -192,7 +230,7 @@
 		pixel_count -= 16;\
 	};\
 
-#define CONVERT2_RGB24_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT2_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -212,7 +250,7 @@
 		pixel_count -= 16;\
 	};\
 
-#define AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -248,7 +286,7 @@
 	};\
 
 
-#define AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\

@@ -24,7 +24,7 @@
 
 #define CONVERT_TO_YUV422(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						CONVERT_RGB24_TO_YUV422,\
+						CONVERT_RGB24_TO_YUV422I,\
 						unpack_bgr24_to_r_g_b_vectors_,\
 						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
@@ -34,7 +34,7 @@
 
 #define CONVERT2_TO_YUV422(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						CONVERT2_RGB24_TO_YUV422,\
+						CONVERT2_RGB24_TO_YUV422I,\
 						unpack_bgr24_to_ga_br_vectors_,\
 						pack_fn,\
 						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
@@ -44,7 +44,7 @@
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422,\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422I,\
 						unpack_bgr24_to_r_g_b_vectors_,\
 						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
@@ -54,7 +54,7 @@
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422,\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422I,\
 						unpack_bgr24_to_ga_br_vectors_,\
 						pack_fn,\
 						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
