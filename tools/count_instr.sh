@@ -1,5 +1,7 @@
 #!/bin/bash
 
+UNIT_TESTING=./tools/unit-testing
+
 if [ $# -ne 1 -a $# -ne 2 ]; then
     echo "$0 <symbol name> [instruction]"
 	echo "If [instruction] is not provided, 'movdqa' is assumed'"
@@ -7,8 +9,8 @@ if [ $# -ne 1 -a $# -ne 2 ]; then
     exit 1
 fi
 
-if [ ! -f ./unit-testing ]; then
-    echo "./unit-testing not in current dir"
+if [ ! -f ${UNIT_TESTING} ]; then
+    echo "${UNIT_TESTING} not in current dir"
     exit 1
 fi
 
@@ -25,8 +27,8 @@ else # assume Mac
 fi
 
 if [ "$instr" = "@" ]; then
-	${cmd} unit-testing | sed -n "${pattern}" | wc -l
+	${cmd} ${UNIT_TESTING} | sed -n "${pattern}" | wc -l
 else
-	${cmd} unit-testing | sed -n "${pattern}" | grep -i "${instr}" | wc -l
+	${cmd} ${UNIT_TESTING} | sed -n "${pattern}" | grep -i "${instr}" | wc -l
 fi
 

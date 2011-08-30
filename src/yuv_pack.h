@@ -48,11 +48,11 @@
 #if GENERATE_UNALIGNED_INLINES == 1
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
 	#define M128_STORE(src, dst)					_mm_storeu_si128(&(dst), (src))
-	#define M128_LOAD(src, dst)						(dst)=_mm_loadu_si128(&(src))
+	#define M128_LOAD(src)							_mm_loadu_si128(&(src))
 #else
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
 	#define M128_STORE(src, dst)					(dst) = (src)
-	#define M128_LOAD(src, dst)						(dst) = (src)
+	#define M128_LOAD(src)							(src)
 #endif
 
 
@@ -148,123 +148,112 @@ INLINE_NAME(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, __m128i* in_4_y_uv_4
 }
 
 /*
- * Pack 2 Y vectors of 8 short  to 1 vector of 16 char
+ * Pack 2 pairs of 422 downsampled Y, UV vectors to YUV422p - the lowest 4 bytes are
+ * filled in the U and V planes
  *
- * Total latency:			1 cycle
+ *
+ * Total latency:			6 cycles
  * Num of pixel handled:	16
  *
  * INPUT:
  *
- * 2 vectors of 8 short
+ * 4 vectors of 8 short
  *
  * yVect1
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
+ * uvVect1
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
  * yVect2
  * Y9 0		Y10 0	Y11 0	Y12 0	Y13 0	Y14 0	Y15 0	Y16 0
  *
+ * uvVect2
+ * U910 0	V910 0	U1112 0	V1112 0	U1314 0	V1314 0	U1516 0	V1516 0
+ *
  *
  * OUTPUT:
  *
- * 1 vectors of 16 char
+ * 3 vectors of 16 char
  *
  * Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12 Y13 Y14	Y15 Y16
  *
+ * U1 U2	U3 U4	U5 U6	U7 U8	0 0		0 0		0 0		0 0
+ *
+ * V1 V2	V3 V4	V5 V6	V7 V8	0 0		0 0		0 0		0 0
  */
-INLINE_NAME(pack_2_y_422_vectors_in_1_y_422p_vector_sse2, __m128i* in_2_y_422_vectors, __m128i* out_1_y_422p_vector) {
-
-	M128_STORE(_mm_packus_epi16(in_2_y_422_vectors[0], in_2_y_422_vectors[2]), out_1_y_422p_vector);// PACKUSWB		1	0.5
-	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16
-}
-
-/*
- * Pack 2 vectors of 8 short UV interleaved to 2 vectors of 8 char U & V (low quadword)
- *
- * Total latency:			5 cycles
- * Num of pixel handled:	8
- *
- * INPUT:
- *
- * 2 vectors of 8 short
- *
- * uvVect1
- * U1 0	V1 0	U2 0	V2 0	U3 0	V3 0	U4 0	V4 0
- *
- * uvVect2
- * U5 0	V5 0	U6 0	V6 0	U7 0	V7 0	U8 0	V8 0
- *
- *
- * OUTPUT:
- *
- * 2 vectors of 16 char
- *
- * u_input
- * U1 U2	U3 U4 	U5 U6	U7 U8	0 0		0 0		0 0		0 0
- *
- * v_input
- * V1 V2	V3 V4 	V5 V6	V7 V8	0 0		0 0		0 0		0 0
- *
- */
-INLINE_NAME(pack_2_uv_422_vectors_in_2_u_v_422p_vector_lo_sse2, __m128i* in_2_uv_vectors, __m128i* out_lo_u_plane, __m128i* out_lo_v_plane) {
-	CONST_M128i(zero, 0x0LL, 0x0LL);
-	CONST_M128i(mask_cr, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
+INLINE_NAME(pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2, __m128i* in_4_y_uv_422_vectors, __m128i* out_y_plane, __m128i* out_u_plane, __m128i* out_v_plane) {
+	CONST_M128I(zero, 0x0LL, 0x0LL);
+	CONST_M128I(mask_cr, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
 	M128I(scratch, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 
-	_M(scratch) = _mm_packus_epi16(in_2_uv_vectors[0], in_2_uv_vectors[1]);		// PACKUSWB		1	0.5
-	// U1 V1 	U2 V2	U3 V3	U4 V4	U5 V5 	U6 V6	U7 V7	U8 V8
+	M128_STORE(_mm_packus_epi16(in_4_y_uv_422_vectors[0], in_4_y_uv_422_vectors[2]), *out_y_plane);
+	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16			// PACKUSWB		1	0.5
+
+	_M(scratch) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);
+	// U1 V1 	U2 V2	U3 V3	U4 V4	U5 V5 	U6 V6	U7 V7	U8 V8			// PACKUSWB		1	0.5
 
 	_M(scratch2) = _mm_and_si128(_M(scratch), _M(mask_cr));						// PAND			1	0.33
 	// U1 0 	U2 0	U3 0	U4 0	U5 0 	U6 0	U7 0	U8 0
 
-	M128_STORE(_mm_packus_epi16(_M(scratch2), _M(zero)), *out_lo_u_plane);		// PACKUSWB		1	0.5
+	M128_STORE(_mm_packus_epi16(_M(scratch2), _M(zero)), *out_u_plane);		// PACKUSWB		1	0.5
 	// U1 U2	U3 U4 	U5 U6	U7 U8	0 0		0 0		0 0		0 0
 
 	_M(scratch2) = _mm_srli_epi16(_M(scratch), 8);								// PSRLW		1	1
 	// V1 0		V2 0	V3 0	V4 0	V5 0	V6 0	V7 0	V8 0
 
-	M128_STORE(_mm_packus_epi16(in_2_uv_vectors[0], _M(zero)), *out_lo_v_plane);// PACKUSWB		1	0.5
+	M128_STORE(_mm_packus_epi16(_M(scratch2), _M(zero)), *out_v_plane);		// PACKUSWB		1	0.5
 	// V1 V2	V3 V4 	V5 V6	V7 V8	0 0		0 0		0 0		0 0
 }
 
-
 /*
- * Pack 2 vectors of 8 short UV interleaved to 2 vectors of 8 char U & V (hi quadword)
+ * Pack 2 pairs of 422 downsampled Y, UV vectors to YUV422p - the highest 4 bytes are
+ * filled in the U and V planes (lowest ones remain untouched)
  *
- * Total latency:			5 cycles
- * Num of pixel handled:	8
+ *
+ * Total latency:			6 cycles
+ * Num of pixel handled:	16
  *
  * INPUT:
  *
- * 2 vectors of 8 short
+ * 4 vectors of 8 short
+ *
+ * yVect1
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  * uvVect1
- * U1 0	V1 0	U2 0	V2 0	U3 0	V3 0	U4 0	V4 0
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * yVect2
+ * Y9 0		Y10 0	Y11 0	Y12 0	Y13 0	Y14 0	Y15 0	Y16 0
  *
  * uvVect2
- * U5 0	V5 0	U6 0	V6 0	U7 0	V7 0	U8 0	V8 0
+ * U910 0	V910 0	U1112 0	V1112 0	U1314 0	V1314 0	U1516 0	V1516 0
  *
  *
  * OUTPUT:
  *
- * 2 vectors of 16 char
+ * 3 vectors of 16 char
  *
- * u_input
- * 0 0		0 0		0 0		0 0		U1 U2	U3 U4 	U5 U6	U7 U8
+ * Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12 Y13 Y14	Y15 Y16
  *
- * v_input
- * 0 0		0 0		0 0		0 0		V1 V2	V3 V4 	V5 V6	V7 V8
+ * x x		x x		x x		x x		U1 U2	U3 U4	U5 U6	U7 U8
+ *
+ * x x		x x		x x		x x		V1 V2	V3 V4	V5 V6	V7 V8
  *
  */
-INLINE_NAME(pack_2_uv_422_vectors_in_2_u_v_422p_vector_lo_sse2, __m128i* in_2_uv_vectors, __m128i* out_lo_u_plane, __m128i* out_lo_v_plane) {
-	CONST_M128i(zero, 0x0LL, 0x0LL);
-	CONST_M128i(mask_cr, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
+INLINE_NAME(pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2, __m128i* in_4_y_uv_422_vectors, __m128i* out_y_plane, __m128i* out_u_plane, __m128i* out_v_plane) {
+	CONST_M128I(zero, 0x0LL, 0x0LL);
+	CONST_M128I(mask_cr, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
 	M128I(scratch, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
-	M128I(scratch3, 0x0LL, 0x0LL);
 
-	_M(scratch) = _mm_packus_epi16(in_2_uv_vectors[0], in_2_uv_vectors[1]);		// PACKUSWB		1	0.5
-	// U1 V1 	U2 V2	U3 V3	U4 V4	U5 V5 	U6 V6	U7 V7	U8 V8
+	M128_STORE(_mm_packus_epi16(in_4_y_uv_422_vectors[0], in_4_y_uv_422_vectors[2]), *out_y_plane);
+	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16			// PACKUSWB		1	0.5
+
+	_M(scratch) = _mm_packus_epi16(in_4_y_uv_422_vectors[1], in_4_y_uv_422_vectors[3]);
+	// U1 V1 	U2 V2	U3 V3	U4 V4	U5 V5 	U6 V6	U7 V7	U8 V8			// PACKUSWB		1	0.5
 
 	_M(scratch2) = _mm_and_si128(_M(scratch), _M(mask_cr));						// PAND			1	0.33
 	// U1 0 	U2 0	U3 0	U4 0	U5 0 	U6 0	U7 0	U8 0
@@ -272,15 +261,15 @@ INLINE_NAME(pack_2_uv_422_vectors_in_2_u_v_422p_vector_lo_sse2, __m128i* in_2_uv
 	_M(scratch2) = _mm_packus_epi16(_M(zero), _M(scratch2));					// PACKUSWB		1	0.5
 	// 0 0		0 0		0 0		0 0		U1 U2	U3 U4 	U5 U6	U7 U8
 
-	M128_LOAD(*out_hi_u_plane, _M(scratch3));
-
-	M128_STORE(, *out_lo_u_plane);
-
+	M128_STORE(_mm_or_si128(M128_LOAD(*out_u_plane), _M(scratch2)), *out_u_plane);
+	// x x		x x		x x		x x		U1 U2	U3 U4	U5 U6	U7 U8			// POR			1	0.33
 
 	_M(scratch2) = _mm_srli_epi16(_M(scratch), 8);								// PSRLW		1	1
 	// V1 0		V2 0	V3 0	V4 0	V5 0	V6 0	V7 0	V8 0
 
-	M128_STORE(_mm_packus_epi16(in_2_uv_vectors[0], _M(zero)), *out_lo_v_plane);// PACKUSWB		1	0.5
-	// V1 V2	V3 V4 	V5 V6	V7 V8	0 0		0 0		0 0		0 0
-}
+	_M(scratch2) = _mm_packus_epi16(_M(zero), _M(scratch2));					// PACKUSWB		1	0.5
+	// 0 0		0 0		0 0		0 0		V1 V2	V3 V4 	V5 V6	V7 V8
 
+	M128_STORE(_mm_or_si128(M128_LOAD(*out_v_plane), _M(scratch2)), *out_v_plane);
+	// x x		x x		x x		x x		V1 V2	V3 V4	V5 V6	V7 V8			// POR			1	0.33
+}
