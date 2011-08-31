@@ -928,12 +928,16 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
  * rbVect
  * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
  */
-EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
 	CONST_M128I(keep_1st, 0x00000000FFFFFFFFLL, 0x0000000000000000LL);
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
 	M128I(scratch4, 0x0LL, 0x0LL);
+
+	// save last two current vectors in previous
+	previous[0] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[2]);
+	previous[1] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[3]);
 
 	//
 	// construct a vector of samples at t = {1, 1, 3, 5}
@@ -1003,8 +1007,8 @@ EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2(__m128i* in_4_v16
  * an SSSE3 implementation would not bring any improvement to the SSE2 one.
  *
  */
-EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
-	avg_422_downsample_first_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors, out_2_v16i_avg_422_ag_rb_vectors);
+EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(in_4_v16i_current_ag_rb_vectors, previous, out_2_v16i_avg_422_ag_rb_vectors);
 }
 
 #endif /* RGB_DOWNSAMPLE_H_ */
