@@ -682,12 +682,11 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
  * bVect
  * B1 0 	B1 0	B3 0 	B3 0	B5 0 	B5	0	B7 0	B7	0
  */
-EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i* out_3_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
 	CONST_M128I(mask, 0x00000000000000FFLL, 0x0000000000000000LL);
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
-
 
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
@@ -773,6 +772,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2(__m128i* in_3_v16
 	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
+
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
 
@@ -807,7 +811,7 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2(__m128i* in_3_v16
  * bVect
  * B1 0 	B1 0	B3 0 	B3 0	B5 0 	B5	0	B7 0	B7	0
  */
-EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_ssse3(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i* out_3_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
 	CONST_M128I(mask, 0x00000000000000FFLL, 0x0000000000000000LL);
 	CONST_M128I(shuf_current, 0xFFFFFF06FFFFFF02LL, 0xFFFFFF0EFFFFFF0ALL);
 	CONST_M128I(shuf_current1, 0xFFFFFF00FFFFFFFFLL, 0xFFFFFF08FFFFFF04LL);
@@ -815,7 +819,6 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
-
 
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
@@ -895,6 +898,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
 	// Duplicate samples at t = {0,2,4,6}
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shuffle_epi8(_M(scratch1),  _M(shuf_result));	// PSHUFB	1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
+
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
 
@@ -928,16 +936,13 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_sse2_ssse3(__m128i* in
  * rbVect
  * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
  */
-EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+//EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2(__m128i* in_4_v16i_current_ag_rb_vectors,  __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
 	CONST_M128I(keep_1st, 0x00000000FFFFFFFFLL, 0x0000000000000000LL);
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
 	M128I(scratch4, 0x0LL, 0x0LL);
-
-	// save last two current vectors in previous
-	previous[0] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[2]);
-	previous[1] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[3]);
 
 	//
 	// construct a vector of samples at t = {1, 1, 3, 5}
@@ -1001,14 +1006,21 @@ EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(_
 	// Average the previous result with S0
 	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_avg_epu16(_M(scratch4), _M(scratch2));	// PAVGW		1	0.5
 	// R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
+
+	// save last two current vectors in previous
+	//previous[0] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[2]);
+	//previous[1] = _mm_load_si128(&in_4_v16i_current_ag_rb_vectors[3]);
 }
 /*
  * Dummy SSSE3 implementation which falls back to the SSE2 implementation as
  * an SSSE3 implementation would not bring any improvement to the SSE2 one.
  *
  */
-EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
-	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(in_4_v16i_current_ag_rb_vectors, previous, out_2_v16i_avg_422_ag_rb_vectors);
+//EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i* previous, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+//	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(in_4_v16i_current_ag_rb_vectors, previous, out_2_v16i_avg_422_ag_rb_vectors);
+//}
+EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_422_ag_rb_vectors) {
+	avg_422_downsample_first_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors, out_2_v16i_avg_422_ag_rb_vectors);
 }
 
 #endif /* RGB_DOWNSAMPLE_H_ */
