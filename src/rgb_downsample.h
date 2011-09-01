@@ -999,7 +999,7 @@ EXTERN_INLINE void	avg_422_downsample_first_ag_rb_vectors_n_save_previous_sse2(_
 	// Average S-1 and S1
 	_M(scratch2) = _mm_avg_epu16(_M(scratch2), _M(scratch1));							// PAVGW		1	0.5
 	// Average the previous result with S0
-	_M(scratch4) = _mm_avg_epu16(_M(scratch4), _M(scratch2));							// PAVGW		1	0.5
+	out_2_v16i_avg_422_ag_rb_vectors[1] = _mm_avg_epu16(_M(scratch4), _M(scratch2));	// PAVGW		1	0.5
 	// R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
 }
 /*
