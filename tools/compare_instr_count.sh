@@ -37,7 +37,7 @@ SYMBOLS_2=$(nm "${UNIT_TESTING2}" | grep 'T' | cut -f3 -d' ' | grep 'convert')
 # List of symbols common to unit-testing 1 and 2
 declare -a COMMON_SYM
 # Array of difference in instruction count 
-declare -A INSTR_COUNT
+declare -a INSTR_COUNT
 index=0
 
 
@@ -61,14 +61,14 @@ else
 			COMMON_SYM[$index]=$sym
 			(( index++ ))
 		else
-			 echo "Symbol $sym is not in unit-testing 1"
+			 echo "Symbol $sym is not in unit-testing 1" 1>&2
 		fi
 	done
 
 	# Check which symbols from list 1 are not in list 2
 	for sym in $SYMBOLS_1
 	do
-		echo $SYMBOLS_2 | grep -q $sym || echo "Symbol $sym in not in unit-testing 2"
+		echo $SYMBOLS_2 | grep -q $sym || ( echo "Symbol $sym in not in unit-testing 2" 1>&2 )
 	done
 fi
 echo
@@ -87,7 +87,7 @@ else
 	otool -tV ${UNIT_TESTING2} > ${DISASSEMBLY_FILE2}
 fi
 
-
+index=0
 # Compute difference in number of instructions in both apps
 # for each symbols in COMMON_SYM
 for sym in ${COMMON_SYM[*]}
@@ -102,18 +102,28 @@ do
 
 	count1=$(sed -n "${pattern}" ${DISASSEMBLY_FILE1} | wc -l)
 	count2=$(sed -n "${pattern}" ${DISASSEMBLY_FILE2} | wc -l)
-	INSTR_COUNT[$sym]=$(( count2 - count1 ))
+	INSTR_COUNT[$index]=$(( count2 - count1 ))
+	(( index++ ))
 done
 
 
 #
 # Print out result
-for sym in "${!INSTR_COUNT[@]}"
+index=0
+while [ $index -lt ${#COMMON_SYM[*]} ]
 do
-	if [ ${INSTR_COUNT[$sym]} -ne 0 ]; then
-		printf "%-60s        % 5d\n" $sym ${INSTR_COUNT[$sym]}
+	if [ ${INSTR_COUNT[$index]} -ne 0 ]; then
+		printf "%-60s        % 5d\n" ${COMMON_SYM[$index]} ${INSTR_COUNT[$index]}
 	fi
+	(( index++ ))
 done
+
+#for sym in "${!INSTR_COUNT[@]}"
+#do
+#	if [ ${INSTR_COUNT[$sym]} -ne 0 ]; then
+#		printf "%-60s        % 5d\n" $sym ${INSTR_COUNT[$sym]}
+#	fi
+#done
 
 
 
