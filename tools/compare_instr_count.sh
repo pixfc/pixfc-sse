@@ -97,7 +97,7 @@ do
 		# linux
 		pattern="/<$sym/,/^$/ p"
 	else # assume Mac
-		pattern="/$sym:/,/^_/ p"
+		pattern="/^$sym:/,/^_/ p"
 	fi
 
 	count1=$(sed -n "${pattern}" ${DISASSEMBLY_FILE1} | wc -l)

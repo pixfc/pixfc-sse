@@ -23,7 +23,7 @@ if [ $? -eq 0 ]; then
     pattern="/<$1>/,/^$/ p"
 else # assume Mac
     cmd='otool -tV'
-    pattern="/$1:/,/^_/ p"
+    pattern="/^$1:/,/^_/ p"
 fi
 
 if [ "$instr" = "@" ]; then
