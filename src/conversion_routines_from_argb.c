@@ -22,7 +22,7 @@
 #include "pixfc-sse.h"
 #include "argb_conversion_common.h"
 
-#define CONVERT_TO_YUV422(pack_fn, instr_set)\
+#define CONVERT_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
 						CONVERT_RGB32_TO_YUV422I,\
 						unpack_argb_to_r_g_b_vectors_,\
@@ -32,7 +32,7 @@
 						instr_set\
 			)
 
-#define CONVERT2_TO_YUV422(pack_fn, instr_set)\
+#define CONVERT2_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
 						CONVERT2_RGB32_TO_YUV422I,\
 						unpack_argb_to_ag_rb_vectors_,\
@@ -42,7 +42,7 @@
 						instr_set\
 			)
 
-#define DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_fn, instr_set)\
+#define DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
 						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422I,\
 						unpack_argb_to_r_g_b_vectors_,\
@@ -52,7 +52,7 @@
 						instr_set\
 			)
 
-#define DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_fn, instr_set)\
+#define DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
 						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422I,\
 						unpack_argb_to_ag_rb_vectors_,\
@@ -62,6 +62,49 @@
 						instr_set\
 			)
 
+#define CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT_RGB32_TO_YUV422P,\
+						unpack_argb_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+						instr_set\
+			)
+
+#define CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT2_RGB32_TO_YUV422P,\
+						unpack_argb_to_ag_rb_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ag_rb_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422P,\
+						unpack_argb_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422P,\
+						unpack_argb_to_ag_rb_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ag_rb_vectors_to_y_vector_sse2,\
+						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+						instr_set\
+			)
 /*
  * We have 2 RGB to YUV422 conversion implementations:
  * - The first one unpacks 8 pixels into 3 16bit vectors R,G & B.
@@ -99,43 +142,62 @@
 
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
+	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
 void		downsample_n_convert_argb_to_yuyv_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
+	DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
 
 // ARGB to YUYV			SSE2
 void		convert_argb_to_yuyv_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
+	CONVERT2_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
 void		downsample_n_convert_argb_to_yuyv_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
+	DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2);
 }
 
 
 // ARGB to UYVY			SSE2 SSSE3
 void		convert_argb_to_uyvy_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
 }
 
 void		downsample_n_convert_argb_to_uyvy_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+	DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
 }
 
 
 // ARGB to UYVY			SSE2
 void		convert_argb_to_uyvy_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT2_TO_YUV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+	CONVERT2_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
 }
 
 void		downsample_n_convert_argb_to_uyvy_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	DOWNSAMPLE_N_CONVERT2_TO_YUYV422(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+	DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
 }
 
+
+// ARGB to YUV422P			SSE2 SSSE3
+void		convert_argb_to_yuv422p_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+void		downsample_n_convert_argb_to_yuv422p_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+
+// ARGB to YUV422P			SSE2
+void		convert_argb_to_yuv422p_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV422P(sse2);
+}
+
+void		downsample_n_convert_argb_to_yuv422p_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT2_TO_YUV422P(sse2);
+}
 
 // RGB to YUV422		NON SSE
 void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void* out)

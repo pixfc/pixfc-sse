@@ -145,6 +145,11 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// ARGB to UYVY
 	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, 16, "ARGB to UYVY"),
 
+	DECLARE_CONV_BLOCK(convert_argb_to_yuv422p_sse2_ssse3, PixFcARGB, PixFcYUV422P, CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, NNB_RESAMPLING, 32, "ARGB to YUV422P - fast resampling"),
+	DECLARE_CONV_BLOCK(convert_argb_to_yuv422p_sse2, PixFcARGB, PixFcYUV422P, CPUID_FEATURE_SSE2, NNB_RESAMPLING, 32, "ARGB to YUV422P - fast resampling"),
+	DECLARE_CONV_BLOCK(downsample_n_convert_argb_to_yuv422p_sse2_ssse3, PixFcARGB, PixFcYUV422P, CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, DEFAULT_ATTRIBUTE, 32, "ARGB to YUV422P"),
+	DECLARE_CONV_BLOCK(downsample_n_convert_argb_to_yuv422p_sse2, PixFcARGB, PixFcYUV422P, CPUID_FEATURE_SSE2, DEFAULT_ATTRIBUTE, 32, "ARGB to YUV422P"),
+
 
 	//
 	// BGRA to YUYV

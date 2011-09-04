@@ -92,8 +92,8 @@
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
-	__m128i*	uplane_out = (__m128i *) ((uint8_t*) yplane + pixel_count);\
-	__m128i*	vplane_out = (__m128i *) ((uint8_t*) uplane + pixel_count / 2);\
+	__m128i*	uplane_out = (__m128i *) ((uint8_t*) yplane_out + pixel_count);\
+	__m128i*	vplane_out = (__m128i *) ((uint8_t*) uplane_out + pixel_count / 2);\
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[4];\
 	while(pixel_count > 0) {\
@@ -134,8 +134,8 @@
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
-	__m128i*	uplane_out = (__m128i *) ((uint8_t*) yplane + pixel_count);\
-	__m128i*	vplane_out = (__m128i *) ((uint8_t*) uplane + pixel_count / 2);\
+	__m128i*	uplane_out = (__m128i *) ((uint8_t*) yplane_out + pixel_count);\
+	__m128i*	vplane_out = (__m128i *) ((uint8_t*) uplane_out + pixel_count / 2);\
 	__m128i		unpack_out[4];\
 	__m128i		convert_out[4];\
 	while(pixel_count > 0) {\
@@ -162,14 +162,24 @@
 // AVG Core conversion loop, common to RGB32 to YUV422 planar & interleaved AVG conversion 1
 #define RGB32_TO_YUV422_AVG_CORE_LOOP1(unpack_fn, y_conv_fn, downsample1_fn, downsample1_out, downsample2_fn, downsample2_out, uv_conv_fn) \
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm8u("R 1-8:", &unpack_out[0]);\
+	print_xmm8u("G 1-8:", &unpack_out[1]);\
+	print_xmm8u("B 1-8:", &unpack_out[2]);\
 	y_conv_fn(unpack_out, convert_out);\
+	print_xmm8u("Y1-8", convert_out);\
 	downsample1_fn(unpack_out, previous, downsample1_out);\
 	uv_conv_fn(downsample1_out, &convert_out[1]);\
+	print_xmm8u("UV1-4", &convert_out[1]);\
 	rgb_in += 2;\
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm8u("R 1-8:", &unpack_out[0]);\
+	print_xmm8u("G 1-8:", &unpack_out[1]);\
+	print_xmm8u("B 1-8:", &unpack_out[2]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
+	print_xmm8u("Y1-8", convert_out);\
 	downsample2_fn(unpack_out, previous, downsample2_out);\
 	uv_conv_fn(downsample2_out, &convert_out[3]);\
+	print_xmm8u("UV1-4", &convert_out[1]);\
 	rgb_in += 2;\
 	pixel_count -= 16;
 
@@ -210,15 +220,15 @@
 	__m128i		convert_out[4];\
 	RGB32_TO_YUV422_AVG_CORE_LOOP1(\
 			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
 			uv_conv_fn);\
 	pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
 	RGB32_TO_YUV422_AVG_CORE_LOOP1(\
 			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
 			uv_conv_fn);\
 	pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
@@ -227,15 +237,15 @@
 	while(pixel_count > 0) {\
 		RGB32_TO_YUV422_AVG_CORE_LOOP1(\
 			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
 			uv_conv_fn);\
 		pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
 		RGB32_TO_YUV422_AVG_CORE_LOOP1(\
 			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
 			uv_conv_fn);\
 		pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
@@ -247,14 +257,30 @@
 // AVG Core conversion loop, common to RGB32 to YUV422 planar & interleaved AVG conversion 1
 #define RGB32_TO_YUV422_AVG_CORE_LOOP2(unpack_fn, downsample1_fn, downsample1_out, downsample2_fn, downsample2_out, y_conv_fn, uv_conv_fn) \
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm16u("AG 1-4:", &unpack_out[0]);\
+	print_xmm16u("RB 1-4:", &unpack_out[1]);\
+	print_xmm16u("AG 5-8:", &unpack_out[2]);\
+	print_xmm16u("RB 5-8:", &unpack_out[3]);\
 	downsample1_fn(unpack_out, previous, downsample1_out);\
+	print_xmm16u("Previous AG (=5-8):", &previous[0]);\
+	print_xmm16u("Previous RB (=5-8):", &previous[1]);\
 	y_conv_fn(unpack_out, convert_out);\
+	print_xmm16u("Y1-8:", convert_out);\
 	uv_conv_fn(downsample1_out, &convert_out[1]);\
+	print_xmm16u("UV1-4:", &convert_out[1]);\
 	rgb_in += 2;\
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm16u("AG 1-4:", &unpack_out[0]);\
+	print_xmm16u("RB 1-4:", &unpack_out[1]);\
+	print_xmm16u("AG 5-8:", &unpack_out[2]);\
+	print_xmm16u("RB 5-8:", &unpack_out[3]);\
 	downsample2_fn(unpack_out, previous, downsample2_out);\
+	print_xmm16u("Previous AG (=5-8):", &previous[0]);\
+	print_xmm16u("Previous RB (=5-8):", &previous[1]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
+	print_xmm16u("Y1-8:", convert_out);\
 	uv_conv_fn(downsample2_out, &convert_out[3]);\
+	print_xmm16u("UV1-4:", &convert_out[1]);\
 	rgb_in += 2;\
 	pixel_count -= 16;\
 
@@ -297,15 +323,15 @@
 	__m128i		convert_out[4];\
 	RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 		unpack_fn_prefix##instr_set,\
-		avg_422_downsample_first_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out),\
-		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+		avg_422_downsample_first_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
+		avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
 		y_conv_fn, uv_conv_fn);\
 	pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
 	RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set,\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out),\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
 			y_conv_fn, uv_conv_fn);\
 	pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 	yplane_out++;\
@@ -314,15 +340,15 @@
 	while(pixel_count > 0) {\
 		RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set,\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out),\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
 			y_conv_fn, uv_conv_fn);\
 		pack_lo_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
 		RGB32_TO_YUV422_AVG_CORE_LOOP2(\
 			unpack_fn_prefix##instr_set, \
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, downsample_out),\
-			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set(unpack_out, previous, unpack_out),\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, downsample_out,\
+			avg_422_downsample_ag_rb_vectors_n_save_previous_##instr_set, unpack_out,\
 			y_conv_fn, uv_conv_fn);\
 		pack_hi_fn(convert_out, yplane_out, uplane_out, vplane_out);\
 		yplane_out++;\
