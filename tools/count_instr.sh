@@ -19,7 +19,7 @@ instr=${2:-movdqa}
 # Check OS and set the disassemble command and sed pattern
 echo $OSTYPE | grep -q "linux"
 if [ $? -eq 0 ]; then
-    cmd='objdump -d'
+    cmd='objdump -dw'
     pattern="/<$1>/,/^$/ p"
 else # assume Mac
     cmd='otool -tV'

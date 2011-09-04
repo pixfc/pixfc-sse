@@ -79,8 +79,8 @@ echo
 echo $OSTYPE | grep -q "linux" && OS=linux
 if [ -n "$OS" ]; then
 	#linux
-	objdump -d ${UNIT_TESTING1} > ${DISASSEMBLY_FILE1}
-	objdump -d ${UNIT_TESTING2} > ${DISASSEMBLY_FILE2}
+	objdump -dw ${UNIT_TESTING1} > ${DISASSEMBLY_FILE1}
+	objdump -dw ${UNIT_TESTING2} > ${DISASSEMBLY_FILE2}
 else
 	#mac
 	otool -tV ${UNIT_TESTING1} > ${DISASSEMBLY_FILE1}
