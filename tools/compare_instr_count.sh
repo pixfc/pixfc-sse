@@ -95,9 +95,16 @@ do
 	# Check OS and set the sed pattern
 	if [ -n "$OS" ]; then
 		# linux
-		pattern="/<$sym/,/^$/ p"
+		pattern='/<'$sym'>/,/^$/ {
+			/nop/ d
+			p
+		}'
 	else # assume Mac
-		pattern="/^$sym:/,/^_/ p"
+	    cmd='otool -tV'
+		pattern='/^'$sym':/,/^_/ {
+			/nop/ d
+			p
+		}'
 	fi
 
 	count1=$(sed -n "${pattern}" ${DISASSEMBLY_FILE1} | wc -l)

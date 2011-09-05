@@ -20,10 +20,16 @@ instr=${2:-movdqa}
 echo $OSTYPE | grep -q "linux"
 if [ $? -eq 0 ]; then
     cmd='objdump -dw'
-    pattern="/<$1>/,/^$/ p"
+    pattern='/<'$1'>/,/^$/ {
+/nop/ d
+p
+}'
 else # assume Mac
     cmd='otool -tV'
-    pattern="/^$1:/,/^_/ p"
+    pattern='/^'$1':/,/^_/ {
+/nop/ d
+p
+}'
 fi
 
 if [ "$instr" = "@" ]; then
