@@ -51,17 +51,17 @@
  *
  */
 // Interleaved YUV
-#define UNALIGNED_YUVI_INPUT_PREAMBLE			DECLARE_VECT_ARRAY4_N_UNALIGN_LOAD(aligned_vector, input);
-#define UNALIGNED_YUVI_INPUT_VECT				(aligned_vector)
+#define UNALIGNED_YUVI_INPUT_PREAMBLE			DECLARE_VECT_ARRAY4_N_UNALIGN_LOAD(aligned_vector, input)
+#define UNALIGNED_YUVI_INPUT_VECT				aligned_vector
 
 // Planar YUV
 #define UNALIGNED_YUVP_Y_INPUT_PREAMBLE			DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(aligned_y_vector, y_input)
 #define UNALIGNED_YUVP_UV_INPUT_PREAMBLE		DECLARE_VECT_N_UNALIGN_LOAD(aligned_u_vector, u_input); DECLARE_VECT_N_UNALIGN_LOAD(aligned_v_vector, v_input)
-#define UNALIGNED_YUVP_INPUT_PREAMBLE			DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(aligned_y_vector, y_input);DECLARE_VECT_N_UNALIGN_LOAD(aligned_u_vector, u_input); DECLARE_VECT_N_UNALIGN_LOAD(aligned_v_vector, v_input);
+#define UNALIGNED_YUVP_INPUT_PREAMBLE			DECLARE_VECT_N_UNALIGN_LOAD(aligned_u_vector, u_input); DECLARE_VECT_N_UNALIGN_LOAD(aligned_v_vector, v_input);DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(aligned_y_vector, y_input)
 
-#define UNALIGNED_YUVP_Y_INPUT_VECT				(aligned_y_vector)
-#define UNALIGNED_YUVP_U_INPUT_VECT				(&aligned_u_vector)
-#define UNALIGNED_YUVP_V_INPUT_VECT				(&aligned_v_vector)
+#define UNALIGNED_YUVP_Y_INPUT_VECT				aligned_y_vector
+#define UNALIGNED_YUVP_U_INPUT_VECT				&aligned_u_vector
+#define UNALIGNED_YUVP_V_INPUT_VECT				&aligned_v_vector
 
 #define UNALIGNED_STORE(src, dst)				_mm_storeu_si128(&(dst), (src))
 #define ALIGNED_STORE(src, dst)					(dst) = (src)
@@ -70,9 +70,9 @@
  * And their counterparts for aligned input/output buffers.
  */
 #define ALIGNED_YUVI_INPUT_VECT					input
-#define YUVP_Y_INPUT_VECT						(y_input)
-#define YUVP_U_INPUT_VECT						(u_input)
-#define YUVP_V_INPUT_VECT						(v_input)
+#define YUVP_Y_INPUT_VECT						y_input
+#define YUVP_U_INPUT_VECT						u_input
+#define YUVP_V_INPUT_VECT						v_input
 #define NOOP
 
 
