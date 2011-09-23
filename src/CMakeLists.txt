@@ -74,7 +74,7 @@ if(DEBUG)
 	elseif(UNIX)
 		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
 	elseif(WIN32)
-		add_definitions(-Wno-implicit-function-declaration)
+#		add_definitions(-Wno-implicit-function-declaration)
 	endif(APPLE)
 
 	# For each header file containing extern inlines, copy it to the binary dir into a source file
