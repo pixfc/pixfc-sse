@@ -61,6 +61,22 @@
 		}\
 	}
 
+
+#define DO_CONVERSION_1U_2P(conversion_macro, unpack_fn, pack1_fn, pack2_fn, ...)\
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro LeftParenthesis unpack_fn, pack1_fn, pack2_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			conversion_macro LeftParenthesis unpack_fn, unaligned_##pack1_fn, unaligned_##pack2_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			conversion_macro LeftParenthesis unaligned_##unpack_fn, pack1_fn, pack2_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			conversion_macro LeftParenthesis unaligned_##unpack_fn, unaligned_##pack1_fn, unaligned_##pack2_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	}
+
 #define DO_CONVERSION_3U_1P(conversion_macro, unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, ...)\
 	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
 		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
