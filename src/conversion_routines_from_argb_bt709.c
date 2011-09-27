@@ -63,6 +63,49 @@
 			)
 
 
+#define CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT_RGB32_TO_YUV422P,\
+						unpack_argb_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
+
+#define CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT2_RGB32_TO_YUV422P,\
+						unpack_argb_to_ag_rb_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ag_rb_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422P,\
+						unpack_argb_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422P,\
+						unpack_argb_to_ag_rb_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ag_rb_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
 
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
@@ -106,6 +149,28 @@ void		downsample_n_convert_argb_to_uyvy_bt709_sse2(const struct PixFcSSE *pixfc,
 
 
 
+// ARGB to YUV422P			SSE2 SSSE3
+void		convert_argb_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+void		downsample_n_convert_argb_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+
+// ARGB to YUV422P			SSE2
+void		convert_argb_to_yuv422p_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV422P(sse2);
+}
+
+void		downsample_n_convert_argb_to_yuv422p_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT2_TO_YUV422P(sse2);
+}
+
+
+
+
 void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out)
 {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
@@ -114,6 +179,9 @@ void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in,
 	uint32_t			pixel_count = conv->pixel_count;
 	uint8_t*			src = (uint8_t *) in;
 	uint8_t*			dst = (uint8_t *) out;
+	uint8_t*			y_plane = dst;
+	uint8_t*			u_plane = dst + pixel_count;
+	uint8_t*			v_plane = u_plane + pixel_count / 2;
 	int32_t				r1, g1, b1, r2, g2, b2;
 	int32_t				y1, y2, u, v;
 
@@ -170,6 +238,11 @@ void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in,
 			*(dst++) = CLIP_PIXEL(y1);
 			*(dst++) = CLIP_PIXEL(v);
 			*(dst++) = CLIP_PIXEL(y2);
+		} else if (dest_fmt == PixFcYUV422P) {
+			*(y_plane++) = CLIP_PIXEL(y1);
+			*(y_plane++) = CLIP_PIXEL(y2);
+			*(u_plane++) = CLIP_PIXEL(u);
+			*(v_plane++) = CLIP_PIXEL(v);
 		} else {
 			printf("Unknown output format in non-SSE conversion from RGB\n");
 		}

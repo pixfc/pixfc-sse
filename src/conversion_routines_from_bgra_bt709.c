@@ -62,7 +62,49 @@
 						instr_set\
 			)
 
+#define CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT_RGB32_TO_YUV422P,\
+						unpack_bgra_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
 
+#define CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						CONVERT2_RGB32_TO_YUV422P,\
+						unpack_bgra_to_ga_br_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422P,\
+						unpack_bgra_to_r_g_b_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT2_TO_YUV422P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422P,\
+						unpack_bgra_to_ga_br_vectors_,\
+						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709_sse2,\
+						instr_set\
+			)
 
 // BGRA to YUYV			SSE2 SSSE3
 void		convert_bgra_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
@@ -103,4 +145,26 @@ void		convert_bgra_to_uyvy_bt709_sse2(const struct PixFcSSE *pixfc, void* source
 
 void		downsample_n_convert_bgra_to_uyvy_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2);
+}
+
+
+
+
+// BGRA to YUV422P			SSE2 SSSE3
+void		convert_bgra_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+void		downsample_n_convert_bgra_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUV422P(sse2_ssse3);
+}
+
+
+// BGRA to YUV422P			SSE2
+void		convert_bgra_to_yuv422p_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV422P(sse2);
+}
+
+void		downsample_n_convert_bgra_to_yuv422p_bt709_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT2_TO_YUV422P(sse2);
 }

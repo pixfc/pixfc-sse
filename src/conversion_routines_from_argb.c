@@ -208,6 +208,9 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 	uint32_t			pixel_count = conv->pixel_count;
 	uint8_t*			src = (uint8_t *) in;
 	uint8_t*			dst = (uint8_t *) out;
+	uint8_t*			y_plane = dst;
+	uint8_t*			u_plane = dst + pixel_count;
+	uint8_t*			v_plane = u_plane + pixel_count / 2;
 	int32_t				r1, g1, b1, r2, g2, b2;
 	int32_t				y1, y2, u, v;
 
@@ -263,6 +266,11 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 			*(dst++) = CLIP_PIXEL(y1);
 			*(dst++) = CLIP_PIXEL(v);
 			*(dst++) = CLIP_PIXEL(y2);
+		} else if (dest_fmt == PixFcYUV422P) {
+			*(y_plane++) = CLIP_PIXEL(y1);
+			*(y_plane++) = CLIP_PIXEL(y2);
+			*(u_plane++) = CLIP_PIXEL(u);
+			*(v_plane++) = CLIP_PIXEL(v);
 		} else {
 			printf("Unknown output format in non-SSE conversion from RGB\n");
 		}
