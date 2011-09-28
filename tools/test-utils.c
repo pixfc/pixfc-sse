@@ -78,7 +78,7 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 
 
 
-uint32_t	allocate_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer) {
+uint32_t	allocate_aligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer) {
 	// validate buffer dimensions
 	if (validate_image_dimensions(fmt, width, height) != 0) {
 		log("buffer size error\n");
@@ -88,13 +88,30 @@ uint32_t	allocate_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, 
 	//  allocate image buffer
 	ALIGN_MALLOC(*buffer, IMG_SIZE(fmt, width, height), 16);
 	if (! buffer) {
-		log("Unable to allocate memory for in buffer\n");
+		log("Unable to allocate aligned memory for buffer\n");
 		return -1;
 	}
 
 	return 0;
 }
 
+
+uint32_t	allocate_unaligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer) {
+	// validate buffer dimensions
+	if (validate_image_dimensions(fmt, width, height) != 0) {
+		log("buffer size error\n");
+		return -1;
+	}
+
+	//  allocate image buffer
+	*buffer = malloc(IMG_SIZE(fmt, width, height));
+	if (! buffer) {
+		log("Unable to allocate unaligned memory for buffer\n");
+		return -1;
+	}
+
+	return 0;
+}
 
 
 void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
@@ -136,7 +153,7 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 					pixel_count -= 32;
 				}
 			} else {
-				while (buffer_size > 0) {
+				while (pixel_count > 0) {
 					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[0]));
 					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[1]));
 
@@ -145,7 +162,7 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 					_mm_storeu_si128(v_plane++, _M(desc->fill_patterns[3]));
 
 					// copy 32 pixels at a time
-					buffer_size -= 32;
+					pixel_count -= 32;
 				}
 			}
 		} else {

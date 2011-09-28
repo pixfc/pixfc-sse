@@ -31,7 +31,7 @@
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
 //#define PIXFC_FLAGS	 PixFcFlag_NNbResampling | PixFcFlag_SSE2Only
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE
-#define PIXFC_FLAGS	PixFcFlag_Default
+//#define PIXFC_FLAGS	PixFcFlag_Default
 //#define PIXFC_FLAGS		PixFcFlag_NNbResampling
 
 
@@ -121,7 +121,7 @@ int 		main(int argc, char **argv) {
 	} else {
 		// Otherwise, allocate a buffer of the given width and height
 		// and fill in buffer with predefined pattern
-		if (allocate_buffer(src_fmt, w, h, (void **)&in) != 0) {
+		if (allocate_aligned_buffer(src_fmt, w, h, (void **)&in) != 0) {
 			log("Error allocating in buffer\n");
 			return 1;
 		}
@@ -136,7 +136,7 @@ int 		main(int argc, char **argv) {
 	}
 
 	// allocate out buffer
-	if (allocate_buffer(dst_fmt, w, h, (void **)&out) != 0) {
+	if (allocate_aligned_buffer(dst_fmt, w, h, (void **)&out) != 0) {
 		log("Error allocating out buffer");
 		free(in);
 		return 1;

@@ -186,7 +186,7 @@ int 		main(int argc, char **argv) {
 				// try to generate the image from RGB buffer from GIMP
 
 				// allocate buffer
-				if (allocate_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
+				if (allocate_aligned_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
 					log("Error allocating memory\n");
 					return -1;
 				}
@@ -200,7 +200,7 @@ int 		main(int argc, char **argv) {
 		// Release previous output buffer and create new one
 		ALIGN_FREE(out);
 		
-		if (allocate_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
+		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
 			log("Error allocating output buffer");
 			return 1;
 		}

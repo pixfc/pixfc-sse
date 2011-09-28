@@ -55,7 +55,12 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
  * large enough to contain an image in the give pixel format. The buffer can be released with free().
  * Returns 0 if OK, -1 otherwise
  */
-uint32_t	allocate_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer);
+uint32_t	allocate_aligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer);
+
+/*
+ * Same as above for unaligned memory
+ */
+uint32_t	allocate_unaligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer);
 
 /*
  * Fill image buffer with the fill found in the struct PixelFormatDescription (see pifmt_descriptions.h)
