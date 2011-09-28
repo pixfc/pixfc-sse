@@ -1,6 +1,5 @@
 PixFC-SSE TODO list:
 
-* Fix segfault happening when using unaligned buffer with some conversion routines
 * Add aligned / unaligned use cases to unit testing
 * Investigate where to place prefetching instructions and check its 
   platform dependency
