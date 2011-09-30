@@ -419,10 +419,10 @@ static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint3
 	uint32_t		count = 0;
 	uint8_t			*buffer = (uint8_t *) in;
 	uint32_t 		buf_size = IMG_SIZE(fmt, width, height);
-	char			filename_fixed[128] = {0};
+	char			filename_fixed[256] = {0};
 
 	// append the extension to the given file name
-	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%.120s.%s", filename, pixfmt_descriptions[fmt].name);
+	SNPRINTF(filename_fixed, sizeof(filename_fixed), "%u_%u_%.120s.%s", width, height, filename, pixfmt_descriptions[fmt].name);
 
 	log("Writing file '%s'...\n", filename_fixed);
 
