@@ -37,6 +37,7 @@
 	#endif
 #endif
 
+#include "conversion_blocks.h"
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
 #include "test-utils.h"
@@ -454,6 +455,34 @@ void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t heigh
 		write_raw_buffer_to_file(fmt, width, height, filename, buffer);
 }
 
+
+uint32_t	enumerate_supported_conversions(uint32_t index, struct PixFcSSE* pixfc, uint32_t width, uint32_t height) {
+	struct PixFcSSE *temp_pixfc;
+
+	// Does the CPU have the required features ?
+	while ((index < conversion_blocks_count) && (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0))
+		index++;
+
+	// Is index is out of bounds ?
+	if (index >= conversion_blocks_count)
+		return -1;
+
+	// Create struct pixfc for this conversion block
+	if (create_pixfc(&temp_pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, PixFcFlag_Default) != 0) {
+		log("Error create struct pixfc for conversion '%s' %ux%u\n", conversion_blocks[index].name, width, height);
+		return -2;
+	}
+
+	// Copy contents
+	*pixfc = *temp_pixfc;
+	// Replace conversion routine with the one from the conversion block
+	pixfc->convert = conversion_blocks[index].convert_fn;
+
+	// Release temp struct
+	destroy_pixfc(temp_pixfc);
+
+	return 0;
+}
 
 
 // Return the amount of ticks in nanoseconds elapsed since startup

@@ -102,6 +102,16 @@ struct timings {
 };
 void				do_timing(struct timings *timings);
 
+/*
+ * Enumerate all conversions by the current CPU.
+ * Call the first time with index = 0, and increment by 1 until return value
+ * is -1.
+ * Return values:
+ * 0:  the struct PixFcSSE is valid.
+ * -1: no more conversions.
+ * -2: error creating struct pixfc for given width, height
+ */
+uint32_t			enumerate_supported_conversions(uint32_t index, struct PixFcSSE* pixfc, uint32_t width, uint32_t height);
 
 
 #if defined(__linux__) || defined(__APPLE__)

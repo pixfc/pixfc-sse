@@ -28,100 +28,82 @@
 #include "platform_util.h"
 #include "test-utils.h"
 
-#define		WIDTH			1920
-#define 	HEIGHT			1080
-#define		NUM_RUNS		100
-#define		NUM_IN_BUF		5
+#define		WIDTH				1920
+#define 	HEIGHT				1080
+#define		NUM_RUNS			100
+#define		NUM_INPUT_BUFFERS	5
 
 
 
-static int		time_conversion_block(const struct ConversionBlock *block, struct timings *timings) {
-	struct PixFcSSE *	pixfc = NULL;
-	void *					input[NUM_IN_BUF] = {0};
+static int		time_conversion_block(struct PixFcSSE *pixfc, struct timings *timings) {
+	void *					input[NUM_INPUT_BUFFERS] = {0};
 	void *					output = NULL;
 	uint32_t				w = WIDTH;
 	uint32_t				h = HEIGHT;
 	uint32_t				run_count;
 	uint32_t				i;		// index into the input buffer array
+	int						result = -1;
 
-	// Create struct pixfc
-	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
-		log("Error create struct pixfc\n");
-		return -1;
-	}
-
-	// Allocate the source and destination buffers
-	for ( i = 0; i < NUM_IN_BUF; i++) {
-		if (allocate_aligned_buffer(block->source_fmt, w, h, &input[i]) != 0) {
+	// Allocate and fill source buffers
+	for ( i = 0; i < NUM_INPUT_BUFFERS; i++) {
+		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[i]) != 0) {
 			log("Error allocating input buffer\n");
-			i = NUM_IN_BUF;
-			while (i-- > 0) {
-				if (input[i] != NULL)
-					free(input[i]);
-			}
-			return -1;
+			goto done;
 		}
-	}
-	if (allocate_aligned_buffer(block->dest_fmt, w, h, &output) != 0){
-		log("Error allocating out buffer\n");
-		i = NUM_IN_BUF;
-		while (i-- > 0) {
-			if (input[i] != NULL)
-				free(input[i]);
-		}
-		return -1;
+
+		fill_image(pixfc->source_fmt, (w * h), input[i]);
 	}
 
-	// Fill input buffers
-	for(i = 0; i < NUM_IN_BUF; i++)
-		fill_image(block->source_fmt, (w * h), input[i]);
+	// Allocate destination buffers
+	if (allocate_aligned_buffer(pixfc->dest_fmt, w, h, &output) != 0){
+		log("Error allocating out buffer\n");
+		goto done;
+	}
 
 	i = 0;
 	for(run_count = 0; run_count < NUM_RUNS; run_count++) {
 		// Perform conversion
 		do_timing(NULL);
-		block->convert_fn(pixfc, input[i], output);
+		pixfc->convert(pixfc, input[i], output);
 		do_timing(timings);
 
 		// Force context switch to invalidate caches
 		MSSLEEP(15);
 
 		// Move on to next buffer
-		i = (i + 1) < NUM_IN_BUF ? (i + 1) : 0;
+		i = (i + 1) < NUM_INPUT_BUFFERS ? (i + 1) : 0;
 	}
 
+	// All went well
+	result = 0;
+
+done:
 	// Free resources
-	i = NUM_IN_BUF;
+	i = NUM_INPUT_BUFFERS;
 	while (i-- > 0)
 		ALIGN_FREE(input[i]);
 	ALIGN_FREE(output);
-	destroy_pixfc(pixfc);
 
-	return 0;
+	return result;
 }
 
 static uint32_t		time_conversion_blocks() {
-	uint32_t	index;
-	struct timings	timings;
+	uint32_t			index = 0;
+	uint32_t			ret;
+	struct PixFcSSE		pixfc;
+	struct timings		timings;
 
 	log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
 	printf("%-80s\t%10s\t%10s\t%10s\t%5s\n","Conversion Block Name", "Avg Time", "Avg User Time",
 			"Avg Sys Time", "Ctx Sw");
 
 	// Loop over all conversion blocks
-	for(index = 0; index < conversion_blocks_count; index++) {
+	while(enumerate_supported_conversions(index, &pixfc, WIDTH, HEIGHT) == 0) {
 		// Reset timing info
 		memset((void *)&timings, 0, sizeof(timings));
 
-		// Make sure the CPU has the required features
-		if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
-			printf("  (skipped %s - CPU missing required features)\n",
-					conversion_blocks[index].name);
-			continue;
-		}
-
 		// Time this conversion block
-		if (time_conversion_block(&conversion_blocks[index], &timings) != 0)
+		if (time_conversion_block(&pixfc, &timings) != 0)
 			return -1;
 
 		printf("%-80s\t%10f\t%10f\t%10f\t%5.1f\n",
@@ -140,6 +122,9 @@ static uint32_t		time_conversion_blocks() {
 						|| (conversion_blocks[(index + 1)].dest_fmt !=
 								conversion_blocks[index].dest_fmt)))
 			printf("\n");
+
+		// move on to next conversion block
+		index++;
 	}
 
 	return 0;
@@ -177,66 +162,52 @@ static uint32_t			check_formats_enum() {
 }
 
 static int			check_unaligned_conversions() {
-	struct PixFcSSE *				pixfc = NULL;
-	const struct ConversionBlock*	block = NULL;
+	struct PixFcSSE 				pixfc;
 	void *							input[2] = { NULL };	// 1 aligned & 1 unaligned input buffer
 	void *							output[2] = { NULL };	// 1 aligned & 1 unaligned output buffer
-	uint32_t						w = 64,	h = 2, index;
+	uint32_t						w = 64,	h = 2, index = 0;
 
 	// Loop over all conversion blocks
-	for(index = 0; index < conversion_blocks_count; index++) {
-		block = &conversion_blocks[index];
+	while(enumerate_supported_conversions(index, &pixfc, w, h) == 0) {
 
-		// Make sure the CPU has the required features
-		if (does_cpu_support(block->required_cpu_features) != 0) {
-			printf("  (skipped %s - CPU missing required features)\n", block->name);
-			continue;
-		}
-
-		printf("%-80s\t", block->name);
+		printf("%-80s\t", conversion_blocks[index].name);
 
 		// Allocate the input & output buffers
-		if (allocate_aligned_buffer(block->source_fmt, w, h, &input[0]) != 0) {
+		if (allocate_aligned_buffer(pixfc.source_fmt, w, h, &input[0]) != 0) {
 			log("Error allocating aligned input buffer\n");
 			return -1;
 		}
-		if (allocate_unaligned_buffer(block->source_fmt, w, h, &input[1]) != 0) {
+		if (allocate_unaligned_buffer(pixfc.source_fmt, w, h, &input[1]) != 0) {
 			log("Error allocating unaligned input buffer\n");
 			return -1;
 		}
-		if (allocate_aligned_buffer(block->dest_fmt, w, h, &output[0]) != 0) {
+		if (allocate_aligned_buffer(pixfc.dest_fmt, w, h, &output[0]) != 0) {
 			log("Error allocating aligned output buffer\n");
 			return -1;
 		}
-		if (allocate_unaligned_buffer(block->dest_fmt, w, h, &output[1]) != 0) {
+		if (allocate_unaligned_buffer(pixfc.dest_fmt, w, h, &output[1]) != 0) {
 			log("Error allocating unaligned output buffer\n");
 			return -1;
 		}
 
 		// Fill input buffers
-		fill_image(block->source_fmt, IMG_SIZE(block->source_fmt, w, h), input[0]);
-		fill_image(block->source_fmt, IMG_SIZE(block->source_fmt, w, h), input[1]);
-
-		// Create struct pixfc
-		if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
-			log("Error create struct pixfc\n");
-			return -1;
-		}
+		fill_image(pixfc.source_fmt, IMG_SIZE(pixfc.source_fmt, w, h), input[0]);
+		fill_image(pixfc.source_fmt, IMG_SIZE(pixfc.source_fmt, w, h), input[1]);
 
 		// Do conversion with aligned input & output buffers
-		block->convert_fn(pixfc, input[0], output[0]);
+		pixfc.convert(&pixfc, input[0], output[0]);
 		printf(".");
 
 		// Do conversion with aligned input & unaligned output buffers
-		block->convert_fn(pixfc, input[0], output[1]);
+		pixfc.convert(&pixfc, input[0], output[1]);
 		printf(".");
 
 		// Do conversion with unaligned input & aligned output buffers
-		block->convert_fn(pixfc, input[1], output[0]);
+		pixfc.convert(&pixfc, input[1], output[0]);
 		printf(".");
 
 		// Do conversion with unaligned input & output buffers
-		block->convert_fn(pixfc, input[1], output[1]);
+		pixfc.convert(&pixfc, input[1], output[1]);
 		printf(". OK !\n");
 
 		// Free resources
@@ -244,7 +215,9 @@ static int			check_unaligned_conversions() {
 		free(input[1]);
 		ALIGN_FREE(output[0]);
 		free(output[1]);
-		destroy_pixfc(pixfc);
+
+		// Move on to next conversion block
+		index++;
 	}
 
 	return 0;
