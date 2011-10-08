@@ -30,6 +30,7 @@ def	get_timings_from_unit_testing(file_path):
 	global text_input
 	timing_dict = {}
 	lines = ""
+	found_start = False;
 
 	if text_input == True:
 		# the path points to a text file with the output of a unit-testing command
@@ -41,8 +42,14 @@ def	get_timings_from_unit_testing(file_path):
 
 	# parse stdout and collect conversion timings in a dict
 	for line in lines:
-		# skip header line and blank lines
-		if line.startswith("Conversion Block Name") or len(line.rstrip()) == 0:
+		# skip to start of timing results
+		if (found_start == False):
+			if (line.startswith("Conversion Block Name")):
+				found_start = True;
+			continue
+
+		# Skip blank lines
+		if len(line.rstrip()) == 0:
 			continue
 		fields = line.split('\t')
 		conversion_name = fields[0].rstrip()
