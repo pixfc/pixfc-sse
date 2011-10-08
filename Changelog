@@ -1,3 +1,7 @@
+v0.2:
+ - Added conversion to / from YUV422P
+ - Improved performance of SSE conversions across supported platforms
+ 
 v0.1.1:
  - Added conversion from {ARGB, BGRA, RGB24, BGR24} to {YUYV, UYVY}
  - Added support for unaligned buffers
