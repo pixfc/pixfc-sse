@@ -1,5 +1,5 @@
 /*
- * yuyv_conversion_routines_common.h
+ * yuv_conversion_recipes.h
  *
  * Copyright (C) 2011 PixFC Team (pixelfc@gmail.com)
  *
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef YUYV_CONVERSION_COMMON_H_
-#define YUYV_CONVERSION_COMMON_H_
+#ifndef YUV_CONVERSION_RECIPES_H_
+#define YUV_CONVERSION_RECIPES_H_
 
 #ifndef DEBUG
 /*
@@ -111,7 +111,7 @@
  *	pack_6_rgb_vectors_in_4_argb_vectors_sse2(convert_out, argb_4pixels);
  *
  */
-#define UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define UPSAMPLE_YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
@@ -333,7 +333,7 @@
  *
  *
  */
-#define UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define UPSAMPLE_YUV422P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
  	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
 	__m128i*    y_plane = (__m128i *) source_buffer;\
@@ -428,7 +428,7 @@
  *	}
  *
  */
-#define CONVERT_YUV422I_TO_RGB(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -572,7 +572,7 @@
  *
  *
  */
-#define CONVERT_YUV422P_TO_RGB(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define YUV422P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 		__m128i*    y_plane = (__m128i *) source_buffer;\
 		__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
 		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
@@ -616,7 +616,7 @@
 /*
  * Convert a YUV422 planar buffer to YUV422 interleaved.
  */
-#define REPACK_YUV422P_TO_YUV422I(repack_fn, instr_set)	\
+#define YUV422P_TO_YUV422I_RECIPE(repack_fn, instr_set)	\
 		__m128i*    y_plane = (__m128i *) source_buffer;\
 		__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
 		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
@@ -634,7 +634,7 @@
 /*
  * Convert a YUV422 interleaved buffer to YUV422 planar.
  */
-#define REPACK_YUV422I_TO_YUV422P(repack_fn, instr_set)	\
+#define YUV422I_TO_YUV422P_RECIPE(repack_fn, instr_set)	\
 		__m128i*    y_plane = (__m128i *) dest_buffer;\
 		__m128i*    u_plane = (__m128i*)((uint8_t *) dest_buffer + pixfc->pixel_count);\
 		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
@@ -651,4 +651,4 @@
 
 
 
-#endif /* YUYV_CONVERSION_COMMON_H_ */
+#endif /* YUV_CONVERSION_RECIPES_H_ */

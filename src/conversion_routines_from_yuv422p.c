@@ -20,11 +20,11 @@
 
 #include "common.h"
 #include "pixfc-sse.h"
-#include "yuyv_conversion_common.h"
+#include "yuv_conversion_recipes.h"
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
-				UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB,\
+				UPSAMPLE_YUV422P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
@@ -36,7 +36,7 @@
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB24(pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
-				UPSAMPLE_AND_CONVERT_YUV422P_TO_RGB,\
+				UPSAMPLE_YUV422P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
@@ -50,7 +50,7 @@
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
-				CONVERT_YUV422P_TO_RGB,\
+				YUV422P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
@@ -62,7 +62,7 @@
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
-				CONVERT_YUV422P_TO_RGB,\
+				YUV422P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
@@ -234,7 +234,7 @@ void 		convert_yuv422p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, 
  *
  */
 void		convert_yuv422p_to_yuyv_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
-	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_yuyv_, sse2);
+	DO_REPACK(YUV422P_TO_YUV422I_RECIPE, repack_yuv422p_to_yuyv_, sse2);
 }
 
 void		convert_yuv422p_to_yuyv_nonsse(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
@@ -256,7 +256,7 @@ void		convert_yuv422p_to_yuyv_nonsse(const struct PixFcSSE* pixfc, void* source_
 }
 
 void		convert_yuv422p_to_uyvy_sse2(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
-	DO_REPACK(REPACK_YUV422P_TO_YUV422I, repack_yuv422p_to_uyvy_, sse2);
+	DO_REPACK(YUV422P_TO_YUV422I_RECIPE, repack_yuv422p_to_uyvy_, sse2);
 }
 
 void		convert_yuv422p_to_uyvy_nonsse(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer){
