@@ -20,11 +20,11 @@
 
 #include "common.h"
 #include "pixfc-sse.h"
-#include "rgb_conversion_recipes.h"
+#include "argb_conversion_common.h"
 
 #define CONVERT_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						RGB32_TO_YUV422I_RECIPE,\
+						CONVERT_RGB32_TO_YUV422I,\
 						unpack_bgra_to_r_g_b_vectors_,\
 						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
@@ -34,7 +34,7 @@
 
 #define CONVERT2_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						RGB32_TO_YUV422I_RECIPE2,\
+						CONVERT2_RGB32_TO_YUV422I,\
 						unpack_bgra_to_ga_br_vectors_,\
 						pack_fn,\
 						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
@@ -44,7 +44,7 @@
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE,\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422I,\
 						unpack_bgra_to_r_g_b_vectors_,\
 						pack_fn,\
 						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
@@ -54,7 +54,7 @@
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_fn, instr_set)\
 			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE2,\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422I,\
 						unpack_bgra_to_ga_br_vectors_,\
 						pack_fn,\
 						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
@@ -64,7 +64,7 @@
 
 #define CONVERT_TO_YUV422P(instr_set)\
 			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV422P_RECIPE,\
+						CONVERT_RGB32_TO_YUV422P,\
 						unpack_bgra_to_r_g_b_vectors_,\
 						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
 						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
@@ -75,7 +75,7 @@
 
 #define CONVERT2_TO_YUV422P(instr_set)\
 			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV422P_RECIPE2,\
+						CONVERT2_RGB32_TO_YUV422P,\
 						unpack_bgra_to_ga_br_vectors_,\
 						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
 						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
@@ -86,7 +86,7 @@
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUV422P(instr_set)\
 			DO_CONVERSION_1U_2P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE,\
+						AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422P,\
 						unpack_bgra_to_r_g_b_vectors_,\
 						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
 						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
@@ -97,7 +97,7 @@
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUV422P(instr_set)\
 			DO_CONVERSION_1U_2P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE2,\
+						AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422P,\
 						unpack_bgra_to_ga_br_vectors_,\
 						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
 						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\

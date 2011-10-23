@@ -1,5 +1,5 @@
 /*
- * rgb_conversion_recipes.h
+ * argb_conversion_common.h
  *
  * Copyright (C) 2011 PixFC Team (pixelfc@gmail.com)
  *
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef RGB_CONVERSION_RECIPES_H_
-#define RGB_CONVERSION_RECIPES_H_
+#ifndef ARGB_CONVERSION_COMMON_H_
+#define ARGB_CONVERSION_COMMON_H_
 
 #include "common.h"
 
@@ -72,7 +72,7 @@
 	pixel_count -= 16;
 
 //  NNB Interleaved conversion 1
-#define RGB32_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -88,7 +88,7 @@
 	};\
 
 // NNB planar conversion 1
-#define RGB32_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB32_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -114,7 +114,7 @@
 	};\
 
 // NNB interleave conversion 2
-#define RGB32_TO_YUV422I_RECIPE2(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT2_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -130,7 +130,7 @@
 	};\
 
 // NNB planar conversion 2
-#define RGB32_TO_YUV422P_RECIPE2(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT2_RGB32_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -184,7 +184,7 @@
 	pixel_count -= 16;
 
 // Average interleave conversion 1
-#define AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -209,7 +209,7 @@
 	};\
 
 // Average planar conversion 1
-#define AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB32_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -285,7 +285,7 @@
 	pixel_count -= 16;\
 
 // AVG interleave conversion 2
-#define AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE2(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -311,7 +311,7 @@
 	}
 
 // AVG planar conversion 2
-#define AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE2(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB32_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -387,7 +387,7 @@
 		pixel_count -= 16;\
 
 // NNB interleave conversion 1
-#define RGB24_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -403,7 +403,7 @@
 	};\
 
 // NNB planar conversion 1
-#define RGB24_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT_RGB24_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -429,7 +429,7 @@
 	};\
 
 // NNB interleave conversion 2
-#define RGB24_TO_YUV422I_RECIPE2(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT2_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -445,7 +445,7 @@
 	};\
 
 // NNB planar conversion 2
-#define RGB24_TO_YUV422P_RECIPE2(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define CONVERT2_RGB24_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -486,7 +486,7 @@
 	pixel_count -= 16;\
 
 // AVG interleave conversion 1
-#define AVG_DOWNSAMPLE_RGB24_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -511,7 +511,7 @@
 	};\
 
 // AVG planar conversion 1
-#define AVG_DOWNSAMPLE_RGB24_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT_RGB24_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -556,7 +556,7 @@
 	};\
 
 // AVG interleave conversion 2
-#define AVG_DOWNSAMPLE_RGB24_TO_YUV422I_RECIPE2(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422I(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yuv_out = (__m128i *) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
@@ -582,7 +582,7 @@
 	};\
 
 // AVG planar conversion 2
-#define AVG_DOWNSAMPLE_RGB24_TO_YUV422P_RECIPE2(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
+#define AVG_DOWNSAMPLE_N_CONVERT2_RGB24_TO_YUV422P(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
 	__m128i*	yplane_out = (__m128i *) dest_buffer;\
@@ -627,4 +627,4 @@
 		vplane_out++;\
 	};\
 
-#endif /* RGB_CONVERSION_RECIPES_H_ */
+#endif /* ARGB_CONVERSION_COMMON_H_ */

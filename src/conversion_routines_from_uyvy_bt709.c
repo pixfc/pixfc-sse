@@ -20,11 +20,11 @@
 
 #include "common.h"
 #include "pixfc-sse.h"
-#include "yuv_conversion_recipes.h"
+#include "yuyv_conversion_common.h"
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION_1U_1P(\
-				UPSAMPLE_YUV422I_TO_RGB_RECIPE,\
+				UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
 				convert_y_uv_vectors_to_rgb_vectors_bt709_,\
@@ -34,7 +34,7 @@
 
 #define UPSAMPLE_AND_CONVERT_TO_RGB24(pack_fn, instr_set)\
 		DO_CONVERSION_1U_1P(\
-				UPSAMPLE_YUV422I_TO_RGB_RECIPE,\
+				UPSAMPLE_AND_CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
 				convert_y_uv_vectors_to_rgb_vectors_bt709_,\
@@ -45,7 +45,7 @@
 
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION_1U_1P(\
-				YUV422I_TO_RGB_RECIPE,\
+				CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
 				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_,\
@@ -55,7 +55,7 @@
 
 #define CONVERT_TO_RGB24(pack_fn, instr_set)\
 		DO_CONVERSION_1U_1P(\
-				YUV422I_TO_RGB_RECIPE,\
+				CONVERT_YUV422I_TO_RGB,\
 				unpack_uyvy_to_y_uv_vectors_,\
 				pack_fn,\
 				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_,\
