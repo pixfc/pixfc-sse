@@ -57,6 +57,11 @@ void		downsample_n_convert_argb_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, v
 void		convert_argb_to_yuv422p_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_argb_to_yuv422p_sse2(const struct PixFcSSE *, void*, void*);
 
+// ARGB to YUV420P			SSE2 SSSE3
+void		convert_argb_to_yuv420p_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+// ARGB to YUV420P			SSE2
+void		convert_argb_to_yuv420p_sse2(const struct PixFcSSE *, void*, void*);
+
 /*
  *
  *
@@ -95,6 +100,8 @@ void		downsample_n_convert_argb_to_yuv422p_bt601_sse2_ssse3(const struct PixFcSS
 // ARGB to YUV422P			SSE2
 void		convert_argb_to_yuv422p_bt601_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_argb_to_yuv422p_bt601_sse2(const struct PixFcSSE *, void*, void*);
+
+
 /*
  *
  *

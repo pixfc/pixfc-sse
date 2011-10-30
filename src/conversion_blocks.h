@@ -61,6 +61,7 @@ struct ConversionBlock{
 	// Some conversion routines require the number of pixels to be 
 	// multiple of some value (or 1 if there is no such requirement).
 	uint32_t				pixel_count_multiple;
+	uint32_t				height_multiple;
 
 	char *					name;
 };

@@ -90,6 +90,12 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}
 
+	// If the height is not multiple of the required value, error out.
+	if (conv->pixel_count % block->height_multiple != 0) {
+		dprint("Height (%u) not multiple of %u\n", conv->pixel_count, block->height_multiple);
+		return PIXFC_CONVERSION_NOT_SUPPORTED;
+	}
+
 	return PIXFC_OK;
 }
 

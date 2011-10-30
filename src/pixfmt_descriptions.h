@@ -54,6 +54,7 @@ typedef struct {
         uint8_t					is_planar;
 
         uint8_t					pixel_count_multiple;
+        uint8_t					height_multiple;	// 0 if not applicable
 		
 		/*
 		 * An array of 16-byte vectors containing the fill pattern.

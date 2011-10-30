@@ -273,3 +273,104 @@ INLINE_NAME(pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2, __m128i* in_4_y_uv_
 	M128_STORE(_mm_or_si128(M128_LOAD(*out_v_plane), _M(scratch2)), *out_v_plane);
 	// x x		x x		x x		x x		V1 V2	V3 V4	V5 V6	V7 V8			// POR			1	0.33
 }
+
+
+
+/*
+ * Pack 2 pairs of Y to one Y vector
+ *
+ *
+ * Total latency:			1 cycle
+ * Num of pixel handled:	16
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short
+ *
+ * yVect1
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * yVect2
+ * Y9 0		Y10 0	Y11 0	Y12 0	Y13 0	Y14 0	Y15 0	Y16 0
+ *
+ *
+ *
+ * OUTPUT:
+ *
+ * 1 vector of 16 char
+ *
+ * Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12 Y13 Y14	Y15 Y16
+ *
+ */
+INLINE_NAME(pack_2_y_vectors_to_1_y_vector_sse2, __m128i* in_y_vector1, __m128i* in_y_vector2, __m128i* out_y_plane) {
+	M128_STORE(_mm_packus_epi16(*in_y_vector1, *in_y_vector2), *out_y_plane);
+	// Y1 Y2	Y3 Y4	Y5 Y6	Y7 Y8	Y9 Y10	Y11 Y12	Y13 Y14	Y15 Y16			// PACKUSWB		1	0.5
+}
+
+
+/*
+ * Pack 4 UV vectors UV vectors to U plane and V plane
+ *
+ * Total latency:			8 cycles
+ * Num of pixel handled:	16
+ *
+ * INPUT:
+ *
+ * 4 vectors of 8 short
+ *
+ * uvVect1
+ * U1 0		V1 0	U2 0	V2 0	U3 0	V3 0	U4 0	V4 0
+ *
+ * uvVect2
+ * U5 0		V5 0	U6 0	V6 0	U7 0	V7 0	U8 0	V8 0
+ *
+ * uvVect3
+ * U9 0		V9 0	U10 0	V10 0	U11 0	V11 0	U12 0	V12 0
+ *
+ * uvVect4
+ * U13 0	V13 0	U14 0	V14 0	U15 0	V15 0	U16 0	V16 0
+ *
+ *
+ * OUTPUT:
+ *
+ * 2 vectors of 16 char
+ *
+ *
+ * U1 U2	U3 U4	U5 U6	U7 U8	U9 U10	U11	U12	U13	U14	U15	U16
+ *
+ * V1 V2	V3 V4	V5 V6	V7 V8	V9 V10	V11 V12	V13	V14	V14	V16
+ *
+ */
+INLINE_NAME(pack_4_uv_vectors_to_yup_vectors_sse2, __m128i* in_4_uv_vectors, __m128i* out_u_plane, __m128i* out_v_plane) {
+	CONST_M128I(mask_v, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
+	M128I(scratch1, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+	M128I(scratch4, 0x0LL, 0x0LL);
+
+	_M(scratch1) = _mm_packus_epi16(in_4_uv_vectors[0], in_4_uv_vectors[1]);
+	// U1 V1 	U2 V2	U3 V3	U4 V4	U5 V5 	U6 V6	U7 V7	U8 V8			// PACKUSWB		1	0.5
+
+	_M(scratch2) = _mm_packus_epi16(in_4_uv_vectors[2], in_4_uv_vectors[3]);
+	// U9 V9 	U10 V10	U11 V11	U12 V12	U13 V13 U14 V14	U15 V15	U16 V16			// PACKUSWB		1	0.5
+
+	_M(scratch3) = _mm_and_si128(_M(scratch1), _M(mask_v));						// PAND			1	0.33
+	// U1 0 	U2 0	U3 0	U4 0	U5 0 	U6 0	U7 0	U8 0
+
+	_M(scratch4) = _mm_and_si128(_M(scratch2), _M(mask_v));						// PAND			1	0.33
+	// U9 0 	U10 0	U11 0	U12 0	U13 0 	U14 0	U15 0	U16 0
+
+	M128_STORE(_mm_packus_epi16(_M(scratch3), _M(scratch4)), *out_u_plane);		// PACKUSWB		1	0.5
+	// U1 U2	U3 U4 	U5 U6	U7 U8	U9 U10	U11 U12	U13 U14 U15 U16
+
+	_M(scratch3) = _mm_srli_epi16(_M(scratch1), 8);								// PSRLW		1	1
+	// V1 0 	V2 0	V3 0	V4 0	V5 0 	V6 0	V7 0	V8 0
+
+	_M(scratch4) = _mm_srli_epi16(_M(scratch2), 8);								// PSRLW		1	1
+	// V9 0 	V10 0	V11 0	V12 0	V13 0 	V14 0	V15 0	V16 0
+
+	M128_STORE(_mm_packus_epi16(_M(scratch3), _M(scratch4)), *out_v_plane);		// PACKUSWB		1	0.5
+	// V1 V2	V3 V4 	V5 V6	V7 V8	V9 V10	V11 V12	V13 V14 V15 V16
+}
+
+

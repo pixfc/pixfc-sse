@@ -42,6 +42,7 @@ typedef enum {
 	PixFcYUYV = 0,
 	PixFcUYVY,
 	PixFcYUV422P,
+	PixFcYUV420P,
 
 	// RGB formats
 	PixFcARGB,	// 32-bit ARGB

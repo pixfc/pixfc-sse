@@ -137,7 +137,7 @@ int 		main(int argc, char **argv) {
 
 	// allocate out buffer
 	if (allocate_aligned_buffer(dst_fmt, w, h, (void **)&out) != 0) {
-		log("Error allocating out buffer");
+		log("Error allocating out buffer\n");
 		free(in);
 		return 1;
 	}

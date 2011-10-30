@@ -73,6 +73,12 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 		return -1;
 	}
 
+	// make sure the height is valid
+	if ((desc->height_multiple != 0) && (height % desc->height_multiple != 0)) {
+		log("image height error: %d %% %d != 0\n", height, desc->height_multiple);
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -125,7 +131,7 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 		// Planar format
 		__m128i* y_plane, *u_plane, *v_plane;
 
-		// Only supports YUV422P for now - back out if any other format, as we
+		// Only supports YUV422P & YUV420P for now - back out if any other format, as we
 		// dont know how to handle them yet.
 		if (fmt == PixFcYUV422P){
 			uint32_t pixel_count = buffer_size * desc->bytes_per_pix_denom / desc->bytes_per_pix_num;
@@ -164,6 +170,49 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 
 					// copy 32 pixels at a time
 					pixel_count -= 32;
+				}
+			}
+		} else if (fmt == PixFcYUV420P){
+			uint32_t pixel_count = buffer_size * desc->bytes_per_pix_denom / desc->bytes_per_pix_num;
+
+			y_plane = buffer;
+			u_plane = (__m128i*) (((uint8_t*) y_plane) + pixel_count);
+			v_plane = (__m128i*) (((uint8_t*) u_plane) + pixel_count / 4);
+
+			// Assume 6 fill vectors: 4 for Y plane, 1 for U plane and 1 for V plane
+			if (desc->fill_patterns_count != 6) {
+				log("FIXME !!!! Dont know how to fill '%s' buffer with %u fill pattern vectors\n",
+						desc->name, desc->fill_patterns_count);
+				return;
+			}
+
+			if (((uintptr_t) buffer & 0x0F) == 0) {
+				while (pixel_count > 0) {
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[0]));
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[1]));
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[2]));
+					_mm_store_si128(y_plane++, _M(desc->fill_patterns[3]));
+
+					_mm_store_si128(u_plane++, _M(desc->fill_patterns[4]));
+
+					_mm_store_si128(v_plane++, _M(desc->fill_patterns[5]));
+
+					// copy 64 pixels at a time
+					pixel_count -= 64;
+				}
+			} else {
+				while (pixel_count > 0) {
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[0]));
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[1]));
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[2]));
+					_mm_storeu_si128(y_plane++, _M(desc->fill_patterns[3]));
+
+					_mm_storeu_si128(u_plane++, _M(desc->fill_patterns[2]));
+
+					_mm_storeu_si128(v_plane++, _M(desc->fill_patterns[3]));
+
+					// copy 64 pixels at a time
+					pixel_count -= 64;
 				}
 			}
 		} else {
