@@ -106,6 +106,30 @@
 						instr_set\
 			)
 
+
+#define CONVERT_TO_YUV420P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						RGB32_TO_YUV420P_RECIPE,\
+						unpack_argb_to_r_g_b_vectors_,\
+						pack_2_y_vectors_to_1_y_vector_sse2,\
+						pack_4_uv_vectors_to_yup_vectors_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
+						instr_set\
+			)
+
+#define CONVERT2_TO_YUV420P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+						RGB32_TO_YUV420P_RECIPE2,\
+						unpack_argb_to_ag_rb_vectors_,\
+						pack_2_y_vectors_to_1_y_vector_sse2,\
+						pack_4_uv_vectors_to_yup_vectors_sse2,\
+						convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
+						convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\
+						instr_set\
+			)
+
+
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
@@ -169,6 +193,15 @@ void		downsample_n_convert_argb_to_yuv422p_bt601_sse2(const struct PixFcSSE *pix
 }
 
 
+// ARGB to YUV420P			SSE2 SSSE3
+void		convert_argb_to_yuv420p_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV420P(sse2_ssse3);
+}
+
+// ARGB to YUV420P			SSE2
+void		convert_argb_to_yuv420p_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV420P(sse2);
+}
 
 void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out)
 {
@@ -250,4 +283,126 @@ void 		convert_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in,
 	}
 }
 
+// RGB to YUV420		NON SSE
+void 		convert_rgb_to_yuv420_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out)
+{
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
+	PixFcPixelFormat 	src_fmt = conv->source_fmt;
+	uint8_t				input_stride = ((src_fmt == PixFcARGB) || (src_fmt == PixFcBGRA)) ? 4 : 3;
+	uint32_t 			pixel_num = 0;
+	uint32_t			pixel_count = conv->pixel_count;
+	uint8_t*			src_line1 = (uint8_t *) in;
+	uint8_t*			src_line2 = src_line1 + conv->width * input_stride;
+	uint8_t*			dst = (uint8_t *) out;
+	uint8_t*			y_line1 = dst;
+	uint8_t*			y_line2 = y_line1 + conv->width;
+	uint8_t*			u_plane = dst + pixel_count;
+	uint8_t*			v_plane = u_plane + pixel_count / 4;
+	int32_t				r1_line1 = 0, g1_line1 = 0, b1_line1 = 0, r2_line1 = 0, g2_line1 = 0, b2_line1 = 0;
+	int32_t				r1_line2 = 0, g1_line2 = 0, b1_line2 = 0, r2_line2 = 0, g2_line2 = 0, b2_line2 = 0;
+	int32_t				y1_line1, y2_line1, y1_line2, y2_line2, u, v;
+	uint32_t			line = conv->height;
+	uint32_t			col = conv->width;
 
+	while(line > 0){
+		while(col > 0){
+			if (src_fmt == PixFcARGB) {
+				src_line1++;	// A
+				r1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				b1_line1 = *(src_line1++);
+				src_line1++;	// A
+				r2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+				src_line2++;	// A
+				r1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				b1_line2 = *(src_line2++);
+				src_line2++;	// A
+				r2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+			} else if (src_fmt == PixFcBGRA) {
+				b1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				r1_line1 = *(src_line1++);
+				src_line1++;	// A
+				b2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+				src_line1++;	// A
+				b1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				r1_line2 = *(src_line2++);
+				src_line2++;	// A
+				b2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+				src_line2++;	// A
+			} else if (src_fmt == PixFcRGB24) {
+				r1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				b1_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+
+				r1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				b1_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+			} else if (src_fmt == PixFcBGR24) {
+				b1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				r1_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+
+				b1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				r1_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+			} else
+				printf("Unknown source pixel format in non-SSE conversion from RGB\n");
+
+			//
+			y1_line1 = ((66 * r1_line1 + 129 * g1_line1 + 25 * b1_line1) >> 8) + 16;
+			y2_line1 = ((66 * r2_line1 + 129 * g2_line1 + 25 * b2_line1) >> 8) + 16;
+			y1_line2 = ((66 * r1_line2 + 129 * g1_line2 + 25 * b1_line2) >> 8) + 16;
+			y2_line2 = ((66 * r2_line2 + 129 * g2_line2 + 25 * b2_line2) >> 8) + 16;
+
+			// Average all input componenents
+			r1_line1 = (r1_line1 + r2_line1 + r1_line2 + r2_line2) / 4;
+			g1_line1 = (g1_line1 + g2_line1 + g1_line2 + g2_line2) / 4;
+			b1_line1 = (b1_line1 + b2_line1 + b1_line2 + b2_line2) / 4;
+			u = ((-38 * r1_line1 - 74 * g1_line1 + 112 * b1_line1) >> 8) + 128;
+			v = ((112 * r1_line1 - 94  * g1_line1 - 18 * b1_line1) >> 8) + 128;
+
+			if (dest_fmt == PixFcYUV420P) {
+				*(y_line1++) = CLIP_PIXEL(y1_line1);
+				*(y_line1++) = CLIP_PIXEL(y2_line1);
+				*(y_line2++) = CLIP_PIXEL(y1_line2);
+				*(y_line2++) = CLIP_PIXEL(y2_line2);
+				*(u_plane++) = CLIP_PIXEL(u);
+				*(v_plane++) = CLIP_PIXEL(v);
+			} else {
+				printf("Unknown output format in non-SSE conversion from RGB\n");
+			}
+
+			col += 2;	// 2 pixels (on two lines) are processed per inner loop
+		}
+
+		src_line1 += conv->width * input_stride;
+		src_line1 += conv->width * input_stride;
+		y_line1 += conv->width;
+		y_line2 += conv->width;
+
+		line -= 2; // two lines are processed per outer loop
+	}
+}

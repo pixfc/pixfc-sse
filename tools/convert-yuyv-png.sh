@@ -2,9 +2,9 @@
 
 if [ $# -ne 1 -a $# -ne 2 ]; then
 	echo "Usage: $0 <yuv_in_format> [filename]"
-	echo "where 'yuv_in_format' is either YUYV, UYVY or YUV422p"
+	echo "where 'yuv_in_format' is either YUYV, UYVY, YUV422p or YUV420p"
 	echo "Input files must also bear that extension"
-	echo "If 'filename' is specified, onyl this file will be converted"
+	echo "If 'filename' is specified, only this file will be converted"
 	exit 1
 fi
 
@@ -41,6 +41,8 @@ elif [ "${ext}" = "YUV422p" ]; then
 	fi  
 	cmd="$(dirname $0)/yuv422p_to_yuyv WIDTH HEIGHT"
 	cmd2="mplayer -demuxer rawvideo -rawvideo format=yuy2:w=WIDTH:h=HEIGHT -vo png:z=0 output.YUYV"
+elif [ "${ext}" = "YUV420p" ]; then
+	cmd="mplayer -demuxer rawvideo -rawvideo format=i420:w=WIDTH:h=HEIGHT -vo png:z=0"
 else
 	echo "Unknown yuv format \'${ext}\'"
 	exit 1

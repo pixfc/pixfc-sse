@@ -11,6 +11,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_yuv422p.c
 	conversion_routines_from_yuv422p_bt601.c
 	conversion_routines_from_yuv422p_bt709.c
+	conversion_routines_from_yuv420p.c
 	conversion_routines_from_uyvy.c
 	conversion_routines_from_uyvy_bt601.c
 	conversion_routines_from_uyvy_bt709.c

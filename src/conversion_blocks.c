@@ -24,6 +24,7 @@
 #include "conversion_blocks.h"
 #include "conversion_routines_from_yuyv.h"
 #include "conversion_routines_from_uyvy.h"
+#include "conversion_routines_from_yuv420p.h"
 #include "conversion_routines_from_yuv422p.h"
 #include "conversion_routines_from_argb.h"
 #include "conversion_routines_from_bgra.h"
@@ -116,6 +117,37 @@ DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_
 
 
 
+
+/*
+ * The following macro declares only NNB conversion blocks:
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 full range
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.601
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.709
+ *
+ * - Fast Nearest NeighBour resampling SSE2 full range
+ * - Fast Nearest NeighBour resampling SSE2 bt.601
+ * - Fast Nearest NeighBour resampling SSE2 bt.709
+ *
+ * - Fast Nearest NeighBour resampling NON-SSE full range
+ * - Fast Nearest NeighBour resampling NON-SSE bt.601
+ * - Fast Nearest NeighBour resampling NON-SSE bt.709
+ */
+#define		DECLARE_NNB_ONLY_CONV_BLOCKS(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK	(convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK	(convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_SSE2_CONV_BLOCK				(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_SSE2_CONV_BLOCK		(convert_fn_prefix##_bt601, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_SSE2_CONV_BLOCK		(convert_fn_prefix##_bt709, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix),\
+DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, desc_str_prefix),\
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, desc_str_prefix)
+
+
+
+
+
+
 /*
  * Repacking conversion blocks
  */
@@ -148,7 +180,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// ARGB to YUV422P
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuv422p, downsample_n_convert_argb_to_yuv422p, convert_rgb_to_yuv422, PixFcARGB, PixFcYUV422P, 32, 1, "ARGB to YUV422P"),
 
-	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_argb_to_yuv420p, PixFcARGB, PixFcYUV420P, 64, 2, "ARGB to YUV420P"),
+	// ARGB to YUV420P (NNB only for now)
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_argb_to_yuv420p, convert_rgb_to_yuv420, PixFcARGB, PixFcYUV420P, 64, 2, "ARGB to YUV420P"),
 
 	//
 	// BGRA to YUYV
@@ -160,6 +193,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGRA to YUV422P
 	DECLARE_CONV_BLOCKS(convert_bgra_to_yuv422p, downsample_n_convert_bgra_to_yuv422p, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUV422P, 32, 1, "BGRA to YUV422P"),
 
+	// BGRA to YUV420P (NNB only for now)
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_bgra_to_yuv420p, convert_rgb_to_yuv420, PixFcBGRA, PixFcYUV420P, 64, 2, "BGRA to YUV420P"),
 
 	//
 	// RGB24 to YUYV
@@ -171,6 +206,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// RGB24 to YUV422P
 	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuv422p, downsample_n_convert_rgb24_to_yuv422p, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUV422P, 32, 1, "RGB24 to YUV422P"),
 
+	DECLARE_NNB_SSE2_CONV_BLOCK(convert_rgb24_to_yuv420p, PixFcRGB24, PixFcYUV420P, 64, 2, "RGB24 to YUV420P"),
+	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_rgb24_to_yuv420p, PixFcRGB24, PixFcYUV420P, 64, 2, "RGB24 to YUV420P"),
 
 	//
 	// BGR24 to YUYV
@@ -237,6 +274,10 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// YUV422P to UYVY
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, 1, "YUV422P to UYVY"),
 	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, "YUV422P to UYVY"),
+
+	//
+	// YUV420P to ARGB
+	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_yuv420p_to_argb, PixFcYUV420P, PixFcARGB, 64, 2, "YUV420P to ARGB"),
 };
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);

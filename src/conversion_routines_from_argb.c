@@ -23,110 +23,110 @@
 #include "rgb_conversion_recipes.h"
 
 #define CONVERT_TO_YUV422I(pack_fn, instr_set)\
-			DO_CONVERSION_1U_1P(\
-						RGB32_TO_YUV422I_RECIPE,\
-						unpack_argb_to_r_g_b_vectors_,\
-						pack_fn,\
-						convert_r_g_b_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_1P(\
+				RGB32_TO_YUV422I_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_,\
+				pack_fn,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define CONVERT2_TO_YUV422I(pack_fn, instr_set)\
-			DO_CONVERSION_1U_1P(\
-						RGB32_TO_YUV422I_RECIPE2,\
-						unpack_argb_to_ag_rb_vectors_,\
-						pack_fn,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_1P(\
+				RGB32_TO_YUV422I_RECIPE2,\
+				unpack_argb_to_ag_rb_vectors_,\
+				pack_fn,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_fn, instr_set)\
-			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE,\
-						unpack_argb_to_r_g_b_vectors_,\
-						pack_fn,\
-						convert_r_g_b_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_1P(\
+				AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_,\
+				pack_fn,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUV422I(pack_fn, instr_set)\
-			DO_CONVERSION_1U_1P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE2,\
-						unpack_argb_to_ag_rb_vectors_,\
-						pack_fn,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_1P(\
+				AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE2,\
+				unpack_argb_to_ag_rb_vectors_,\
+				pack_fn,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define CONVERT_TO_YUV422P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV422P_RECIPE,\
-						unpack_argb_to_r_g_b_vectors_,\
-						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
-						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
-						convert_r_g_b_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				RGB32_TO_YUV422P_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_,\
+				pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+				pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define CONVERT2_TO_YUV422P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV422P_RECIPE2,\
-						unpack_argb_to_ag_rb_vectors_,\
-						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
-						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				RGB32_TO_YUV422P_RECIPE2,\
+				unpack_argb_to_ag_rb_vectors_,\
+				pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+				pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define DOWNSAMPLE_N_CONVERT_TO_YUV422P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE,\
-						unpack_argb_to_r_g_b_vectors_,\
-						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
-						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
-						convert_r_g_b_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_,\
+				pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+				pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define DOWNSAMPLE_N_CONVERT2_TO_YUV422P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE2,\
-						unpack_argb_to_ag_rb_vectors_,\
-						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
-						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE2,\
+				unpack_argb_to_ag_rb_vectors_,\
+				pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
+				pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define CONVERT_TO_YUV420P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV420P_RECIPE,\
-						unpack_argb_to_r_g_b_vectors_,\
-						pack_2_y_vectors_to_1_y_vector_sse2,\
-						pack_4_uv_vectors_to_yup_vectors_sse2,\
-						convert_r_g_b_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				RGB32_TO_YUV420P_RECIPE,\
+				unpack_argb_to_r_g_b_vectors_,\
+				pack_2_y_vectors_to_1_y_vector_sse2,\
+				pack_4_uv_vectors_to_yup_vectors_sse2,\
+				convert_r_g_b_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 
 #define CONVERT2_TO_YUV420P(instr_set)\
-			DO_CONVERSION_1U_2P(\
-						RGB32_TO_YUV420P_RECIPE2,\
-						unpack_argb_to_ag_rb_vectors_,\
-						pack_2_y_vectors_to_1_y_vector_sse2,\
-						pack_4_uv_vectors_to_yup_vectors_sse2,\
-						convert_ag_rb_vectors_to_y_vector_sse2,\
-						convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
-						instr_set\
-			)
+		DO_CONVERSION_1U_2P(\
+				RGB32_TO_YUV420P_RECIPE2,\
+				unpack_argb_to_ag_rb_vectors_,\
+				pack_2_y_vectors_to_1_y_vector_sse2,\
+				pack_4_uv_vectors_to_yup_vectors_sse2,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
 /*
  * We have 2 RGB to YUV422 conversion implementations:
  * - The first one unpacks 8 pixels into 3 16bit vectors R,G & B.
@@ -312,3 +312,128 @@ void 		convert_rgb_to_yuv422_nonsse(const struct PixFcSSE* conv, void* in, void*
 		pixel_num += 2;	// 2 pixels processed per loop
 	}
 }
+
+// RGB to YUV420		NON SSE
+void 		convert_rgb_to_yuv420_nonsse(const struct PixFcSSE* conv, void* in, void* out)
+{
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
+	PixFcPixelFormat 	src_fmt = conv->source_fmt;
+	uint8_t				input_stride = ((src_fmt == PixFcARGB) || (src_fmt == PixFcBGRA)) ? 4 : 3;
+	uint32_t 			pixel_num = 0;
+	uint32_t			pixel_count = conv->pixel_count;
+	uint8_t*			src_line1 = (uint8_t *) in;
+	uint8_t*			src_line2 = src_line1 + conv->width * input_stride;
+	uint8_t*			dst = (uint8_t *) out;
+	uint8_t*			y_line1 = dst;
+	uint8_t*			y_line2 = y_line1 + conv->width;
+	uint8_t*			u_plane = dst + pixel_count;
+	uint8_t*			v_plane = u_plane + pixel_count / 4;
+	int32_t				r1_line1 = 0, g1_line1 = 0, b1_line1 = 0, r2_line1 = 0, g2_line1 = 0, b2_line1 = 0;
+	int32_t				r1_line2 = 0, g1_line2 = 0, b1_line2 = 0, r2_line2 = 0, g2_line2 = 0, b2_line2 = 0;
+	int32_t				y1_line1, y2_line1, y1_line2, y2_line2, u, v;
+	uint32_t			line = conv->height;
+	uint32_t			col = conv->width;
+
+	while(line > 0){
+		while(col > 0){
+			if (src_fmt == PixFcARGB) {
+				src_line1++;	// A
+				r1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				b1_line1 = *(src_line1++);
+				src_line1++;	// A
+				r2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+				src_line2++;	// A
+				r1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				b1_line2 = *(src_line2++);
+				src_line2++;	// A
+				r2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+			} else if (src_fmt == PixFcBGRA) {
+				b1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				r1_line1 = *(src_line1++);
+				src_line1++;	// A
+				b2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+				src_line1++;	// A
+				b1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				r1_line2 = *(src_line2++);
+				src_line2++;	// A
+				b2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+				src_line2++;	// A
+			} else if (src_fmt == PixFcRGB24) {
+				r1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				b1_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+
+				r1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				b1_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+			} else if (src_fmt == PixFcBGR24) {
+				b1_line1 = *(src_line1++);
+				g1_line1 = *(src_line1++);
+				r1_line1 = *(src_line1++);
+				b2_line1 = *(src_line1++);
+				g2_line1 = *(src_line1++);
+				r2_line1 = *(src_line1++);
+
+				b1_line2 = *(src_line2++);
+				g1_line2 = *(src_line2++);
+				r1_line2 = *(src_line2++);
+				b2_line2 = *(src_line2++);
+				g2_line2 = *(src_line2++);
+				r2_line2 = *(src_line2++);
+			} else
+				printf("Unknown source pixel format in non-SSE conversion from RGB\n");
+
+			//
+			y1_line1 = (77 * r1_line1 + 150 * g1_line1 + 29 * b1_line1) >> 8;
+			y2_line1 = (77 * r2_line1 + 150 * g2_line1 + 29 * b2_line1) >> 8;
+			y1_line2 = (77 * r1_line2 + 150 * g1_line2 + 29 * b1_line2) >> 8;
+			y2_line2 = (77 * r2_line2 + 150 * g2_line2 + 29 * b2_line2) >> 8;
+
+			// Average all input componenents
+			r1_line1 = (r1_line1 + r2_line1 + r1_line2 + r2_line2) / 4;
+			g1_line1 = (g1_line1 + g2_line1 + g1_line2 + g2_line2) / 4;
+			b1_line1 = (b1_line1 + b2_line1 + b1_line2 + b2_line2) / 4;
+			u = ((-43 * r1_line1 - 85 * g1_line1 + 128 * b1_line1) >> 8) + 128;
+			v = ((128 * r1_line1 - 107  * g1_line1 - 21 * b1_line1) >> 8) + 128;
+
+			if (dest_fmt == PixFcYUV420P) {
+				*(y_line1++) = CLIP_PIXEL(y1_line1);
+				*(y_line1++) = CLIP_PIXEL(y2_line1);
+				*(y_line2++) = CLIP_PIXEL(y1_line2);
+				*(y_line2++) = CLIP_PIXEL(y2_line2);
+				*(u_plane++) = CLIP_PIXEL(u);
+				*(v_plane++) = CLIP_PIXEL(v);
+			} else {
+				printf("Unknown output format in non-SSE conversion from RGB\n");
+			}
+
+			col += 2;	// 2 pixels (on two lines) are processed per inner loop
+		}
+
+		src_line1 += conv->width * input_stride;
+		src_line1 += conv->width * input_stride;
+		y_line1 += conv->width;
+		y_line2 += conv->width;
+
+		line -= 2; // two lines are processed per outer loop
+	}
+}
+

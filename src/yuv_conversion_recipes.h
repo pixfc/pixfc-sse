@@ -651,8 +651,8 @@
 
 
 
-#define UPSAMPLE_YUV420P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
- 	__m128i		unpack_out[8];\
+#define YUV420P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+ 	__m128i		unpack_out[4];\
 	__m128i		convert_out[6];\
 	__m128i*    y_line1 = (__m128i *) source_buffer;\
 	__m128i*    y_line2 = (__m128i*)((uint8_t *) y_line1 + pixfc->width);\
@@ -664,50 +664,42 @@
 	uint32_t	lines_remaining = pixfc->height;\
 	while(lines_remaining > 0) {\
 		while(pixels_remaining_on_line > 0) {\
-			unpack_y_fn(y_line1, unpack_out, &unpack_out[3]);\
-			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[4]);\
-			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[6], &unpack_out[7]);\
-			reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+			unpack_y_fn(y_line1, unpack_out, &unpack_out[2]);\
+			y_line1++;\
+			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
-			reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[6], &unpack_out[5]);\
-			conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
-			pack_fn(convert_out, rgb_out);\
-			y_plane++;\
-			rgb_out += output_stride;\
-			unpack_y_fn(y_plane, unpack_out, &unpack_out[3]);\
-			unpack_out[1] = _mm_load_si128(&unpack_out[6]);\
-			unpack_out[4] = _mm_load_si128(&unpack_out[7]);\
-			unpack_lo_uv_fn(&u_plane[1], &v_plane[1], &unpack_out[6], &unpack_out[7]);\
-			reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out_line1);\
+			rgb_out_line1 += output_stride;\
+			unpack_y_fn(y_line2, unpack_out, &unpack_out[2]);\
+			y_line2++;\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
-			reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[6], &unpack_out[5]);\
-			conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
-			pack_fn(convert_out, rgb_out);\
-			y_plane++;\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out_line2);\
+			rgb_out_line2 += output_stride;\
+			unpack_y_fn(y_line1, unpack_out, &unpack_out[2]);\
+			y_line1++;\
+			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
 			u_plane++;\
 			v_plane++;\
-			rgb_out += output_stride;\
-			pixel_count -= 32;\
-			unpack_out[1] = _mm_load_si128(&unpack_out[6]);\
-			unpack_out[4] = _mm_load_si128(&unpack_out[7]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out_line1);\
+			rgb_out_line1 += output_stride;\
+			unpack_y_fn(y_line2, unpack_out, &unpack_out[2]);\
+			y_line2++;\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out_line2);\
+			rgb_out_line2 += output_stride;\
+			pixels_remaining_on_line -= 32;\
 		}\
+		y_line1 = (__m128i*)((uint8_t *) y_line1 + pixfc->width);\
+		y_line2 = (__m128i*)((uint8_t *) y_line2 + pixfc->width);\
+		rgb_out_line1 = (__m128i *) ((uint8_t *)rgb_out_line1 + output_stride * pixfc->width);\
+		rgb_out_line2 = (__m128i *) ((uint8_t *)rgb_out_line2 + output_stride * pixfc->width);\
+		lines_remaining -=2;\
+		pixels_remaining_on_line = pixfc->width;\
 	}\
-	unpack_y_fn(y_plane, unpack_out, &unpack_out[3]);\
-	unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[6], &unpack_out[7]);\
-	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
-	conv_fn_prefix##instr_set(unpack_out, convert_out);\
-	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[6], &unpack_out[5]);\
-	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
-	pack_fn(convert_out, rgb_out);\
-	y_plane++;\
-	rgb_out += output_stride;\
-	unpack_y_fn(y_plane, unpack_out, &unpack_out[3]);\
-	unpack_out[1] = _mm_load_si128(&unpack_out[6]);\
-	unpack_out[4] = _mm_load_si128(&unpack_out[7]);\
-	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
-	conv_fn_prefix##instr_set(unpack_out, convert_out);\
-	reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
-	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
-	pack_fn(convert_out, rgb_out);\
 
 #endif /* YUV_CONVERSION_RECIPES_H_ */

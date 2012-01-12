@@ -58,6 +58,8 @@ void		downsample_n_convert_rgb24_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, 
 void		convert_rgb24_to_yuv422p_sse2(const struct PixFcSSE *, void*, void*);
 void		downsample_n_convert_rgb24_to_yuv422p_sse2(const struct PixFcSSE *, void*, void*);
 
+void		convert_rgb24_to_yuv420p_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		convert_rgb24_to_yuv420p_sse2(const struct PixFcSSE *, void*, void*);
 /*
  *
  *
