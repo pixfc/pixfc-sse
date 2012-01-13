@@ -1069,7 +1069,7 @@
 	__m128i*	yplane_line1 = (__m128i *) dest_buffer;\
 	__m128i*	yplane_line2 = (__m128i *) ((uint8_t*)yplane_line1 + pixfc->width);\
 	__m128i*	uplane_out = (__m128i *) ((uint8_t*)yplane_line1 + pixfc->pixel_count);\
-	__m128i*	vplane_out = (__m128i *) ((uint8_t*)uplane_out + pixfc->pixel_count / 2);\
+	__m128i*	vplane_out = (__m128i *) ((uint8_t*)uplane_out + pixfc->pixel_count / 4);\
 	__m128i		unpack_out[12];\
 	/* [0]: l1	R 1-8		[6]:  l2	R 1-8*/\
 	/* [1]: l1	G 1-8		[7]:  l2	G 1-8*/\
