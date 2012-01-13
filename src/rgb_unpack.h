@@ -755,7 +755,7 @@ INLINE_NAME(unpack_rgb24_to_ag_rb_vectors_sse2_ssse3, __m128i* input, __m128i* o
 INLINE_NAME(unpack_rgb24_to_r_g_b_vectors_sse2, __m128i* in_3_v8i_rgb24_vectors, __m128i* out_6_v16i_r_g_b_vectors)
 {
 	__m128i		argb_vectors[4];
-	uint32_t	index = 16;
+	uint32_t	num_pixels = 16;
 	uint8_t*	dest = (uint8_t *) argb_vectors;
 	uint8_t*	src = (uint8_t *) in_3_v8i_rgb24_vectors;
 	
@@ -766,7 +766,7 @@ INLINE_NAME(unpack_rgb24_to_r_g_b_vectors_sse2, __m128i* in_3_v8i_rgb24_vectors,
 	dest++;
 
 	// Unpack to ARGB first, then to AG / RB
-	while (index < 16) {
+	while (num_pixels-- > 0) {
 		memcpy(dest, src, 3);
 		dest += 4;
 		src += 3;
