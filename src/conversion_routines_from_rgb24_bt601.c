@@ -107,6 +107,29 @@
 			)
 
 
+#define CONVERT_TO_YUV420P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+					RGB24_TO_YUV420P_RECIPE,\
+					unpack_rgb24_to_r_g_b_vectors_,\
+					pack_2_y_vectors_to_1_y_vector_sse2,\
+					pack_4_uv_vectors_to_yup_vectors_sse2,\
+					convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
+					convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
+					instr_set\
+			)
+
+#define CONVERT2_TO_YUV420P(instr_set)\
+			DO_CONVERSION_1U_2P(\
+					RGB24_TO_YUV420P_RECIPE2,\
+					unpack_rgb24_to_ag_rb_vectors_,\
+					pack_2_y_vectors_to_1_y_vector_sse2,\
+					pack_4_uv_vectors_to_yup_vectors_sse2,\
+					convert_ag_rb_vectors_to_y_vector_bt601_sse2,\
+					convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,\
+					instr_set\
+			)
+
+
 // RGB24 to YUYV			SSE2 SSSE3
 void		convert_rgb24_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
@@ -169,3 +192,16 @@ void		convert_rgb24_to_yuv422p_bt601_sse2(const struct PixFcSSE *pixfc, void* so
 void		downsample_n_convert_rgb24_to_yuv422p_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT2_TO_YUV422P(sse2);
 }
+
+
+
+
+// RGB24 to YUV420P			SSE2 / SSSE3
+void		convert_rgb24_to_yuv420p_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV420P(sse2_ssse3);
+}
+
+void		convert_rgb24_to_yuv420p_bt601_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT2_TO_YUV420P(sse2);
+}
+

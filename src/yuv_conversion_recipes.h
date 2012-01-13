@@ -657,40 +657,87 @@
 	__m128i*    y_line1 = (__m128i *) source_buffer;\
 	__m128i*    y_line2 = (__m128i*)((uint8_t *) y_line1 + pixfc->width);\
 	__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
-	__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane  + pixfc->pixel_count / 2);\
+	__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane  + pixfc->pixel_count / 4);\
 	__m128i*	rgb_out_line1 = (__m128i *) dest_buffer;\
 	__m128i*	rgb_out_line2 = (__m128i *) ((uint8_t *)rgb_out_line1 + output_stride * pixfc->width);\
 	uint32_t	pixels_remaining_on_line = pixfc->width;\
 	uint32_t	lines_remaining = pixfc->height;\
+	int i;\
 	while(lines_remaining > 0) {\
 		while(pixels_remaining_on_line > 0) {\
 			unpack_y_fn(y_line1, unpack_out, &unpack_out[2]);\
+			print_xmm8u("l1 Y 1 - 8:", unpack_out);\
+			print_xmm8u("l1 Y 9 - 16:", &unpack_out[2]);\
 			y_line1++;\
 			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			print_xmm8u("l12 UV 1 - 4:", &unpack_out[1]);\
+			print_xmm8u("l12 UV 5 - 8:", &unpack_out[3]);\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm8u("l1 R 1 - 8:", convert_out);\
+			print_xmm8u("l1 G 1 - 8:", &convert_out[1]);\
+			print_xmm8u("l1 B 1 - 8:", &convert_out[2]);\
+print_xmm8u("l12 UV 1 - 4:", &unpack_out[1]);\
+print_xmm8u("l12 UV 5 - 8:", &unpack_out[3]);\
 			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			print_xmm8u("l1 R 9 - 16:", &convert_out[3]);\
+			print_xmm8u("l1 G 9 - 16:", &convert_out[4]);\
+			print_xmm8u("l1 B 9 - 16:", &convert_out[5]);\
 			pack_fn(convert_out, rgb_out_line1);\
+			for(i = 0; i < output_stride; i++)\
+			print_xmm8u("l1 RGB output 1 - 16:", &rgb_out_line1[i]);\
 			rgb_out_line1 += output_stride;\
 			unpack_y_fn(y_line2, unpack_out, &unpack_out[2]);\
+			print_xmm8u("l2 Y 1 - 8:", unpack_out);\
+			print_xmm8u("l2 Y 9 - 16:", &unpack_out[2]);\
 			y_line2++;\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm8u("l2 R 1 - 8:", convert_out);\
+			print_xmm8u("l2 G 1 - 8:", &convert_out[1]);\
+			print_xmm8u("l2 B 1 - 8:", &convert_out[2]);\
 			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			print_xmm8u("l2 R 9 - 16:", &convert_out[3]);\
+			print_xmm8u("l2 G 9 - 16:", &convert_out[4]);\
+			print_xmm8u("l2 B 9 - 16:", &convert_out[5]);\
 			pack_fn(convert_out, rgb_out_line2);\
+			for(i = 0; i < output_stride; i++)\
+			print_xmm8u("l2 RGB output 1 - 16:", rgb_out_line2);\
 			rgb_out_line2 += output_stride;\
 			unpack_y_fn(y_line1, unpack_out, &unpack_out[2]);\
+			print_xmm8u("l1 Y 17 - 24:", unpack_out);\
+			print_xmm8u("l1 Y 25 - 32:", &unpack_out[2]);\
 			y_line1++;\
 			unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+			print_xmm8u("l12 UV 9 - 12:", &unpack_out[1]);\
+			print_xmm8u("l12 UV 13 - 16:", &unpack_out[3]);\
 			u_plane++;\
 			v_plane++;\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm8u("l1 R 17 - 24:", convert_out);\
+			print_xmm8u("l1 G 17 - 24:", &convert_out[1]);\
+			print_xmm8u("l1 B 17 - 24:", &convert_out[2]);\
 			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			print_xmm8u("l1 R 25 - 32:", &convert_out[3]);\
+			print_xmm8u("l1 G 25 - 32:", &convert_out[4]);\
+			print_xmm8u("l1 B 25 - 32:", &convert_out[5]);\
 			pack_fn(convert_out, rgb_out_line1);\
+			for(i = 0; i < output_stride; i++)\
+			print_xmm8u("l1 RGB output  17 - 32:", rgb_out_line1);\
 			rgb_out_line1 += output_stride;\
 			unpack_y_fn(y_line2, unpack_out, &unpack_out[2]);\
+			print_xmm8u("l2 Y 17 - 24:", unpack_out);\
+			print_xmm8u("l2 Y 25 - 32:", &unpack_out[2]);\
 			y_line2++;\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm8u("l2 R 17 - 24:", convert_out);\
+			print_xmm8u("l2 G 17 - 24:", &convert_out[1]);\
+			print_xmm8u("l2 B 17 - 24:", &convert_out[2]);\
 			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+			print_xmm8u("l2 R 25 - 32:", &convert_out[3]);\
+			print_xmm8u("l2 G 25 - 32:", &convert_out[4]);\
+			print_xmm8u("l2 B 25 - 32:", &convert_out[5]);\
 			pack_fn(convert_out, rgb_out_line2);\
+			for(i = 0; i < output_stride; i++)\
+			print_xmm8u("l2 RGB output 17 - 32:", rgb_out_line1);\
 			rgb_out_line2 += output_stride;\
 			pixels_remaining_on_line -= 32;\
 		}\

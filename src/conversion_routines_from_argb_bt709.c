@@ -290,7 +290,6 @@ void 		convert_rgb_to_yuv420_bt709_nonsse(const struct PixFcSSE* conv, void* in,
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
 	PixFcPixelFormat 	src_fmt = conv->source_fmt;
 	uint8_t				input_stride = ((src_fmt == PixFcARGB) || (src_fmt == PixFcBGRA)) ? 4 : 3;
-	uint32_t 			pixel_num = 0;
 	uint32_t			pixel_count = conv->pixel_count;
 	uint8_t*			src_line1 = (uint8_t *) in;
 	uint8_t*			src_line2 = src_line1 + conv->width * input_stride;

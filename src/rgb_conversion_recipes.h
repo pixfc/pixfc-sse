@@ -540,7 +540,7 @@
 	print_xmm8u("l2 RB 5-8:", &unpack_out[7]);\
 	y_conv_fn(&unpack_out[4], &convert_out[4]);\
 	print_xmm8u("l2 Y1-8", &convert_out[4]);\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[4], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 1-4:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 1-4:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, convert_out);\
@@ -569,7 +569,7 @@
 	print_xmm8u("l2 Y9-16", &downsample_out[1]);\
 	y_pack_fn(&convert_out[4], &downsample_out[1], yplane_line2);\
 	yplane_line2++;\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[4], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 5-8:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 5-8:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[1]);\
@@ -593,7 +593,7 @@
 	print_xmm8u("l2 RB 21-24:", &unpack_out[7]);\
 	y_conv_fn(&unpack_out[4], &convert_out[4]);\
 	print_xmm8u("l2 Y17-24", &convert_out[4]);\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[4], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 9-12:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 9-12:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[2]);\
@@ -623,7 +623,7 @@
 	print_xmm8u("l2 Y24-32", &downsample_out[1]);\
 	y_pack_fn(&convert_out[4], &downsample_out[1], yplane_line2);\
 	yplane_line2++;\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[4], downsample_out);\
 	print_xmm8u("l12 420 downsampled R 13-16:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled G 13-16:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[3]);\
@@ -1087,7 +1087,7 @@
 	__m128i		convert_out[5];\
 	while(lines_remaining > 0){\
 		while(pixels_remaining_on_line > 0) {\
-			RGB32_TO_YUV420_NNB_CORE_LOOP1(\
+			RGB24_TO_YUV420_NNB_CORE_LOOP1(\
 					unpack_fn_prefix##instr_set, y_conv_fn,\
 					avg_420_downsample_r_g_b_vectors_##instr_set,\
 					uv_conv_fn, y_pack_fn, uv_pack_fn);\
@@ -1108,22 +1108,22 @@
 // NNB Core conversion loop for RGB24 to YUV420 planar NNB conversion 2
 #define RGB24_TO_YUV420_NNB_CORE_LOOP2(unpack_fn, y_conv_fn, downsample_fn, uv_conv_fn, y_pack_fn, uv_pack_fn) \
 	unpack_fn(rgb_line1, unpack_out);\
-	rgb_line1 += 2;\
+	rgb_line1 += 3;\
 	print_xmm8u("l1 AG 1-4:", &unpack_out[0]);\
 	print_xmm8u("l1 RB 1-4:", &unpack_out[1]);\
 	print_xmm8u("l1 AG 5-8:", &unpack_out[2]);\
 	print_xmm8u("l1 RB 5-8:", &unpack_out[3]);\
 	y_conv_fn(unpack_out, &convert_out[3]);\
 	print_xmm8u("l1 Y1-8", &convert_out[3]);\
-	unpack_fn(rgb_line2, &unpack_out[4]);\
-	rgb_line2 += 2;\
-	print_xmm8u("l2 AG 1-4:", &unpack_out[4]);\
-	print_xmm8u("l2 RB 1-4:", &unpack_out[5]);\
-	print_xmm8u("l2 AG 5-8:", &unpack_out[6]);\
-	print_xmm8u("l2 RB 5-8:", &unpack_out[7);\
-	y_conv_fn(&unpack_out[4], &convert_out[4]);\
+	unpack_fn(rgb_line2, &unpack_out[8]);\
+	rgb_line2 += 3;\
+	print_xmm8u("l2 AG 1-4:", &unpack_out[8]);\
+	print_xmm8u("l2 RB 1-4:", &unpack_out[9]);\
+	print_xmm8u("l2 AG 5-8:", &unpack_out[10]);\
+	print_xmm8u("l2 RB 5-8:", &unpack_out[11]);\
+	y_conv_fn(&unpack_out[8], &convert_out[4]);\
 	print_xmm8u("l2 Y1-8", &convert_out[4]);\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[8], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 1-4:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 1-4:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, convert_out);\
@@ -1131,28 +1131,24 @@
 	/* 												 	*/\
 	/* Next set of 8 pixels (9-16) along the same line 	*/\
 	/* 												 	*/\
-	unpack_fn(rgb_line1, unpack_out);\
-	rgb_line1 += 2;\
-	print_xmm8u("l1 AG 9-12:", &unpack_out[0]);\
-	print_xmm8u("l1 RB 9-12:", &unpack_out[1]);\
-	print_xmm8u("l1 AG 13-16:", &unpack_out[2]);\
-	print_xmm8u("l1 RB 13-16:", &unpack_out[3]);\
+	print_xmm8u("l1 AG 9-12:", &unpack_out[4]);\
+	print_xmm8u("l1 RB 9-12:", &unpack_out[5]);\
+	print_xmm8u("l1 AG 13-16:", &unpack_out[6]);\
+	print_xmm8u("l1 RB 13-16:", &unpack_out[7]);\
 	/* storing y samples in downsample array to avoid having to create another stack-allocated __m128i array */\
-	y_conv_fn(unpack_out, downsample_out);\
+	y_conv_fn(&unpack_out[4], downsample_out);\
 	print_xmm8u("l1 Y9-16", downsample_out);\
 	y_pack_fn(&convert_out[3], downsample_out, yplane_line1);\
 	yplane_line1++;\
-	unpack_fn(rgb_line2, &unpack_out[4]);\
-	rgb_line2 += 2;\
-	print_xmm8u("l2 AG 9-12:", &unpack_out[4]);\
-	print_xmm8u("l2 RB 9-12:", &unpack_out[5]);\
-	print_xmm8u("l2 AG 12-16:", &unpack_out[6]);\
-	print_xmm8u("l2 RB 12-16:", &unpack_out[7]);\
-	y_conv_fn(&unpack_out[4], &downsample_out[1]);\
+	print_xmm8u("l2 AG 9-12:", &unpack_out[12]);\
+	print_xmm8u("l2 RB 9-12:", &unpack_out[13]);\
+	print_xmm8u("l2 AG 12-16:", &unpack_out[14]);\
+	print_xmm8u("l2 RB 12-16:", &unpack_out[15]);\
+	y_conv_fn(&unpack_out[12], &downsample_out[1]);\
 	print_xmm8u("l2 Y9-16", &downsample_out[1]);\
 	y_pack_fn(&convert_out[4], &downsample_out[1], yplane_line2);\
 	yplane_line2++;\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(&unpack_out[4], &unpack_out[12], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 5-8:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 5-8:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[1]);\
@@ -1161,22 +1157,22 @@
 	/* Next set of 8 pixels (17-24) along the same line */\
 	/* 												 	*/\
 	unpack_fn(rgb_line1, unpack_out);\
-	rgb_line1 += 2;\
+	rgb_line1 += 3;\
 	print_xmm8u("l1 AG 17-20:", &unpack_out[0]);\
 	print_xmm8u("l1 RB 17-20:", &unpack_out[1]);\
 	print_xmm8u("l1 AG 21-24:", &unpack_out[2]);\
 	print_xmm8u("l1 RB 21-24:", &unpack_out[3]);\
 	y_conv_fn(unpack_out, &convert_out[3]);\
 	print_xmm8u("l1 Y17-24", &convert_out[3]);\
-	unpack_fn(rgb_line2, &unpack_out[4]);\
-	rgb_line2 += 2;\
-	print_xmm8u("l2 AG 17-20:", &unpack_out[4]);\
-	print_xmm8u("l2 RB 17-20:", &unpack_out[5]);\
-	print_xmm8u("l2 AG 21-24:", &unpack_out[6]);\
-	print_xmm8u("l2 RB 21-24:", &unpack_out[7]);\
-	y_conv_fn(&unpack_out[4], &convert_out[4]);\
+	unpack_fn(rgb_line2, &unpack_out[8]);\
+	rgb_line2 += 3;\
+	print_xmm8u("l2 AG 17-20:", &unpack_out[8]);\
+	print_xmm8u("l2 RB 17-20:", &unpack_out[9]);\
+	print_xmm8u("l2 AG 21-24:", &unpack_out[10]);\
+	print_xmm8u("l2 RB 21-24:", &unpack_out[11]);\
+	y_conv_fn(&unpack_out[8], &convert_out[4]);\
 	print_xmm8u("l2 Y17-24", &convert_out[4]);\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(unpack_out, &unpack_out[8], downsample_out);\
 	print_xmm8u("l12 420 downsampled AG 9-12:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled RB 9-12:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[2]);\
@@ -1185,28 +1181,24 @@
 	/* 											 		*/\
 	/* Next set of 8 pixels (25-32) along the same line */\
 	/* 											 		*/\
-	unpack_fn(rgb_line1, unpack_out);\
-	rgb_line1 += 2;\
-	print_xmm8u("l1 AG 25-28:", &unpack_out[0]);\
-	print_xmm8u("l1 RB 25-28:", &unpack_out[1]);\
-	print_xmm8u("l1 AG 29-32:", &unpack_out[2]);\
-	print_xmm8u("l1 RB 29-32:", &unpack_out[3]);\
+	print_xmm8u("l1 AG 25-28:", &unpack_out[4]);\
+	print_xmm8u("l1 RB 25-28:", &unpack_out[5]);\
+	print_xmm8u("l1 AG 29-32:", &unpack_out[6]);\
+	print_xmm8u("l1 RB 29-32:", &unpack_out[7]);\
 	/* storing y samples in downsample array to avoid having to create another stack-allocated __m128i array */\
-	y_conv_fn(unpack_out, downsample_out);\
+	y_conv_fn(&unpack_out[4], downsample_out);\
 	print_xmm8u("l1 Y25-32", downsample_out);\
 	y_pack_fn(&convert_out[3], downsample_out, yplane_line1);\
 	yplane_line1++;\
-	unpack_fn(rgb_line2, &unpack_out[4]);\
-	rgb_line2 += 2;\
-	print_xmm8u("l2 AG 25-28:", &unpack_out[4]);\
-	print_xmm8u("l2 RB 25-28:", &unpack_out[5]);\
-	print_xmm8u("l2 AG 28-32:", &unpack_out[6]);\
-	print_xmm8u("l2 RB 28-32:", &unpack_out[7]);\
-	y_conv_fn(&unpack_out[4], &downsample_out[1]);\
+	print_xmm8u("l2 AG 25-28:", &unpack_out[12]);\
+	print_xmm8u("l2 RB 25-28:", &unpack_out[13]);\
+	print_xmm8u("l2 AG 28-32:", &unpack_out[14]);\
+	print_xmm8u("l2 RB 28-32:", &unpack_out[15]);\
+	y_conv_fn(&unpack_out[12], &downsample_out[1]);\
 	print_xmm8u("l2 Y24-32", &downsample_out[1]);\
 	y_pack_fn(&convert_out[4], &downsample_out[1], yplane_line2);\
 	yplane_line2++;\
-	downsample_fn(unpack_out, downsample_out);\
+	downsample_fn(&unpack_out[4], &unpack_out[12], downsample_out);\
 	print_xmm8u("l12 420 downsampled R 13-16:", &downsample_out[0]);\
 	print_xmm8u("l12 420 downsampled G 13-16:", &downsample_out[1]);\
 	uv_conv_fn(downsample_out, &convert_out[3]);\
@@ -1220,12 +1212,12 @@
 	uint32_t	lines_remaining = pixfc->height;\
 	uint32_t	pixels_remaining_on_line = pixfc->width;\
 	__m128i*	rgb_line1 = (__m128i *) source_buffer;\
-	__m128i*	rgb_line2 = (__m128i *) ((uint8_t*)source_buffer + pixfc->width*4);\
+	__m128i*	rgb_line2 = (__m128i *) ((uint8_t*)source_buffer + pixfc->width*3);\
 	__m128i*	yplane_line1 = (__m128i *) dest_buffer;\
 	__m128i*	yplane_line2 = (__m128i *) ((uint8_t*)yplane_line1 + pixfc->width);\
 	__m128i*	uplane_out = (__m128i *) ((uint8_t*)yplane_line1 + pixfc->pixel_count);\
 	__m128i*	vplane_out = (__m128i *) ((uint8_t*)uplane_out + pixfc->pixel_count / 4);\
-	__m128i		unpack_out[8];\
+	__m128i		unpack_out[16];\
 	__m128i		downsample_out[2];\
 	/* [0]: l12   	UV 1-4*/\
 	/* [1]: l12   	UV 5-8*/\
@@ -1236,7 +1228,7 @@
 	__m128i		convert_out[5];\
 	while(lines_remaining > 0){\
 		while(pixels_remaining_on_line > 0) {\
-			RGB32_TO_YUV420_NNB_CORE_LOOP2(\
+			RGB24_TO_YUV420_NNB_CORE_LOOP2(\
 					unpack_fn_prefix##instr_set, y_conv_fn,\
 					avg_420_downsample_ag_rb_vectors_##instr_set,\
 					uv_conv_fn, y_pack_fn, uv_pack_fn);\
@@ -1246,8 +1238,8 @@
 		};\
 		/* the inner while loop handles two lines at a time */\
 		lines_remaining -= 2;\
-		rgb_line1 = (__m128i *) ((uint8_t*)rgb_line1 + pixfc->width * 4);\
-		rgb_line2 = (__m128i *) ((uint8_t*)rgb_line2 + pixfc->width * 4);\
+		rgb_line1 = (__m128i *) ((uint8_t*)rgb_line1 + pixfc->width * 3);\
+		rgb_line2 = (__m128i *) ((uint8_t*)rgb_line2 + pixfc->width * 3);\
 		yplane_line1 = (__m128i *) ((uint8_t*)yplane_line1 + pixfc->width);\
 		yplane_line2 = (__m128i *) ((uint8_t*)yplane_line2 + pixfc->width);\
 		pixels_remaining_on_line = pixfc->width;\

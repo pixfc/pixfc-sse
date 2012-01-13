@@ -131,6 +131,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 			{
 				/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 						Decimal values:
+						U		Y		V		Y
 						84      76      255		75
 						43      149     21		148
 						255     29      107		28

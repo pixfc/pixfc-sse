@@ -117,6 +117,17 @@
 				instr_set\
 		)
 
+#define CONVERT2_TO_YUV420P(instr_set)\
+		DO_CONVERSION_1U_2P(\
+				RGB24_TO_YUV420P_RECIPE2,\
+				unpack_rgb24_to_ag_rb_vectors_,\
+				pack_2_y_vectors_to_1_y_vector_sse2,\
+				pack_4_uv_vectors_to_yup_vectors_sse2,\
+				convert_ag_rb_vectors_to_y_vector_sse2,\
+				convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,\
+				instr_set\
+		)
+
 
 
 // RGB24 to YUYV			SSE2 SSSE3
@@ -189,6 +200,7 @@ void		convert_rgb24_to_yuv420p_sse2_ssse3(const struct PixFcSSE *pixfc, void* so
 	CONVERT_TO_YUV420P(sse2_ssse3);
 }
 
+// RGB24 to YUV420P			SSE2
 void		convert_rgb24_to_yuv420p_sse2(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_YUV420P(sse2);
+	CONVERT2_TO_YUV420P(sse2);
 }

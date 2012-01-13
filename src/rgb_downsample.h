@@ -1238,18 +1238,18 @@ EXTERN_INLINE void	avg_420_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
  * rbVect
  * R12 0	B12 0	R34 0	B34 0	R56 0	B56 0	R78 0	B78 0
  */
-EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2(__m128i* in_8_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_420_ag_rb_vectors) {
+EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2(__m128i* in_4_v16i_current_ag_rb_vectors_1, __m128i* in_4_v16i_current_ag_rb_vectors_2, __m128i *out_2_v16i_avg_420_ag_rb_vectors) {
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
 	M128I(scratch4, 0x0LL, 0x0LL);
 
 	// Average AG1-4 on line1 and line2
-	_M(scratch1) = _mm_avg_epu16(in_8_v16i_current_ag_rb_vectors[0], in_8_v16i_current_ag_rb_vectors[4]);
+	_M(scratch1) = _mm_avg_epu16(in_4_v16i_current_ag_rb_vectors_1[0], in_4_v16i_current_ag_rb_vectors_2[0]);
 	// A1 0		G1 0	A2 0	G2 0	A3 0	G3 0	A4 0	G4 0					// PAVGW		1	0.5
 
 	// Average AG5-8 on line1 and line2
-	_M(scratch2) = _mm_avg_epu16(in_8_v16i_current_ag_rb_vectors[2], in_8_v16i_current_ag_rb_vectors[6]);
+	_M(scratch2) = _mm_avg_epu16(in_4_v16i_current_ag_rb_vectors_1[2], in_4_v16i_current_ag_rb_vectors_2[2]);
 	// A5 0		G5 0	A6 0	G6 0	A7 0	G7 0	A8 0	G8 0					// PAVGW		1	0.5
 
 	_M(scratch1) = _mm_shuffle_epi32(_M(scratch1), 0x8D);								// PSHUFD		1	0.5
@@ -1271,11 +1271,11 @@ EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2(__m128i* in_8_v16i_curr
 	//
 	// and repeat for RB
 	// Average AG1-4 on line1 and line2
-	_M(scratch1) = _mm_avg_epu16(in_8_v16i_current_ag_rb_vectors[1], in_8_v16i_current_ag_rb_vectors[5]);
+	_M(scratch1) = _mm_avg_epu16(in_4_v16i_current_ag_rb_vectors_1[1], in_4_v16i_current_ag_rb_vectors_2[1]);
 	// R1 0		B1 0	R2 0	B2 0	R3 0	B3 0	R4 0	B4 0					// PAVGW		1	0.5
 
 	// Average AG5-8 on line1 and line2
-	_M(scratch2) = _mm_avg_epu16(in_8_v16i_current_ag_rb_vectors[3], in_8_v16i_current_ag_rb_vectors[7]);
+	_M(scratch2) = _mm_avg_epu16(in_4_v16i_current_ag_rb_vectors_1[3], in_4_v16i_current_ag_rb_vectors_2[3]);
 	// R5 0		B5 0	R6 0	B6 0	R7 0	B7 0	R8 0	B8 0					// PAVGW		1	0.5
 
 	_M(scratch1) = _mm_shuffle_epi32(_M(scratch1), 0x8D);								// PSHUFD		1	0.5
@@ -1299,8 +1299,8 @@ EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2(__m128i* in_8_v16i_curr
  * an SSSE3 implementation would not bring any improvement to the SSE2 one.
  *
  */
-EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2_ssse3(__m128i* in_8_v16i_current_ag_rb_vectors, __m128i *out_2_v16i_avg_420_ag_rb_vectors) {
-	avg_420_downsample_ag_rb_vectors_sse2(in_8_v16i_current_ag_rb_vectors, out_2_v16i_avg_420_ag_rb_vectors);
+EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors_1, __m128i* in_4_v16i_current_ag_rb_vectors_2, __m128i *out_2_v16i_avg_420_ag_rb_vectors) {
+	avg_420_downsample_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors_1, in_4_v16i_current_ag_rb_vectors_2, out_2_v16i_avg_420_ag_rb_vectors);
 }
 
 #endif /* RGB_DOWNSAMPLE_H_ */
