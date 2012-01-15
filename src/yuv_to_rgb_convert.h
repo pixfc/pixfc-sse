@@ -72,19 +72,19 @@
  */
 EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors)
 {
-	CONST_M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);
+	M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);
 	M128I(uvRCoeffs, 0x0166000001660000LL, 0x0166000001660000LL);
 	M128I(uvGCoeffs, 0xFF4AFFA8FF4AFFA8LL, 0xFF4AFFA8FF4AFFA8LL);
 	M128I(uvBCoeffs, 0x000001C4000001C4LL, 0x000001C4000001C4LL);
 	
 	// U - 128	V - 128
-	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
+	_M(sub128) = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
-	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		3	1
+	_M(uvRCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvRCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*358	U34*0 + V34*358	U56*0 + V56*358	U78*0 + V78*358
 	// C12				C34				C56				C78		(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
@@ -111,7 +111,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		3	1
+	_M(uvGCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvGCoeffs));		// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	// C12					C34					C56					C78
 	
@@ -132,7 +132,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2(__m12
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		3	1
+	_M(uvBCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvBCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	// C12					C34					C56					C78
 	
@@ -338,19 +338,19 @@ EXTERN_INLINE void convert_y_uv_vectors_to_rgb_vectors_sse2(__m128i* in_3_v16i_y
 EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3(__m128i* in_2_v16i_y_uv_vectors, __m128i* out_3_v16i_rgb_vectors)
 {
 	CONST_M128I(shuffMask, 0x0605060502010201LL, 0x0E0D0E0D0A090A09LL);
-	CONST_M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);
+	M128I(sub128, 0xFF80FF80FF80FF80LL, 0xFF80FF80FF80FF80LL);
 	M128I(uvRCoeffs, 0x0166000001660000LL, 0x0166000001660000LL);
 	M128I(uvGCoeffs, 0xFF4AFFA8FF4AFFA8LL, 0xFF4AFFA8FF4AFFA8LL);
 	M128I(uvBCoeffs, 0x000001C4000001C4LL, 0x000001C4000001C4LL);
 	
 	// U - 128	V - 128
-	in_2_v16i_y_uv_vectors[1] = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
+	_M(sub128) = _mm_add_epi16(in_2_v16i_y_uv_vectors[1], _M(sub128));// PADDW		1	0.5
 	
 	//
 	// R
 	// U and V coefficients
 	// 0, 358, 0, 358, 0, 358, 0, 358
-	_M(uvRCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvRCoeffs));		// PMADDWD		3	1
+	_M(uvRCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvRCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*358	U34*0 + V34*358	U56*0 + V56*358	U78*0 + V78*358
 	// C12		C34		C56		C78			(4 * 32-bits values)
 	// A B Sb Sb 		upper 16 bits are always the sign bit due to the coeffs and pixels values
@@ -373,7 +373,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
 	// G
 	// U and V coeffs ()
 	// -88, -182, -88, -182, -88, -182, -88, -182
-	_M(uvGCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvGCoeffs));		// PMADDWD		3	1
+	_M(uvGCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvGCoeffs));		// PMADDWD		3	1
 	// U12*-88 + V12*-182	U34*-88 + V34*-182	U56*-88 + V56*-182	U78*-88 + V78*-182
 	// C12		C34		C56		C78
 	
