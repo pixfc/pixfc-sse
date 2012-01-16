@@ -21,26 +21,26 @@
 #include "common.h"
 #include "pixfc-sse.h"
 #include "yuv_conversion_recipes.h"
-#define CONVERT_TO_RGB32(pack_fn, instr_set)\
+#define CONVERT_TO_RGB32(convert_fn_prefix, pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
 				YUV420P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
-				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
+				convert_fn_prefix,\
 				4,\
 				instr_set\
 		)
 
-#define CONVERT_TO_RGB24(pack_fn, instr_set)\
+#define CONVERT_TO_RGB24(convert_fn_prefix, pack_fn, instr_set)\
 		DO_CONVERSION_3U_1P(\
 				YUV420P_TO_RGB_RECIPE,\
 				unpack_yuv42Xp_to_2_y_vectors_sse2,\
 				unpack_low_yuv42Xp_to_uv_vector_sse2,\
 				unpack_high_yuv42Xp_to_uv_vector_sse2,\
 				pack_fn,\
-				nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_,\
+				convert_fn_prefix,\
 				3,\
 				instr_set\
 		)
@@ -56,12 +56,31 @@
  */
 
 void		convert_yuv420p_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2,	sse2_ssse3);
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
 
 void		convert_yuv420p_to_argb_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
 }
+
+
+void		convert_yuv420p_to_argb_bt601_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_argb_bt601_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
+}
+
+
+void		convert_yuv420p_to_argb_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_argb_bt709_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2);
+}
+
 
 /*
  * 		Y U V 4 2 0 P
@@ -73,11 +92,29 @@ void		convert_yuv420p_to_argb_sse2(const struct PixFcSSE * pixfc, void* source_b
  */
 
 void		convert_yuv420p_to_bgra_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_bgra_vectors_sse2,	sse2_ssse3);
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2,	sse2_ssse3);
 }
 
 void		convert_yuv420p_to_bgra_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_bgra_vectors_sse2, sse2);
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, sse2);
+}
+
+
+void		convert_yuv420p_to_bgra_bt601_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2,	sse2_ssse3);
+}
+
+void		convert_yuv420p_to_bgra_bt601_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, sse2);
+}
+
+
+void		convert_yuv420p_to_bgra_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2,	sse2_ssse3);
+}
+
+void		convert_yuv420p_to_bgra_bt709_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB32(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_4_bgra_vectors_sse2, sse2);
 }
 
 
@@ -90,12 +127,31 @@ void		convert_yuv420p_to_bgra_sse2(const struct PixFcSSE * pixfc, void* source_b
  * 		R G B   2 4
  */
 void		convert_yuv420p_to_rgb24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3);
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3);
 }
 
 void		convert_yuv420p_to_rgb24_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, sse2);
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, sse2);
 }
+
+
+void		convert_yuv420p_to_rgb24_bt601_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_rgb24_bt601_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, sse2);
+}
+
+
+void		convert_yuv420p_to_rgb24_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_rgb24_bt709_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_to_3_rgb24_vectors_sse2_slowpacking, sse2);
+}
+
 
 /*
  *
@@ -107,11 +163,29 @@ void		convert_yuv420p_to_rgb24_sse2(const struct PixFcSSE * pixfc, void* source_
  *
  */
 void		convert_yuv420p_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
 }
 
 void		convert_yuv420p_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	CONVERT_TO_RGB24(pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, sse2);
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, sse2);
+}
+
+
+void		convert_yuv420p_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_bgr24_bt601_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601_, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, sse2);
+}
+
+
+void		convert_yuv420p_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv420p_to_bgr24_bt709_sse2(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB24(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709_, pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, sse2);
 }
 
 /*
@@ -158,7 +232,103 @@ void 		convert_yuv420p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, 
 			*(dst++) = CLIP_PIXEL(r);
 			*(dst++) = CLIP_PIXEL(g);
 			*(dst++) = CLIP_PIXEL(b);
-		} else  {	// PixFcBGR24
+		} else { //PixFcBGR24)
+			*(dst++) = CLIP_PIXEL(b);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(r);
+		}
+	}
+}
+
+
+void 		convert_yuv420p_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out){
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
+	uint32_t 			pixel_num = 0;
+	uint32_t			pixel_count = conv->pixel_count;
+	uint8_t*			y_src = (uint8_t *) in;
+	uint8_t*			u_src = y_src + pixel_count;
+	uint8_t*			v_src = u_src + pixel_count / 2;
+	uint8_t*			dst = (uint8_t *) out;
+	int32_t				r, g, b;
+	int32_t				y, u, v;
+	
+	while(pixel_num++ < pixel_count){
+		y = (*y_src++ - 16) << 8;
+		u = *u_src - 128;
+		v = *v_src - 128;
+		
+		if ((pixel_num & 0x1) == 0) {
+			u_src++;
+			v_src++;
+		}
+		
+		r = (y + (408 * v)) >> 8;
+		g = (y - (100 * u) - (208 * v)) >> 8;
+		b = (y + (772 * u)) >> 8;
+		
+		if (dest_fmt == PixFcARGB) {
+			*(dst++) = 0;		//A
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(b);
+		} else if (dest_fmt == PixFcBGRA) {
+			*(dst++) = CLIP_PIXEL(b);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = 0;		//A
+		} else  if (dest_fmt == PixFcRGB24) {
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(b);
+		} else { //PixFcBGR24)
+			*(dst++) = CLIP_PIXEL(b);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(r);
+		}
+	}
+}
+
+
+void 		convert_yuv420p_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out){
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
+	uint32_t 			pixel_num = 0;
+	uint32_t			pixel_count = conv->pixel_count;
+	uint8_t*			y_src = (uint8_t *) in;
+	uint8_t*			u_src = y_src + pixel_count;
+	uint8_t*			v_src = u_src + pixel_count / 2;
+	uint8_t*			dst = (uint8_t *) out;
+	int32_t				r, g, b;
+	int32_t				y, u, v;
+	
+	while(pixel_num++ < pixel_count){
+		y = (*y_src++ - 16) << 8;
+		u = *u_src - 128;
+		v = *v_src - 128;
+		
+		if ((pixel_num & 0x1) == 0) {
+			u_src++;
+			v_src++;
+		}
+		
+		r = (y + (459 * v)) >> 8;
+		g = (y - (54 * u) - (136 * v)) >> 8;
+		b = (y + (540 * u)) >> 8;
+		
+		if (dest_fmt == PixFcARGB) {
+			*(dst++) = 0;		//A
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(b);
+		} else if (dest_fmt == PixFcBGRA) {
+			*(dst++) = CLIP_PIXEL(b);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = 0;		//A
+		} else  if (dest_fmt == PixFcRGB24) {
+			*(dst++) = CLIP_PIXEL(r);
+			*(dst++) = CLIP_PIXEL(g);
+			*(dst++) = CLIP_PIXEL(b);
+		} else { //PixFcBGR24)
 			*(dst++) = CLIP_PIXEL(b);
 			*(dst++) = CLIP_PIXEL(g);
 			*(dst++) = CLIP_PIXEL(r);

@@ -279,9 +279,19 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, 1, "YUV422P to UYVY"),
 	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, "YUV422P to UYVY"),
 
+	
 	//
 	// YUV420P to ARGB
-	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_yuv420p_to_argb, PixFcYUV420P, PixFcARGB, 64, 2, "YUV420P to ARGB"),
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_yuv420p_to_argb, convert_yuv420p_to_any_rgb, PixFcYUV420P, PixFcARGB, 64, 2, "YUV420P to ARGB"),
+	
+	// YUV420P to BGRA
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_yuv420p_to_bgra, convert_yuv420p_to_any_rgb, PixFcYUV420P, PixFcBGRA, 64, 2, "YUV420P to BGRA"),
+	
+	// YUV420P to RGB24
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_yuv420p_to_rgb24, convert_yuv420p_to_any_rgb, PixFcYUV420P, PixFcRGB24, 64, 2, "YUV420P to RGB24"),
+
+	// YUV420P to BGR24
+	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_yuv420p_to_bgr24, convert_yuv420p_to_any_rgb, PixFcYUV420P, PixFcBGR24, 64, 2, "YUV420P to BGR24"),
 };
 
 const uint32_t		conversion_blocks_count = sizeof(conversion_blocks) / sizeof(conversion_blocks[0]);

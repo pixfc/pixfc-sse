@@ -424,7 +424,7 @@ void 		convert_rgb_to_yuv420_nonsse(const struct PixFcSSE* conv, void* in, void*
 				printf("Unknown output format in non-SSE conversion from RGB\n");
 			}
 
-			col += 2;	// 2 pixels (on two lines) are processed per inner loop
+			col -= 2;	// 2 pixels (on two lines) are processed per inner loop
 		}
 
 		src_line1 += conv->width * input_stride;

@@ -674,8 +674,6 @@
 			print_xmm8u("l1 R 1 - 8:", convert_out);\
 			print_xmm8u("l1 G 1 - 8:", &convert_out[1]);\
 			print_xmm8u("l1 B 1 - 8:", &convert_out[2]);\
-print_xmm8u("l12 UV 1 - 4:", &unpack_out[1]);\
-print_xmm8u("l12 UV 5 - 8:", &unpack_out[3]);\
 			conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
 			print_xmm8u("l1 R 9 - 16:", &convert_out[3]);\
 			print_xmm8u("l1 G 9 - 16:", &convert_out[4]);\

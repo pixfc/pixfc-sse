@@ -387,7 +387,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_sse2_ssse3
 	// B
 	// U and V coeffs ()
 	// 0, 452, 0, 452, 0, 452, 0, 452
-	_M(uvBCoeffs) = _mm_madd_epi16(in_2_v16i_y_uv_vectors[1], _M(uvBCoeffs));		// PMADDWD		3	1
+	_M(uvBCoeffs) = _mm_madd_epi16(_M(sub128), _M(uvBCoeffs));		// PMADDWD		3	1
 	// U12*0 + V12*452	U34*0 + V34*452	U56*0 + V56*452	U78*0 + V78*452
 	// 0 C12		0 C34		0 C56		0 C78
 	
@@ -1377,7 +1377,7 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
  *	 CONST_M128I(shuff1,	0xFFFF0504FFFF0100LL, 0xFFFF0D0CFFFF0908LL);
  *	 CONST_M128I(shuff2,	0x0504FFFF0100FFFFLL, 0x0D0CFFFF0908FFFFLL);
  *	 M128I(sub16, 0xFFF0FFF0FFF0FFF0LL, 0xFFF0FFF0FFF0FFF0LL);
- *	 *	 M128I(uvOdd, 0x0LL, 0x0LL);
+ *	 M128I(uvOdd, 0x0LL, 0x0LL);
  *	 M128I(uvEven, 0x0LL, 0x0LL);
  *	 
  *	 // Y - 16
