@@ -60,7 +60,7 @@ def	get_timings_from_unit_testing(file_path):
 	
 def usage():
 	print "Usage: ", sys.argv[0], " [-t] <path to unit-testing 1> <path to unit-testing 2>"
-	print "Run the 'unit-testing' app twice and ompare the execution speeds of conversion routines."
+	print "Run the 'unit-testing' app twice and compare the execution speeds of conversion routines."
 	print "If '-t' is specified, the two paths point to a text file containing the output of 'unit-testing'."
 	print "Otherwise, the two paths point to two 'unit-testing' executables."
 	sys.exit(1)

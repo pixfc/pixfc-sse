@@ -47,7 +47,7 @@ static int		time_conversion_block(struct PixFcSSE *pixfc, struct timings *timing
 	// Allocate and fill source buffers
 	for ( i = 0; i < NUM_INPUT_BUFFERS; i++) {
 		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[i]) != 0) {
-			log("Error allocating input buffer\n");
+			pixfc_log("Error allocating input buffer\n");
 			goto done;
 		}
 
@@ -56,7 +56,7 @@ static int		time_conversion_block(struct PixFcSSE *pixfc, struct timings *timing
 
 	// Allocate destination buffers
 	if (allocate_aligned_buffer(pixfc->dest_fmt, w, h, &output) != 0){
-		log("Error allocating out buffer\n");
+		pixfc_log("Error allocating out buffer\n");
 		goto done;
 	}
 
@@ -89,11 +89,10 @@ done:
 
 static uint32_t		time_conversion_blocks() {
 	uint32_t			index = 0;
-	uint32_t			ret;
 	struct PixFcSSE		pixfc;
 	struct timings		timings;
 
-	log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
+	pixfc_log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
 	printf("%-80s\t%10s\t%10s\t%10s\t%5s\n","Conversion Block Name", "Avg Time", "Avg User Time",
 			"Avg Sys Time", "Ctx Sw");
 
@@ -142,7 +141,7 @@ static uint32_t			check_formats_enum() {
 		// descriptions array must be sorted according to the
 		// PixFcPixelFormat enum. Here we enforce this rule.
 		if (pixfmt_descriptions[index].pixFcFormat != index) {
-			log("Element at index %d in pixel format description does not"
+			pixfc_log("Element at index %d in pixel format description does not"
 					" match the expected PixFcPixelFormat enum entry (it "
 					"matches entry %d)\n", index, pixfmt_descriptions[index].pixFcFormat);
 			result = -1;
@@ -152,7 +151,7 @@ static uint32_t			check_formats_enum() {
 
 	// Check that both arrays have the same number of elements
 	if (index != PixFcFormatCount) {
-		log("The number of pixel format descriptions (%d does not"
+		pixfc_log("The number of pixel format descriptions (%d does not"
 				" match the number of PixFcPixelFormat entries (%d)).\n",
 				index, PixFcFormatCount);
 		result = -1;
@@ -174,19 +173,19 @@ static int			check_unaligned_conversions() {
 
 		// Allocate the input & output buffers
 		if (allocate_aligned_buffer(pixfc.source_fmt, w, h, &input[0]) != 0) {
-			log("Error allocating aligned input buffer\n");
+			pixfc_log("Error allocating aligned input buffer\n");
 			return -1;
 		}
 		if (allocate_unaligned_buffer(pixfc.source_fmt, w, h, &input[1]) != 0) {
-			log("Error allocating unaligned input buffer\n");
+			pixfc_log("Error allocating unaligned input buffer\n");
 			return -1;
 		}
 		if (allocate_aligned_buffer(pixfc.dest_fmt, w, h, &output[0]) != 0) {
-			log("Error allocating aligned output buffer\n");
+			pixfc_log("Error allocating aligned output buffer\n");
 			return -1;
 		}
 		if (allocate_unaligned_buffer(pixfc.dest_fmt, w, h, &output[1]) != 0) {
-			log("Error allocating unaligned output buffer\n");
+			pixfc_log("Error allocating unaligned output buffer\n");
 			return -1;
 		}
 
@@ -229,32 +228,32 @@ static int			check_unaligned_conversions() {
  */
 int 				main(int argc, char **argv) {
 
-	log("\n");
-	log("\t\tU N I T   T E S T I N G\n");
-	log("\n");
-	log("Checking PixFcPixelFormat enum and description arrays...\n");
+	pixfc_log("\n");
+	pixfc_log("\t\tU N I T   T E S T I N G\n");
+	pixfc_log("\n");
+	pixfc_log("Checking PixFcPixelFormat enum and description arrays...\n");
 	if (check_formats_enum() == 0)
-		log("PASSED\n");
+		pixfc_log("PASSED\n");
 	else
-		log("FAILED\n");
+		pixfc_log("FAILED\n");
 
-	log("\n");
-	log("\n");
-	log("Testing conversion from aligned / unaligned buffers...\n");
+	pixfc_log("\n");
+	pixfc_log("\n");
+	pixfc_log("Testing conversion from aligned / unaligned buffers...\n");
 	if (check_unaligned_conversions() == 0)
-		log("PASSED\n");
+		pixfc_log("PASSED\n");
 	else
-		log("FAILED\n");
+		pixfc_log("FAILED\n");
 
-	log("\n");
-	log("\n");
-	log("Checking conversion block timing ... \n");
+	pixfc_log("\n");
+	pixfc_log("\n");
+	pixfc_log("Checking conversion block timing ... \n");
 	if (time_conversion_blocks() == 0)
-		log("PASSED\n");
+		pixfc_log("PASSED\n");
 	else
-		log("FAILED\n");
+		pixfc_log("FAILED\n");
 
-	log("\n");
+	pixfc_log("\n");
 	return 0;
 }
 

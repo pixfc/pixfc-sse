@@ -29,10 +29,10 @@
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
-#define PIXFC_FLAGS	 PixFcFlag_NNbResampling// | PixFcFlag_SSE2Only
-//#define PIXFC_FLAGS	PixFcFlag_NoSSE
+//#define PIXFC_FLAGS	 PixFcFlag_NNbResampling// | PixFcFlag_SSE2Only
+#define PIXFC_FLAGS	PixFcFlag_NoSSE  |  PixFcFlag_NNbResampling
 //#define PIXFC_FLAGS	PixFcFlag_Default
-//#define PIXFC_FLAGS		PixFcFlag_NNbResampling
+
 
 
 
@@ -115,14 +115,14 @@ int 		main(int argc, char **argv) {
 	// If we were given an input file name, get its contents
 	if (src_filename != NULL) {
 		if (get_buffer_from_file(src_fmt, w, h, src_filename, (void **)&in) < 0) {
-			log("Error getting buffer from file\n");
+			pixfc_log("Error getting buffer from file\n");
 			return 1;
 		}
 	} else {
 		// Otherwise, allocate a buffer of the given width and height
 		// and fill in buffer with predefined pattern
 		if (allocate_aligned_buffer(src_fmt, w, h, (void **)&in) != 0) {
-			log("Error allocating in buffer\n");
+			pixfc_log("Error allocating in buffer\n");
 			return 1;
 		}
 
@@ -137,32 +137,32 @@ int 		main(int argc, char **argv) {
 
 	// allocate out buffer
 	if (allocate_aligned_buffer(dst_fmt, w, h, (void **)&out) != 0) {
-		log("Error allocating out buffer\n");
+		pixfc_log("Error allocating out buffer\n");
 		free(in);
 		return 1;
 	}
 
-	log("Image size:\t%d x %d\n", w, h);
-	log("Input format:\t%s\n", pixfmt_descriptions[src_fmt].name);
-	log("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
+	pixfc_log("Image size:\t%d x %d\n", w, h);
+	pixfc_log("Input format:\t%s\n", pixfmt_descriptions[src_fmt].name);
+	pixfc_log("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
 
 	// create struct pixfc
 	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, PIXFC_FLAGS) != 0)
 	{
-		log("error creating struct pixfc\n");
+		pixfc_log("error creating struct pixfc\n");
 		free(in);
 		free(out);
 		return 1;
 	}
 
-	log("%10s\t%10s\t%10s\t%5s\n", "Avg Time", "Avg User Time", "Avg Sys Time", "Ctx Sw");
+	pixfc_log("%10s\t%10s\t%10s\t%5s\n", "Avg Time", "Avg User Time", "Avg Sys Time", "Ctx Sw");
 
 	// Run conversion function
 	do_timing(NULL);
 	pixfc->convert(pixfc, in, out);
 	do_timing(&timings);
 
-	log("%10f\t%10f\t%10f\t%5.1f\n",
+	pixfc_log("%10f\t%10f\t%10f\t%5.1f\n",
 			(double)((double)timings.total_time_ns / 1000000.0),
 			(double)((double)timings.user_time_ns / 1000000.0),
 			(double)((double)timings.sys_time_ns / 1000000.0),

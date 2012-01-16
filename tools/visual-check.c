@@ -109,10 +109,24 @@ static const InputFile* 	find_input_file_for_format(PixFcPixelFormat format){
 // Use the provided conversion block to convert image of given width and height in in buffer to out buffer
 static int		do_image_conversion(const struct ConversionBlock *block, void* in, void *out, uint32_t w, uint32_t h) {
 	struct PixFcSSE *	pixfc = NULL;
+	uint32_t			flags = PixFcFlag_Default;
+	
+	// Synthesize the flags to pass to create_pixfc() based on the conversion block's flags
+	if (block->attributes & NNB_RESAMPLING)
+		flags |= PixFcFlag_NNbResampling;
+	
+	if (block->required_cpu_features == CPUID_FEATURE_NONE)
+		flags |= PixFcFlag_NoSSE;
+	
+	if (block->attributes & BT601_CONVERSION)
+		flags |= PixFcFlag_BT601Conversion;
+
+	if (block->attributes & BT709_CONVERSION)
+		flags |= PixFcFlag_BT709Conversion;
 	
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, PixFcFlag_Default) != 0) {
-		log("Error create struct pixfc\n");
+	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, flags) != 0) {
+		pixfc_log("Error create struct pixfc\n");
 		return -1;
 	}
 	
@@ -166,7 +180,7 @@ int 		main(int argc, char **argv) {
 			
 			in_file = find_input_file_for_format(conversion_blocks[index].source_fmt);
 			if (in_file == NULL) {
-				log("Error looking for input file for format '%s'\n",
+				pixfc_log("Error looking for input file for format '%s'\n",
 					   pixfmt_descriptions[conversion_blocks[index].source_fmt].name);
 				return 1;
 			}
@@ -178,7 +192,7 @@ int 		main(int argc, char **argv) {
 
 				// Load buffer from specified file
 				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
-					log("Error getting buffer from input file '%s'\n", in_file->filename);
+					pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
 					return 1;
 				}
 			} else {
@@ -187,11 +201,11 @@ int 		main(int argc, char **argv) {
 
 				// allocate buffer
 				if (allocate_aligned_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
-					log("Error allocating memory\n");
+					pixfc_log("Error allocating memory\n");
 					return -1;
 				}
 				if (fill_argb_image_with_rgb_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in) != 0) {
-					log("Error getting buffer from RGB GIMP image\n");
+					pixfc_log("Error getting buffer from RGB GIMP image\n");
 					return 1;
 				}
 			}
@@ -201,7 +215,7 @@ int 		main(int argc, char **argv) {
 		ALIGN_FREE(out);
 		
 		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
-			log("Error allocating output buffer");
+			pixfc_log("Error allocating output buffer");
 			return 1;
 		}
 

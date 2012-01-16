@@ -29,7 +29,7 @@
 #include "pixfc-sse.h"
 
 // printf helper which prints file name and line number
-#define log(fmt, ...) 	do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
+#define pixfc_log(fmt, ...) 	do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
 								__FILE__, __LINE__, ## __VA_ARGS__);\
 								fflush(stderr); } while(0)
 
