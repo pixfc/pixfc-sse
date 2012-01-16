@@ -38,8 +38,6 @@
 #include "yuv_repack.h"
 #include "yuv_upsample.h"
 #include "yuv_to_rgb_convert.h"
-#include "yuv_to_rgb_convert_bt601.h"
-#include "yuv_to_rgb_convert_bt709.h"
 #endif
 
 /*
