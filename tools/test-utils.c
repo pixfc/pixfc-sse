@@ -37,6 +37,7 @@
 	#endif
 #endif
 
+#include "common.h"
 #include "conversion_blocks.h"
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
