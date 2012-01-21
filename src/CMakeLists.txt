@@ -69,9 +69,9 @@ if(DEBUG)
 
 	# Add compiler specific flags	
 	if(APPLE)
-		add_definitions(-gdwarf-2 -Wall -Winline -Wno-implicit-function-declaration )
+		add_definitions(-ggdb3 -O0 -Wall -Winline -Wno-implicit-function-declaration )
 	elseif(UNIX)
-		add_definitions(-gdwarf-2 -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
+		add_definitions(-ggdb3 -O0  -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
 	elseif(WIN32)
 #		add_definitions(-Wno-implicit-function-declaration)
 	endif(APPLE)

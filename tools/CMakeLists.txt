@@ -6,6 +6,21 @@ if(NOT WIN32)
 	add_definitions(-Wno-trigraphs -msse2)
 endif(NOT WIN32)
 
+# Check if we are building in debug mode
+if(DEBUG)
+        include_directories(AFTER .)
+        add_definitions(-DDEBUG)
+
+        # Add compiler specific flags   
+        if(APPLE)
+                add_definitions(-ggdb -O0 -Wall -Winline -Wno-implicit-function-declaration )
+        elseif(UNIX)
+                add_definitions(-ggdb -O0 -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
+        elseif(WIN32)
+#               add_definitions(-Wno-implicit-function-declaration)
+        endif(APPLE)
+endif(DEBUG)
+
 #
 # UNIT TESTING TARGET
 #
