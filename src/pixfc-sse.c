@@ -43,8 +43,13 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	}
 
 	// If we were told to require conversion blocks performing NNB resampling,
-	// enforce it.
-	if ((flags & PixFcFlag_NNbResamplingOnly) && ! (block->attributes & NNB_RESAMPLING)) {
+	// enforce it, but keep going if the user asked for a non-SSE routine
+	// (PixFcFlag_NoSSE) but did not specify NNB resampling
+	// (PixFcFlag_NNbResamplingOnly not set). (because Some non-SSE conversion
+	// blocks only do NNB resampling, so then return the non-SSE routine anyway
+	// as there is no other routine that would satisfy the NoSSE flag)
+	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))
+		&& ! ((flags & PixFcFlag_NoSSE) && ((flags & PixFcFlag_NNbResamplingOnly) == 0))){
 		dprint("Enforcing NNbResampling flag\n");
 		return PIXFC_CONVERSION_NOT_SUPPORTED;
 	}

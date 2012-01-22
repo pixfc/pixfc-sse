@@ -106,32 +106,18 @@ static const InputFile* 	find_input_file_for_format(PixFcPixelFormat format){
 
 
 //
-// Use the provided conversion block to convert image of given width and height in in buffer to out buffer
-static int		do_image_conversion(const struct ConversionBlock *block, void* in, void *out, uint32_t w, uint32_t h) {
+// Use the conversion block at the provided index to convert image of given width and height in in buffer to out buffer
+static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w, uint32_t h) {
 	struct PixFcSSE *	pixfc = NULL;
-	uint32_t			flags = PixFcFlag_Default;
-	
-	// Synthesize the flags to pass to create_pixfc() based on the conversion block's flags
-	if (block->attributes & NNB_RESAMPLING)
-		flags |= PixFcFlag_NNbResampling;
-	
-	if (block->required_cpu_features == CPUID_FEATURE_NONE)
-		flags |= PixFcFlag_NoSSE;
-	
-	if (block->attributes & BT601_CONVERSION)
-		flags |= PixFcFlag_BT601Conversion;
-
-	if (block->attributes & BT709_CONVERSION)
-		flags |= PixFcFlag_BT709Conversion;
 	
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, block->source_fmt, block->dest_fmt, w, h, flags) != 0) {
+	if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
 		pixfc_log("Error create struct pixfc\n");
 		return -1;
 	}
 	
 	// Perform conversion
-	block->convert_fn(pixfc, in, out);
+	pixfc->convert(pixfc, in, out);
 		
 	destroy_pixfc(pixfc);
 	
@@ -222,7 +208,7 @@ int 		main(int argc, char **argv) {
 		printf("%-60s %dx%d\n", conversion_blocks[index].name, in_file->width, in_file->height);
 		
 		// Do conversion
-		if (do_image_conversion(&conversion_blocks[index], in, out, in_file->width, in_file->height) != 0)
+		if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
 			return -1;
 		
 		// Save output buffer

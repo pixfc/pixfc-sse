@@ -89,7 +89,7 @@ done:
 
 static uint32_t		time_conversion_blocks() {
 	uint32_t			index = 0;
-	struct PixFcSSE		pixfc;
+	struct PixFcSSE *	pixfc;
 	struct timings		timings;
 
 	pixfc_log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
@@ -97,13 +97,20 @@ static uint32_t		time_conversion_blocks() {
 			"Avg Sys Time", "Ctx Sw");
 
 	// Loop over all conversion blocks
-	while(enumerate_supported_conversions(index, &pixfc, WIDTH, HEIGHT) == 0) {
+	for(index = 0; index < conversion_blocks_count; index++) {
+		if (create_pixfc_for_conversion_block(index, &pixfc, WIDTH, HEIGHT) != 0) {
+			printf("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
+			continue;
+		}
+
 		// Reset timing info
 		memset((void *)&timings, 0, sizeof(timings));
 
 		// Time this conversion block
-		if (time_conversion_block(&pixfc, &timings) != 0)
+		if (time_conversion_block(pixfc, &timings) != 0)
 			return -1;
+
+		destroy_pixfc(pixfc);
 
 		printf("%-80s\t%10f\t%10f\t%10f\t%5.1f\n",
 				conversion_blocks[index].name,
@@ -121,9 +128,6 @@ static uint32_t		time_conversion_blocks() {
 						|| (conversion_blocks[(index + 1)].dest_fmt !=
 								conversion_blocks[index].dest_fmt)))
 			printf("\n");
-
-		// move on to next conversion block
-		index++;
 	}
 
 	return 0;
@@ -161,63 +165,210 @@ static uint32_t			check_formats_enum() {
 }
 
 static int			check_unaligned_conversions() {
-	struct PixFcSSE 				pixfc;
+	struct PixFcSSE *				pixfc;
 	void *							input[2] = { NULL };	// 1 aligned & 1 unaligned input buffer
 	void *							output[2] = { NULL };	// 1 aligned & 1 unaligned output buffer
 	uint32_t						w = 64,	h = 2, index = 0;
 
 	// Loop over all conversion blocks
-	while(enumerate_supported_conversions(index, &pixfc, w, h) == 0) {
+	for(index = 0; index < conversion_blocks_count; index++) {
+		if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
+			printf("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
+			continue;
+		}
 
 		printf("%-80s\t", conversion_blocks[index].name);
 
 		// Allocate the input & output buffers
-		if (allocate_aligned_buffer(pixfc.source_fmt, w, h, &input[0]) != 0) {
+		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[0]) != 0) {
 			pixfc_log("Error allocating aligned input buffer\n");
 			return -1;
 		}
-		if (allocate_unaligned_buffer(pixfc.source_fmt, w, h, &input[1]) != 0) {
+		if (allocate_unaligned_buffer(pixfc->source_fmt, w, h, &input[1]) != 0) {
 			pixfc_log("Error allocating unaligned input buffer\n");
 			return -1;
 		}
-		if (allocate_aligned_buffer(pixfc.dest_fmt, w, h, &output[0]) != 0) {
+		if (allocate_aligned_buffer(pixfc->dest_fmt, w, h, &output[0]) != 0) {
 			pixfc_log("Error allocating aligned output buffer\n");
 			return -1;
 		}
-		if (allocate_unaligned_buffer(pixfc.dest_fmt, w, h, &output[1]) != 0) {
+		if (allocate_unaligned_buffer(pixfc->dest_fmt, w, h, &output[1]) != 0) {
 			pixfc_log("Error allocating unaligned output buffer\n");
 			return -1;
 		}
 
 		// Fill input buffers
-		fill_image(pixfc.source_fmt, IMG_SIZE(pixfc.source_fmt, w, h), input[0]);
-		fill_image(pixfc.source_fmt, IMG_SIZE(pixfc.source_fmt, w, h), input[1]);
+		fill_image(pixfc->source_fmt, IMG_SIZE(pixfc->source_fmt, w, h), input[0]);
+		fill_image(pixfc->source_fmt, IMG_SIZE(pixfc->source_fmt, w, h), input[1]);
 
 		// Do conversion with aligned input & output buffers
-		pixfc.convert(&pixfc, input[0], output[0]);
+		pixfc->convert(pixfc, input[0], output[0]);
 		printf(".");
 
 		// Do conversion with aligned input & unaligned output buffers
-		pixfc.convert(&pixfc, input[0], output[1]);
+		pixfc->convert(pixfc, input[0], output[1]);
 		printf(".");
 
 		// Do conversion with unaligned input & aligned output buffers
-		pixfc.convert(&pixfc, input[1], output[0]);
+		pixfc->convert(pixfc, input[1], output[0]);
 		printf(".");
 
 		// Do conversion with unaligned input & output buffers
-		pixfc.convert(&pixfc, input[1], output[1]);
+		pixfc->convert(pixfc, input[1], output[1]);
 		printf(". OK !\n");
 
 		// Free resources
+		destroy_pixfc(pixfc);
 		ALIGN_FREE(input[0]);
 		free(input[1]);
 		ALIGN_FREE(output[0]);
 		free(output[1]);
-
-		// Move on to next conversion block
-		index++;
 	}
+
+	return 0;
+}
+
+uint32_t		check_conversion_enumeration() {
+	uint32_t 			index;
+	struct PixFcSSE * 	pixfc = NULL;
+	uint32_t			w = 64, h = 2;
+
+	for(index = 0; index < conversion_blocks_count; index++) {
+		pixfc_log("Checking '%s' ... \n", conversion_blocks[index].name);
+
+		if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
+			pixfc_log("Unable to test conversion block\n");
+			continue;
+		}
+
+		if (pixfc->convert != conversion_blocks[index].convert_fn) {
+			pixfc_log("Wrong conversion function returned for index %u\n", index);
+			return -1;
+		}
+
+		if (pixfc->source_fmt!= conversion_blocks[index].source_fmt) {
+			pixfc_log("Wrong source format returned for index %u\n", index);
+			return -1;
+		}
+
+		if (pixfc->dest_fmt!= conversion_blocks[index].dest_fmt) {
+			pixfc_log("Wrong destination format returned for index %u\n", index);
+			return -1;
+		}
+		pixfc_log(" OK !\n");
+	}
+
+	return 0;
+}
+
+uint32_t 	do_flag_check(PixFcFlag flag, uint32_t expected_index) {
+	struct PixFcSSE *	pixfc;
+	uint32_t			result = -1;
+
+	if (create_pixfc(&pixfc, PixFcARGB, PixFcYUYV, 64, 2, flag) == 0) {
+		if (pixfc->convert != conversion_blocks[expected_index].convert_fn)
+			pixfc_log("Wrong conversion function\n");
+		else
+			result = 0;
+
+		destroy_pixfc(pixfc);
+	} else
+		pixfc_log("Error creating pixfc\n");
+
+	return result;
+}
+
+// Checks that passing PixFcFlags_* result in the right conversion block
+// being chosen.
+uint32_t	check_pixfc_flags() {
+	// Default flag
+	pixfc_log("Checking default flag\n");
+	if (do_flag_check(PixFcFlag_Default, 3) != 0) {
+		pixfc_log("Default flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	// NoSSE flag
+	pixfc_log("Checking NoSSE flag\n");
+	if (do_flag_check(PixFcFlag_NoSSE, 12) != 0) {
+		pixfc_log("NoSSE flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking NoSSE | NNB flag\n");
+	// NoSSE | NNBflag
+	if (do_flag_check(PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, 12) != 0) {
+		pixfc_log("NoSSE | NNB flags check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking SSE2Only flag\n");
+	// SSE2Only flag
+	if (do_flag_check(PixFcFlag_SSE2Only, 9) != 0) {
+		pixfc_log("SSE2Only flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking SSE2Only | NNB flag\n");
+	// SSE2Only | NNB flag
+	if (do_flag_check(PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, 6) != 0) {
+		pixfc_log("SSE2Only | NNB flags check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking Bt601 flag\n");
+	// BT601 flag
+	if (do_flag_check(PixFcFlag_BT601Conversion, 4) != 0) {
+		pixfc_log("Bt601 flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking Bt601 | NNB flag\n");
+	// BT601 | NNB flag
+	if (do_flag_check(PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly, 1) != 0) {
+		pixfc_log("Bt601 | NNB flags check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking Bt709 flag\n");
+	// BT709 flag
+	if (do_flag_check(PixFcFlag_BT709Conversion, 5) != 0) {
+		pixfc_log("Bt709 flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking Bt709 | NNB flag\n");
+	// BT709 | NNB flag
+	if (do_flag_check(PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly, 2) != 0) {
+		pixfc_log("Bt709 | NNB flags check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
+
+	pixfc_log("Checking NNBOnly flag\n");
+	// NNB flag
+	if (do_flag_check(PixFcFlag_NNbResamplingOnly, 0) != 0) {
+		pixfc_log("NNB flag check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
 
 	return 0;
 }
@@ -230,28 +381,54 @@ int 				main(int argc, char **argv) {
 
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
+
+	pixfc_log("\n");
+	pixfc_log("Running internal checks ...\n");
+	if (check_conversion_enumeration() != 0) {
+		pixfc_log("FAILED\n");
+		return -1;
+	}
+	pixfc_log("PASSED\n");
+
+
+	pixfc_log("\n");
+	pixfc_log("\n");
+	pixfc_log("Running PixFcFlags checks ...\n");
+	if (check_pixfc_flags()!= 0)
+		pixfc_log("FAILED\n");
+		// dont exit as this one may fail if the CPU doesnt have SSSE3
+	else
+		pixfc_log("PASSED\n");
+
+
+	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking PixFcPixelFormat enum and description arrays...\n");
-	if (check_formats_enum() == 0)
-		pixfc_log("PASSED\n");
-	else
+	if (check_formats_enum() != 0) {
 		pixfc_log("FAILED\n");
+		return -1;
+	}
+	pixfc_log("PASSED\n");
+
 
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Testing conversion from aligned / unaligned buffers...\n");
-	if (check_unaligned_conversions() == 0)
-		pixfc_log("PASSED\n");
-	else
+	if (check_unaligned_conversions() != 0) {
 		pixfc_log("FAILED\n");
+		return -1;
+	}
+	pixfc_log("PASSED\n");
+
 
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking conversion block timing ... \n");
-	if (time_conversion_blocks() == 0)
-		pixfc_log("PASSED\n");
-	else
+	if (time_conversion_blocks() != 0) {
 		pixfc_log("FAILED\n");
+		return -1;
+	}
+	pixfc_log("PASSED\n");
 
 	pixfc_log("\n");
 	return 0;
