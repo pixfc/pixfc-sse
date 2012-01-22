@@ -193,147 +193,85 @@ void		convert_yuv420p_to_bgr24_bt709_sse2(const struct PixFcSSE * pixfc, void* s
  * Non SSE conversion block (nearest neighbour upsampling)
  *
  */
-void 		convert_yuv420p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, void* out){
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			y_src = (uint8_t *) in;
-	uint8_t*			u_src = y_src + pixel_count;
-	uint8_t*			v_src = u_src + pixel_count / 2;
-	uint8_t*			dst = (uint8_t *) out;
-	int32_t				r, g, b;
-	int32_t				y, u, v;
-
-	while(pixel_num++ < pixel_count){
-		y = (*y_src++) << 8;
-		u = *u_src - 128;
-		v = *v_src - 128;
-
-		if ((pixel_num & 0x1) == 0) {
-			u_src++;
-			v_src++;
-		}
-
-		r = (y + (359 * v)) >> 8;
-		g = (y - (88 * u) - (183 * v)) >> 8;
-		b = (y + (454 * u)) >> 8;
-
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else { //PixFcBGR24)
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-	}
+#define 	DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(fn_name, y_off, u_off, v_off, ru_coef, rv_coef, gu_coef, gv_coef, bu_coef, bv_coef) \
+void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+	uint32_t			output_stride = ((dest_fmt == PixFcARGB) || (dest_fmt == PixFcBGRA)) ? 4 : 3;\
+	uint32_t 			pixels_remaining_on_line = conv->width;\
+	uint32_t			lines_remaining = conv->height;\
+	uint32_t			pixel_count = conv->pixel_count;\
+	uint8_t*			y_src_line1 = (uint8_t *) in;\
+	uint8_t*			y_src_line2 = y_src_line1 + conv->width;\
+	uint8_t*			u_src = y_src_line1 + pixel_count;\
+	uint8_t*			v_src = u_src + pixel_count / 4;\
+	uint8_t*			dst_line1 = (uint8_t *) out;\
+	uint8_t*			dst_line2 = dst_line1 + conv->width * output_stride;\
+	int32_t				r_line1, g_line1, b_line1;\
+	int32_t				r_line2, g_line2, b_line2;\
+	int32_t				y, u, v;\
+	while(lines_remaining > 0){\
+		while(pixels_remaining_on_line-- > 0) {\
+			y = (*y_src_line1++ + y_off) << 8;\
+			u = *u_src + u_off;\
+			v = *v_src + v_off;\
+			r_line1 = (y + (ru_coef * u) + (rv_coef * v)) >> 8;\
+			g_line1 = (y + (gu_coef * u) + (gv_coef * v)) >> 8;\
+			b_line1 = (y + (bu_coef * u) + (bv_coef * v)) >> 8;\
+			y = (*y_src_line2++) << 8;\
+			r_line2 = (y + (ru_coef * u) + (rv_coef * v)) >> 8;\
+			g_line2 = (y + (gu_coef * u) + (gv_coef * v)) >> 8;\
+			b_line2 = (y + (bu_coef * u) + (bv_coef * v)) >> 8;\
+			if ((pixels_remaining_on_line & 0x1) == 0) {\
+				u_src++;\
+				v_src++;\
+			}\
+			if (dest_fmt == PixFcARGB) {\
+				*(dst_line1++) = 0;\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line2++) = 0;\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+			} else if (dest_fmt == PixFcBGRA) {\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = 0;\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = 0;\
+			} else  if (dest_fmt == PixFcRGB24) {\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+			} else {\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+			}\
+		}\
+		pixels_remaining_on_line = conv->width;\
+		lines_remaining -= 2;\
+		y_src_line1 += conv->width;\
+		y_src_line2 += conv->width;\
+		dst_line1 += conv->width * output_stride;\
+		dst_line2 += conv->width * output_stride;\
+	}\
 }
 
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse, 0, -128, -128, 0, 359, -88, -183, 454, 0);
 
-void 		convert_yuv420p_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out){
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			y_src = (uint8_t *) in;
-	uint8_t*			u_src = y_src + pixel_count;
-	uint8_t*			v_src = u_src + pixel_count / 2;
-	uint8_t*			dst = (uint8_t *) out;
-	int32_t				r, g, b;
-	int32_t				y, u, v;
-	
-	while(pixel_num++ < pixel_count){
-		y = (*y_src++ - 16) << 8;
-		u = *u_src - 128;
-		v = *v_src - 128;
-		
-		if ((pixel_num & 0x1) == 0) {
-			u_src++;
-			v_src++;
-		}
-		
-		r = (y + (408 * v)) >> 8;
-		g = (y - (100 * u) - (208 * v)) >> 8;
-		b = (y + (772 * u)) >> 8;
-		
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else { //PixFcBGR24)
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-	}
-}
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt601_nonsse, -16, -128, -128, 0, 408, -100, -208, 772, 0);
 
-
-void 		convert_yuv420p_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out){
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			y_src = (uint8_t *) in;
-	uint8_t*			u_src = y_src + pixel_count;
-	uint8_t*			v_src = u_src + pixel_count / 2;
-	uint8_t*			dst = (uint8_t *) out;
-	int32_t				r, g, b;
-	int32_t				y, u, v;
-	
-	while(pixel_num++ < pixel_count){
-		y = (*y_src++ - 16) << 8;
-		u = *u_src - 128;
-		v = *v_src - 128;
-		
-		if ((pixel_num & 0x1) == 0) {
-			u_src++;
-			v_src++;
-		}
-		
-		r = (y + (459 * v)) >> 8;
-		g = (y - (54 * u) - (136 * v)) >> 8;
-		b = (y + (540 * u)) >> 8;
-		
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else { //PixFcBGR24)
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-	}
-}
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse, -16, -128, -128, 0, 459, -54, -136, 540, 0);
 
 
