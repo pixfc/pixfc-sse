@@ -154,8 +154,10 @@ int main (int argc, char **argv) {
 			*y_line2++ = *(src + width * 2 + 4);
 			*y_line2++ = *(src + width * 2 + 6);
 
-			*u_plane++ = (*(src + 1) + *(src + 5) + *(src + width * 2 + 1) + *(src + width * 2 + 5)) / 4;
-			*v_plane++ = (*(src + 3) + *(src + 7) + *(src + width * 2 + 3) + *(src + width * 2 + 7)) / 4;
+			*u_plane++ = (*(src + 1) + *(src + width * 2 + 1)) / 2;
+			*u_plane++ = (*(src + 5) + *(src + width * 2 + 5)) / 2;
+			*v_plane++ = (*(src + 3) + *(src + width * 2 + 3)) / 2;
+			*v_plane++ = (*(src + 7) + *(src + width * 2 + 7)) / 2;
 
 			src += 8;
 			pixels_remaining_on_line -= 4;
