@@ -1,398 +1,478 @@
-Conversion Block Name                                                                     Avg Time      Avg User Time   Avg Sys Time    Ctx Sw
-ARGB to YUYV - SSE2 / SSSE3 - fast resampling                                   	  1.552271	  0.900000	  0.000000	  0.0
-ARGB to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.619918	  0.100000	  0.100000	  0.0
-ARGB to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.608405	  0.100000	  0.000000	  0.0
-ARGB to YUYV - SSE2 / SSSE3                                                     	  2.336139	  0.200000	  0.000000	  0.0
-ARGB to YUYV - bt.601 - SSE2 / SSSE3                                            	  2.403457	  0.100000	  0.000000	  0.0
-ARGB to YUYV - bt.709 - SSE2 / SSSE3                                            	  2.405633	  0.300000	  0.100000	  0.0
-ARGB to YUYV - SSE2 - fast resampling                                           	  1.685131	  0.300000	  0.000000	  0.0
-ARGB to YUYV - bt.601 - SSE2 - fast resampling                                  	  1.754689	  0.100000	  0.000000	  0.0
-ARGB to YUYV - bt.709 - SSE2 - fast resampling                                  	  1.750306	  0.100000	  0.000000	  0.0
-ARGB to YUYV - SSE2                                                             	  2.195700	  0.400000	  0.000000	  0.0
-ARGB to YUYV - bt.601 - SSE2                                                    	  2.197753	  0.500000	  0.100000	  0.0
-ARGB to YUYV - bt.709 - SSE2                                                    	  2.199602	  0.400000	  0.000000	  0.0
-ARGB to YUYV - NON-SSE - fast resampling                                        	 10.506728	  5.400000	  0.100000	  0.0
-ARGB to YUYV - bt.601 - NON-SSE - fast resampling                               	 11.583987	  7.200000	  0.100000	  0.0
-ARGB to YUYV - bt.709 - NON-SSE - fast resampling                               	 11.200786	  6.100000	  0.100000	  0.0
+Conversion Block Name                                                           	  Avg Time	Avg User Time	Avg Sys Time	Ctx Sw
+ARGB to YUYV - SSE2 / SSSE3 - fast resampling                                   	  1.557207	  0.200000	  0.000000	  0.0
+ARGB to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.602212	  0.400000	  0.000000	  0.0
+ARGB to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.602498	  0.400000	  0.000000	  0.0
+ARGB to YUYV - SSE2 / SSSE3                                                     	  2.317025	  0.600000	  0.000000	  0.0
+ARGB to YUYV - bt.601 - SSE2 / SSSE3                                            	  2.378331	  0.200000	  0.000000	  0.0
+ARGB to YUYV - bt.709 - SSE2 / SSSE3                                            	  2.388336	  0.500000	  0.100000	  0.0
+ARGB to YUYV - SSE2 - fast resampling                                           	  1.663141	  0.200000	  0.000000	  0.0
+ARGB to YUYV - bt.601 - SSE2 - fast resampling                                  	  1.728889	  0.100000	  0.000000	  0.0
+ARGB to YUYV - bt.709 - SSE2 - fast resampling                                  	  1.730610	  0.000000	  0.000000	  0.0
+ARGB to YUYV - SSE2                                                             	  2.154014	  0.300000	  0.100000	  0.0
+ARGB to YUYV - bt.601 - SSE2                                                    	  2.174325	  0.300000	  0.000000	  0.0
+ARGB to YUYV - bt.709 - SSE2                                                    	  2.179928	  0.200000	  0.000000	  0.0
+ARGB to YUYV - NON-SSE - fast resampling                                        	  8.008501	  3.400000	  0.000000	  0.0
+ARGB to YUYV - bt.601 - NON-SSE - fast resampling                               	 11.595377	  6.600000	  0.000000	  0.0
+ARGB to YUYV - bt.709 - NON-SSE - fast resampling                               	 11.200348	  6.000000	  0.200000	  0.0
 
-ARGB to UYVY - SSE2 / SSSE3 - fast resampling                                   	  1.556240	  0.100000	  0.000000	  0.0
-ARGB to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.613032	  0.200000	  0.000000	  0.0
-ARGB to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.614562	  0.200000	  0.100000	  0.0
-ARGB to UYVY - SSE2 / SSSE3                                                     	  2.328983	  0.000000	  0.000000	  0.0
-ARGB to UYVY - bt.601 - SSE2 / SSSE3                                            	  2.391824	  0.100000	  0.100000	  0.0
-ARGB to UYVY - bt.709 - SSE2 / SSSE3                                            	  2.387565	  0.300000	  0.100000	  0.0
-ARGB to UYVY - SSE2 - fast resampling                                           	  1.688844	  0.200000	  0.000000	  0.0
-ARGB to UYVY - bt.601 - SSE2 - fast resampling                                  	  1.749200	  0.300000	  0.000000	  0.0
-ARGB to UYVY - bt.709 - SSE2 - fast resampling                                  	  1.752678	  0.100000	  0.100000	  0.0
-ARGB to UYVY - SSE2                                                             	  2.202505	  0.200000	  0.000000	  0.0
-ARGB to UYVY - bt.601 - SSE2                                                    	  2.209237	  0.200000	  0.200000	  0.0
-ARGB to UYVY - bt.709 - SSE2                                                    	  2.208866	  0.100000	  0.000000	  0.0
-ARGB to UYVY - NON-SSE - fast resampling                                        	 11.198782	  6.200000	  0.100000	  0.0
-ARGB to UYVY - bt.601 - NON-SSE - fast resampling                               	 12.280846	  7.500000	  0.000000	  0.0
-ARGB to UYVY - bt.709 - NON-SSE - fast resampling                               	 11.908157	  6.800000	  0.100000	  0.0
+ARGB to UYVY - SSE2 / SSSE3 - fast resampling                                   	  1.532124	  0.300000	  0.000000	  0.0
+ARGB to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.589594	  0.200000	  0.000000	  0.0
+ARGB to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.591090	  0.000000	  0.000000	  0.0
+ARGB to UYVY - SSE2 / SSSE3                                                     	  2.304047	  0.300000	  0.000000	  0.0
+ARGB to UYVY - bt.601 - SSE2 / SSSE3                                            	  2.362784	  0.400000	  0.000000	  0.0
+ARGB to UYVY - bt.709 - SSE2 / SSSE3                                            	  2.366567	  0.300000	  0.000000	  0.0
+ARGB to UYVY - SSE2 - fast resampling                                           	  1.668606	  0.400000	  0.000000	  0.0
+ARGB to UYVY - bt.601 - SSE2 - fast resampling                                  	  1.726185	  0.200000	  0.000000	  0.0
+ARGB to UYVY - bt.709 - SSE2 - fast resampling                                  	  1.724012	  0.100000	  0.000000	  0.0
+ARGB to UYVY - SSE2                                                             	  2.177817	  0.400000	  0.000000	  0.0
+ARGB to UYVY - bt.601 - SSE2                                                    	  2.184041	  0.200000	  0.000000	  0.0
+ARGB to UYVY - bt.709 - SSE2                                                    	  2.185352	  0.100000	  0.000000	  0.0
+ARGB to UYVY - NON-SSE - fast resampling                                        	  8.355579	  3.600000	  0.100000	  0.0
+ARGB to UYVY - bt.601 - NON-SSE - fast resampling                               	 12.283620	  7.800000	  0.100000	  0.0
+ARGB to UYVY - bt.709 - NON-SSE - fast resampling                               	 11.911762	  7.000000	  0.100000	  0.0
 
-ARGB to YUV422P - SSE2 / SSSE3 - fast resampling                                	  1.636499	  0.300000	  0.000000	  0.0
-ARGB to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.716096	  0.100000	  0.000000	  0.0
-ARGB to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.718011	  0.100000	  0.100000	  0.0
-ARGB to YUV422P - SSE2 / SSSE3                                                  	  2.502600	  0.000000	  0.100000	  0.0
-ARGB to YUV422P - bt.601 - SSE2 / SSSE3                                         	  2.541804	  0.500000	  0.100000	  0.0
-ARGB to YUV422P - bt.709 - SSE2 / SSSE3                                         	  2.544673	  0.200000	  0.200000	  0.0
-ARGB to YUV422P - SSE2 - fast resampling                                        	  1.847339	  0.100000	  0.000000	  0.0
-ARGB to YUV422P - bt.601 - SSE2 - fast resampling                               	  1.902470	  0.300000	  0.000000	  0.0
-ARGB to YUV422P - bt.709 - SSE2 - fast resampling                               	  1.902766	  0.400000	  0.100000	  0.0
-ARGB to YUV422P - SSE2                                                          	  2.282174	  0.100000	  0.100000	  0.0
-ARGB to YUV422P - bt.601 - SSE2                                                 	  2.327980	  0.600000	  0.000000	  0.0
-ARGB to YUV422P - bt.709 - SSE2                                                 	  2.328000	  0.300000	  0.200000	  0.0
-ARGB to YUV422P - NON-SSE - fast resampling                                     	 11.606660	  6.000000	  0.100000	  0.0
-ARGB to YUV422P - bt.601 - NON-SSE - fast resampling                            	 12.311133	  7.300000	  0.100000	  0.0
-ARGB to YUV422P - bt.709 - NON-SSE - fast resampling                            	 11.975618	  7.100000	  0.100000	  0.0
+ARGB to YUV422P - SSE2 / SSSE3 - fast resampling                                	  1.613108	  0.100000	  0.000000	  0.0
+ARGB to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.695288	  0.400000	  0.000000	  0.0
+ARGB to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.697590	  0.200000	  0.000000	  0.0
+ARGB to YUV422P - SSE2 / SSSE3                                                  	  2.476662	  0.600000	  0.100000	  0.0
+ARGB to YUV422P - bt.601 - SSE2 / SSSE3                                         	  2.519750	  0.600000	  0.000000	  0.0
+ARGB to YUV422P - bt.709 - SSE2 / SSSE3                                         	  2.519610	  0.300000	  0.000000	  0.0
+ARGB to YUV422P - SSE2 - fast resampling                                        	  1.824529	  0.400000	  0.000000	  0.0
+ARGB to YUV422P - bt.601 - SSE2 - fast resampling                               	  1.877964	  0.200000	  0.000000	  0.0
+ARGB to YUV422P - bt.709 - SSE2 - fast resampling                               	  1.876799	  0.100000	  0.000000	  0.0
+ARGB to YUV422P - SSE2                                                          	  2.258789	  0.600000	  0.000000	  0.0
+ARGB to YUV422P - bt.601 - SSE2                                                 	  2.305617	  0.500000	  0.000000	  0.0
+ARGB to YUV422P - bt.709 - SSE2                                                 	  2.305748	  0.300000	  0.000000	  0.0
+ARGB to YUV422P - NON-SSE - fast resampling                                     	  9.476967	  4.200000	  0.000000	  0.0
+ARGB to YUV422P - bt.601 - NON-SSE - fast resampling                            	 12.316425	  9.500000	  0.000000	  0.0
+ARGB to YUV422P - bt.709 - NON-SSE - fast resampling                            	 11.991957	 10.600000	  0.000000	  0.0
 
-BGRA to YUYV - SSE2 / SSSE3 - fast resampling                                   	  1.552297	  0.000000	  0.000000	  0.0
-BGRA to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.610775	  0.100000	  0.000000	  0.0
-BGRA to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.610487	  0.200000	  0.000000	  0.0
-BGRA to YUYV - SSE2 / SSSE3                                                     	  2.335374	  0.400000	  0.000000	  0.0
-BGRA to YUYV - bt.601 - SSE2 / SSSE3                                            	  2.408288	  0.300000	  0.000000	  0.0
-BGRA to YUYV - bt.709 - SSE2 / SSSE3                                            	  2.405067	  0.200000	  0.000000	  0.0
-BGRA to YUYV - SSE2 - fast resampling                                           	  1.710431	  0.300000	  0.000000	  0.0
-BGRA to YUYV - bt.601 - SSE2 - fast resampling                                  	  1.742815	  0.000000	  0.000000	  0.0
-BGRA to YUYV - bt.709 - SSE2 - fast resampling                                  	  1.742949	  0.000000	  0.000000	  0.0
-BGRA to YUYV - SSE2                                                             	  2.268317	  0.200000	  0.000000	  0.0
-BGRA to YUYV - bt.601 - SSE2                                                    	  2.283221	  0.200000	  0.200000	  0.0
-BGRA to YUYV - bt.709 - SSE2                                                    	  2.281040	  0.300000	  0.100000	  0.0
-BGRA to YUYV - NON-SSE - fast resampling                                        	 10.848154	  5.600000	  0.200000	  0.0
-BGRA to YUYV - bt.601 - NON-SSE - fast resampling                               	 11.574430	  7.700000	  0.000000	  0.0
-BGRA to YUYV - bt.709 - NON-SSE - fast resampling                               	 11.558079	  7.600000	  0.000000	  0.0
+ARGB to YUV420P - SSE2 / SSSE3 - fast resampling                                	  1.405012	  0.400000	  0.000000	  0.0
+ARGB to YUV420P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.463443	  0.500000	  0.000000	  0.0
+ARGB to YUV420P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.462868	  0.500000	  0.000000	  0.0
+ARGB to YUV420P - SSE2 - fast resampling                                        	  1.503717	  0.300000	  0.000000	  0.0
+ARGB to YUV420P - bt.601 - SSE2 - fast resampling                               	  1.536365	  0.400000	  0.000000	  0.0
+ARGB to YUV420P - bt.709 - SSE2 - fast resampling                               	  1.538330	  0.100000	  0.000000	  0.0
+ARGB to YUV420P - NON-SSE - fast resampling                                     	  9.846983	  4.700000	  0.000000	  0.0
+ARGB to YUV420P - bt.601 - NON-SSE - fast resampling                            	 10.528729	  5.300000	  0.000000	  0.0
+ARGB to YUV420P - bt.709 - NON-SSE - fast resampling                            	 10.105100	  7.600000	  0.100000	  0.0
 
-BGRA to UYVY - SSE2 / SSSE3 - fast resampling                                   	  1.556193	  0.300000	  0.000000	  0.0
-BGRA to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.613955	  0.400000	  0.000000	  0.0
-BGRA to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.616660	  0.100000	  0.000000	  0.0
-BGRA to UYVY - SSE2 / SSSE3                                                     	  2.331673	  0.000000	  0.000000	  0.0
-BGRA to UYVY - bt.601 - SSE2 / SSSE3                                            	  2.389308	  0.300000	  0.000000	  0.0
-BGRA to UYVY - bt.709 - SSE2 / SSSE3                                            	  2.389838	  0.300000	  0.300000	  0.0
-BGRA to UYVY - SSE2 - fast resampling                                           	  1.708550	  0.400000	  0.100000	  0.0
-BGRA to UYVY - bt.601 - SSE2 - fast resampling                                  	  1.749798	  0.200000	  0.000000	  0.0
-BGRA to UYVY - bt.709 - SSE2 - fast resampling                                  	  1.746544	  0.100000	  0.100000	  0.0
-BGRA to UYVY - SSE2                                                             	  2.278891	  0.200000	  0.000000	  0.0
-BGRA to UYVY - bt.601 - SSE2                                                    	  2.296309	  0.200000	  0.100000	  0.0
-BGRA to UYVY - bt.709 - SSE2                                                    	  2.297097	  0.400000	  0.100000	  0.0
-BGRA to UYVY - NON-SSE - fast resampling                                        	 11.553661	  7.500000	  0.100000	  0.0
-BGRA to UYVY - bt.601 - NON-SSE - fast resampling                               	 12.639316	  7.400000	  0.000000	  0.0
-BGRA to UYVY - bt.709 - NON-SSE - fast resampling                               	 12.263592	  8.000000	  0.000000	  0.0
+BGRA to YUYV - SSE2 / SSSE3 - fast resampling                                   	  1.526979	  0.000000	  0.000000	  0.0
+BGRA to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.581092	  0.300000	  0.000000	  0.0
+BGRA to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.584336	  0.300000	  0.000000	  0.0
+BGRA to YUYV - SSE2 / SSSE3                                                     	  2.310572	  0.100000	  0.000000	  0.0
+BGRA to YUYV - bt.601 - SSE2 / SSSE3                                            	  2.381500	  0.400000	  0.100000	  0.0
+BGRA to YUYV - bt.709 - SSE2 / SSSE3                                            	  2.375714	  0.300000	  0.000000	  0.0
+BGRA to YUYV - SSE2 - fast resampling                                           	  1.683753	  0.100000	  0.000000	  0.0
+BGRA to YUYV - bt.601 - SSE2 - fast resampling                                  	  1.718077	  0.100000	  0.000000	  0.0
+BGRA to YUYV - bt.709 - SSE2 - fast resampling                                  	  1.713220	  0.300000	  0.000000	  0.0
+BGRA to YUYV - SSE2                                                             	  2.243742	  0.200000	  0.000000	  0.0
+BGRA to YUYV - bt.601 - SSE2                                                    	  2.254687	  0.200000	  0.000000	  0.0
+BGRA to YUYV - bt.709 - SSE2                                                    	  2.256662	  0.300000	  0.000000	  0.0
+BGRA to YUYV - NON-SSE - fast resampling                                        	  8.006156	  3.100000	  0.100000	  0.0
+BGRA to YUYV - bt.601 - NON-SSE - fast resampling                               	 11.578712	  6.900000	  0.000000	  0.0
+BGRA to YUYV - bt.709 - NON-SSE - fast resampling                               	 11.566077	  6.300000	  0.000000	  0.0
 
-BGRA to YUV422P - SSE2 / SSSE3 - fast resampling                                	  1.637962	  0.200000	  0.100000	  0.0
-BGRA to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.720187	  0.900000	  0.000000	  0.0
-BGRA to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.713151	  0.200000	  0.000000	  0.0
-BGRA to YUV422P - SSE2 / SSSE3                                                  	  2.499767	  0.000000	  0.100000	  0.0
-BGRA to YUV422P - bt.601 - SSE2 / SSSE3                                         	  2.541839	  2.100000	  0.000000	  0.0
-BGRA to YUV422P - bt.709 - SSE2 / SSSE3                                         	  2.545011	  0.900000	  0.000000	  0.0
-BGRA to YUV422P - SSE2 - fast resampling                                        	  1.859557	  0.600000	  0.000000	  0.0
-BGRA to YUV422P - bt.601 - SSE2 - fast resampling                               	  1.917880	  0.200000	  0.000000	  0.0
-BGRA to YUV422P - bt.709 - SSE2 - fast resampling                               	  1.916637	  0.200000	  0.100000	  0.0
-BGRA to YUV422P - SSE2                                                          	  2.293697	  0.500000	  0.000000	  0.0
-BGRA to YUV422P - bt.601 - SSE2                                                 	  2.355734	  0.400000	  0.000000	  0.0
-BGRA to YUV422P - bt.709 - SSE2                                                 	  2.351133	  0.200000	  0.100000	  0.0
-BGRA to YUV422P - NON-SSE - fast resampling                                     	 11.952660	  6.800000	  0.100000	  0.0
-BGRA to YUV422P - bt.601 - NON-SSE - fast resampling                            	 12.668273	  9.400000	  0.200000	  0.0
-BGRA to YUV422P - bt.709 - NON-SSE - fast resampling                            	 12.321570	  7.300000	  0.000000	  0.0
+BGRA to UYVY - SSE2 / SSSE3 - fast resampling                                   	  1.536474	  0.000000	  0.000000	  0.0
+BGRA to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.593603	  0.200000	  0.100000	  0.0
+BGRA to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.587116	  0.000000	  0.100000	  0.0
+BGRA to UYVY - SSE2 / SSSE3                                                     	  2.300830	  0.000000	  0.000000	  0.0
+BGRA to UYVY - bt.601 - SSE2 / SSSE3                                            	  2.365192	  0.500000	  0.000000	  0.0
+BGRA to UYVY - bt.709 - SSE2 / SSSE3                                            	  2.366234	  0.300000	  0.000000	  0.0
+BGRA to UYVY - SSE2 - fast resampling                                           	  1.686827	  0.300000	  0.000000	  0.0
+BGRA to UYVY - bt.601 - SSE2 - fast resampling                                  	  1.749440	  0.500000	  0.000000	  0.0
+BGRA to UYVY - bt.709 - SSE2 - fast resampling                                  	  1.766887	  0.400000	  0.000000	  0.0
+BGRA to UYVY - SSE2                                                             	  2.251621	  0.100000	  0.000000	  0.0
+BGRA to UYVY - bt.601 - SSE2                                                    	  2.266705	  0.200000	  0.000000	  0.0
+BGRA to UYVY - bt.709 - SSE2                                                    	  2.268718	  0.100000	  0.000000	  0.0
+BGRA to UYVY - NON-SSE - fast resampling                                        	  8.360888	  3.700000	  0.000000	  0.0
+BGRA to UYVY - bt.601 - NON-SSE - fast resampling                               	 12.646431	  7.500000	  0.100000	  0.0
+BGRA to UYVY - bt.709 - NON-SSE - fast resampling                               	 12.268537	  7.300000	  0.000000	  0.0
 
-RGB24 to YUYV - SSE2 / SSSE3 - fast resampling                                  	  1.513511	  0.600000	  0.000000	  0.0
-RGB24 to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.531698	  0.300000	  0.000000	  0.0
-RGB24 to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.531725	  0.100000	  0.000000	  0.0
-RGB24 to YUYV - SSE2 / SSSE3                                                    	  2.437517	  0.400000	  0.100000	  0.0
-RGB24 to YUYV - bt.601 - SSE2 / SSSE3                                           	  2.442190	  0.300000	  0.100000	  0.0
-RGB24 to YUYV - bt.709 - SSE2 / SSSE3                                           	  2.448585	  0.400000	  0.000000	  0.0
-RGB24 to YUYV - SSE2 - fast resampling                                          	  3.917351	  0.600000	  0.000000	  0.0
-RGB24 to YUYV - bt.601 - SSE2 - fast resampling                                 	  3.966619	  0.900000	  0.200000	  0.0
-RGB24 to YUYV - bt.709 - SSE2 - fast resampling                                 	  3.970741	  0.700000	  0.100000	  0.0
-RGB24 to YUYV - SSE2                                                            	  4.527766	  1.100000	  0.000000	  0.0
-RGB24 to YUYV - bt.601 - SSE2                                                   	  4.601211	  0.800000	  0.200000	  0.0
-RGB24 to YUYV - bt.709 - SSE2                                                   	  4.599111	  0.700000	  0.100000	  0.0
-RGB24 to YUYV - NON-SSE - fast resampling                                       	 11.164496	  6.000000	  0.000000	  0.0
-RGB24 to YUYV - bt.601 - NON-SSE - fast resampling                              	 11.896036	  7.100000	  0.000000	  0.0
-RGB24 to YUYV - bt.709 - NON-SSE - fast resampling                              	 11.877445	  7.100000	  0.000000	  0.0
+BGRA to YUV422P - SSE2 / SSSE3 - fast resampling                                	  1.612320	  0.100000	  0.100000	  0.0
+BGRA to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.693068	  0.100000	  0.000000	  0.0
+BGRA to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.694387	  0.100000	  0.000000	  0.0
+BGRA to YUV422P - SSE2 / SSSE3                                                  	  2.475919	  0.700000	  0.100000	  0.0
+BGRA to YUV422P - bt.601 - SSE2 / SSSE3                                         	  2.521443	  0.300000	  0.000000	  0.0
+BGRA to YUV422P - bt.709 - SSE2 / SSSE3                                         	  2.518286	  0.400000	  0.000000	  0.0
+BGRA to YUV422P - SSE2 - fast resampling                                        	  1.840650	  0.300000	  0.100000	  0.0
+BGRA to YUV422P - bt.601 - SSE2 - fast resampling                               	  1.888623	  0.200000	  0.000000	  0.0
+BGRA to YUV422P - bt.709 - SSE2 - fast resampling                               	  1.895008	  0.100000	  0.100000	  0.0
+BGRA to YUV422P - SSE2                                                          	  2.267975	  0.600000	  0.000000	  0.0
+BGRA to YUV422P - bt.601 - SSE2                                                 	  2.325852	  0.300000	  0.000000	  0.0
+BGRA to YUV422P - bt.709 - SSE2                                                 	  2.325868	  0.600000	  0.000000	  0.0
+BGRA to YUV422P - NON-SSE - fast resampling                                     	  9.463995	  4.400000	  0.000000	  0.0
+BGRA to YUV422P - bt.601 - NON-SSE - fast resampling                            	 12.683636	  7.500000	  0.000000	  0.0
+BGRA to YUV422P - bt.709 - NON-SSE - fast resampling                            	 12.334134	  7.500000	  0.000000	  0.0
 
-RGB24 to UYVY - SSE2 / SSSE3 - fast resampling                                  	  1.551798	  0.000000	  0.000000	  0.0
-RGB24 to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.521329	  0.200000	  0.000000	  0.0
-RGB24 to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.520938	  0.000000	  0.000000	  0.0
-RGB24 to UYVY - SSE2 / SSSE3                                                    	  2.395042	  0.000000	  0.100000	  0.0
-RGB24 to UYVY - bt.601 - SSE2 / SSSE3                                           	  2.437571	  0.400000	  0.200000	  0.0
-RGB24 to UYVY - bt.709 - SSE2 / SSSE3                                           	  2.437326	  0.300000	  0.100000	  0.0
-RGB24 to UYVY - SSE2 - fast resampling                                          	  3.944774	  1.800000	  0.000000	  0.0
-RGB24 to UYVY - bt.601 - SSE2 - fast resampling                                 	  3.987261	  2.000000	  0.000000	  0.0
-RGB24 to UYVY - bt.709 - SSE2 - fast resampling                                 	  3.986616	  1.600000	  0.100000	  0.0
-RGB24 to UYVY - SSE2                                                            	  4.545630	  1.200000	  0.000000	  0.0
-RGB24 to UYVY - bt.601 - SSE2                                                   	  4.625341	  1.200000	  0.100000	  0.0
-RGB24 to UYVY - bt.709 - SSE2                                                   	  4.624953	  1.100000	  0.000000	  0.0
-RGB24 to UYVY - NON-SSE - fast resampling                                       	 11.872973	  6.600000	  0.100000	  0.0
-RGB24 to UYVY - bt.601 - NON-SSE - fast resampling                              	 12.955103	  8.100000	  0.100000	  0.0
-RGB24 to UYVY - bt.709 - NON-SSE - fast resampling                              	 12.583902	  7.900000	  0.100000	  0.0
+BGRA to YUV420P - SSE2 / SSSE3 - fast resampling                                	  1.405993	  0.200000	  0.000000	  0.0
+BGRA to YUV420P - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.462412	  0.100000	  0.100000	  0.0
+BGRA to YUV420P - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.462928	  0.000000	  0.100000	  0.0
+BGRA to YUV420P - SSE2 - fast resampling                                        	  1.494080	  0.200000	  0.000000	  0.0
+BGRA to YUV420P - bt.601 - SSE2 - fast resampling                               	  1.524695	  0.000000	  0.100000	  0.0
+BGRA to YUV420P - bt.709 - SSE2 - fast resampling                               	  1.527473	  0.300000	  0.000000	  0.0
+BGRA to YUV420P - NON-SSE - fast resampling                                     	 10.003849	  4.300000	  0.100000	  0.0
+BGRA to YUV420P - bt.601 - NON-SSE - fast resampling                            	 10.630031	  5.900000	  0.000000	  0.0
+BGRA to YUV420P - bt.709 - NON-SSE - fast resampling                            	 10.243269	  5.000000	  0.000000	  0.0
 
-RGB24 to YUV422P - SSE2 / SSSE3 - fast resampling                               	  1.606839	  0.400000	  0.000000	  0.0
-RGB24 to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.619344	  0.100000	  0.000000	  0.0
-RGB24 to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.619045	  0.500000	  0.000000	  0.0
-RGB24 to YUV422P - SSE2 / SSSE3                                                 	  2.441360	  0.700000	  0.000000	  0.0
-RGB24 to YUV422P - bt.601 - SSE2 / SSSE3                                        	  2.526884	  0.500000	  0.000000	  0.0
-RGB24 to YUV422P - bt.709 - SSE2 / SSSE3                                        	  2.526200	  0.300000	  0.000000	  0.0
-RGB24 to YUV422P - SSE2 - fast resampling                                       	  3.980320	  1.500000	  0.000000	  0.0
-RGB24 to YUV422P - bt.601 - SSE2 - fast resampling                              	  4.038395	  1.100000	  0.000000	  0.0
-RGB24 to YUV422P - bt.709 - SSE2 - fast resampling                              	  4.013509	  1.900000	  0.000000	  0.0
-RGB24 to YUV422P - SSE2                                                         	  4.587601	  1.500000	  0.100000	  0.0
-RGB24 to YUV422P - bt.601 - SSE2                                                	  4.687053	  1.300000	  0.000000	  0.0
-RGB24 to YUV422P - bt.709 - SSE2                                                	  4.682969	  1.600000	  0.100000	  0.0
-RGB24 to YUV422P - NON-SSE - fast resampling                                    	 11.918194	  6.700000	  0.000000	  0.0
-RGB24 to YUV422P - bt.601 - NON-SSE - fast resampling                           	 12.985220	  8.100000	  0.000000	  0.0
-RGB24 to YUV422P - bt.709 - NON-SSE - fast resampling                           	 12.630951	  7.500000	  0.000000	  0.0
+RGB24 to YUYV - SSE2 / SSSE3 - fast resampling                                  	  1.498193	  0.100000	  0.000000	  0.0
+RGB24 to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.512162	  0.200000	  0.000000	  0.0
+RGB24 to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.516388	  0.100000	  0.100000	  0.0
+RGB24 to YUYV - SSE2 / SSSE3                                                    	  2.419075	  0.000000	  0.000000	  0.0
+RGB24 to YUYV - bt.601 - SSE2 / SSSE3                                           	  2.430368	  0.800000	  0.000000	  0.0
+RGB24 to YUYV - bt.709 - SSE2 / SSSE3                                           	  2.424875	  0.100000	  0.000000	  0.0
+RGB24 to YUYV - SSE2 - fast resampling                                          	  3.930620	  0.600000	  0.000000	  0.0
+RGB24 to YUYV - bt.601 - SSE2 - fast resampling                                 	  3.979731	  0.700000	  0.000000	  0.0
+RGB24 to YUYV - bt.709 - SSE2 - fast resampling                                 	  3.981999	  0.600000	  0.100000	  0.0
+RGB24 to YUYV - SSE2                                                            	  4.532132	  1.300000	  0.000000	  0.0
+RGB24 to YUYV - bt.601 - SSE2                                                   	  4.648381	  1.100000	  0.000000	  0.0
+RGB24 to YUYV - bt.709 - SSE2                                                   	  4.643672	  1.200000	  0.000000	  0.0
+RGB24 to YUYV - NON-SSE - fast resampling                                       	  8.331130	  3.700000	  0.000000	  0.0
+RGB24 to YUYV - bt.601 - NON-SSE - fast resampling                              	 11.929888	  6.900000	  0.000000	  0.0
+RGB24 to YUYV - bt.709 - NON-SSE - fast resampling                              	 11.914346	  7.000000	  0.000000	  0.0
 
-BGR24 to YUYV - SSE2 / SSSE3 - fast resampling                                  	  1.516436	  0.100000	  0.100000	  0.0
-BGR24 to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.530211	  0.000000	  0.000000	  0.0
-BGR24 to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.533777	  0.300000	  0.000000	  0.0
-BGR24 to YUYV - SSE2 / SSSE3                                                    	  2.435596	  1.300000	  0.000000	  0.0
-BGR24 to YUYV - bt.601 - SSE2 / SSSE3                                           	  2.445176	  2.400000	  0.000000	  0.0
-BGR24 to YUYV - bt.709 - SSE2 / SSSE3                                           	  2.440310	  0.300000	  0.000000	  0.0
-BGR24 to YUYV - SSE2 - fast resampling                                          	  3.931940	  2.200000	  0.000000	  0.0
-BGR24 to YUYV - bt.601 - SSE2 - fast resampling                                 	  3.973982	  0.800000	  0.000000	  0.0
-BGR24 to YUYV - bt.709 - SSE2 - fast resampling                                 	  3.972649	  0.900000	  0.000000	  0.0
-BGR24 to YUYV - SSE2                                                            	  4.526074	  0.800000	  0.100000	  0.0
-BGR24 to YUYV - bt.601 - SSE2                                                   	  4.543868	  1.300000	  0.100000	  0.0
-BGR24 to YUYV - bt.709 - SSE2                                                   	  4.544112	  1.400000	  0.000000	  0.0
-BGR24 to YUYV - NON-SSE - fast resampling                                       	 11.523040	  6.200000	  0.300000	  0.0
-BGR24 to YUYV - bt.601 - NON-SSE - fast resampling                              	 12.607580	  7.400000	  0.100000	  0.0
-BGR24 to YUYV - bt.709 - NON-SSE - fast resampling                              	 12.231594	  7.200000	  0.100000	  0.0
+RGB24 to UYVY - SSE2 / SSSE3 - fast resampling                                  	  1.533942	  0.000000	  0.000000	  0.0
+RGB24 to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.501475	  0.100000	  0.100000	  0.0
+RGB24 to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.503500	  0.200000	  0.000000	  0.0
+RGB24 to UYVY - SSE2 / SSSE3                                                    	  2.384547	  0.500000	  0.100000	  0.0
+RGB24 to UYVY - bt.601 - SSE2 / SSSE3                                           	  2.426040	  0.000000	  0.000000	  0.0
+RGB24 to UYVY - bt.709 - SSE2 / SSSE3                                           	  2.419872	  0.500000	  0.000000	  0.0
+RGB24 to UYVY - SSE2 - fast resampling                                          	  3.985547	  0.700000	  0.000000	  0.0
+RGB24 to UYVY - bt.601 - SSE2 - fast resampling                                 	  4.060254	  0.900000	  0.000000	  0.0
+RGB24 to UYVY - bt.709 - SSE2 - fast resampling                                 	  4.051514	  0.800000	  0.000000	  0.0
+RGB24 to UYVY - SSE2                                                            	  4.641027	  1.100000	  0.000000	  0.0
+RGB24 to UYVY - bt.601 - SSE2                                                   	  4.714790	  1.500000	  0.000000	  0.0
+RGB24 to UYVY - bt.709 - SSE2                                                   	  4.713232	  1.300000	  0.100000	  0.0
+RGB24 to UYVY - NON-SSE - fast resampling                                       	  8.822260	  4.000000	  0.000000	  0.0
+RGB24 to UYVY - bt.601 - NON-SSE - fast resampling                              	 13.231664	  8.500000	  0.000000	  0.0
+RGB24 to UYVY - bt.709 - NON-SSE - fast resampling                              	 12.786272	  7.500000	  0.100000	  0.0
 
-BGR24 to UYVY - SSE2 / SSSE3 - fast resampling                                  	  1.559135	  0.100000	  0.100000	  0.0
-BGR24 to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.521030	  0.100000	  0.200000	  0.0
-BGR24 to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.521896	  0.400000	  0.000000	  0.0
-BGR24 to UYVY - SSE2 / SSSE3                                                    	  2.399440	  0.200000	  0.000000	  0.0
-BGR24 to UYVY - bt.601 - SSE2 / SSSE3                                           	  2.440380	  0.300000	  0.000000	  0.0
-BGR24 to UYVY - bt.709 - SSE2 / SSSE3                                           	  2.614623	  0.300000	  0.100000	  0.0
-BGR24 to UYVY - SSE2 - fast resampling                                          	  3.966066	  0.700000	  0.000000	  0.0
-BGR24 to UYVY - bt.601 - SSE2 - fast resampling                                 	  3.967543	  0.700000	  0.000000	  0.0
-BGR24 to UYVY - bt.709 - SSE2 - fast resampling                                 	  3.970160	  1.700000	  0.000000	  0.0
-BGR24 to UYVY - SSE2                                                            	  4.527459	  1.300000	  0.200000	  0.0
-BGR24 to UYVY - bt.601 - SSE2                                                   	  4.739557	  1.200000	  0.000000	  0.0
-BGR24 to UYVY - bt.709 - SSE2                                                   	  4.567661	  1.200000	  0.000000	  0.0
-BGR24 to UYVY - NON-SSE - fast resampling                                       	 12.230593	  7.300000	  0.000000	  0.0
-BGR24 to UYVY - bt.601 - NON-SSE - fast resampling                              	 13.313213	  8.300000	  0.000000	  0.0
-BGR24 to UYVY - bt.709 - NON-SSE - fast resampling                              	 12.961281	  7.800000	  0.000000	  0.0
+RGB24 to YUV422P - SSE2 / SSSE3 - fast resampling                               	  1.607292	  0.000000	  0.000000	  0.0
+RGB24 to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.616891	  0.200000	  0.000000	  0.0
+RGB24 to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.622534	  0.300000	  0.000000	  0.0
+RGB24 to YUV422P - SSE2 / SSSE3                                                 	  2.475416	  0.200000	  0.000000	  0.0
+RGB24 to YUV422P - bt.601 - SSE2 / SSSE3                                        	  2.540139	  0.400000	  0.000000	  0.0
+RGB24 to YUV422P - bt.709 - SSE2 / SSSE3                                        	  2.566205	  0.200000	  0.000000	  0.0
+RGB24 to YUV422P - SSE2 - fast resampling                                       	  3.962145	  1.000000	  0.000000	  0.0
+RGB24 to YUV422P - bt.601 - SSE2 - fast resampling                              	  4.007421	  0.600000	  0.000000	  0.0
+RGB24 to YUV422P - bt.709 - SSE2 - fast resampling                              	  4.006307	  1.000000	  0.000000	  0.0
+RGB24 to YUV422P - SSE2                                                         	  4.631107	  1.400000	  0.000000	  0.0
+RGB24 to YUV422P - bt.601 - SSE2                                                	  4.751397	  1.400000	  0.000000	  0.0
+RGB24 to YUV422P - bt.709 - SSE2                                                	  4.744879	  0.900000	  0.000000	  0.0
+RGB24 to YUV422P - NON-SSE - fast resampling                                    	  9.928972	  5.200000	  0.000000	  0.0
+RGB24 to YUV422P - bt.601 - NON-SSE - fast resampling                           	 13.235185	  7.600000	  0.100000	  0.0
+RGB24 to YUV422P - bt.709 - NON-SSE - fast resampling                           	 12.887489	  7.700000	  0.000000	  0.0
 
-BGR24 to YUV422P - SSE2 / SSSE3 - fast resampling                               	  1.620928	  0.500000	  0.100000	  0.0
-BGR24 to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.632528	  0.200000	  0.000000	  0.0
-BGR24 to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.622066	  0.200000	  0.000000	  0.0
-BGR24 to YUV422P - SSE2 / SSSE3                                                 	  2.445000	  0.600000	  0.000000	  0.0
-BGR24 to YUV422P - bt.601 - SSE2 / SSSE3                                        	  2.525398	  0.400000	  0.000000	  0.0
-BGR24 to YUV422P - bt.709 - SSE2 / SSSE3                                        	  2.526024	  0.300000	  0.000000	  0.0
-BGR24 to YUV422P - SSE2 - fast resampling                                       	  3.982469	  0.700000	  0.300000	  0.0
-BGR24 to YUV422P - bt.601 - SSE2 - fast resampling                              	  3.917600	  1.100000	  0.000000	  0.0
-BGR24 to YUV422P - bt.709 - SSE2 - fast resampling                              	  3.917556	  0.600000	  0.000000	  0.0
-BGR24 to YUV422P - SSE2                                                         	  4.649581	  0.800000	  0.100000	  0.0
-BGR24 to YUV422P - bt.601 - SSE2                                                	  4.637351	  1.400000	  0.100000	  0.0
-BGR24 to YUV422P - bt.709 - SSE2                                                	  4.632118	  1.200000	  0.000000	  0.0
-BGR24 to YUV422P - NON-SSE - fast resampling                                    	 12.298436	  7.400000	  0.100000	  0.0
-BGR24 to YUV422P - bt.601 - NON-SSE - fast resampling                           	 13.332872	  8.000000	  0.300000	  0.0
-BGR24 to YUV422P - bt.709 - NON-SSE - fast resampling                           	 12.987495	  7.900000	  0.100000	  0.0
+RGB24 to YUV420P - SSE2 / SSSE3 - fast resampling                               	  1.501580	  0.400000	  0.000000	  0.0
+RGB24 to YUV420P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.587586	  0.000000	  0.100000	  0.0
+RGB24 to YUV420P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.574131	  0.200000	  0.000000	  0.0
+RGB24 to YUV420P - SSE2 - fast resampling                                       	  3.712633	  0.700000	  0.000000	  0.0
+RGB24 to YUV420P - bt.601 - SSE2 - fast resampling                              	  3.635303	  0.700000	  0.100000	  0.0
+RGB24 to YUV420P - bt.709 - SSE2 - fast resampling                              	  3.649861	  1.000000	  0.000000	  0.0
+RGB24 to YUV420P - NON-SSE - fast resampling                                    	 10.359992	  5.200000	  0.000000	  0.0
+RGB24 to YUV420P - bt.601 - NON-SSE - fast resampling                           	 11.030217	  6.000000	  0.000000	  0.0
+RGB24 to YUV420P - bt.709 - NON-SSE - fast resampling                           	 10.549504	  5.300000	  0.100000	  0.0
 
-YUYV to ARGB - SSE2 / SSSE3 - fast resampling                                   	  1.560534	  0.100000	  0.000000	  0.0
-YUYV to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.818693	  0.100000	  0.000000	  0.0
-YUYV to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.811648	  0.200000	  0.100000	  0.0
-YUYV to ARGB - SSE2 / SSSE3                                                     	  1.940258	  0.200000	  0.000000	  0.0
-YUYV to ARGB - bt.601 - SSE2 / SSSE3                                            	  2.390123	  0.300000	  0.000000	  0.0
-YUYV to ARGB - bt.709 - SSE2 / SSSE3                                            	  2.383422	  0.200000	  0.000000	  0.0
-YUYV to ARGB - SSE2 - fast resampling                                           	  1.834065	  0.300000	  0.100000	  0.0
-YUYV to ARGB - bt.601 - SSE2 - fast resampling                                  	  1.929236	  0.100000	  0.000000	  0.0
-YUYV to ARGB - bt.709 - SSE2 - fast resampling                                  	  1.924877	  0.200000	  0.000000	  0.0
-YUYV to ARGB - SSE2                                                             	  2.148675	  0.300000	  0.000000	  0.0
-YUYV to ARGB - bt.601 - SSE2                                                    	  2.301896	  0.600000	  0.100000	  0.0
-YUYV to ARGB - bt.709 - SSE2                                                    	  2.305142	  0.000000	  0.000000	  0.0
-YUYV to ARGB - NON-SSE - fast resampling                                        	 13.908556	  9.000000	  0.300000	  0.0
-YUYV to ARGB - bt.601 - NON-SSE - fast resampling                               	 13.828765	  8.900000	  0.000000	  0.0
-YUYV to ARGB - bt.709 - NON-SSE - fast resampling                               	 14.542747	  9.600000	  0.200000	  0.0
+BGR24 to YUYV - SSE2 / SSSE3 - fast resampling                                  	  1.529478	  0.100000	  0.100000	  0.0
+BGR24 to YUYV - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.514713	  0.200000	  0.000000	  0.0
+BGR24 to YUYV - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.522515	  0.100000	  0.000000	  0.0
+BGR24 to YUYV - SSE2 / SSSE3                                                    	  2.451011	  0.000000	  0.000000	  0.0
+BGR24 to YUYV - bt.601 - SSE2 / SSSE3                                           	  2.456286	  0.000000	  0.100000	  0.0
+BGR24 to YUYV - bt.709 - SSE2 / SSSE3                                           	  2.454707	  0.000000	  0.000000	  0.0
+BGR24 to YUYV - SSE2 - fast resampling                                          	  3.992673	  0.800000	  0.000000	  0.0
+BGR24 to YUYV - bt.601 - SSE2 - fast resampling                                 	  4.025893	  1.000000	  0.000000	  0.0
+BGR24 to YUYV - bt.709 - SSE2 - fast resampling                                 	  4.029544	  0.800000	  0.000000	  0.0
+BGR24 to YUYV - SSE2                                                            	  4.601481	  0.900000	  0.100000	  0.0
+BGR24 to YUYV - bt.601 - SSE2                                                   	  4.590510	  1.200000	  0.100000	  0.0
+BGR24 to YUYV - bt.709 - SSE2                                                   	  4.590331	  1.200000	  0.000000	  0.0
+BGR24 to YUYV - NON-SSE - fast resampling                                       	  8.814895	  3.700000	  0.100000	  0.0
+BGR24 to YUYV - bt.601 - NON-SSE - fast resampling                              	 12.803350	  8.000000	  0.000000	  0.0
+BGR24 to YUYV - bt.709 - NON-SSE - fast resampling                              	 12.452594	  7.200000	  0.000000	  0.0
 
-YUYV to BGRA - SSE2 / SSSE3 - fast resampling                                   	  1.564431	  0.100000	  0.100000	  0.0
-YUYV to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.815865	  0.200000	  0.100000	  0.0
-YUYV to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.816294	  0.100000	  0.000000	  0.0
-YUYV to BGRA - SSE2 / SSSE3                                                     	  1.945263	  0.200000	  0.000000	  0.0
-YUYV to BGRA - bt.601 - SSE2 / SSSE3                                            	  2.356518	  0.300000	  0.100000	  0.0
-YUYV to BGRA - bt.709 - SSE2 / SSSE3                                            	  2.359527	  0.500000	  0.100000	  0.0
-YUYV to BGRA - SSE2 - fast resampling                                           	  1.789058	  0.200000	  0.000000	  0.0
-YUYV to BGRA - bt.601 - SSE2 - fast resampling                                  	  1.902034	  0.100000	  0.100000	  0.0
-YUYV to BGRA - bt.709 - SSE2 - fast resampling                                  	  1.905715	  0.200000	  0.000000	  0.0
-YUYV to BGRA - SSE2                                                             	  2.150116	  0.100000	  0.000000	  0.0
-YUYV to BGRA - bt.601 - SSE2                                                    	  2.326949	  0.100000	  0.100000	  0.0
-YUYV to BGRA - bt.709 - SSE2                                                    	  2.324845	  0.100000	  0.100000	  0.0
-YUYV to BGRA - NON-SSE - fast resampling                                        	 14.512606	  9.100000	  0.000000	  0.0
-YUYV to BGRA - bt.601 - NON-SSE - fast resampling                               	 14.177116	  9.000000	  0.200000	  0.0
-YUYV to BGRA - bt.709 - NON-SSE - fast resampling                               	 14.965398	 10.600000	  0.100000	  0.0
+BGR24 to UYVY - SSE2 / SSSE3 - fast resampling                                  	  1.536360	  0.300000	  0.000000	  0.0
+BGR24 to UYVY - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.589175	  0.100000	  0.000000	  0.0
+BGR24 to UYVY - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.500955	  0.100000	  0.000000	  0.0
+BGR24 to UYVY - SSE2 / SSSE3                                                    	  2.421856	  0.400000	  0.000000	  0.0
+BGR24 to UYVY - bt.601 - SSE2 / SSSE3                                           	  2.460172	  0.900000	  0.100000	  0.0
+BGR24 to UYVY - bt.709 - SSE2 / SSSE3                                           	  2.469093	  0.300000	  0.000000	  0.0
+BGR24 to UYVY - SSE2 - fast resampling                                          	  4.022790	  0.700000	  0.000000	  0.0
+BGR24 to UYVY - bt.601 - SSE2 - fast resampling                                 	  4.015297	  0.800000	  0.000000	  0.0
+BGR24 to UYVY - bt.709 - SSE2 - fast resampling                                 	  4.006774	  0.700000	  0.000000	  0.0
+BGR24 to UYVY - SSE2                                                            	  4.631487	  1.200000	  0.100000	  0.0
+BGR24 to UYVY - bt.601 - SSE2                                                   	  4.648537	  1.100000	  0.000000	  0.0
+BGR24 to UYVY - bt.709 - SSE2                                                   	  4.634012	  1.000000	  0.000000	  0.0
+BGR24 to UYVY - NON-SSE - fast resampling                                       	  9.178732	  4.600000	  0.100000	  0.0
+BGR24 to UYVY - bt.601 - NON-SSE - fast resampling                              	 13.520243	  8.400000	  0.100000	  0.0
+BGR24 to UYVY - bt.709 - NON-SSE - fast resampling                              	 13.168866	  8.200000	  0.100000	  0.0
 
-YUYV to RGB24 - SSE2 / SSSE3 - fast resampling                                  	  1.356608	  0.200000	  0.100000	  0.0
-YUYV to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.910997	  0.200000	  0.000000	  0.0
-YUYV to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.913707	  0.200000	  0.000000	  0.0
-YUYV to RGB24 - SSE2 / SSSE3                                                    	  2.007781	  0.300000	  0.100000	  0.0
-YUYV to RGB24 - bt.601 - SSE2 / SSSE3                                           	  2.455364	  1.100000	  0.000000	  0.0
-YUYV to RGB24 - bt.709 - SSE2 / SSSE3                                           	  2.455280	  0.100000	  0.000000	  0.0
-YUYV to RGB24 - SSE2 - fast resampling                                          	  3.609808	  0.600000	  0.000000	  0.0
-YUYV to RGB24 - bt.601 - SSE2 - fast resampling                                 	  3.742226	  0.700000	  0.100000	  0.0
-YUYV to RGB24 - bt.709 - SSE2 - fast resampling                                 	  3.740490	  0.800000	  0.100000	  0.0
-YUYV to RGB24 - SSE2                                                            	  4.108218	  0.700000	  0.100000	  0.0
-YUYV to RGB24 - bt.601 - SSE2                                                   	  4.252841	  0.900000	  0.100000	  0.0
-YUYV to RGB24 - bt.709 - SSE2                                                   	  4.249739	  0.900000	  0.100000	  0.0
-YUYV to RGB24 - NON-SSE - fast resampling                                       	 14.974755	  9.400000	  0.300000	  0.0
-YUYV to RGB24 - bt.601 - NON-SSE - fast resampling                              	 14.809978	 11.500000	  0.300000	  0.0
-YUYV to RGB24 - bt.709 - NON-SSE - fast resampling                              	 15.616483	 10.700000	  0.200000	  0.0
+BGR24 to YUV422P - SSE2 / SSSE3 - fast resampling                               	  1.589526	  0.100000	  0.000000	  0.0
+BGR24 to YUV422P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.599071	  0.100000	  0.100000	  0.0
+BGR24 to YUV422P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.605027	  0.100000	  0.000000	  0.0
+BGR24 to YUV422P - SSE2 / SSSE3                                                 	  2.462275	  0.000000	  0.000000	  0.0
+BGR24 to YUV422P - bt.601 - SSE2 / SSSE3                                        	  2.541531	  0.500000	  0.000000	  0.0
+BGR24 to YUV422P - bt.709 - SSE2 / SSSE3                                        	  2.540352	  0.200000	  0.100000	  0.0
+BGR24 to YUV422P - SSE2 - fast resampling                                       	  3.969402	  0.800000	  0.200000	  0.0
+BGR24 to YUV422P - bt.601 - SSE2 - fast resampling                              	  3.905151	  1.000000	  0.100000	  0.0
+BGR24 to YUV422P - bt.709 - SSE2 - fast resampling                              	  3.902248	  1.000000	  0.100000	  0.0
+BGR24 to YUV422P - SSE2                                                         	  4.710587	  0.800000	  0.000000	  0.0
+BGR24 to YUV422P - bt.601 - SSE2                                                	  4.747415	  1.600000	  0.100000	  0.0
+BGR24 to YUV422P - bt.709 - SSE2                                                	  4.674179	  1.200000	  0.000000	  0.0
+BGR24 to YUV422P - NON-SSE - fast resampling                                    	 10.286490	  4.800000	  0.000000	  0.0
+BGR24 to YUV422P - bt.601 - NON-SSE - fast resampling                           	 13.561541	  8.700000	  0.100000	  0.0
+BGR24 to YUV422P - bt.709 - NON-SSE - fast resampling                           	 13.215211	  8.300000	  0.100000	  0.0
 
-YUYV to BGR24 - SSE2 / SSSE3 - fast resampling                                  	  1.366962	  0.100000	  0.000000	  0.0
-YUYV to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.890943	  0.200000	  0.000000	  0.0
-YUYV to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.891683	  0.100000	  0.000000	  0.0
-YUYV to BGR24 - SSE2 / SSSE3                                                    	  2.009448	  0.200000	  0.000000	  0.0
-YUYV to BGR24 - bt.601 - SSE2 / SSSE3                                           	  2.455312	  0.100000	  0.100000	  0.0
-YUYV to BGR24 - bt.709 - SSE2 / SSSE3                                           	  2.456125	  0.000000	  0.100000	  0.0
-YUYV to BGR24 - SSE2 - fast resampling                                          	  3.327253	  0.600000	  0.100000	  0.0
-YUYV to BGR24 - bt.601 - SSE2 - fast resampling                                 	  3.591839	  0.900000	  0.000000	  0.0
-YUYV to BGR24 - bt.709 - SSE2 - fast resampling                                 	  3.591954	  0.800000	  0.100000	  0.0
-YUYV to BGR24 - SSE2                                                            	  3.908661	  0.800000	  0.000000	  0.0
-YUYV to BGR24 - bt.601 - SSE2                                                   	  4.046745	  1.100000	  0.100000	  0.0
-YUYV to BGR24 - bt.709 - SSE2                                                   	  4.049168	  1.000000	  0.000000	  0.0
-YUYV to BGR24 - NON-SSE - fast resampling                                       	 14.200706	  9.200000	  0.000000	  0.0
-YUYV to BGR24 - bt.601 - NON-SSE - fast resampling                              	 13.718903	  8.600000	  0.100000	  0.0
-YUYV to BGR24 - bt.709 - NON-SSE - fast resampling                              	 14.381324	  9.500000	  0.000000	  0.0
+BGR24 to YUV420P - SSE2 / SSSE3 - fast resampling                               	  1.504235	  0.000000	  0.000000	  0.0
+BGR24 to YUV420P - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.582009	  0.000000	  0.100000	  0.0
+BGR24 to YUV420P - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.583607	  0.100000	  0.000000	  0.0
+BGR24 to YUV420P - SSE2 - fast resampling                                       	  3.708644	  0.800000	  0.200000	  0.0
+BGR24 to YUV420P - bt.601 - SSE2 - fast resampling                              	  3.639259	  0.600000	  0.000000	  0.0
+BGR24 to YUV420P - bt.709 - SSE2 - fast resampling                              	  3.651042	  0.700000	  0.000000	  0.0
+BGR24 to YUV420P - NON-SSE - fast resampling                                    	 10.430440	  5.600000	  0.000000	  0.0
+BGR24 to YUV420P - bt.601 - NON-SSE - fast resampling                           	 11.175173	  6.100000	  0.000000	  0.0
+BGR24 to YUV420P - bt.709 - NON-SSE - fast resampling                           	 10.668297	  5.400000	  0.000000	  0.0
 
-YUYV to YUV422P - SSE2 / SSSE3                                                  	  0.684563	  0.000000	  0.000000	  0.0
-YUYV to YUV422P - SSE2                                                          	  0.671520	  0.000000	  0.000000	  0.0
-YUYV to YUV422P - NON SSE                                                       	  2.053458	  0.200000	  0.000000	  0.0
+YUYV to ARGB - SSE2 / SSSE3 - fast resampling                                   	  1.541242	  0.400000	  0.100000	  0.0
+YUYV to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.822292	  0.300000	  0.000000	  0.0
+YUYV to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.817631	  0.100000	  0.000000	  0.0
+YUYV to ARGB - SSE2 / SSSE3                                                     	  1.934267	  0.200000	  0.100000	  0.0
+YUYV to ARGB - bt.601 - SSE2 / SSSE3                                            	  2.404508	  0.100000	  0.000000	  0.0
+YUYV to ARGB - bt.709 - SSE2 / SSSE3                                            	  2.408413	  0.500000	  0.000000	  0.0
+YUYV to ARGB - SSE2 - fast resampling                                           	  1.825268	  0.200000	  0.000000	  0.0
+YUYV to ARGB - bt.601 - SSE2 - fast resampling                                  	  1.925500	  0.300000	  0.000000	  0.0
+YUYV to ARGB - bt.709 - SSE2 - fast resampling                                  	  1.923085	  0.300000	  0.000000	  0.0
+YUYV to ARGB - SSE2                                                             	  2.147527	  0.200000	  0.100000	  0.0
+YUYV to ARGB - bt.601 - SSE2                                                    	  2.313313	  0.200000	  0.000000	  0.0
+YUYV to ARGB - bt.709 - SSE2                                                    	  2.318343	  0.300000	  0.100000	  0.0
+YUYV to ARGB - NON-SSE - fast resampling                                        	 14.170942	  8.900000	  0.100000	  0.0
+YUYV to ARGB - bt.601 - NON-SSE - fast resampling                               	 14.045705	  8.700000	  0.000000	  0.0
+YUYV to ARGB - bt.709 - NON-SSE - fast resampling                               	 14.895975	  8.900000	  0.000000	  0.0
 
-UYVY to ARGB - SSE2 / SSSE3 - fast resampling                                   	  1.561558	  0.300000	  0.000000	  0.0
-UYVY to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.818117	  1.300000	  0.000000	  0.0
-UYVY to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.814059	  0.400000	  0.000000	  0.0
-UYVY to ARGB - SSE2 / SSSE3                                                     	  1.940711	  0.100000	  0.100000	  0.0
-UYVY to ARGB - bt.601 - SSE2 / SSSE3                                            	  2.389804	  0.000000	  0.000000	  0.0
-UYVY to ARGB - bt.709 - SSE2 / SSSE3                                            	  2.383175	  0.000000	  0.200000	  0.0
-UYVY to ARGB - SSE2 - fast resampling                                           	  1.723435	  0.200000	  0.000000	  0.0
-UYVY to ARGB - bt.601 - SSE2 - fast resampling                                  	  1.744557	  0.300000	  0.100000	  0.0
-UYVY to ARGB - bt.709 - SSE2 - fast resampling                                  	  1.738117	  0.100000	  0.000000	  0.0
-UYVY to ARGB - SSE2                                                             	  2.182548	  0.200000	  0.000000	  0.0
-UYVY to ARGB - bt.601 - SSE2                                                    	  2.313000	  0.600000	  0.000000	  0.0
-UYVY to ARGB - bt.709 - SSE2                                                    	  2.312742	  0.200000	  0.000000	  0.0
-UYVY to ARGB - NON-SSE - fast resampling                                        	 13.925640	  9.000000	  0.200000	  0.0
-UYVY to ARGB - bt.601 - NON-SSE - fast resampling                               	 13.828706	  8.800000	  0.200000	  0.0
-UYVY to ARGB - bt.709 - NON-SSE - fast resampling                               	 14.594592	  9.900000	  0.000000	  0.0
+YUYV to BGRA - SSE2 / SSSE3 - fast resampling                                   	  1.545594	  0.000000	  0.000000	  0.0
+YUYV to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.834314	  0.300000	  0.000000	  0.0
+YUYV to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.828212	  1.300000	  0.100000	  0.0
+YUYV to BGRA - SSE2 / SSSE3                                                     	  1.951534	  0.800000	  0.000000	  0.0
+YUYV to BGRA - bt.601 - SSE2 / SSSE3                                            	  2.376921	  0.400000	  0.000000	  0.0
+YUYV to BGRA - bt.709 - SSE2 / SSSE3                                            	  2.378908	  0.300000	  0.000000	  0.0
+YUYV to BGRA - SSE2 - fast resampling                                           	  1.772899	  0.100000	  0.000000	  0.0
+YUYV to BGRA - bt.601 - SSE2 - fast resampling                                  	  1.897588	  0.100000	  0.000000	  0.0
+YUYV to BGRA - bt.709 - SSE2 - fast resampling                                  	  1.898632	  0.100000	  0.000000	  0.0
+YUYV to BGRA - SSE2                                                             	  2.155063	  0.200000	  0.100000	  0.0
+YUYV to BGRA - bt.601 - SSE2                                                    	  2.338894	  1.800000	  0.000000	  0.0
+YUYV to BGRA - bt.709 - SSE2                                                    	  2.339127	  0.900000	  0.000000	  0.0
+YUYV to BGRA - NON-SSE - fast resampling                                        	 14.873196	  9.500000	  0.000000	  0.0
+YUYV to BGRA - bt.601 - NON-SSE - fast resampling                               	 14.428285	  9.200000	  0.000000	  0.0
+YUYV to BGRA - bt.709 - NON-SSE - fast resampling                               	 15.308633	  9.900000	  0.000000	  0.0
 
-UYVY to BGRA - SSE2 / SSSE3 - fast resampling                                   	  1.570283	  0.100000	  0.000000	  0.0
-UYVY to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.822933	  0.200000	  0.000000	  0.0
-UYVY to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.823805	  0.200000	  0.000000	  0.0
-UYVY to BGRA - SSE2 / SSSE3                                                     	  1.951463	  0.200000	  0.200000	  0.0
-UYVY to BGRA - bt.601 - SSE2 / SSSE3                                            	  2.360330	  0.300000	  0.000000	  0.0
-UYVY to BGRA - bt.709 - SSE2 / SSSE3                                            	  2.358547	  0.200000	  0.100000	  0.0
-UYVY to BGRA - SSE2 - fast resampling                                           	  1.695836	  0.100000	  0.100000	  0.0
-UYVY to BGRA - bt.601 - SSE2 - fast resampling                                  	  1.752509	  0.200000	  0.000000	  0.0
-UYVY to BGRA - bt.709 - SSE2 - fast resampling                                  	  1.760772	  0.100000	  0.100000	  0.0
-UYVY to BGRA - SSE2                                                             	  2.187560	  0.300000	  0.000000	  0.0
-UYVY to BGRA - bt.601 - SSE2                                                    	  2.339309	  0.400000	  0.000000	  0.0
-UYVY to BGRA - bt.709 - SSE2                                                    	  2.340714	  0.500000	  0.000000	  0.0
-UYVY to BGRA - NON-SSE - fast resampling                                        	 14.516728	  8.900000	  0.100000	  0.0
-UYVY to BGRA - bt.601 - NON-SSE - fast resampling                               	 14.180099	  9.300000	  0.000000	  0.0
-UYVY to BGRA - bt.709 - NON-SSE - fast resampling                               	 14.976367	  9.500000	  0.100000	  0.0
+YUYV to RGB24 - SSE2 / SSSE3 - fast resampling                                  	  1.442013	  0.000000	  0.100000	  0.0
+YUYV to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.913263	  0.200000	  0.000000	  0.0
+YUYV to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.911894	  0.100000	  0.000000	  0.0
+YUYV to RGB24 - SSE2 / SSSE3                                                    	  2.010333	  0.300000	  0.000000	  0.0
+YUYV to RGB24 - bt.601 - SSE2 / SSSE3                                           	  2.475692	  0.200000	  0.000000	  0.0
+YUYV to RGB24 - bt.709 - SSE2 / SSSE3                                           	  2.480763	  0.600000	  0.000000	  0.0
+YUYV to RGB24 - SSE2 - fast resampling                                          	  3.637296	  0.900000	  0.000000	  0.0
+YUYV to RGB24 - bt.601 - SSE2 - fast resampling                                 	  3.781688	  0.700000	  0.100000	  0.0
+YUYV to RGB24 - bt.709 - SSE2 - fast resampling                                 	  3.788031	  0.700000	  0.000000	  0.0
+YUYV to RGB24 - SSE2                                                            	  4.162571	  0.900000	  0.100000	  0.0
+YUYV to RGB24 - bt.601 - SSE2                                                   	  4.329843	  0.900000	  0.100000	  0.0
+YUYV to RGB24 - bt.709 - SSE2                                                   	  4.321774	  0.900000	  0.000000	  0.0
+YUYV to RGB24 - NON-SSE - fast resampling                                       	 15.225517	  9.900000	  0.100000	  0.0
+YUYV to RGB24 - bt.601 - NON-SSE - fast resampling                              	 15.052089	  8.600000	  0.100000	  0.0
+YUYV to RGB24 - bt.709 - NON-SSE - fast resampling                              	 15.869552	 11.000000	  0.000000	  0.0
 
-UYVY to RGB24 - SSE2 / SSSE3 - fast resampling                                  	  1.354530	  0.100000	  0.100000	  0.0
-UYVY to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.916440	  0.400000	  0.000000	  0.0
-UYVY to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.947603	  0.100000	  0.000000	  0.0
-UYVY to RGB24 - SSE2 / SSSE3                                                    	  2.051905	  0.400000	  0.000000	  0.0
-UYVY to RGB24 - bt.601 - SSE2 / SSSE3                                           	  2.456210	  0.000000	  0.000000	  0.0
-UYVY to RGB24 - bt.709 - SSE2 / SSSE3                                           	  2.457744	  0.000000	  0.000000	  0.0
-UYVY to RGB24 - SSE2 - fast resampling                                          	  3.625860	  0.500000	  0.000000	  0.0
-UYVY to RGB24 - bt.601 - SSE2 - fast resampling                                 	  3.738001	  0.600000	  0.100000	  0.0
-UYVY to RGB24 - bt.709 - SSE2 - fast resampling                                 	  3.735812	  0.500000	  0.100000	  0.0
-UYVY to RGB24 - SSE2                                                            	  4.202901	  1.000000	  0.000000	  0.0
-UYVY to RGB24 - bt.601 - SSE2                                                   	  4.295671	  1.000000	  0.000000	  0.0
-UYVY to RGB24 - bt.709 - SSE2                                                   	  4.294509	  0.800000	  0.000000	  0.0
-UYVY to RGB24 - NON-SSE - fast resampling                                       	 14.980547	  9.900000	  0.000000	  0.0
-UYVY to RGB24 - bt.601 - NON-SSE - fast resampling                              	 14.817740	 11.200000	  0.100000	  0.0
-UYVY to RGB24 - bt.709 - NON-SSE - fast resampling                              	 15.642937	 10.500000	  0.000000	  0.0
+YUYV to BGR24 - SSE2 / SSSE3 - fast resampling                                  	  1.448639	  0.000000	  0.000000	  0.0
+YUYV to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.888019	  0.000000	  0.100000	  0.0
+YUYV to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.891748	  0.000000	  0.100000	  0.0
+YUYV to BGR24 - SSE2 / SSSE3                                                    	  2.021194	  0.300000	  0.100000	  0.0
+YUYV to BGR24 - bt.601 - SSE2 / SSSE3                                           	  2.479864	  0.300000	  0.000000	  0.0
+YUYV to BGR24 - bt.709 - SSE2 / SSSE3                                           	  2.470876	  0.500000	  0.000000	  0.0
+YUYV to BGR24 - SSE2 - fast resampling                                          	  3.372808	  0.600000	  0.000000	  0.0
+YUYV to BGR24 - bt.601 - SSE2 - fast resampling                                 	  3.629008	  0.600000	  0.100000	  0.0
+YUYV to BGR24 - bt.709 - SSE2 - fast resampling                                 	  3.627201	  0.500000	  0.100000	  0.0
+YUYV to BGR24 - SSE2                                                            	  3.946597	  0.700000	  0.100000	  0.0
+YUYV to BGR24 - bt.601 - SSE2                                                   	  4.105642	  0.700000	  0.000000	  0.0
+YUYV to BGR24 - bt.709 - SSE2                                                   	  4.104121	  0.800000	  0.100000	  0.0
+YUYV to BGR24 - NON-SSE - fast resampling                                       	 14.499975	  9.900000	  0.000000	  0.0
+YUYV to BGR24 - bt.601 - NON-SSE - fast resampling                              	 13.953549	  9.100000	  0.000000	  0.0
+YUYV to BGR24 - bt.709 - NON-SSE - fast resampling                              	 14.645302	  9.500000	  0.100000	  0.0
 
-UYVY to BGR24 - SSE2 / SSSE3 - fast resampling                                  	  1.364530	  0.100000	  0.000000	  0.0
-UYVY to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.893564	  0.300000	  0.000000	  0.0
-UYVY to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.893989	  0.200000	  0.000000	  0.0
-UYVY to BGR24 - SSE2 / SSSE3                                                    	  2.010844	  0.300000	  0.000000	  0.0
-UYVY to BGR24 - bt.601 - SSE2 / SSSE3                                           	  2.459184	  0.000000	  0.000000	  0.0
-UYVY to BGR24 - bt.709 - SSE2 / SSSE3                                           	  2.457084	  0.500000	  0.000000	  0.0
-UYVY to BGR24 - SSE2 - fast resampling                                          	  3.314763	  0.400000	  0.000000	  0.0
-UYVY to BGR24 - bt.601 - SSE2 - fast resampling                                 	  3.443455	  0.800000	  0.000000	  0.0
-UYVY to BGR24 - bt.709 - SSE2 - fast resampling                                 	  3.439711	  0.700000	  0.000000	  0.0
-UYVY to BGR24 - SSE2                                                            	  3.950650	  0.900000	  0.000000	  0.0
-UYVY to BGR24 - bt.601 - SSE2                                                   	  4.288440	  0.800000	  0.000000	  0.0
-UYVY to BGR24 - bt.709 - SSE2                                                   	  4.286274	  1.200000	  0.000000	  0.0
-UYVY to BGR24 - NON-SSE - fast resampling                                       	 14.199912	  9.000000	  0.400000	  0.0
-UYVY to BGR24 - bt.601 - NON-SSE - fast resampling                              	 13.727892	  8.600000	  0.000000	  0.0
-UYVY to BGR24 - bt.709 - NON-SSE - fast resampling                              	 14.431128	  9.400000	  0.400000	  0.0
+YUYV to YUV422P - SSE2 / SSSE3                                                  	  0.723059	  0.100000	  0.000000	  0.0
+YUYV to YUV422P - SSE2                                                          	  0.727727	  0.000000	  0.000000	  0.0
+YUYV to YUV422P - NON SSE                                                       	  2.107883	  0.200000	  0.000000	  0.0
 
-UYVY to YUV422P - SSE2 / SSSE3                                                  	  0.676764	  0.000000	  0.000000	  0.0
-UYVY to YUV422P - SSE2                                                          	  0.674112	  0.000000	  0.000000	  0.0
-UYVY to YUV422P - NON SSE                                                       	  2.060144	  0.200000	  0.000000	  0.0
+UYVY to ARGB - SSE2 / SSSE3 - fast resampling                                   	  1.543721	  0.200000	  0.100000	  0.0
+UYVY to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.810342	  0.200000	  0.000000	  0.0
+UYVY to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.819726	  0.200000	  0.000000	  0.0
+UYVY to ARGB - SSE2 / SSSE3                                                     	  1.926807	  0.200000	  0.100000	  0.0
+UYVY to ARGB - bt.601 - SSE2 / SSSE3                                            	  2.402859	  0.300000	  0.000000	  0.0
+UYVY to ARGB - bt.709 - SSE2 / SSSE3                                            	  2.404677	  0.400000	  0.100000	  0.0
+UYVY to ARGB - SSE2 - fast resampling                                           	  1.717187	  0.200000	  0.100000	  0.0
+UYVY to ARGB - bt.601 - SSE2 - fast resampling                                  	  1.755492	  0.200000	  0.000000	  0.0
+UYVY to ARGB - bt.709 - SSE2 - fast resampling                                  	  1.761372	  0.200000	  0.000000	  0.0
+UYVY to ARGB - SSE2                                                             	  2.174863	  0.300000	  0.000000	  0.0
+UYVY to ARGB - bt.601 - SSE2                                                    	  2.315216	  0.100000	  0.000000	  0.0
+UYVY to ARGB - bt.709 - SSE2                                                    	  2.316004	  0.300000	  0.100000	  0.0
+UYVY to ARGB - NON-SSE - fast resampling                                        	 14.168458	  9.200000	  0.000000	  0.0
+UYVY to ARGB - bt.601 - NON-SSE - fast resampling                               	 14.062126	  8.600000	  0.000000	  0.0
+UYVY to ARGB - bt.709 - NON-SSE - fast resampling                               	 14.898057	  7.300000	  0.000000	  0.0
 
-YUV422P to ARGB - SSE2 / SSSE3 - fast resampling                                	  1.533082	  0.300000	  0.000000	  0.0
-YUV422P to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.774108	  0.000000	  0.000000	  0.0
-YUV422P to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.774497	  0.100000	  0.000000	  0.0
-YUV422P to ARGB - SSE2 / SSSE3                                                  	  1.970374	  0.100000	  0.000000	  0.0
-YUV422P to ARGB - bt.601 - SSE2 / SSSE3                                         	  2.381381	  0.300000	  0.000000	  0.0
-YUV422P to ARGB - bt.709 - SSE2 / SSSE3                                         	  2.381467	  0.000000	  0.200000	  0.0
-YUV422P to ARGB - SSE2 - fast resampling                                        	  1.674499	  0.500000	  0.100000	  0.0
-YUV422P to ARGB - bt.601 - SSE2 - fast resampling                               	  1.894709	  0.300000	  0.000000	  0.0
-YUV422P to ARGB - bt.709 - SSE2 - fast resampling                               	  1.893874	  0.300000	  0.100000	  0.0
-YUV422P to ARGB - SSE2                                                          	  2.063809	  0.300000	  0.000000	  0.0
-YUV422P to ARGB - bt.601 - SSE2                                                 	  2.348925	  0.200000	  0.000000	  0.0
-YUV422P to ARGB - bt.709 - SSE2                                                 	  2.349142	  0.300000	  0.000000	  0.0
-YUV422P to ARGB - NON-SSE - fast resampling                                     	 12.643439	  7.600000	  0.100000	  0.0
-YUV422P to ARGB - bt.601 - NON-SSE - fast resampling                            	 12.559040	  8.100000	  0.000000	  0.0
-YUV422P to ARGB - bt.709 - NON-SSE - fast resampling                            	 12.866791	  7.800000	  0.400000	  0.0
+UYVY to BGRA - SSE2 / SSSE3 - fast resampling                                   	  1.546823	  0.200000	  0.000000	  0.0
+UYVY to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                          	  1.838269	  0.200000	  0.000000	  0.0
+UYVY to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                          	  1.828908	  0.000000	  0.200000	  0.0
+UYVY to BGRA - SSE2 / SSSE3                                                     	  1.941737	  0.200000	  0.000000	  0.0
+UYVY to BGRA - bt.601 - SSE2 / SSSE3                                            	  2.384762	  0.300000	  0.100000	  0.0
+UYVY to BGRA - bt.709 - SSE2 / SSSE3                                            	  2.377142	  0.200000	  0.000000	  0.0
+UYVY to BGRA - SSE2 - fast resampling                                           	  1.679099	  0.200000	  0.000000	  0.0
+UYVY to BGRA - bt.601 - SSE2 - fast resampling                                  	  1.746334	  0.000000	  0.000000	  0.0
+UYVY to BGRA - bt.709 - SSE2 - fast resampling                                  	  1.738025	  0.000000	  0.000000	  0.0
+UYVY to BGRA - SSE2                                                             	  2.182307	  0.200000	  0.100000	  0.0
+UYVY to BGRA - bt.601 - SSE2                                                    	  2.344462	  0.600000	  0.000000	  0.0
+UYVY to BGRA - bt.709 - SSE2                                                    	  2.343651	  0.300000	  0.000000	  0.0
+UYVY to BGRA - NON-SSE - fast resampling                                        	 14.781439	  9.900000	  0.000000	  0.0
+UYVY to BGRA - bt.601 - NON-SSE - fast resampling                               	 14.412298	  9.200000	  0.100000	  0.0
+UYVY to BGRA - bt.709 - NON-SSE - fast resampling                               	 15.320721	 10.400000	  0.000000	  0.0
 
-YUV422P to BGRA - SSE2 / SSSE3 - fast resampling                                	  1.538475	  0.000000	  0.000000	  0.0
-YUV422P to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.947855	  0.100000	  0.000000	  0.0
-YUV422P to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.947099	  0.100000	  0.000000	  0.0
-YUV422P to BGRA - SSE2 / SSSE3                                                  	  1.961958	  0.100000	  0.100000	  0.0
-YUV422P to BGRA - bt.601 - SSE2 / SSSE3                                         	  2.344751	  0.500000	  0.000000	  0.0
-YUV422P to BGRA - bt.709 - SSE2 / SSSE3                                         	  2.346408	  0.300000	  0.000000	  0.0
-YUV422P to BGRA - SSE2 - fast resampling                                        	  1.645028	  0.000000	  0.000000	  0.0
-YUV422P to BGRA - bt.601 - SSE2 - fast resampling                               	  1.953073	  0.300000	  0.000000	  0.0
-YUV422P to BGRA - bt.709 - SSE2 - fast resampling                               	  1.953618	  0.000000	  0.000000	  0.0
-YUV422P to BGRA - SSE2                                                          	  2.085371	  0.100000	  0.000000	  0.0
-YUV422P to BGRA - bt.601 - SSE2                                                 	  2.352347	  0.400000	  0.000000	  0.0
-YUV422P to BGRA - bt.709 - SSE2                                                 	  2.357230	  1.200000	  0.000000	  0.0
-YUV422P to BGRA - NON-SSE - fast resampling                                     	 12.734369	  9.600000	  0.000000	  0.0
-YUV422P to BGRA - bt.601 - NON-SSE - fast resampling                            	 12.650826	  8.100000	  0.100000	  0.0
-YUV422P to BGRA - bt.709 - NON-SSE - fast resampling                            	 12.952100	  8.400000	  0.100000	  0.0
+UYVY to RGB24 - SSE2 / SSSE3 - fast resampling                                  	  1.398500	  0.100000	  0.100000	  0.0
+UYVY to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.915495	  0.200000	  0.000000	  0.0
+UYVY to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.911396	  0.400000	  0.000000	  0.0
+UYVY to RGB24 - SSE2 / SSSE3                                                    	  2.012803	  0.100000	  0.000000	  0.0
+UYVY to RGB24 - bt.601 - SSE2 / SSSE3                                           	  2.472916	  0.400000	  0.100000	  0.0
+UYVY to RGB24 - bt.709 - SSE2 / SSSE3                                           	  2.477857	  0.200000	  0.000000	  0.0
+UYVY to RGB24 - SSE2 - fast resampling                                          	  3.668414	  0.700000	  0.100000	  0.0
+UYVY to RGB24 - bt.601 - SSE2 - fast resampling                                 	  3.779260	  0.700000	  0.000000	  0.0
+UYVY to RGB24 - bt.709 - SSE2 - fast resampling                                 	  3.773828	  0.500000	  0.000000	  0.0
+UYVY to RGB24 - SSE2                                                            	  4.257459	  0.800000	  0.000000	  0.0
+UYVY to RGB24 - bt.601 - SSE2                                                   	  4.392566	  1.300000	  0.000000	  0.0
+UYVY to RGB24 - bt.709 - SSE2                                                   	  4.383931	  1.200000	  0.000000	  0.0
+UYVY to RGB24 - NON-SSE - fast resampling                                       	 15.276515	 10.100000	  0.000000	  0.0
+UYVY to RGB24 - bt.601 - NON-SSE - fast resampling                              	 15.067685	 11.200000	  0.000000	  0.0
+UYVY to RGB24 - bt.709 - NON-SSE - fast resampling                              	 15.913091	 11.100000	  0.000000	  0.0
 
-YUV422P to RGB24 - SSE2 / SSSE3 - fast resampling                               	  1.324750	  0.300000	  0.000000	  0.0
-YUV422P to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.759924	  0.700000	  0.000000	  0.0
-YUV422P to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.759867	  0.300000	  0.000000	  0.0
-YUV422P to RGB24 - SSE2 / SSSE3                                                 	  2.029460	  0.200000	  0.000000	  0.0
-YUV422P to RGB24 - bt.601 - SSE2 / SSSE3                                        	  2.463750	  0.100000	  0.000000	  0.0
-YUV422P to RGB24 - bt.709 - SSE2 / SSSE3                                        	  2.466918	  2.400000	  0.000000	  0.0
-YUV422P to RGB24 - SSE2 - fast resampling                                       	  4.003832	  0.600000	  0.000000	  0.0
-YUV422P to RGB24 - bt.601 - SSE2 - fast resampling                              	  4.062235	  0.700000	  0.000000	  0.0
-YUV422P to RGB24 - bt.709 - SSE2 - fast resampling                              	  4.061855	  1.000000	  0.300000	  0.0
-YUV422P to RGB24 - SSE2                                                         	  3.908903	  1.200000	  0.100000	  0.0
-YUV422P to RGB24 - bt.601 - SSE2                                                	  4.160700	  1.800000	  0.100000	  0.0
-YUV422P to RGB24 - bt.709 - SSE2                                                	  4.160177	  1.100000	  0.000000	  0.0
-YUV422P to RGB24 - NON-SSE - fast resampling                                    	 13.341669	  8.200000	  0.000000	  0.0
-YUV422P to RGB24 - bt.601 - NON-SSE - fast resampling                           	 13.248932	  8.100000	  0.000000	  0.0
-YUV422P to RGB24 - bt.709 - NON-SSE - fast resampling                           	 13.563602	  8.500000	  0.000000	  0.0
+UYVY to BGR24 - SSE2 / SSSE3 - fast resampling                                  	  1.435724	  0.100000	  0.000000	  0.0
+UYVY to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                         	  1.889873	  0.400000	  0.100000	  0.0
+UYVY to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                         	  1.891975	  0.300000	  0.000000	  0.0
+UYVY to BGR24 - SSE2 / SSSE3                                                    	  2.024020	  0.000000	  0.000000	  0.0
+UYVY to BGR24 - bt.601 - SSE2 / SSSE3                                           	  2.475242	  0.400000	  0.100000	  0.0
+UYVY to BGR24 - bt.709 - SSE2 / SSSE3                                           	  2.471540	  0.100000	  0.000000	  0.0
+UYVY to BGR24 - SSE2 - fast resampling                                          	  3.364251	  0.500000	  0.000000	  0.0
+UYVY to BGR24 - bt.601 - SSE2 - fast resampling                                 	  3.481446	  0.800000	  0.000000	  0.0
+UYVY to BGR24 - bt.709 - SSE2 - fast resampling                                 	  3.486200	  0.700000	  0.100000	  0.0
+UYVY to BGR24 - SSE2                                                            	  3.993869	  0.800000	  0.100000	  0.0
+UYVY to BGR24 - bt.601 - SSE2                                                   	  4.338340	  0.800000	  0.000000	  0.0
+UYVY to BGR24 - bt.709 - SSE2                                                   	  4.328611	  1.300000	  0.000000	  0.0
+UYVY to BGR24 - NON-SSE - fast resampling                                       	 14.399707	  9.200000	  0.100000	  0.0
+UYVY to BGR24 - bt.601 - NON-SSE - fast resampling                              	 13.985103	  8.700000	  0.200000	  0.0
+UYVY to BGR24 - bt.709 - NON-SSE - fast resampling                              	 14.648544	 10.100000	  0.100000	  0.0
 
-YUV422P to BGR24 - SSE2 / SSSE3 - fast resampling                               	  1.322214	  0.300000	  0.000000	  0.0
-YUV422P to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.762529	  0.100000	  0.000000	  0.0
-YUV422P to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.765515	  0.100000	  0.100000	  0.0
-YUV422P to BGR24 - SSE2 / SSSE3                                                 	  2.050862	  0.200000	  0.100000	  0.0
-YUV422P to BGR24 - bt.601 - SSE2 / SSSE3                                        	  2.467576	  0.300000	  0.000000	  0.0
-YUV422P to BGR24 - bt.709 - SSE2 / SSSE3                                        	  2.468403	  0.300000	  0.100000	  0.0
-YUV422P to BGR24 - SSE2 - fast resampling                                       	  4.061650	  0.700000	  0.000000	  0.0
-YUV422P to BGR24 - bt.601 - SSE2 - fast resampling                              	  3.842942	  0.300000	  0.000000	  0.0
-YUV422P to BGR24 - bt.709 - SSE2 - fast resampling                              	  3.842315	  1.100000	  0.000000	  0.0
-YUV422P to BGR24 - SSE2                                                         	  3.768366	  0.900000	  0.000000	  0.0
-YUV422P to BGR24 - bt.601 - SSE2                                                	  4.179859	  1.000000	  0.100000	  0.0
-YUV422P to BGR24 - bt.709 - SSE2                                                	  4.179452	  1.200000	  0.200000	  0.0
-YUV422P to BGR24 - NON-SSE - fast resampling                                    	 12.773837	  7.700000	  0.100000	  0.0
-YUV422P to BGR24 - bt.601 - NON-SSE - fast resampling                           	 12.703581	  7.700000	  0.000000	  0.0
-YUV422P to BGR24 - bt.709 - NON-SSE - fast resampling                           	 12.955843	  8.000000	  0.100000	  0.0
+UYVY to YUV422P - SSE2 / SSSE3                                                  	  0.729459	  0.000000	  0.000000	  0.0
+UYVY to YUV422P - SSE2                                                          	  0.731588	  0.000000	  0.000000	  0.0
+UYVY to YUV422P - NON SSE                                                       	  2.115888	  0.200000	  0.000000	  0.0
 
-YUV422P to YUYV - SSE2                                                          	  0.594780	  0.000000	  0.000000	  0.0
-YUV422P to YUYV - NON SSE                                                       	  1.922002	  0.200000	  0.000000	  0.0
+YUV422P to ARGB - SSE2 / SSSE3 - fast resampling                                	  1.572347	  0.100000	  0.100000	  0.0
+YUV422P to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.747645	  0.200000	  0.000000	  0.0
+YUV422P to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.754553	  0.300000	  0.000000	  0.0
+YUV422P to ARGB - SSE2 / SSSE3                                                  	  1.962822	  0.400000	  0.000000	  0.0
+YUV422P to ARGB - bt.601 - SSE2 / SSSE3                                         	  2.396289	  0.500000	  0.000000	  0.0
+YUV422P to ARGB - bt.709 - SSE2 / SSSE3                                         	  2.398227	  0.300000	  0.100000	  0.0
+YUV422P to ARGB - SSE2 - fast resampling                                        	  1.649900	  0.100000	  0.000000	  0.0
+YUV422P to ARGB - bt.601 - SSE2 - fast resampling                               	  1.890521	  0.100000	  0.100000	  0.0
+YUV422P to ARGB - bt.709 - SSE2 - fast resampling                               	  1.892687	  0.100000	  0.000000	  0.0
+YUV422P to ARGB - SSE2                                                          	  2.063527	  0.300000	  0.000000	  0.0
+YUV422P to ARGB - bt.601 - SSE2                                                 	  2.345500	  0.400000	  0.000000	  0.0
+YUV422P to ARGB - bt.709 - SSE2                                                 	  2.350461	  0.400000	  0.100000	  0.0
+YUV422P to ARGB - NON-SSE - fast resampling                                     	 12.852635	  7.900000	  0.200000	  0.0
+YUV422P to ARGB - bt.601 - NON-SSE - fast resampling                            	 12.750852	  7.800000	  0.000000	  0.0
+YUV422P to ARGB - bt.709 - NON-SSE - fast resampling                            	 13.068815	  8.100000	  0.000000	  0.0
 
-YUV422P to UYVY - SSE2                                                          	  0.594399	  0.100000	  0.000000	  0.0
-YUV422P to UYVY - NON SSE                                                       	  1.922409	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - SSE2 / SSSE3 - fast resampling                                	  1.485470	  0.100000	  0.000000	  0.0
+YUV422P to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.937907	  0.200000	  0.000000	  0.0
+YUV422P to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.937441	  0.200000	  0.000000	  0.0
+YUV422P to BGRA - SSE2 / SSSE3                                                  	  1.968471	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - bt.601 - SSE2 / SSSE3                                         	  2.364896	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - bt.709 - SSE2 / SSSE3                                         	  2.359744	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - SSE2 - fast resampling                                        	  1.595016	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - bt.601 - SSE2 - fast resampling                               	  1.941547	  0.200000	  0.000000	  0.0
+YUV422P to BGRA - bt.709 - SSE2 - fast resampling                               	  1.941140	  0.300000	  0.100000	  0.0
+YUV422P to BGRA - SSE2                                                          	  2.098134	  0.300000	  0.000000	  0.0
+YUV422P to BGRA - bt.601 - SSE2                                                 	  2.361856	  0.400000	  0.000000	  0.0
+YUV422P to BGRA - bt.709 - SSE2                                                 	  2.358713	  0.100000	  0.000000	  0.0
+YUV422P to BGRA - NON-SSE - fast resampling                                     	 12.930484	  7.900000	  0.000000	  0.0
+YUV422P to BGRA - bt.601 - NON-SSE - fast resampling                            	 12.903723	  7.800000	  0.000000	  0.0
+YUV422P to BGRA - bt.709 - NON-SSE - fast resampling                            	 13.156099	  8.000000	  0.100000	  0.0
+
+YUV422P to RGB24 - SSE2 / SSSE3 - fast resampling                               	  1.424677	  0.000000	  0.000000	  0.0
+YUV422P to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.769415	  0.100000	  0.100000	  0.0
+YUV422P to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.768157	  0.300000	  0.000000	  0.0
+YUV422P to RGB24 - SSE2 / SSSE3                                                 	  2.047557	  0.300000	  0.000000	  0.0
+YUV422P to RGB24 - bt.601 - SSE2 / SSSE3                                        	  2.494515	  0.500000	  0.000000	  0.0
+YUV422P to RGB24 - bt.709 - SSE2 / SSSE3                                        	  2.497092	  0.300000	  0.000000	  0.0
+YUV422P to RGB24 - SSE2 - fast resampling                                       	  4.081299	  0.600000	  0.200000	  0.0
+YUV422P to RGB24 - bt.601 - SSE2 - fast resampling                              	  4.086376	  0.900000	  0.100000	  0.0
+YUV422P to RGB24 - bt.709 - SSE2 - fast resampling                              	  4.085311	  0.900000	  0.100000	  0.0
+YUV422P to RGB24 - SSE2                                                         	  3.950572	  0.800000	  0.100000	  0.0
+YUV422P to RGB24 - bt.601 - SSE2                                                	  4.244427	  0.800000	  0.000000	  0.0
+YUV422P to RGB24 - bt.709 - SSE2                                                	  4.245813	  1.000000	  0.100000	  0.0
+YUV422P to RGB24 - NON-SSE - fast resampling                                    	 13.554916	  8.400000	  0.000000	  0.0
+YUV422P to RGB24 - bt.601 - NON-SSE - fast resampling                           	 13.466806	  8.600000	  0.100000	  0.0
+YUV422P to RGB24 - bt.709 - NON-SSE - fast resampling                           	 13.785517	  8.900000	  0.000000	  0.0
+
+YUV422P to BGR24 - SSE2 / SSSE3 - fast resampling                               	  1.473588	  0.100000	  0.000000	  0.0
+YUV422P to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.766743	  0.400000	  0.000000	  0.0
+YUV422P to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.762891	  0.200000	  0.000000	  0.0
+YUV422P to BGR24 - SSE2 / SSSE3                                                 	  2.074686	  0.100000	  0.100000	  0.0
+YUV422P to BGR24 - bt.601 - SSE2 / SSSE3                                        	  2.494559	  0.300000	  0.000000	  0.0
+YUV422P to BGR24 - bt.709 - SSE2 / SSSE3                                        	  2.500554	  0.300000	  0.100000	  0.0
+YUV422P to BGR24 - SSE2 - fast resampling                                       	  4.003044	  0.700000	  0.000000	  0.0
+YUV422P to BGR24 - bt.601 - SSE2 - fast resampling                              	  3.928834	  0.900000	  0.000000	  0.0
+YUV422P to BGR24 - bt.709 - SSE2 - fast resampling                              	  3.918859	  0.700000	  0.200000	  0.0
+YUV422P to BGR24 - SSE2                                                         	  3.880658	  0.800000	  0.000000	  0.0
+YUV422P to BGR24 - bt.601 - SSE2                                                	  4.186040	  1.000000	  0.000000	  0.0
+YUV422P to BGR24 - bt.709 - SSE2                                                	  4.187553	  1.200000	  0.000000	  0.0
+YUV422P to BGR24 - NON-SSE - fast resampling                                    	 12.979531	  7.600000	  0.100000	  0.0
+YUV422P to BGR24 - bt.601 - NON-SSE - fast resampling                           	 12.902928	  7.900000	  0.000000	  0.0
+YUV422P to BGR24 - bt.709 - NON-SSE - fast resampling                           	 13.170668	  8.200000	  0.000000	  0.0
+
+YUV422P to YUYV - SSE2                                                          	  0.593477	  0.000000	  0.000000	  0.0
+YUV422P to YUYV - NON SSE                                                       	  1.929979	  0.200000	  0.000000	  0.0
+
+YUV422P to UYVY - SSE2                                                          	  0.594661	  0.100000	  0.000000	  0.0
+YUV422P to UYVY - NON SSE                                                       	  1.938720	  0.000000	  0.000000	  0.0
+
+YUV420P to ARGB - SSE2 / SSSE3 - fast resampling                                	  1.510217	  0.000000	  0.000000	  0.0
+YUV420P to ARGB - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.575634	  0.100000	  0.000000	  0.0
+YUV420P to ARGB - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.596987	  0.100000	  0.000000	  0.0
+YUV420P to ARGB - SSE2 - fast resampling                                        	  1.596843	  0.000000	  0.100000	  0.0
+YUV420P to ARGB - bt.601 - SSE2 - fast resampling                               	  1.608821	  0.100000	  0.000000	  0.0
+YUV420P to ARGB - bt.709 - SSE2 - fast resampling                               	  1.582206	  0.200000	  0.000000	  0.0
+YUV420P to ARGB - NON-SSE - fast resampling                                     	 12.013845	  7.200000	  0.100000	  0.0
+YUV420P to ARGB - bt.601 - NON-SSE - fast resampling                            	 11.813019	  8.500000	  0.100000	  0.0
+YUV420P to ARGB - bt.709 - NON-SSE - fast resampling                            	 11.386625	  6.500000	  0.000000	  0.1
+
+YUV420P to BGRA - SSE2 / SSSE3 - fast resampling                                	  1.588158	  0.200000	  0.000000	  0.0
+YUV420P to BGRA - bt.601 - SSE2 / SSSE3 - fast resampling                       	  1.675970	  0.300000	  0.000000	  0.0
+YUV420P to BGRA - bt.709 - SSE2 / SSSE3 - fast resampling                       	  1.674957	  0.800000	  0.000000	  0.0
+YUV420P to BGRA - SSE2 - fast resampling                                        	  1.633257	  0.000000	  0.000000	  0.0
+YUV420P to BGRA - bt.601 - SSE2 - fast resampling                               	  1.693923	  0.400000	  0.000000	  0.0
+YUV420P to BGRA - bt.709 - SSE2 - fast resampling                               	  1.695785	  0.200000	  0.000000	  0.0
+YUV420P to BGRA - NON-SSE - fast resampling                                     	 12.207927	  7.000000	  0.100000	  0.0
+YUV420P to BGRA - bt.601 - NON-SSE - fast resampling                            	 11.963298	  6.700000	  0.000000	  0.0
+YUV420P to BGRA - bt.709 - NON-SSE - fast resampling                            	 12.427253	  7.400000	  0.100000	  0.0
+
+YUV420P to RGB24 - SSE2 / SSSE3 - fast resampling                               	  1.305826	  0.000000	  0.000000	  0.0
+YUV420P to RGB24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.587307	  0.100000	  0.000000	  0.0
+YUV420P to RGB24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.581604	  0.500000	  0.000000	  0.0
+YUV420P to RGB24 - SSE2 - fast resampling                                       	  3.510552	  1.800000	  0.000000	  0.0
+YUV420P to RGB24 - bt.601 - SSE2 - fast resampling                              	  3.734808	  1.900000	  0.000000	  0.0
+YUV420P to RGB24 - bt.709 - SSE2 - fast resampling                              	  3.730187	  0.700000	  0.000000	  0.0
+YUV420P to RGB24 - NON-SSE - fast resampling                                    	 12.681053	  7.600000	  0.000000	  0.0
+YUV420P to RGB24 - bt.601 - NON-SSE - fast resampling                           	 12.675399	  7.700000	  0.000000	  0.0
+YUV420P to RGB24 - bt.709 - NON-SSE - fast resampling                           	 12.183670	  7.300000	  0.000000	  0.0
+
+YUV420P to BGR24 - SSE2 / SSSE3 - fast resampling                               	  1.309829	  0.100000	  0.000000	  0.0
+YUV420P to BGR24 - bt.601 - SSE2 / SSSE3 - fast resampling                      	  1.568986	  0.100000	  0.000000	  0.0
+YUV420P to BGR24 - bt.709 - SSE2 / SSSE3 - fast resampling                      	  1.563443	  0.200000	  0.000000	  0.0
+YUV420P to BGR24 - SSE2 - fast resampling                                       	  3.636016	  0.600000	  0.000000	  0.0
+YUV420P to BGR24 - bt.601 - SSE2 - fast resampling                              	  3.845553	  0.800000	  0.100000	  0.0
+YUV420P to BGR24 - bt.709 - SSE2 - fast resampling                              	  3.818958	  0.700000	  0.000000	  0.0
+YUV420P to BGR24 - NON-SSE - fast resampling                                    	 11.142909	  6.100000	  0.000000	  0.0
+YUV420P to BGR24 - bt.601 - NON-SSE - fast resampling                           	 11.021919	  5.700000	  0.100000	  0.0
+YUV420P to BGR24 - bt.709 - NON-SSE - fast resampling                           	 11.504763	  6.400000	  0.100000	  0.0
