@@ -173,11 +173,11 @@ static int			check_unaligned_conversions() {
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
 		if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
-			printf("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
+			pixfc_log("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
 			continue;
 		}
 
-		printf("%-80s\t", conversion_blocks[index].name);
+		pixfc_log("%-80s\t", conversion_blocks[index].name);
 
 		// Allocate the input & output buffers
 		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[0]) != 0) {
@@ -203,19 +203,19 @@ static int			check_unaligned_conversions() {
 
 		// Do conversion with aligned input & output buffers
 		pixfc->convert(pixfc, input[0], output[0]);
-		printf(".");
+		pixfc_log(".");
 
 		// Do conversion with aligned input & unaligned output buffers
 		pixfc->convert(pixfc, input[0], output[1]);
-		printf(".");
+		pixfc_log(".");
 
 		// Do conversion with unaligned input & aligned output buffers
 		pixfc->convert(pixfc, input[1], output[0]);
-		printf(".");
+		pixfc_log(".");
 
 		// Do conversion with unaligned input & output buffers
 		pixfc->convert(pixfc, input[1], output[1]);
-		printf(". OK !\n");
+		pixfc_log(". OK !\n");
 
 		// Free resources
 		destroy_pixfc(pixfc);
