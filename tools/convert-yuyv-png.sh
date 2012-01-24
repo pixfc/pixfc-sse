@@ -65,17 +65,17 @@ do
 	fi
 
 	# replace WIDTH and HEIGHT with actual value in commands
-	cmd="${cmd/WIDTH/$width}"
-	cmd="${cmd/HEIGHT/$height}"
+	command="${cmd/WIDTH/$width}"
+	command="${command/HEIGHT/$height}"
 
 	# run first commandd
-	${cmd} "${filearray[$i]}"
+	${command} "${filearray[$i]}"
 
 	# and repeat if there is a second one
 	if [ -n "${cmd2}" ]; then
-		cmd2="${cmd2/WIDTH/$width}"
-		cmd2="${cmd2/HEIGHT/$height}"
-		${cmd2}
+		command="${cmd2/WIDTH/$width}"
+		command="${command/HEIGHT/$height}"
+		${command}
 	fi
 
 	mv 00000001.png "${filearray[$i]}.png"
