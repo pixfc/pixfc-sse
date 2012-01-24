@@ -467,7 +467,9 @@ EXTERN_INLINE void inline_fn_prefix##sse2(__m128i* input, __m128i* y_output, __m
 	_M(scratch2) = _mm_srli_si128(_M(scratch2), 1);\
 	store_op(_mm_packus_epi16(_M(scratch), _M(scratch2)), y_output[0]);\
 	_M(scratch) = _mm_and_si128((yuyv_input)[2], _M(mask_luma));\
+	_M(scratch) = _mm_srli_si128(_M(scratch), 1);\
 	_M(scratch2) = _mm_and_si128((yuyv_input)[3], _M(mask_luma));\
+	_M(scratch2) = _mm_srli_si128(_M(scratch2), 1);\
 	store_op(_mm_packus_epi16(_M(scratch), _M(scratch2)), y_output[1]);\
 	_M(scratch) = _mm_and_si128((yuyv_input)[0], _M(mask_cb));\
 	_M(scratch2) = _mm_and_si128((yuyv_input)[1], _M(mask_cb));\
