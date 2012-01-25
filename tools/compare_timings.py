@@ -20,6 +20,7 @@
 #
 import getopt
 import os
+import operator
 import subprocess
 import sys
 
@@ -120,7 +121,7 @@ if __name__ == "__main__":
 			print "Conversion '{0:60}' does not exist in second unit test".format(name)
 
 	print "Results (negative means second test was faster)"
-	for name, time in sorted(results.iteritems()):
+	for name, time in sorted(results.iteritems(), key=operator.itemgetter(1)):
 		print "{0:60}\t{1: .3f}".format(name, time)
 
 
