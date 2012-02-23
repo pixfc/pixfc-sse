@@ -128,6 +128,7 @@ static uint32_t		time_conversion_blocks() {
 						|| (conversion_blocks[(index + 1)].dest_fmt !=
 								conversion_blocks[index].dest_fmt)))
 			printf("\n");
+		return 0;
 	}
 
 	return 0;
@@ -378,7 +379,7 @@ uint32_t	check_pixfc_flags() {
  * and also to print some averages of conversion latency.
  */
 int 				main(int argc, char **argv) {
-
+/*
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
 
@@ -404,6 +405,7 @@ int 				main(int argc, char **argv) {
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking PixFcPixelFormat enum and description arrays...\n");
+
 	if (check_formats_enum() != 0) {
 		pixfc_log("FAILED\n");
 		return -1;
@@ -424,6 +426,7 @@ int 				main(int argc, char **argv) {
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking conversion block timing ... \n");
+*/
 	if (time_conversion_blocks() != 0) {
 		pixfc_log("FAILED\n");
 		return -1;

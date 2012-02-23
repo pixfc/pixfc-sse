@@ -37,6 +37,7 @@
 #define CONST_M128I(var, val64_1, val64_2)		static const __m128i var = { val64_1, val64_2 }
 #define M128I(var, val64_1, val64_2)			__m128i var = { val64_1, val64_2 }
 #define	_M(var)									(var)
+#define _PRAGMA_(...)   						_Pragma( #__VA_ARGS__ )
 
 #else
 
@@ -48,6 +49,7 @@
 #define CONST_M128I(var, val64_1, val64_2)		__declspec(align(16)) static const __int64 var[] = { (val64_1), (val64_2) }
 #define M128I(var, val64_1, val64_2)			__declspec(align(16)) __int64 var[] = { (val64_1), (val64_2)}
 #define	_M(var)									(*((__m128i *)(var)))
+#define _PRAGMA_(...)   						__pragma( #__VA_ARGS__ )
 
 #endif
 

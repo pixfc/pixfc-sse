@@ -112,30 +112,44 @@
 #define UPSAMPLE_YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
-	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
+	__m128i*    	yuyv_8pixels = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
-	uint32_t	pixel_count = pixfc->pixel_count - 16;\
-	unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
-	while(pixel_count > 0) {\
+	uint32_t	row_byte = pixfc->width * 2;\
+	uint32_t	pixel_count;\
+	uint32_t	line;\
+	uint32_t	init = 0;\
+	_PRAGMA_(omp parallel for schedule(static) private(unpack_out, convert_out, pixel_count) firstprivate(yuyv_8pixels, rgb_out_buf))\
+	for(line = 0; line < pixfc->height; line++)\
+	{\
+		if(init == 0) {\
+		yuyv_8pixels = (__m128i*)((uint8_t*) yuyv_8pixels + line * row_byte);\
+		rgb_out_buf = (__m128i*)((uint8_t*) rgb_out_buf + line * output_stride);\
+		init = 1;\
+		}\
+		pixel_count = pixfc->width - 16;\
+		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
+		while(pixel_count > 0) {\
+			unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
+			unpack_fn_prefix##instr_set(&yuyv_8pixels[2], &unpack_out[6]);\
+			reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+			conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+			pack_fn(convert_out, rgb_out_buf);\
+			yuyv_8pixels += 2;\
+			rgb_out_buf += output_stride;\
+			pixel_count -= 16;\
+			unpack_out[0] = _mm_load_si128(&unpack_out[6]);\
+			unpack_out[1] = _mm_load_si128(&unpack_out[7]);\
+		}\
 		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
-		unpack_fn_prefix##instr_set(&yuyv_8pixels[2], &unpack_out[6]);\
 		reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+		reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
-		reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
 		conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
 		pack_fn(convert_out, rgb_out_buf);\
-		yuyv_8pixels += 2;\
-		rgb_out_buf += output_stride;\
-		pixel_count -= 16;\
-		unpack_out[0] = _mm_load_si128(&unpack_out[6]);\
-		unpack_out[1] = _mm_load_si128(&unpack_out[7]);\
 	}\
-	unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
-	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
-	reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
-	conv_fn_prefix##instr_set(unpack_out, convert_out);\
-	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
-	pack_fn(convert_out, rgb_out_buf);\
+
 
 
 /*
