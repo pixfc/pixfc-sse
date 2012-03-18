@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#include <string.h>
 #include "common.h"
 #include "conversion_blocks.h"
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
+
+#include <string.h>
+#include <stdlib.h>
 
 /*
  * Check if the given conversion block:

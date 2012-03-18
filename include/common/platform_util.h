@@ -21,7 +21,19 @@
 #ifndef PLATFORM_UTIL_H
 #define PLATFORM_UTIL_H
 
+// Platform detection
+#if defined(__i386__) || defined(__x86_64__)
+#define __INTEL_CPU__	1
+#endif
+
+#ifdef __INTEL_CPU__
 #include <emmintrin.h>
+#else // __INTEL_CPU__
+typedef long long __m128i __attribute__ ((__vector_size__ (16), __may_alias__));
+#endif	// __INTEL__CPU__
+
+
+
 
 #if defined(__linux__) || defined(__APPLE__)
 
@@ -50,5 +62,6 @@
 #define	_M(var)									(*((__m128i *)(var)))
 
 #endif
+
 
 #endif	// #ifndef PLATFORM_UTIL_H

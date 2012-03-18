@@ -21,15 +21,19 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#include <stdio.h>
-#include <stdint.h>
-#include <emmintrin.h>
-
 #include "platform_util.h"
 #include "debug_support.h"
 
+#include <stdio.h>
+#include <stdint.h>
+#ifdef __INTEL_CPU__
+#include <emmintrin.h>
+#endif
+
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
+
+#ifdef __INTEL_CPU__
 
 //
 // The following DO_CONVERSION_* macros help us detect whether the input and
@@ -188,6 +192,15 @@
 #define	DECLARE_VECT_ARRAY4_N_UNALIGN_LOAD(var, unaligned_buffer_ptr)\
 		__m128i var[4]; (var)[0] = _mm_loadu_si128(unaligned_buffer_ptr); (var)[1] = _mm_loadu_si128(&unaligned_buffer_ptr[1]); (var)[2] = _mm_loadu_si128(&unaligned_buffer_ptr[2]); (var)[3] = _mm_loadu_si128(&unaligned_buffer_ptr[3])
 
+#else	// __INTEL_CPU__
+
+#define DO_CONVERSION_1U_1P(conversion_macro, unpack_fn, pack_fn, ...)
+#define DO_CONVERSION_1U_2P(conversion_macro, unpack_fn, pack1_fn, pack2_fn, ...)
+#define DO_CONVERSION_3U_1P(conversion_macro, unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, ...)
+#define DO_REPACK(repack_macro, repack_fn_suffix, ...) 
+
+#endif // __INTEL_CPU__
+
 /*
  * This function returns the features supported by the cpu
  * as returned by the CPUID instructions. (ECX is in the higher
@@ -211,7 +224,7 @@ uint32_t			does_cpu_support(uint64_t);
 /*
  * Various debugging functions
  */
-#ifdef DEBUG
+#if defined(DEBUG) && defined(__INTEL_CPU__)
 
 void 						print_xmm32(char *name, __m128i *reg);
 void 						print_xmm16(char *name, __m128i *reg);

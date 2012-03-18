@@ -22,11 +22,13 @@
 #define RGB_TO_YUV_CONVERT_H_
 
 
-#include <emmintrin.h>
-#include <tmmintrin.h>
-
 #include "debug_support.h"
 #include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
+#include <emmintrin.h>
+#include <tmmintrin.h>
 
 
 /*
@@ -868,6 +870,7 @@ DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ag_rb_vectors_to_u
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709_sse2,
 										  0x0000A9370000A937LL, 0xE6257062E6257062LL,
 										  0x000099DB000099DBLL, 0x7062F5C37062F5C3LL);
+#endif 	// __INTEL_CPU__
 
 #endif /* RGB_TO_YUV_CONVERT_H_ */
 

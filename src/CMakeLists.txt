@@ -57,9 +57,9 @@ list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
 
 
 # Add compiler options
-if(NOT WIN32)
+if(NOT WIN32 AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]")
 	add_definitions(-msse2 -mssse3)
-endif(NOT WIN32)
+endif(NOT WIN32 AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]")
 
 
 # Check if we are building in debug mode

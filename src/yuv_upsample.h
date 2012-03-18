@@ -21,11 +21,13 @@
 #ifndef YUV_UPSAMPLE_H_
 #define YUV_UPSAMPLE_H_
 
-#include <emmintrin.h>
-#include <tmmintrin.h>
-
 #include "debug_support.h"
 #include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
+#include <emmintrin.h>
+#include <tmmintrin.h>
 
 
 
@@ -140,5 +142,7 @@ EXTERN_INLINE void	reconstruct_missing_uv_sse2_ssse3(__m128i* current_uv, __m128
 	*out = _mm_avg_epu16(*current_uv, _M(avgB));						// PAVGW	1	0.5
 }
 
+
+#endif	// __INTEL_CPU__
 
 #endif /* YUV_UPSAMPLE_H_ */

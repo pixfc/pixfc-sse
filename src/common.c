@@ -37,6 +37,7 @@ uint32_t			does_cpu_support(uint64_t mask) {
 INLINE uint64_t		get_cpu_features() {
 	uint32_t	features[4]= {0};	// CPU feature Lo in [3], Hi in [2]
 
+#ifdef __INTEL_CPU__
 	// Return cached value if valid
 	if (cpu_features != 0)
 		return cpu_features;
@@ -69,7 +70,8 @@ INLINE uint64_t		get_cpu_features() {
 	
 	// Cache value for next time.
 	cpu_features = (uint64_t) (((uint64_t)features[2]) << 32 | (uint64_t)  features[3]);
-	
+#endif	// __INTEL_CPU__
+
 	return cpu_features;
 }
 

@@ -18,12 +18,14 @@
  *
  */
 
-#include <emmintrin.h>
-#include <tmmintrin.h>
-
 #include "common.h"
 #include "debug_support.h"
 #include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
+#include <emmintrin.h>
+#include <tmmintrin.h>
 
 
 #ifndef GENERATE_UNALIGNED_INLINES
@@ -373,4 +375,5 @@ INLINE_NAME(pack_4_uv_vectors_to_yup_vectors_sse2, __m128i* in_4_uv_vectors, __m
 	// V1 V2	V3 V4 	V5 V6	V7 V8	V9 V10	V11 V12	V13 V14 V15 V16
 }
 
+#endif	// __INTEL_CPU__
 

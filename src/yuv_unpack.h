@@ -18,12 +18,15 @@
  *
  */
 
-#include <emmintrin.h>
-#include <tmmintrin.h>
-
 #include "debug_support.h"
 #include "common.h"
 #include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
+#include <emmintrin.h>
+#include <tmmintrin.h>
+
 
 
 #ifndef GENERATE_UNALIGNED_INLINES
@@ -397,4 +400,6 @@ INLINE_NAME(unpack_high_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_
 	// U13 0	V13 0	U14 0 	V14 0	U15 0 	V15 0	U16 0	V16 0		// PUNPCKHBW       1	0.5
 
 };
+
+#endif	// __INTEL_CPU__
 

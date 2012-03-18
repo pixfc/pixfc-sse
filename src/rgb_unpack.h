@@ -18,14 +18,16 @@
  *
  */
 
+#include "common.h"
+#include "debug_support.h"
+#include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
 #include <emmintrin.h>
 #include <stdint.h>
 #include <string.h>
 #include <tmmintrin.h>
-
-#include "common.h"
-#include "debug_support.h"
-#include "platform_util.h"
 
 #ifndef GENERATE_UNALIGNED_INLINES
 #error "The GENERATE_UNALIGNED_INLINES macro is not defined"
@@ -1221,4 +1223,6 @@ INLINE_NAME(unpack_bgr24_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* o
 	out_6_v16i_r_g_b_vectors[5] = _mm_or_si128(out_6_v16i_r_g_b_vectors[5], _M(scratch1));	// POR		1	0.33
 	// B9  0	B10 0	B11  0	B12  0	B13  0	B14  0	B15  0	B16  0
 };
+
+#endif	// __INTEL_CPU__
 

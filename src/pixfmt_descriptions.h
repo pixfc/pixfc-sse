@@ -21,11 +21,13 @@
 #ifndef PIXFMT_DESCRIPTIONS_H_
 #define PIXFMT_DESCRIPTIONS_H_
 
-#include <emmintrin.h>
 
 #include "pixfc-sse.h"
 #include "platform_util.h"
 
+#ifdef __INTEL_CPU__
+#include <emmintrin.h>
+#endif
 /*
  * A structure grouping together interesting bits of info about
  * a pixel format:

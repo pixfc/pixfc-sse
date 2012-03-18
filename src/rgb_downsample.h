@@ -21,11 +21,14 @@
 #ifndef RGB_DOWNSAMPLE_H_
 #define RGB_DOWNSAMPLE_H_
 
+#include "debug_support.h"
+#include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
-#include "debug_support.h"
-#include "platform_util.h"
 
 /*
  * Create 3 422 downsampled R, G, B vectors from 3 R, G, B vectors
@@ -1302,5 +1305,7 @@ EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2(__m128i* in_4_v16i_curr
 EXTERN_INLINE void	avg_420_downsample_ag_rb_vectors_sse2_ssse3(__m128i* in_4_v16i_current_ag_rb_vectors_1, __m128i* in_4_v16i_current_ag_rb_vectors_2, __m128i *out_2_v16i_avg_420_ag_rb_vectors) {
 	avg_420_downsample_ag_rb_vectors_sse2(in_4_v16i_current_ag_rb_vectors_1, in_4_v16i_current_ag_rb_vectors_2, out_2_v16i_avg_420_ag_rb_vectors);
 }
+
+#endif	// __INTEL_CPU__
 
 #endif /* RGB_DOWNSAMPLE_H_ */

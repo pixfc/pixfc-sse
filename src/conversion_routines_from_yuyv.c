@@ -217,6 +217,7 @@ void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, voi
 /*
  * Original yuv to rgb conversion - left here for ref
  */
+#ifdef __INTEL_CPU__
 void 		convert_yuyv_to_rgb_original(const struct PixFcSSE* conv, void* in, void* out){
 	__m128i*	yuyv_8pixels = (__m128i *) in;
 	__m128i*	rgb_out_buf = (__m128i *) out;
@@ -234,7 +235,7 @@ void 		convert_yuyv_to_rgb_original(const struct PixFcSSE* conv, void* in, void*
 		pixel_count -= 16;
 	};
 }
-
+#endif
 
 
 /*

@@ -22,11 +22,14 @@
 #define YUV_TO_RGB_CONVERT_H_
 
 
+#include "debug_support.h"
+#include "platform_util.h"
+
+#ifdef	__INTEL_CPU__
+
 #include <emmintrin.h>
 #include <tmmintrin.h>
 
-#include "debug_support.h"
-#include "platform_util.h"
 
 /*
  * Convert 2 vectors of 8 short Y, UY into 3 vectors of 8 short R, G & B
@@ -1607,6 +1610,8 @@ DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE(convert_y_uv_vectors_to_rgb_vecto
 											   0x00E5000000E50000LL, 0x00E5000000E50000LL,
 											   0xFFBCFFE5FFBCFFE5LL, 0xFFBCFFE5FFBCFFE5LL,
 											   0x0000010E0000010ELL, 0x0000010E0000010ELL);
+#endif	// __INTEL_CPU__
+
 #endif /* YUV_TO_RGB_CONVERT_H_ */
 
 

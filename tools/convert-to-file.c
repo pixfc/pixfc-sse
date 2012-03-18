@@ -16,16 +16,18 @@
  *
  */
 
-#include <emmintrin.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
 #include "rgb_image.h"
 #include "test-utils.h"
 
+#ifdef __INTEL_CPU__
+#include <emmintrin.h>
+#endif
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion

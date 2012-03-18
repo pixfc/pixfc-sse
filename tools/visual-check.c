@@ -16,10 +16,6 @@
  *
  */
 
-#include <emmintrin.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "common.h"
 #include "conversion_blocks.h"
 #include "pixfc-sse.h"
@@ -27,6 +23,15 @@
 #include "platform_util.h"
 #include "rgb_image.h"
 #include "test-utils.h"
+
+#ifdef __INTEL_CPU__
+#include <emmintrin.h>
+#endif
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 
 #define		PATH_TO_TEST_IMG	"../test-images/"
 

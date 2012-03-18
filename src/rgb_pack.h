@@ -18,14 +18,16 @@
  *
  */
 
+#include "common.h"
+#include "debug_support.h"
+#include "platform_util.h"
+
+#ifdef __INTEL_CPU__
+
 #include <emmintrin.h>
 #include <tmmintrin.h>
 #include <stdint.h>
 #include <string.h>
-
-#include "common.h"
-#include "debug_support.h"
-#include "platform_util.h"
 
 
 #ifndef GENERATE_UNALIGNED_INLINES
@@ -505,4 +507,6 @@ INLINE_NAME(pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, __m128i* in_
 	repack_4_bgra_vectors_to_3_bgr24_vectors_nonsse(pack_out, out_3_bgr24_vectors);
 
 }
+
+#endif 	// __INTEL_CPU__
 

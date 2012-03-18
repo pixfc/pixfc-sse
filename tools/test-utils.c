@@ -18,7 +18,30 @@
  *
  */
 #define _CRT_SECURE_NO_WARNINGS		// MS only
+
+#include "common.h"
+#include "conversion_blocks.h"
+#include "pixfmt_descriptions.h"
+#include "platform_util.h"
+#include "test-utils.h"
+
+#ifdef __INTEL_CPU__
 #include <emmintrin.h>
+#else
+void _mm_store_si128(__m128i *dest, __m128i src) {
+	uint8_t* d = (uint8_t*)dest;
+	uint8_t* s = (uint8_t*)&src;
+	uint32_t i = 0;
+	
+	for(i = 0; i < 16; i++) {
+		*d++ = *s++;
+	}
+}
+
+void _mm_storeu_si128(__m128i *dest, __m128i src) {
+	_mm_store_si128(dest, src);
+}
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -36,12 +59,6 @@
 		#include <mach/mach_time.h>
 	#endif
 #endif
-
-#include "common.h"
-#include "conversion_blocks.h"
-#include "pixfmt_descriptions.h"
-#include "platform_util.h"
-#include "test-utils.h"
 
 
 PixFcPixelFormat	find_matching_pixel_format(char *format_string) {
