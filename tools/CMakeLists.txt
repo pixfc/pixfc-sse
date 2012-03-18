@@ -4,9 +4,9 @@ include_directories(AFTER include ../src)
 
 if(NOT WIN32)
 	add_definitions(-Wno-trigraphs)
-	if(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]")
+	if(PIXFC_TARGET_PROCESSOR MATCHES "intel")
 		add_definitions(-msse2 -mssse3)
-	endif(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]")
+	endif(PIXFC_TARGET_PROCESSOR MATCHES "intel")
 endif(NOT WIN32)
 
 # Check if we are building in debug mode

@@ -20,6 +20,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (PixFC-SSE)
 
+include(cmake/DetectPlatform.cmake)
+
 # include dirs
 include_directories(AFTER include include/common)
 if(WIN32)
