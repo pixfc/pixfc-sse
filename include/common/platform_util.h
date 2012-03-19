@@ -22,7 +22,8 @@
 #define PLATFORM_UTIL_H
 
 // Platform detection
-#if defined(__i386__) || defined(__x86_64__)
+// If we are building on Windows, assume we are building for Intel
+#if defined(WIN32) || defined(__i386__) || defined(__x86_64__)
 #define __INTEL_CPU__	1
 #endif
 
