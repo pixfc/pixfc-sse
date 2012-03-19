@@ -56,27 +56,29 @@ list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
 )
 
 
-# Add target CPU specific compiler options
+# No cross compiling support for Windows yet.
+# So only if not on Windows, add target CPU 
+# specific compiler options
 if(NOT WIN32)
-	if(PIXFC_TARGET_PROCESSOR MATCHES "Intel")
+	if(PIXFC_TARGET_ARCH MATCHES "Intel")
 		add_definitions(-msse2 -mssse3)
-		if(PIXFC_TARGET_PROCESSOR MATCHES "x86$")
+		if(PIXFC_TARGET_ARCH MATCHES "x86$")
 			add_definitions(-m32)
-			message("32-bit build")
-		elseif(PIXFC_TARGET_PROCESSOR MATCHES "x86_64$")
+			message("Build setup for Intel 32-bit CPU")
+		elseif(PIXFC_TARGET_ARCH MATCHES "x86_64$")
 			add_definitions(-m64)
-			message("64-bit build")
-		else(PIXFC_TARGET_PROCESSOR MATCHES "x86$")
-			message(FATAL_ERROR "Unknown Intel CPU" ${PIXFC_TARGET_PROCESSOR})
-		endif(PIXFC_TARGET_PROCESSOR MATCHES "x86$")
-	elseif(PIXFC_TARGET_PROCESSOR STREQUAL "ARM")
+			message("Build setup for Intel 64-bit CPU")
+		else(PIXFC_TARGET_ARCH MATCHES "x86$")
+			message(FATAL_ERROR "Unknown Intel CPU " ${PIXFC_TARGET_ARCH})
+		endif(PIXFC_TARGET_ARCH MATCHES "x86$")
+	elseif(PIXFC_TARGET_ARCH STREQUAL "ARM")
 		if(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
 			message(FATAL_ERROR "PIXFC_ARM_TARGET_PROCESSOR not defined - define in toolchain CMAKE file: " ${CMAKE_TOOLCHAIN_FILE})
 		endif(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
 
-		message(${PIXFC_ARM_TARGET_PROCESSOR} " build")
+		message("Build setup for ${PIXFC_ARM_TARGET_PROCESSOR} CPU")
 		add_definitions(-mtune=${PIXFC_ARM_TARGET_PROCESSOR})
-	endif(PIXFC_TARGET_PROCESSOR MATCHES "Intel")
+	endif(PIXFC_TARGET_ARCH MATCHES "Intel")
 endif(NOT WIN32)
 
 # Check if we are building in debug mode

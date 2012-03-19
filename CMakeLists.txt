@@ -18,9 +18,9 @@
 #
 
 cmake_minimum_required (VERSION 2.6)
-project (PixFC-SSE)
+project (PixFC-SSE C)
 
-include(cmake/DetectPlatform.cmake)
+include(cmake/DetectTarget.cmake)
 
 # include dirs
 include_directories(AFTER include include/common)
