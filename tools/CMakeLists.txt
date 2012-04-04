@@ -4,9 +4,23 @@ include_directories(AFTER include ../src)
 
 if(NOT WIN32)
 	add_definitions(-Wno-trigraphs)
-	if(PIXFC_TARGET_PROCESSOR MATCHES "intel")
-		add_definitions(-msse2 -mssse3)
-	endif(PIXFC_TARGET_PROCESSOR MATCHES "intel")
+
+        if(PIXFC_TARGET_ARCH MATCHES "Intel")
+                add_definitions(-msse2 -mssse3)
+                if(PIXFC_TARGET_ARCH MATCHES "x86$")
+                        add_definitions(-m32)
+                elseif(PIXFC_TARGET_ARCH MATCHES "x86_64$")
+                        add_definitions(-m64)
+                else(PIXFC_TARGET_ARCH MATCHES "x86$")
+                        message(FATAL_ERROR "Unknown Intel CPU " ${PIXFC_TARGET_ARCH})
+                endif(PIXFC_TARGET_ARCH MATCHES "x86$")
+        elseif(PIXFC_TARGET_ARCH STREQUAL "ARM")
+                if(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
+                        message(FATAL_ERROR "PIXFC_ARM_TARGET_PROCESSOR not defined - define in toolchain CMAKE file: " ${CMAKE_TOOLCHAIN_FILE})
+                endif(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
+
+                add_definitions(-mtune=${PIXFC_ARM_TARGET_PROCESSOR})
+        endif(PIXFC_TARGET_ARCH MATCHES "Intel")
 endif(NOT WIN32)
 
 # Check if we are building in debug mode
