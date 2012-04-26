@@ -188,7 +188,7 @@ void 		convert_yuv422p_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void
 	int32_t				y, u, v;
 
 	while(pixel_num++ < pixel_count){
-		y = (*y_src++) << 8;
+		y = (*y_src++) -16;
 		u = *u_src - 128;
 		v = *v_src - 128;
 
@@ -197,9 +197,9 @@ void 		convert_yuv422p_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void
 			v_src++;
 		}
 
-		r = (y + (459 * v)) >> 8;
-		g = (y - (54 * u) - (136 * v)) >> 8;
-		b = (y + (540 * u)) >> 8;
+		r = (298 * y + (459 * v)) >> 8;
+		g = (298 * y - (54 * u) - (136 * v)) >> 8;
+		b = (298 * y + (540 * u)) >> 8;
 
 		if (dest_fmt == PixFcARGB) {
 			*(dst++) = 0;		//A

@@ -182,13 +182,13 @@ void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* i
 	int32_t				y, u, v;
 
 	while(pixel_num++ < pixel_count){
-		y = (! which_y) ? ((src[0] - 16) << 8) : (src[2] - 16) << 8;
+		y = ((! which_y) ? src[0] : src[2]) - 16;
 		u = src[1] - 128;
 		v = src[3] - 128;
 
-		r = (y + (459 * v)) >> 8;
-		g = (y - (54 * u) - (136 * v)) >> 8;
-		b = (y + (540 * u)) >> 8;
+		r = (298 * y + (459 * v)) >> 8;
+		g = (298 * y - (54 * u) - (136 * v)) >> 8;
+		b = (298 * y + (540 * u)) >> 8;
 
 		if (dest_fmt == PixFcARGB) {
 			*(dst++) = 0;		//A
