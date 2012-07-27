@@ -32,6 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX_DIFF	2
 
 //
 // Use the conversion block at the provided index to convert image of given width and height in in buffer to out buffer
@@ -52,18 +53,62 @@ static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w,
 	return 0;
 }
 
+static int		do_scalar_image_conversion(PixFcPixelFormat src_fmt, PixFcPixelFormat dest_fmt,  void* in, void *out, uint32_t w, uint32_t h) {
+	struct PixFcSSE *	pixfc = NULL;
+
+	// Create struct pixfc
+	if (create_pixfc(&pixfc, src_fmt, dest_fmt, w, h, PixFcFlag_NoSSE) != 0) {
+		pixfc_log("Error create struct pixfc for scalar conversion\n");
+		return -1;
+	}
+
+	// Perform conversion
+	pixfc->convert(pixfc, in, out);
+
+	destroy_pixfc(pixfc);
+
+	return 0;
+}
+
+static int		compare_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	uint32_t i;
+	uint32_t buffer_size = IMG_SIZE(fmt, width, height);
+	uint32_t bytes_per_row = width * pixfmt_descriptions[fmt].bytes_per_pix_num / pixfmt_descriptions[fmt].bytes_per_pix_denom;
+	for(i = 0; i < buffer_size; i++) {
+		if(abs(*out_scalar - *out_sse) > max_diff) {
+			printf("Pixel %ux%u (buffer offset %u) differ by %u : SSE: %hhu - Scalar: %hhu\n",
+					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) / width,
+					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width,
+					abs(*out_scalar - *out_sse), max_diff, *out_sse, *out_scalar);
+			return -1;
+		}
+		out_scalar++;
+		out_sse++;
+	}
+
+	return 0;
+}
+
 int 		main(int argc, char **argv) {
 	uint32_t				index;
 	const InputFile*		in_file = NULL;
-	char 					out_filename[128] = {0};
-	char					*r;
 	PixFcPixelFormat		src_fmt = PixFcFormatCount;
+	uint8_t					max_diff = MAX_DIFF;
 	// In / out buffers
 	__m128i	*				in = NULL;
-	__m128i	*				out = NULL;	
+	__m128i	*				out = NULL;	// buffer holding SSE converted data
+	__m128i	*				out_scalar = NULL;// buffer holding scalar converted data for comparison
 	
+	if (argc < 2) {
+		printf("Usage: %s threshold [ source pixel format]\n", argv[0]);
+		return 0;
+	}
+
 	// Check if we should restrict to a single source format
-	if (argc == 2) {
+	if (argc >= 2)
+		max_diff = atoi(argv[1]);
+
+	if (argc == 3) {
 		src_fmt = find_matching_pixel_format(argv[1]);
 		if (src_fmt != PixFcFormatCount)
 			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
@@ -80,6 +125,11 @@ int 		main(int argc, char **argv) {
 		if ((src_fmt != PixFcFormatCount) && (src_fmt != conversion_blocks[index].source_fmt))
 			continue;
 		
+		// Make sure we skipped the scalar conversion routines
+		// (we dont want to compare them with themselves)
+		if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+			continue;
+
 		// Make sure the CPU has the required features
 		if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
 			printf("  (skipped %s - CPU missing required features)\n",
@@ -125,27 +175,34 @@ int 		main(int argc, char **argv) {
 			}
 		}
 		
-		// Release previous output buffer and create new one
+		// Release previous output buffers and create new ones
 		ALIGN_FREE(out);
+		ALIGN_FREE(out_scalar);
 		
 		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
 			pixfc_log("Error allocating output buffer");
 			return 1;
 		}
 
+		if (allocate_aligned_buffer(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, (void **)&out_scalar) != 0) {
+			pixfc_log("Error allocating scalar output buffer");
+			return 1;
+		}
+
 		printf("%-60s %dx%d\n", conversion_blocks[index].name, in_file->width, in_file->height);
 		
-		// Do conversion
+		// Do SSE conversion
 		if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
 			return -1;
 		
-		// Save output buffer
-		strcpy(out_filename, (in_file->filename) ? in_file->filename : "rgb_buffer");
-		strcat(out_filename, " - ");
-		strcat(out_filename, conversion_blocks[index].name);
-		while ( (r = strchr(out_filename, '/')) != NULL)
-			   r[0] = '-';
-		write_buffer_to_file(conversion_blocks[index].dest_fmt, in_file->width, in_file->height, out_filename, out);
+		// Do scalar conversion
+		if (do_scalar_image_conversion(conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, in, out_scalar, in_file->width, in_file->height) != 0)
+			return -1;
+
+		// Compare the two output buffers
+		if (compare_output_buffers((uint8_t*)out, (uint8_t*)out_scalar, conversion_blocks[index].dest_fmt, in_file->width, in_file->height, max_diff) != 0) {
+			break;
+		}
 		
 		// Add a blank line if the next conversion block uses different
 		// source or destinaton format
@@ -159,6 +216,8 @@ int 		main(int argc, char **argv) {
 	
 	ALIGN_FREE(in);
 	ALIGN_FREE(out);			   
+	ALIGN_FREE(out_scalar);
+
 	
 	return 0;
 }

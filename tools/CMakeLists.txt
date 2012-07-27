@@ -81,3 +81,17 @@ else(WIN32 OR APPLE)
 	target_link_libraries(visual-check pixfc-sse rt)
 endif(WIN32 OR APPLE)
 
+#
+#  VALIDATE OUTPUT TARGET
+#
+# Create groups for XCode and VS
+source_group("source files" FILES validate-output.c test-utils.c rgb_image.c)
+source_group("header files" FILES test-utils.h rgb_image.h)
+# Create app
+add_executable(validate-output validate-output.c test-utils.c rgb_image.c test-utils.h rgb_image.h)
+if(WIN32 OR APPLE)
+	target_link_libraries(validate-output pixfc-sse)
+else(WIN32 OR APPLE)
+	target_link_libraries(validate-output pixfc-sse rt)
+endif(WIN32 OR APPLE)
+

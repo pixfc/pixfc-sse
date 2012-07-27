@@ -33,6 +33,28 @@
 								__FILE__, __LINE__, ## __VA_ARGS__);\
 								fflush(stderr); } while(0)
 
+
+typedef struct {
+	PixFcPixelFormat	format;
+	uint32_t			width;
+	uint32_t			height;
+	char *				filename;
+} InputFile;
+
+
+// Relative path to the test-image dir
+#define		PATH_TO_TEST_IMG	"../test-images/"
+// Array of InputFiles each describing a single test file in the test-images dir
+extern const InputFile		input_files[];
+// Number of elements in the previous array
+extern const uint32_t		input_files_size;
+
+/*
+ * Return the InputFile matching the given format, or NULL
+ */
+const InputFile* 	find_input_file_for_format(PixFcPixelFormat format);
+
+
 /*
  * Look for PixFcPixelFormat enum entry matching the given pixel format
  * passed as a string. (Uses pixfmt_descriptions array to look for match)

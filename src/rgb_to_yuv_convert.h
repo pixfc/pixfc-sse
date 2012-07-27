@@ -97,12 +97,12 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2(__m128i* in_3_v16i_r_g
 /*
  * R, G, B vectors to Y vector - bt{601,709}
  */
-#define DEFINE_R_G_B_TO_Y_INLINE(fn_name, rCoeffVal, gCoeffVal, bCoeffVal)\
+#define DEFINE_R_G_B_TO_Y_INLINE(fn_name, rCoeffVal, gCoeffVal, bCoeffVal, offsetVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_y_vector) {\
 		CONST_M128I(rYCoeffs, rCoeffVal, rCoeffVal);\
 		CONST_M128I(gYCoeffs, gCoeffVal, gCoeffVal);\
 		CONST_M128I(bYCoeffs, bCoeffVal, bCoeffVal);\
-		CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);\
+		CONST_M128I(resultOffset, offsetVal, offsetVal);\
 		M128I(rScratch, 0x0LL, 0x0LL);\
 		M128I(gScratch, 0x0LL, 0x0LL);\
 		M128I(bScratch, 0x0LL, 0x0LL);\
@@ -111,7 +111,7 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2(__m128i* in_3_v16i_r_g
 		_M(bScratch) = _mm_mulhi_epu16(in_3_v16i_r_g_b_vectors[2], _M(bYCoeffs));\
 		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));\
 		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));\
-		*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(add_16));\
+		*out_1_v16i_y_vector = _mm_add_epi16(_M(rScratch), _M(resultOffset));\
 	}
 /*
  * The previous macro expands to:
@@ -183,7 +183,7 @@ EXTERN_INLINE void convert_r_g_b_vectors_to_y_vector_sse2(__m128i* in_3_v16i_r_g
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt601_sse2, 0x41CB41CB41CB41CBLL, 0x8106810681068106LL, 0x1917191719171917LL);
+DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt601_sse2, 0x41CB41CB41CB41CBLL, 0x8106810681068106LL, 0x1917191719171917LL, 0x0010001000100010LL);
 
 /*
  * Convert 3 vectors of 8 short R, G, B into 1 vector of 8 short Y
@@ -219,7 +219,7 @@ DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt601_sse2, 0x41CB41C
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED92ED92ED9LL, 0x9D2F9D2F9D2F9D2FLL, 0x0FDF0FDF0FDF0FDFLL);
+DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED92ED92ED9LL, 0x9D2F9D2F9D2F9D2FLL, 0x0FDF0FDF0FDF0FDFLL, 0x0010001000100010LL);
 
 
 
@@ -227,12 +227,12 @@ DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED
 /*
  * R, G, B vectors to UV vectors - full range, bt{601, 709}
  */
-#define DEFINE_R_G_B_TO_UV_INLINE(fn_name, rUVCoeffVal, gUVCoeffVal, bUVCoeffVal)\
+#define DEFINE_R_G_B_TO_UV_INLINE(fn_name, rUVCoeffVal, gUVCoeffVal, bUVCoeffVal, offsetVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_3_v16i_r_g_b_vectors, __m128i* out_1_v16i_uv_vector) {\
 		CONST_M128I(rUVCoeffsInterleaved, rUVCoeffVal, rUVCoeffVal);\
 		CONST_M128I(gUVCoeffsInterleaved, gUVCoeffVal, gUVCoeffVal);\
 		CONST_M128I(bUVCoeffsInterleaved, bUVCoeffVal, bUVCoeffVal);\
-		CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);\
+		CONST_M128I(resultOffset, offsetVal, offsetVal);\
 		M128I(rScratch, 0x0LL, 0x0LL);\
 		M128I(gScratch, 0x0LL, 0x0LL);\
 		M128I(bScratch, 0x0LL, 0x0LL);\
@@ -241,7 +241,7 @@ DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED
 		_M(bScratch) = _mm_mulhi_epi16(in_3_v16i_r_g_b_vectors[2], _M(bUVCoeffsInterleaved));\
 		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(gScratch));\
 		_M(rScratch) = _mm_add_epi16(_M(rScratch), _M(bScratch));\
-		*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(add128));\
+		*out_1_v16i_uv_vector = _mm_add_epi16(_M(rScratch), _M(resultOffset));\
 	}
 /*
  * The previous macro expands to
@@ -316,7 +316,7 @@ DEFINE_R_G_B_TO_Y_INLINE(convert_r_g_b_vectors_to_y_vector_bt709_sse2, 0x2ED92ED
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2, 0x7FFFD4BC7FFFD4BCLL, 0x94BCAB4494BCAB44LL, 0xEB447FFFEB447FFFLL);
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2, 0x7FFFD4BC7FFFD4BCLL, 0x94BCAB4494BCAB44LL, 0xEB447FFFEB447FFFLL, 0x0080008000800080LL);
 
 
 /*
@@ -353,7 +353,7 @@ DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2, 0x7062DA1D7062DA1DLL, 0xA1CBB581A1CBB581LL, 0xEDD37062EDD37062LL);
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2, 0x7062DA1D7062DA1DLL, 0xA1CBB581A1CBB581LL, 0xEDD37062EDD37062LL, 0x0080008000800080LL);
 
 
 /*
@@ -390,7 +390,7 @@ DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt6
  *
  */
 
-DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2, 0x7062E6257062E625LL, 0x99DBA93799DBA937LL, 0xF5C37062F5C37062LL);
+DEFINE_R_G_B_TO_UV_INLINE(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2, 0x7062E6257062E625LL, 0x99DBA93799DBA937LL, 0xF5C37062F5C37062LL, 0x0080008000800080LL);
 
 
 /*
@@ -510,11 +510,11 @@ DEFINE_AG_RB_TO_Y_FR(convert_ga_br_vectors_to_y_vector_sse2, 0x00004B7D00004B7DL
 /*
  * AG, RB vectors to Y vector - bt{601,709}
  */
-#define DEFINE_AG_RB_TO_Y_INLINE(fn_name, gaYCoeffVal, brYCoeffVal)\
+#define DEFINE_AG_RB_TO_Y_INLINE(fn_name, gaYCoeffVal, brYCoeffVal, offsetVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_4_v16i_ga_br_vectors, __m128i* out_1_v16i_y_vector) {\
 		CONST_M128I(gaYCoeffs, gaYCoeffVal, gaYCoeffVal);\
 		CONST_M128I(brYCoeffs, brYCoeffVal, brYCoeffVal);\
-		CONST_M128I(add_16, 0x0010001000100010LL, 0x0010001000100010LL);\
+		CONST_M128I(resultOffset, offsetVal, offsetVal);\
 		M128I(y1Scratch, 0x0LL, 0x0LL);\
 		M128I(y2Scratch, 0x0LL, 0x0LL);\
 		M128I(scratch, 0x0LL, 0x0LL);\
@@ -527,7 +527,7 @@ DEFINE_AG_RB_TO_Y_FR(convert_ga_br_vectors_to_y_vector_sse2, 0x00004B7D00004B7DL
 		_M(y2Scratch) = _mm_add_epi32 (_M(y2Scratch), _M(scratch));\
 		_M(y2Scratch) = _mm_srli_epi32 (_M(y2Scratch), 15);\
 		_M(y1Scratch) = _mm_packs_epi32(_M(y1Scratch), _M(y2Scratch));\
-		*out_1_v16i_y_vector = _mm_add_epi16(_M(y1Scratch), _M(add_16));\
+		*out_1_v16i_y_vector = _mm_add_epi16(_M(y1Scratch), _M(resultOffset));\
 	}
 
 /*
@@ -619,9 +619,9 @@ DEFINE_AG_RB_TO_Y_FR(convert_ga_br_vectors_to_y_vector_sse2, 0x00004B7D00004B7DL
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DEFINE_AG_RB_TO_Y_INLINE(convert_ag_rb_vectors_to_y_vector_bt601_sse2, 0x4083000040830000LL, 0x0C8B20E50C8B20E5LL);
+DEFINE_AG_RB_TO_Y_INLINE(convert_ag_rb_vectors_to_y_vector_bt601_sse2, 0x4083000040830000LL, 0x0C8B20E50C8B20E5LL, 0x0010001000100010LL);
 
-DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt601_sse2, 0x0000408300004083LL, 0x20E50C8B20E50C8BLL);
+DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt601_sse2, 0x0000408300004083LL, 0x20E50C8B20E50C8BLL, 0x0010001000100010LL);
 
 
 /*
@@ -663,9 +663,9 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt601_sse2, 0x0000408
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DEFINE_AG_RB_TO_Y_INLINE(convert_ag_rb_vectors_to_y_vector_bt709_sse2, 0x4E9700004E970000LL, 0x07F0176D07F0176DLL);
+DEFINE_AG_RB_TO_Y_INLINE(convert_ag_rb_vectors_to_y_vector_bt709_sse2, 0x4E9700004E970000LL, 0x07F0176D07F0176DLL, 0x0010001000100010LL);
 
-DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9700004E97LL, 0x176D07F0176D07F0LL);
+DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9700004E97LL, 0x176D07F0176D07F0LL, 0x0010001000100010LL);
 
 
 
@@ -674,9 +674,9 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9
 /*
  * AG, RB vectors to UV vector - FR and bt{601,709}
  */
-#define DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(fn_name, gaUCoeffVal, brUCoeffVal, gaVCoeffVal, brVCoeffVal)\
+#define DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(fn_name, gaUCoeffVal, brUCoeffVal, gaVCoeffVal, brVCoeffVal, offsetVal)\
 	EXTERN_INLINE void fn_name(__m128i* in_2_v16i_ga_br_vectors, __m128i* out_1_v16i_uv_vector) {\
-		CONST_M128I(add128, 0x0080008000800080LL, 0x0080008000800080LL);\
+		CONST_M128I(resultOffset, offsetVal, offsetVal);\
 		CONST_M128I(gaUCoeffs, gaUCoeffVal, gaUCoeffVal);\
 		CONST_M128I(brUCoeffs, brUCoeffVal, brUCoeffVal);\
 		CONST_M128I(gaVCoeffs, gaVCoeffVal, gaVCoeffVal);\
@@ -693,7 +693,7 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9
 		_M(gaScratch) = _mm_add_epi32(_M(gaScratch), _M(brScratch));\
 		_M(gaScratch) = _mm_and_si128 (_M(gaScratch), _M(zeroLowWord));\
 		_M(gaScratch) = _mm_or_si128(*out_1_v16i_uv_vector, _M(gaScratch));\
-		*out_1_v16i_uv_vector = _mm_add_epi16(_M(gaScratch), _M(add128));\
+		*out_1_v16i_uv_vector = _mm_add_epi16(_M(gaScratch), _M(resultOffset));\
 	}
 
 /*
@@ -786,11 +786,13 @@ DEFINE_AG_RB_TO_Y_INLINE(convert_ga_br_vectors_to_y_vector_bt709_sse2, 0x00004E9
 
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ag_rb_vectors_to_uv_vector_sse2,
 										0xAB440000AB440000LL, 0x7FFFD4BC7FFFD4BCLL,
-										0x94BC000094BC0000LL, 0xEB447FFFEB447FFFLL);
+										0x94BC000094BC0000LL, 0xEB447FFFEB447FFFLL,
+										0x0080008000800080LL);
 
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_uv_vector_sse2,
 										0x0000AB440000AB44LL, 0xD4BC7FFFD4BC7FFFLL,
-										0x000094BC000094BCLL, 0x7FFFEB447FFFEB44LL);
+										0x000094BC000094BCLL, 0x7FFFEB447FFFEB44LL,
+										0x0080008000800080LL);
 
 
 
@@ -826,11 +828,13 @@ DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_u
  */
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601_sse2,
 									  0xB5810000B5810000LL, 0x7062DA1D7062DA1DLL, 
-									  0xA1CB0000A1CB0000LL, 0xEDD37062EDD37062LL);
+									  0xA1CB0000A1CB0000LL, 0xEDD37062EDD37062LL,
+									0x0080008000800080LL);
 
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_uv_vector_bt601_sse2,
 									  0x0000B5810000B581LL, 0xDA1D7062DA1D7062LL,
-									  0x0000A1CB0000A1CBLL, 0x7062EDD37062EDD3LL);
+									  0x0000A1CB0000A1CBLL, 0x7062EDD37062EDD3LL,
+									0x0080008000800080LL);
 
 
 /*
@@ -865,11 +869,13 @@ DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_u
  */
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709_sse2,
 										0xA9370000A9370000LL, 0x7062E6257062E625LL,
-										0x99DB000099DB0000LL, 0xF5C37062F5C37062LL);
+										0x99DB000099DB0000LL, 0xF5C37062F5C37062LL,
+										0x0080008000800080LL);
 
 DEFINE_DOWNSAMPLED_AG_RB_TO_UV_INLINE(convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709_sse2,
 										  0x0000A9370000A937LL, 0xE6257062E6257062LL,
-										  0x000099DB000099DBLL, 0x7062F5C37062F5C3LL);
+										  0x000099DB000099DBLL, 0x7062F5C37062F5C3LL,
+										0x0080008000800080LL);
 #endif 	// __INTEL_CPU__
 
 #endif /* RGB_TO_YUV_CONVERT_H_ */

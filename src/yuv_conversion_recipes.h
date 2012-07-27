@@ -443,6 +443,37 @@
 		pixel_count -= 16;\
 	};\
 
+/*
+ * Convert v210 to RGB using NNB upsampling
+ * (based off the YUV422I_TO_RGB_RECIPE, adjusted to v210 unpacking creating 6
+ * output vectors instead of 2 as YUV422I unpacking does)
+ */
+#define V210_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
+	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
+	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i		unpack_out[6];\
+	__m128i		convert_out[6];\
+	while(pixel_count > 0) {\
+		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
+		yuyv_8pixels += 3;\
+		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+		pack_fn(convert_out, rgb_out_buf);\
+		rgb_out_buf += output_stride;\
+		conv_fn_prefix##instr_set(&unpack_out[4], convert_out);\
+		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
+		yuyv_8pixels += 3;\
+		conv_fn_prefix##instr_set(unpack_out, &convert_out[3]);\
+		pack_fn(convert_out, rgb_out_buf);\
+		rgb_out_buf += output_stride;\
+		conv_fn_prefix##instr_set(&unpack_out[2], convert_out);\
+		conv_fn_prefix##instr_set(&unpack_out[4], &convert_out[3]);\
+		pack_fn(convert_out, rgb_out_buf);\
+		rgb_out_buf += output_stride;\
+		pixel_count -= 48;\
+	};\
+
 
 /*
  *

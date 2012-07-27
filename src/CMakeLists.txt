@@ -27,6 +27,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_bgr24.c
 	conversion_routines_from_bgr24_bt601.c
 	conversion_routines_from_bgr24_bt709.c
+	conversion_routines_from_v210.c
 )
 
 # header files
@@ -61,7 +62,7 @@ list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
 # specific compiler options
 if(NOT WIN32)
 	if(PIXFC_TARGET_ARCH MATCHES "Intel")
-		add_definitions(-msse2 -mssse3)
+		add_definitions(-msse2 -mssse3 -msse4.1)
 		if(PIXFC_TARGET_ARCH MATCHES "x86$")
 			add_definitions(-m32)
 			message("Build setup for Intel 32-bit CPU")

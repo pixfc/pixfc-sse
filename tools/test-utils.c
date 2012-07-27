@@ -61,6 +61,64 @@ void _mm_storeu_si128(__m128i *dest, __m128i src) {
 #endif
 
 
+const InputFile		input_files[] = {
+	{
+		PixFcYUYV,
+		1280, 1024,
+		"1280x1024.yuyv",
+	},
+	{
+		PixFcUYVY,
+		1920, 1080,
+		"1920x1080.uyvy",
+	},
+	{
+		PixFcYUV422P,
+		1280, 1024,
+		"1280x1024.yuv422p",
+	},
+	{
+		PixFcYUV420P,
+		1280, 1024,
+		"1280x1024.yuv420p",
+	},
+	{
+		PixFcARGB,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcBGRA,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcRGB24,
+		1920, 1080,
+		NULL,
+	},
+	{
+		PixFcBGR24,
+		1920, 1080,
+		NULL,
+	},
+};
+const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
+
+
+//
+// Return the InputFile matching the given format, or NULL
+const InputFile* 	find_input_file_for_format(PixFcPixelFormat format){
+	uint32_t	index = input_files_size;
+
+	while (index-- > 0) {
+		if (input_files[index].format == format)
+			return &input_files[index];
+	}
+
+	return NULL;
+}
+
 PixFcPixelFormat	find_matching_pixel_format(char *format_string) {
 	PixFcPixelFormat		format = PixFcFormatCount;
 	uint32_t				index = pixfmt_descriptions_count;

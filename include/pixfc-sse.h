@@ -43,6 +43,7 @@ typedef enum {
 	PixFcUYVY,
 	PixFcYUV422P,
 	PixFcYUV420P,
+	PixFcV210,		// 10-bit YUV ( https://developer.apple.com/quicktime/icefloe/dispatch019.html#v210 )
 
 	// RGB formats
 	PixFcARGB,	// 32-bit ARGB

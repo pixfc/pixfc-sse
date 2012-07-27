@@ -30,9 +30,12 @@
 #include "conversion_routines_from_bgra.h"
 #include "conversion_routines_from_rgb24.h"
 #include "conversion_routines_from_bgr24.h"
+#include "conversion_routines_from_v210.h"
 
 #define 	DECLARE_CONV_BLOCK(convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, height_mult_count, desc)\
 { convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, pix_mult_count, height_mult_count, desc }
+
+//
 
 // NNB resampling NON-SSE {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)\
@@ -41,6 +44,8 @@ DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 			src_fmt, dst_fmt, 		CPUID_FEAT
 DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NNB_RESAMPLING, 1, 1, desc_str_prefix " - bt.601 - NON-SSE - fast resampling")
 #define		DECLARE_NNB_BT709_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING, 1, 1, desc_str_prefix " - bt.709 - NON-SSE - fast resampling")
+
+//
 
 // NNB resampling SSE2 {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
@@ -58,6 +63,8 @@ DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2, 		src_fmt, dst_fmt, 		CPUID_F
 #define		DECLARE_AVG_BT709_SSE2_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2, 		src_fmt, dst_fmt,		CPUID_FEATURE_SSE2, 		BT709_CONVERSION, pix_mult_count, height_mult_count, desc_str_prefix " - bt.709 - SSE2")
 
+//
+
 // NNB resampling SSSE3 {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, 	NNB_RESAMPLING, pix_mult_count, height_mult_count, desc_str_prefix " - SSE2 / SSSE3 - fast resampling")
@@ -73,6 +80,16 @@ DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3, 		src_fmt, dst_fmt, 		CPUID_F
 DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2_ssse3, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, 	BT601_CONVERSION, pix_mult_count, height_mult_count, desc_str_prefix " - bt.601 - SSE2 / SSSE3")
 #define		DECLARE_AVG_BT709_SSE2_SSSE3_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3, 	BT709_CONVERSION,  pix_mult_count, height_mult_count, desc_str_prefix " - bt.709 - SSE2 / SSSE3")
+
+//
+
+// NNB resampling SSE41 {FR, bt.601, bt.709) macros
+#define		DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3_sse41, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	NNB_RESAMPLING, pix_mult_count, height_mult_count, desc_str_prefix " - SSE2 / SSSE3 / SSE41 - fast resampling")
+#define		DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT601_CONVERSION | NNB_RESAMPLING, pix_mult_count, height_mult_count, desc_str_prefix " - bt.601 - SSE2 / SSSE3 /SSE41 - fast resampling")
+#define		DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, pix_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT709_CONVERSION | NNB_RESAMPLING, pix_mult_count, height_mult_count, desc_str_prefix " - bt.709 - SSE2 / SSSE3 / SSE41 - fast resampling")
 
 
 /*
@@ -170,6 +187,7 @@ DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_p
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
+	DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 0, "v210 to ARGB"),
 	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, "ARGB to YUYV"),
