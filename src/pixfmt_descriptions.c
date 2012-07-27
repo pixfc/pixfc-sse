@@ -165,33 +165,34 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 			/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:
 			 U		Y		V		Y
-			 84      76      255		75
-			 43      149     21		148
-			 255     29      107		28
-			 128     255     128		254
+			 336	304		1020	300
+			 172	596		84		592
+			 1020	116		428		112
+			 512	1020	512		1016
+
 			 
 			 bright red(255 0 0)		light pink 	(255 179  176)
-			 84		76				255		255
+			 336	304		1020	1020
 			 bright green(0 255 0)	dark green 	(0   106 0)
-			 41		149				21		0
+			 164	596		84		0
 			 bright blue(0 0 255)	light purple(170 171 255)
-			 255		29				107		200
+			 1020	116		428		800
 			 orange (254 165 0)		bordeaux (81 0 0)
-			 30		173				186		0
+			 120	692		744		0
 			 
 			 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:
 			 U		Y		V		Y
-			 84      76      255		75
-			 43      149     21		148
-			 255     29      107		28
-			 128     255     128		254
+			 336	304		1020	300
+			 172	596		84		592
+			 1020	116		428		112
+			 512	1020	512		1016
 			 */
 			
-			_E(0x0706b0743fc94054LL, 0x2542b12c3fc4c150LL),
-			_E(0x000152540a4ff3fcLL, 0x130543f8200ff200LL),
-			_E(0x12cff130150002e8LL, 0x2b41e3201ac1d3fcLL),
-			_E(0x3f8803fc2001c1acLL, 0x074ff250054950acLL),
+			_E(0x2542b12c3fc4c150LL, 0x0706b0743fc94054LL),
+			_E(0x130543f8200ff200LL, 0x000152540a4ff3fcLL),
+			_E(0x2b41e3201ac1d3fcLL, 0x12cff130150002e8LL),
+			_E(0x074ff250054950acLL, 0x3f8803fc2001c1acLL),
 		},
 		4,
 		"v210",

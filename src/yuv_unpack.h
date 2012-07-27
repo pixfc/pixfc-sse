@@ -450,13 +450,13 @@ INLINE_NAME(unpack_1v_v210_to_y_uv_vectors_sse2_ssse3_sse41, __m128i* input, __m
 	// 0		Y0		0		U23		0		Y3		0		V45
 
 
-	_M(scratch3) = _mm_blendv_epi8(_M(scratch2), _M(scratch), _M(blend_uv_mask));	// PBLENDVB		1	1
+	_M(scratch3) = _mm_blendv_epi8(_M(scratch), _M(scratch2), _M(blend_uv_mask));	// PBLENDVB		1	1
 	//	U01		V01		0		U23		V23		U45		0		V45
 	*out_uv = _mm_shuffle_epi8(_M(scratch3), _M(shuffle1));							//	PSHUFB		1	0.5
 	//	U01		V01		U23		V23		U45		V45		0		0
 
 
-	_M(scratch3) = _mm_blendv_epi8(_M(scratch2), _M(scratch), _M(blend_y_mask));	// PBLENDVB		1	1
+	_M(scratch3) = _mm_blendv_epi8(_M(scratch), _M(scratch2), _M(blend_y_mask));	// PBLENDVB		1	1
 	//	0		Y0		Y1		Y2		0		Y3		Y4		Y5
 	*out_y = _mm_shuffle_epi8(_M(scratch3), _M(shuffle2));							//	PSHUFB		1	0.5
 	// Y0		Y1		Y2		Y3		Y4		Y5		0		0
@@ -485,10 +485,10 @@ INLINE_NAME(unpack_1v_v210_to_y_uv_vectors_sse2_ssse3_sse41, __m128i* input, __m
 INLINE_NAME(unpack_1v_v210_to_y_uv_vectors_sse2_ssse3, __m128i* input, __m128i* out_y, __m128i* out_uv) {
 	CONST_M128I(keep_low_component, 0x000003FF000003FFLL, 0x000003FF000003FFLL);
 	CONST_M128I(keep_middle_component, 0x03FF000003FF0000LL, 0x03FF000003FF0000LL);
-	CONST_M128I(shuffle_uv1, 0xFFFFFFFFFFFF0B0ALL, 0x0908FFFF03020100LL);
-	CONST_M128I(shuffle_uv2, 0xFFFFFFFF0F0EFFFFLL, 0xFFFF0706FFFFFFFFLL);
-	CONST_M128I(shuffle_y1, 0xFFFFFFFF0F0E0D0CLL, 0xFFFF07060504FFFFLL);
-	CONST_M128I(shuffle_y2, 0xFFFFFFFFFFFFFFFFLL, 0x0B0AFFFFFFFF0302LL);
+	CONST_M128I(shuffle_uv1, 0x0908FFFF03020100LL, 0xFFFFFFFFFFFF0B0ALL);
+	CONST_M128I(shuffle_uv2, 0xFFFF0706FFFFFFFFLL, 0xFFFFFFFF0F0EFFFFLL);
+	CONST_M128I(shuffle_y1, 0xFFFF07060504FFFFLL, 0xFFFFFFFF0F0E0D0CLL);
+	CONST_M128I(shuffle_y2, 0x0B0AFFFFFFFF0302LL, 0xFFFFFFFFFFFFFFFFLL);
 	M128I(scratch, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
@@ -531,64 +531,64 @@ INLINE_NAME(unpack_1v_v210_to_y_uv_vectors_sse2_ssse3, __m128i* input, __m128i* 
 
 
 #define DEFINE_UNPACK_4_V210_VECTORS(instr_set) \
-INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128i* output) {\
+INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128i* yuv1_8_out, __m128i* yuv9_16_out, __m128i* yuv17_24_out) {\
 	M128I(y1, 0x0LL, 0x0LL);\
 	M128I(uv1, 0x0LL, 0x0LL);\
 	M128I(y2, 0x0LL, 0x0LL);\
 	M128I(uv2, 0x0LL, 0x0LL);\
 	M128I(y3, 0x0LL, 0x0LL);\
 	M128I(uv3, 0x0LL, 0x0LL);\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &uv1, &y1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &y1, &uv1);\
 	/* Y0		Y1		Y2		Y3		Y4		Y5		0		0 */\
 	/* U10		V10		U23		V23		U45		V45		0		0 */\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &uv2, &y2);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &y2, &uv2);\
 	/* Y6		Y7		Y8		Y9		Y10		Y11		0		0 */\
 	/* U67		V67		U89		V89		U1011	V1011	0		0 */\
 	\
 	_M(y3) = _mm_slli_si128(_M(y2), 12);								/* PSLLDQ			1	0.5 */\
-	output[0] = _mm_or_si128(_M(y3), _M(y1));							/* POR              1	0.33 */\
+	yuv1_8_out[0] = _mm_or_si128(_M(y3), _M(y1));							/* POR              1	0.33 */\
 	/* Y0		Y1		Y2		Y3		Y4		Y5		Y6		Y7 */\
 	_M(y2) = _mm_srli_si128(_M(y2), 4);									/* PSRLDQ			1	0.5 */\
 	/* Y8		Y9		Y10		Y11		0		0		0		0 */\
 	\
 	\
 	_M(uv3) = _mm_slli_si128(_M(uv2), 12);								/* PSLLDQ			1	0.5 */\
-	output[1] = _mm_or_si128(_M(uv3), _M(uv1));							/* POR              1	0.33 */\
+	yuv1_8_out[1] = _mm_or_si128(_M(uv3), _M(uv1));							/* POR              1	0.33 */\
 	/* U01		V01		U23		V23		U45		V45		U67		V67 */\
 	_M(uv2) = _mm_srli_si128(_M(uv2), 4);								/* PSRLDQ			1	0.5 */\
 	/* U89		V89		U1011	V1011	0		0		0		0 */\
 	\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &uv3, &y3);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &y3, &uv3);\
 	/* Y12		Y13		Y14		Y15		Y16		Y17		0		0 */\
 	/* U1213	V1213	U1415	V1415	U1617	V1617	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y3), 8);									/* PSLLDQ			1	0.5 */\
-	output[2] = _mm_or_si128(_M(y1), _M(y2));							/* POR              1	0.33 */\
+	yuv9_16_out[2] = _mm_or_si128(_M(y1), _M(y2));							/* POR              1	0.33 */\
 	/* Y8		Y9		Y10		Y11		Y12		Y13		Y14		Y15 */\
 	_M(y3) = _mm_srli_si128(_M(y3), 8);									/* PSRLDQ			1	0.5 */\
 	/* Y16		Y17		0		0		0		0		0		0 */\
 	\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv3), 8);								/* PSLLDQ			1	0.5 */\
-	output[3] = _mm_or_si128(_M(uv1), _M(uv2));							/* POR              1	0.33 */\
+	yuv9_16_out[3] = _mm_or_si128(_M(uv1), _M(uv2));							/* POR              1	0.33 */\
 	/* U89		V89		U1011	V1011	U1213	V1213	U1415	V1415 */\
 	_M(uv3) = _mm_srli_si128(_M(uv3), 8);								/* PSRLDQ			1	0.5 */\
 	/* U1617	V1617	0		0		0		0		0		0 */\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &uv1, &y1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &y1, &uv1);\
 	/* Y18		Y19		Y20		Y21		Y22		Y23		0		0 */\
 	/* U1819	V1819	U2021	V2021	U2223	V2223	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y1), 4);									/* PSLLDQ			1	0.5 */\
-	output[4] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
+	yuv17_24_out[4] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
 	/*	Y16		Y17		Y18		Y19		Y20		Y21		Y22		Y23 */\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv1), 4);								/* PSLLDQ			1	0.5 */\
-	output[5] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
+	yuv17_24_out[5] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
 	/* U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223 */\
 }
 

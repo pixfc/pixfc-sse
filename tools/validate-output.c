@@ -74,12 +74,14 @@ static int		compare_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcP
 	uint32_t i;
 	uint32_t buffer_size = IMG_SIZE(fmt, width, height);
 	uint32_t bytes_per_row = width * pixfmt_descriptions[fmt].bytes_per_pix_num / pixfmt_descriptions[fmt].bytes_per_pix_denom;
+	uint8_t* sse_start = out_sse;
 	for(i = 0; i < buffer_size; i++) {
 		if(abs(*out_scalar - *out_sse) > max_diff) {
-			printf("Pixel %ux%u (buffer offset %u) differ by %u : SSE: %hhu - Scalar: %hhu\n",
-					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) / width,
-					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width,
-					abs(*out_scalar - *out_sse), max_diff, *out_sse, *out_scalar);
+			printf("Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",
+					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width + 1,
+					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) / width + 1,
+					(unsigned long long)(out_sse - sse_start),
+					abs(*out_scalar - *out_sse), *out_sse, *out_scalar);
 			return -1;
 		}
 		out_scalar++;

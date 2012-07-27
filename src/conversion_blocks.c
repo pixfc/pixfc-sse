@@ -187,7 +187,13 @@ DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, desc_str_p
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
-	DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 0, "v210 to ARGB"),
+	//DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+	//DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+	//DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+	//DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+	//DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK(convert_v210_to_argb, PixFcV210, PixFcARGB, 48, 1, "v210 to ARGB"),
+
 	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, "ARGB to YUYV"),

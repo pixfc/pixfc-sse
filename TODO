@@ -1,5 +1,8 @@
 PixFC-SSE TODO list:
 
+* use PALIGNR in up/downsampling code
+* Investigate if 8-bit left-shifted coefficients can be used and whether they 
+  provide acceptable results for yuv to rgb inlines
 * Add aligned / unaligned use cases to unit testing
 * Investigate where to place prefetching instructions and check its 
   platform dependency

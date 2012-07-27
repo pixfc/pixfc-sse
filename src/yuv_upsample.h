@@ -111,6 +111,10 @@ EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3(__m128i* current_uv, _
 
 	*out = _mm_avg_epu16(*current_uv, _M(avgB));						// PAVGW	1	0.5
 }
+// no change for SSE4.1
+EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3_sse41(__m128i* current_uv, __m128i* out) {
+	reconstruct_last_missing_uv_sse2_ssse3(current_uv, out);
+}
 
 /*
  * Calculate missing chroma values by averaging previous and current chroma values
@@ -141,8 +145,12 @@ EXTERN_INLINE void	reconstruct_missing_uv_sse2_ssse3(__m128i* current_uv, __m128
 
 	*out = _mm_avg_epu16(*current_uv, _M(avgB));						// PAVGW	1	0.5
 }
-
-
+//no change for SSE41
+EXTERN_INLINE void	reconstruct_missing_uv_sse2_ssse3_sse41(__m128i* current_uv, __m128i* next_uv, __m128i* out) {
+	reconstruct_missing_uv_sse2_ssse3(current_uv, next_uv, out);
+}
+	
+	
 #endif	// __INTEL_CPU__
 
 #endif /* YUV_UPSAMPLE_H_ */

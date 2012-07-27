@@ -83,6 +83,11 @@ const InputFile		input_files[] = {
 		"1280x1024.yuv420p",
 	},
 	{
+		PixFcV210,
+		960, 780,
+		NULL,
+	},
+	{
 		PixFcARGB,
 		1920, 1080,
 		NULL,

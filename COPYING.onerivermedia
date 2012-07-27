@@ -1,7 +1,7 @@
 OneRiverMedia (http://codecs.onerivermedia.com) holds the copyright for the
-test image embedded in a C array of RGB values in rgb_image.h. So credits go to
-them for this image, and big thanks to Marco Solorio for allowing us to re-use
-it in PixFC.
+raw v210 test image in test-images/1920x1080.v210 AND the test image embedded
+in a C array of RGB values in rgb_image.h. So credits go to them for this image,
+and big thanks to Marco Solorio for allowing us to re-use it in PixFC.
 
 The following copyright notice was downloaded on 11th June 2011 from
 http://codecs.onerivermedia.com/copyright, and applies to the
