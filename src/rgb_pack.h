@@ -213,16 +213,12 @@ INLINE_NAME(pack_6_rgb_vectors_in_4_argb_vectors_sse2, __m128i* in_6_r_g_b_vecto
  * INPUT:
  *
  * 6 vectors of 8 short:
- * rVect1 - 2
  * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
- * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
- *
- * gVect1 - 2
  * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
- * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
- *
- * bVect1 - 2
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
+ * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
  * B9 0		B10 0	B11 0	B12 0	B13 0	B14 0	B15 0	B16 0
  *
  * OUTPUT

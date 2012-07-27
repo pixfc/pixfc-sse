@@ -82,7 +82,7 @@ void		upsample_n_convert_v210_to_argb_bt709_sse2_ssse3(const struct PixFcSSE * p
 	UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
 void		convert_v210_to_argb_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
+	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
 
  
@@ -160,58 +160,4 @@ void		upsample_n_convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE * 
 void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3,	sse2_ssse3);
 }
-
-
-/*
- *
- * Non SSE conversion block (nearest neighbour upsampling)
- *
- */
-/*
-void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out){
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			which_y = 0;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			src = (uint8_t *) in;
-	uint8_t*			dst = (uint8_t *) out;
-	int32_t				r, g, b;
-	int32_t				y, u, v;
-
-	while(pixel_num++ < pixel_count){
-		y = (! which_y) ? ((src[0] - 16) << 8) : (src[2] - 16) << 8;
-		u = src[1] - 128;
-		v = src[3] - 128;
-
-		r = (y + (459 * v)) >> 8;
-		g = (y - (54 * u) - (136 * v)) >> 8;
-		b = (y + (540 * u)) >> 8;
-
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else  {	// PixFcBGR24
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-
-		if (which_y++) {
-			which_y = 0;
-			src += 4;
-		}
-	}
-}
-*/
 

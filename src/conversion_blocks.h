@@ -60,7 +60,7 @@ struct ConversionBlock{
 
 	// Some conversion routines require the number of pixels to be 
 	// multiple of some value (or 1 if there is no such requirement).
-	uint32_t				pixel_count_multiple;
+	uint32_t				width_multiple;
 	uint32_t				height_multiple;
 	
 	// Each line must have a multiple of this number of pixels,
@@ -72,7 +72,7 @@ struct ConversionBlock{
 };
 
 /*
- * Global array of existing full range SSE and non-SSE conversion blocks, and the number of elements in it.
+ * Global array of existing SSE and non-SSE conversion blocks, and the number of elements in it.
  * (Instantiated in conversion_blocks.c)
  */
 extern const struct ConversionBlock		conversion_blocks[];

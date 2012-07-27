@@ -1,5 +1,5 @@
 #No cross-compiling support for win yet
-#message("System processor: " ${CMAKE_SYSTEM_PROCESSOR})
+message("System processor: " ${CMAKE_SYSTEM_PROCESSOR})
 if (NOT WIN32)
 	if(CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]")
 		set(PIXFC_TARGET_ARCH "ARM" CACHE STRING "Target arch is ARM")

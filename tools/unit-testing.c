@@ -90,7 +90,7 @@ done:
 	return result;
 }
 
-static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt) {
+static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt) {
 	uint32_t			index = 0;
 	struct PixFcSSE *	pixfc;
 	struct timings		timings;
@@ -102,6 +102,9 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt) {
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
 		if ((source_fmt != PixFcFormatCount) && (conversion_blocks[index].source_fmt != source_fmt))
+			continue;
+
+		if ((dest_fmt != PixFcFormatCount) && (conversion_blocks[index].dest_fmt != dest_fmt))
 			continue;
 
 		if (create_pixfc_for_conversion_block(index, &pixfc, WIDTH, HEIGHT) != 0) {
@@ -388,15 +391,130 @@ uint32_t	check_pixfc_flags() {
 	return 0;
 }
 
+static uint32_t do_conversion(uint32_t index, uint32_t w, uint32_t h) {
+	struct PixFcSSE *	pixfc;
+	void *				input = NULL;	// 1 aligned & 1 unaligned input buffer
+	void *				output = NULL;	// 1 aligned & 1 unaligned output buffer
+
+	if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
+		pixfc_log("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
+		return -1;
+	}
+
+	pixfc_log("%-80s%dx%d\n", conversion_blocks[index].name, w, h);
+
+	// Allocate the input & output buffers
+	if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input) != 0) {
+		pixfc_log("Error allocating input buffer\n");
+		return -1;
+	}
+	if (allocate_aligned_buffer(pixfc->dest_fmt, w, h, &output) != 0) {
+		pixfc_log("Error allocating output buffer\n");
+		ALIGN_FREE(input);
+		return -1;
+	}
+
+	// Fill input buffers
+	fill_image(pixfc->source_fmt, IMG_SIZE(pixfc->source_fmt, w, h), input);
+
+	// Do conversion with aligned input & output buffers
+	pixfc->convert(pixfc, input, output);
+
+	// Free resources
+	destroy_pixfc(pixfc);
+	ALIGN_FREE(input);
+	ALIGN_FREE(output);
+
+	return 0;
+}
+
+static uint32_t check_v210_conversion_buffer_sizes() {
+	static const uint32_t	w_16_1[] = {16, 16*2, 16*3, 16*4, 16*5, 16*6, 16, 16*2, 16*3, 16*4, 16*5, 16*6, 720, 720, 960, 960+16, 960+32, 960+48, 1280, 1920};
+	static const uint32_t	h_16_1[] = {1,  1,    1,    1,    1,    1,    2,  2,    2,    2,    2,    2,    480, 576, 720,  720,    720,    720,   1024, 1080};
+	static const uint32_t 	size_count_16_1 = sizeof(w_16_1)/sizeof(w_16_1[0]);
+	//
+	static const uint32_t	w_32_1[] = {32, 32*2, 32*3, 32*4, 32*5, 32*6, 32, 32*2, 32*3, 32*4, 32*5, 32*6, 640, 960, 1280, 1920};
+	static const uint32_t	h_32_1[] = {1,  1,    1,    1,    1,    1,    2,  2,    2,    2,    2,    2,    480, 720, 1024, 1080};
+	static const uint32_t 	size_count_32_1 = sizeof(w_32_1)/sizeof(w_32_1[0]);
+	//
+	static const uint32_t	w_32_2[] = {32, 32*2, 32*3, 32*4, 32*5, 32*6, 736, 736, 960, 1280, 1920};
+	static const uint32_t	h_32_2[] = {2,  2,    2,    2,    2,    2,    480, 576, 720, 1024, 1080};
+	static const uint32_t 	size_count_32_2 = sizeof(w_32_2)/sizeof(w_32_2[0]);
+	uint32_t				size_index = 0;
+
+	//
+	const uint32_t*		width_array = NULL;
+	const uint32_t*		height_array = NULL;
+	uint32_t			array_size = 0;
+	uint32_t			conv_index = 0;
+
+	// Loop over all conversion blocks
+	for(conv_index = 0; conv_index < conversion_blocks_count; conv_index++) {
+		if ((conversion_blocks[conv_index].width_multiple == 16) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			width_array = w_16_1;
+			height_array = h_16_1;
+			array_size = size_count_16_1;
+		} else if ((conversion_blocks[conv_index].width_multiple == 32) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			width_array = w_32_1;
+			height_array = h_32_1;
+			array_size = size_count_32_1;
+		} else if ((conversion_blocks[conv_index].width_multiple == 32) && (conversion_blocks[conv_index].height_multiple == 2)) {
+			width_array = w_32_2;
+			height_array = h_32_2;
+			array_size = size_count_32_2;
+		} else if ((conversion_blocks[conv_index].width_multiple == 2) && (conversion_blocks[conv_index].height_multiple == 2)) {
+			// Non-sse YUV420p conversions
+			width_array = w_32_2;
+			height_array = h_32_2;
+			array_size = size_count_32_2;
+		} else if ((conversion_blocks[conv_index].width_multiple == 2) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			// Some non-sse conversions
+			width_array = w_32_1;
+			height_array = h_32_1;
+			array_size = size_count_32_1;
+		} else if ((conversion_blocks[conv_index].width_multiple == 1) && (conversion_blocks[conv_index].height_multiple == 2)) {
+			// Some non-sse conversions
+			width_array = w_32_2;
+			height_array = h_32_2;
+			array_size = size_count_32_2;
+		} else if ((conversion_blocks[conv_index].width_multiple == 1) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			// All other non-sse conversions
+			width_array = w_32_1;
+			height_array = h_32_1;
+			array_size = size_count_32_1;
+		} else {
+			pixfc_log("Unhandled width / height multiple: %u - %u for conversion %-80s\n",
+					conversion_blocks[conv_index].width_multiple,
+					conversion_blocks[conv_index].height_multiple,
+					conversion_blocks[conv_index].name);
+			return -1;
+		}
+
+		// try each image size
+		for(size_index = 0; size_index < array_size; size_index ++) {
+			if (do_conversion(conv_index, width_array[size_index], height_array[size_index]) != 0) {
+				pixfc_log("Error testing conversion '%-80s'\n", conversion_blocks[conv_index].name);
+				return -1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 /*
  * Here we run a few tests to make sure things are sound internally
  * and also to print some averages of conversion latency.
  */
 int 				main(int argc, char **argv) {
 	PixFcPixelFormat	source_fmt = PixFcFormatCount;
+	PixFcPixelFormat	dest_fmt = PixFcFormatCount;
 
-	if (argc == 2)
+	if (argc >= 2)
 		source_fmt = find_matching_pixel_format(argv[1]);
+
+	if (argc == 3)
+		dest_fmt = find_matching_pixel_format(argv[2]);
 
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
@@ -438,11 +556,19 @@ int 				main(int argc, char **argv) {
 	}
 	pixfc_log("PASSED\n");
 
+	pixfc_log("\n");
+	pixfc_log("\n");
+	pixfc_log("Testing v210 conversions with multiple buffer sizes\n");
+	if (check_v210_conversion_buffer_sizes() != 0) {
+		pixfc_log("FAILED\n");
+		return -1;
+	}
+	pixfc_log("PASSED\n");
 
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Checking conversion block timing ... \n");
-	if (time_conversion_blocks(source_fmt) != 0) {
+	if (time_conversion_blocks(source_fmt, dest_fmt) != 0) {
 		pixfc_log("FAILED\n");
 		return -1;
 	}

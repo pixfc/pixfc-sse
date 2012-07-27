@@ -340,44 +340,81 @@ DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, 16, 128, 128, 47, 1
 // RGB to v210		NON SSE
 
 #define 	DEFINE_ANY_RGB_TO_V210_FN(fn_name, y_offset, u_offset, v_offset, yr_coef, yg_coef, yb_coef, ur_coef, ug_coef, ub_coef, vr_coef, vg_coef, vb_coef) \
-	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out)\
+	void 		fn_name(const struct PixFcSSE* pixfc, void* in, void* out)\
 	{\
-		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		PixFcPixelFormat 	src_fmt = pixfc->source_fmt;\
+		uint32_t 			pixel = 0;\
+		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
-		while(pixel_num < pixel_count){\
-			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
-			u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
-			v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
-			y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
-			*dst = CLIP_10BIT_PIXEL(u) & 0x3FF;\
-			*dst |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 10;\
-			*(dst++) |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 20;\
-			*dst = CLIP_10BIT_PIXEL(y2) & 0x3FF;\
-			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
-			u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
-			v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
-			y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
-			*dst |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 10;\
-			*(dst++) |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 20;\
-			*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
-			*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
-			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
-			u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
-			v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
-			y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
-			*(dst++) |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 20;\
-			*dst = CLIP_10BIT_PIXEL(y1) & 0x3FF;\
-			*dst |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 10;\
-			*(dst++) |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 20;\
-			pixel_num += 6;\
+		/* This conversion function only assumes an even number of pixels */\
+		while(line++ < pixfc->height){\
+			/* Convert as many chunks of 6 pixels as possible */\
+			while(pixel < pixfc->width - 5) {\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*dst = CLIP_10BIT_PIXEL(u) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(y2) & 0x3FF;\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*dst |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(y1) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 20;\
+				pixel += 6;\
+			}\
+			/* There can only be 2 or 4 pixels left since we assumed an even number of pixels */\
+			if ((pixfc->width - pixel) == 2) {\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*dst = CLIP_10BIT_PIXEL(u) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(y2) & 0x3FF;\
+			} else if ((pixfc->width - pixel) == 4) {\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*dst = CLIP_10BIT_PIXEL(u) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(v) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(y2) & 0x3FF;\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				y1 = (((yr_coef) * r1 + (yg_coef) * g1 + (yb_coef) * b1) >> 8) + y_offset;\
+				u = (((ur_coef) * r1 + (ug_coef) * g1 + (ub_coef) * b1) >> 8) + u_offset;\
+				v = (((vr_coef) * r1 + (vg_coef) * g1 + (vb_coef) * b1) >> 8) + v_offset;\
+				y2 = (((yr_coef) * r2 + (yg_coef) * g2 + (yb_coef) * b2) >> 8) + y_offset;\
+				*dst |= (CLIP_10BIT_PIXEL(u) & 0x3FF) << 10;\
+				*(dst++) |= (CLIP_10BIT_PIXEL(y1) & 0x3FF) << 20;\
+				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
+				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
+			}\
+		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+		pixel = 0;\
 		}\
 	}\
 

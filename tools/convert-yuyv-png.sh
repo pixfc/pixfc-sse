@@ -1,22 +1,36 @@
 #!/bin/bash -x
 
-if [ $# -ne 1 -a $# -ne 2 ]; then
-	echo "Usage: $0 <yuv_in_format> [filename]"
+if [ $# -ne 1 -a $# -ne 2 -a $# -ne 3 ]; then
+	echo "Usage: $0 <yuv_in_format> [-d] [filename]"
 	echo "where 'yuv_in_format' is either YUYV, UYVY, YUV422p or YUV420p"
 	echo "Input files must also bear that extension"
+    echo "-d means delete original file after succesful conversion"
 	echo "If 'filename' is specified, only this file will be converted"
 	exit 1
 fi
 
 ext=$1
+del_orig=0
 
 # Get list of files to convert
 if [ $# -eq 2 ]; then
-	if [ ! -f "$2" ]; then
+    if [ "$2" = "-d" ]; then
+        del_orig=1
+        readarray -t filearray < <(ls -1 *.${ext})
+	elif [ ! -f "$2" ]; then
 		echo "File \'$2\' does not exist"
 		exit 1
-	fi
-	filearray[0]="$2"
+	else
+	    filearray[0]="$2"
+    fi
+elif [ $# -eq 3 ]; then
+    del_orig=1
+    if [ ! -f "$3" ]; then
+		echo "File \'$3\' does not exist"
+		exit 1
+    fi
+
+    filearray[0]="$3"
 else
 	readarray -t filearray < <(ls -1 *.${ext})
 fi
@@ -78,6 +92,10 @@ do
 		${command}
 	fi
 
-	mv 00000001.png "${filearray[$i]}.png"
+    if [ $? -eq 0 -a $del_orig -eq 1 ];  then
+        rm "${name}"
+    fi
+	
+    mv 00000001.png "${filearray[$i]}.png"
 done
 

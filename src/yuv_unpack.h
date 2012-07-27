@@ -19,15 +19,14 @@
  */
 
 #include "debug_support.h"
-#include "common.h"
 #include "platform_util.h"
+#include "common.h"
 
 #ifdef __INTEL_CPU__
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
 #include <smmintrin.h>
-
 
 #ifndef GENERATE_UNALIGNED_INLINES
 #error "The GENERATE_UNALIGNED_INLINES macro is not defined"
@@ -403,6 +402,12 @@ INLINE_NAME(unpack_high_yuv42Xp_to_uv_vector_sse2, __m128i* u_input, __m128i* v_
 	// U13 0	V13 0	U14 0 	V14 0	U15 0 	V15 0	U16 0	V16 0		// PUNPCKHBW       1	0.5
 
 };
+
+
+#ifdef FAKE_SSE41_BLENDV
+#define _mm_blendv_epi8 _fake_mm_blendv_epi8
+__m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask);
+#endif
 
 
 /*

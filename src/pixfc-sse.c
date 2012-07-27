@@ -100,9 +100,9 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PixFc_InvalidSourceImageRowSize;
 	}
 
-	// If the number of pixels is not multiple of the required value, error out.
-	if (conv->pixel_count % block->pixel_count_multiple != 0) {
-		dprint("Skipping '%s' - Pixel count (%u) not multiple of %u\n", block->name, conv->pixel_count, block->pixel_count_multiple);
+	// If the width is not multiple of the required value, error out.
+	if (conv->width % block->width_multiple != 0) {
+		dprint("Skipping '%s' - Width (%u) not multiple of %u\n", block->name, conv->pixel_count, block->width_multiple);
 		return PixFc_UnsupportedSourceImageDimension;
 	}
 

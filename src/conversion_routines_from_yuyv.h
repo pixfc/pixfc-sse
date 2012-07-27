@@ -66,7 +66,7 @@ void		convert_yuyv_to_bgr24_sse2(const struct PixFcSSE *, void *, void *);
 
 
 // YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_yuv422i_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -118,7 +118,7 @@ void		convert_yuyv_to_bgr24_bt601_sse2(const struct PixFcSSE *, void *, void *);
 
 
 // YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_yuv422i_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -168,7 +168,7 @@ void		convert_yuyv_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
 
 
 // YUYV to anyRGB		NON SSE
-void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_yuv422i_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void* );
 
 
 
@@ -181,7 +181,25 @@ void 		convert_yuyv_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* s
  */
 void		convert_yuyv_to_yuv422p_sse2(const struct PixFcSSE*, void*, void*);
 void		convert_yuyv_to_yuv422p_sse2_ssse3(const struct PixFcSSE*, void*, void*);
-void		convert_yuyv_to_yuv422p_nonsse(const struct PixFcSSE*, void*, void*);
+void		convert_yuv422i_to_yuv422p_nonsse(const struct PixFcSSE*, void*, void*);
+
+
+/*
+ *
+ *	Y U Y V
+ *
+ *	T O
+ *
+ *	V 2 1 0
+ *
+ *
+ */
+// YUYV to V210
+void		convert_yuyv_to_v210_sse2_ssse3_sse41(const struct PixFcSSE*, void* , void*);
+void		convert_yuyv_to_v210_sse2_ssse3(const struct PixFcSSE* , void* , void*);
+
+void		convert_yuv422i_to_v210_nonsse(const struct PixFcSSE* , void* , void*);
+
 
 #endif 		// CONVERSION_ROUTINES_FROM_YUYV_H_
 

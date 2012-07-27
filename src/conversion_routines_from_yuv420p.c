@@ -214,13 +214,13 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 			y = *y_src_line1++ + y_off;\
 			u = *u_src + u_off;\
 			v = *v_src + v_off;\
-			r_line1 = (ry_coef * y + (ru_coef * u) + (rv_coef * v)) >> 8;\
-			g_line1 = (gy_coef * y + (gu_coef * u) + (gv_coef * v)) >> 8;\
-			b_line1 = (by_coef * y + (bu_coef * u) + (bv_coef * v)) >> 8;\
+			r_line1 = ((y * ry_coef) + (ru_coef * u) + (rv_coef * v)) >> 8;\
+			g_line1 = ((y * gy_coef) + (gu_coef * u) + (gv_coef * v)) >> 8;\
+			b_line1 = ((y * by_coef) + (bu_coef * u) + (bv_coef * v)) >> 8;\
 			y = *y_src_line2++ + y_off;\
-			r_line2 = (ry_coef * y + (ru_coef * u) + (rv_coef * v)) >> 8;\
-			g_line2 = (gy_coef * y + (gu_coef * u) + (gv_coef * v)) >> 8;\
-			b_line2 = (by_coef * y + (bu_coef * u) + (bv_coef * v)) >> 8;\
+			r_line2 = ((y * ry_coef) + (ru_coef * u) + (rv_coef * v)) >> 8;\
+			g_line2 = ((y * gy_coef) + (gu_coef * u) + (gv_coef * v)) >> 8;\
+			b_line2 = ((y * by_coef) + (bu_coef * u) + (bv_coef * v)) >> 8;\
 			if ((pixels_remaining_on_line & 0x1) == 0) {\
 				u_src++;\
 				v_src++;\
@@ -268,11 +268,10 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	}\
 }
 
-//																		y_off, u_off, v_off, ry_coef, ru_coef, rv_coef, gu_coef, gv_coef, bu_coef, bv_coef
-DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse, 		   0, -128, -128, 256, 0, 359, 298, -88, -183, 298, 454, 0);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse,         0, -128, -128, 256, 0, 359, 256,  -88, -183, 256, 454, 0);
 
 DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt601_nonsse, -16, -128, -128, 298, 0, 408, 298, -100, -208, 298, 772, 0);
 
-DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse, -16, -128, -128, 298, 0, 459, 298, -54, -136, 298, 540, 0);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse, -16, -128, -128, 298, 0, 459, 298,  -54, -136, 298, 540, 0);
 
 

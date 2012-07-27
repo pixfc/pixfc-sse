@@ -66,7 +66,7 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
 // V210 to anyRGB		NON SSE
-void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
@@ -118,7 +118,7 @@ void		convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, vo
 
 
 // V210 to anyRGB		NON SSE
-void 		convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
@@ -168,7 +168,7 @@ void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, vo
 
 
 // V210 to anyRGB		NON SSE
-void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
@@ -184,14 +184,14 @@ void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* s
  *
  */
 // V210 to YUYV
-void		convert_v210_to_yuyv_sse2_ssse3_sse41(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
-void		convert_v210_to_yuyv_sse2_ssse3(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void		convert_v210_to_yuyv_sse2_ssse3_sse41(const struct PixFcSSE* , void* , void*);
+void		convert_v210_to_yuyv_sse2_ssse3(const struct PixFcSSE* , void* , void*);
 
 // V210 to UYVY
-void		convert_v210_to_uyvy_sse2_ssse3_sse41(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
-void		convert_v210_to_uyvy_sse2_ssse3(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void		convert_v210_to_uyvy_sse2_ssse3_sse41(const struct PixFcSSE* , void* , void*);
+void		convert_v210_to_uyvy_sse2_ssse3(const struct PixFcSSE* , void* , void*);
 
-void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 

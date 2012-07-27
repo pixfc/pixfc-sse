@@ -138,57 +138,6 @@ void		convert_uyvy_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_buf
 }
 
 
-/*
- *
- * Non SSE conversion block
- *
- */
-void 		convert_uyvy_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, void* out){
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			which_y = 0;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			src = (uint8_t *) in;
-	uint8_t*			dst = (uint8_t *) out;
-	int32_t				r, g, b;
-	int32_t				y, u, v;
-
-	while(pixel_num++ < pixel_count){
-		y = (! which_y) ? (src[1] << 8) : src[3] << 8;
-		u = src[0] - 128;
-		v = src[2] - 128;
-
-		r = (y + (359 * v)) >> 8;
-		g = (y - (88 * u) - (183 * v)) >> 8;
-		b = (y + (454 * u)) >> 8;
-
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else  {	// PixFcBGR24
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-
-		if (which_y++) {
-			which_y = 0;
-			src += 4;
-		}
-	}
-}
-
 
 /*
  *  	U Y V Y
@@ -205,20 +154,22 @@ void		convert_uyvy_to_yuv422p_sse2_ssse3(const struct PixFcSSE * pixfc, void* so
 	DO_REPACK(YUV422I_TO_YUV422P_RECIPE, repack_uyvy_to_yuv422p_, sse2_ssse3);
 }
 
-void		convert_uyvy_to_yuv422p_nonsse(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-	uint32_t 	pixel_count = pixfc->pixel_count;
-	uint8_t *	src = (uint8_t *)source_buffer;
-	uint8_t *	y_plane = (uint8_t *) dest_buffer;
-	uint8_t *	u_plane = y_plane + pixel_count;
-	uint8_t *	v_plane = u_plane + pixel_count / 2;
 
-	// Do conversion
-	while(pixel_count > 0) {
-		*u_plane++ = *src++;
-		*y_plane++ = *src++;
-		*v_plane++ = *src++;
-		*y_plane++ = *src++;
+/*
+ *
+ *		U Y V Y
+ *
+ *		T O
+ *
+ *		V 2 1 0
+ *
+ *
+ */
+// UYVY to V210
+void		convert_uyvy_to_v210_sse2_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(YUV422I_TO_V210_RECIPE, unpack_uyvy_to_y_uv_vectors_sse2_ssse3, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41);
+}
 
-		pixel_count -= 2;
-	}
+void		convert_uyvy_to_v210_sse2_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(YUV422I_TO_V210_RECIPE, unpack_uyvy_to_y_uv_vectors_sse2_ssse3, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3);
 }

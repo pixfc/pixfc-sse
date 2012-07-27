@@ -2,11 +2,15 @@
 
 UNIT_TESTING=./tools/unit-testing
 
-if [ $# -ne 1 -a $# -ne 2 ]; then
-    echo "$0 <symbol name> [instruction]"
+if [ $# -ne 1 -a $# -ne 2 -a $# -ne 3 ]; then
+    echo "$0 <symbol name> [instruction] [path_to_object_file]"
 	echo "If [instruction] is not provided, 'movdqa' is assumed'"
 	echo "If [instruction] is @, then all instructions are counted"
     exit 1
+fi
+
+if [ $# -eq 3 ]; then
+	UNIT_TESTING="$3"
 fi
 
 if [ ! -f ${UNIT_TESTING} ]; then

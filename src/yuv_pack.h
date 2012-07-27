@@ -18,9 +18,9 @@
  *
  */
 
-#include "common.h"
 #include "debug_support.h"
 #include "platform_util.h"
+#include "common.h"
 
 #ifdef __INTEL_CPU__
 
@@ -377,6 +377,11 @@ INLINE_NAME(pack_4_uv_vectors_to_yup_vectors_sse2, __m128i* in_4_uv_vectors, __m
 	M128_STORE(_mm_packus_epi16(_M(scratch3), _M(scratch4)), *out_v_plane);		// PACKUSWB		1	0.5
 	// V1 V2	V3 V4 	V5 V6	V7 V8	V9 V10	V11 V12	V13 V14 V15 V16
 }
+
+#ifdef FAKE_SSE41_BLENDV
+#define _mm_blendv_epi8 _fake_mm_blendv_epi8
+__m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask);
+#endif
 
 
 /*

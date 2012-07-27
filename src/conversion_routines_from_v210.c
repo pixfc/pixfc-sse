@@ -77,7 +77,6 @@
 void		upsample_n_convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	 UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3_sse41);
 }
-
 void		convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2,	sse2_ssse3_sse41);
 }
@@ -87,6 +86,7 @@ void		upsample_n_convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, 
 void		convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
+
 
 /*
  * 		V 2 1 0
@@ -196,36 +196,68 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
 #define DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(fn_name, yOffset, uvOffset, yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef) \
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		uint32_t 			pixel = 0;\
+		uint32_t			line = 0;\
 		uint32_t*			src = (uint32_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
-		while(pixel_num < pixel_count){\
-			/* Pixel 1 and 2 */\
-			y = ((*src >> 10) & 0x3FF) - yOffset;\
-			u = (*src & 0x3FF) - uvOffset;\
-			v = ((*src >> 20) & 0x3FF) - uvOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			y = (src[1] & 0x3FF) - yOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			/* Pixel 3 and 4 */\
-			y = ((src[1] >> 20) & 0x3FF) - yOffset;\
-			u = ((src[1] >> 10) & 0x3FF) - uvOffset;\
-			v = (src[2] & 0x3FF) - uvOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			y = ((src[2] >> 10) & 0x3FF) - yOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			/* Pixel 5 and 6 */\
-			y = (src[3] & 0x3FF) - yOffset;\
-			u = ((src[2] >> 20) & 0x3FF) - uvOffset;\
-			v = ((src[3] >> 10) & 0x3FF) - uvOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			y = ((src[3] >> 20) & 0x3FF) - yOffset;\
-			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
-			src += 4;\
-			pixel_num += 6;\
+		/* This conversion routines only assumes there is an even number of pixels. */\
+		while(line++ < conv->height) {\
+			/* Convert as many chunks of 6 pixels as possible,
+			   until less than 6 pixels remain. */\
+			while(pixel < (conv->width - 5)) {\
+				/* Pixel 1 and 2 */\
+				y = ((*src >> 10) & 0x3FF) - yOffset;\
+				u = (*src & 0x3FF) - uvOffset;\
+				v = ((*src >> 20) & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = (src[1] & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				/* Pixel 3 and 4 */\
+				y = ((src[1] >> 20) & 0x3FF) - yOffset;\
+				u = ((src[1] >> 10) & 0x3FF) - uvOffset;\
+				v = (src[2] & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = ((src[2] >> 10) & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				/* Pixel 5 and 6 */\
+				y = (src[3] & 0x3FF) - yOffset;\
+				u = ((src[2] >> 20) & 0x3FF) - uvOffset;\
+				v = ((src[3] >> 10) & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = ((src[3] >> 20) & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				src += 4;\
+				pixel += 6;\
+			}\
+			/* There can only be 2 or 4 pixels left since yuv422
+			   formats (inc v210) carry at the very least an even
+			   number of pixels. */\
+			if ((conv->width - pixel) == 2) {\
+				y = ((*src >> 10) & 0x3FF) - yOffset;\
+				u = (*src & 0x3FF) - uvOffset;\
+				v = ((*src >> 20) & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = (src[1] & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			} else if ((conv->width - pixel) == 4) {\
+				y = ((*src >> 10) & 0x3FF) - yOffset;\
+				u = (*src & 0x3FF) - uvOffset;\
+				v = ((*src >> 20) & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = (src[1] & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				/* Pixel 3 and 4 */\
+				y = ((src[1] >> 20) & 0x3FF) - yOffset;\
+				u = ((src[1] >> 10) & 0x3FF) - uvOffset;\
+				v = (src[2] & 0x3FF) - uvOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+				y = ((src[2] >> 10) & 0x3FF) - yOffset;\
+				CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			}\
+			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			pixel = 0;\
 		}\
 	}
 
@@ -299,34 +331,65 @@ void		convert_v210_to_uyvy_sse2_ssse3(const struct PixFcSSE* pixfc, void* source
 
 void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer) {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
+	uint32_t 			pixel = 0;
+	uint32_t			line = conv->height;
 	uint32_t*			src = (uint32_t *) srcBuffer;
 	uint8_t*			dst = (uint8_t *) dstBuffer;
 	int32_t				y1, y2, u, v;
-	while(pixel_num < pixel_count){
-		/* Pixel 1 and 2 */
-		y1 = (*src >> 12) & 0xFF;
-		u = (*src >> 2) & 0xFF;
-		v = (*src >> 22) & 0xFF;
-		y2 = (src[1] >> 2) & 0xFF;
-		PACK_TO_YUV422P(y1, u, v, y2, dst)
-		
-		/* Pixel 3 and 4 */
-		y1 = (src[1] >> 22) & 0xFF;
-		u = (src[1] >> 12) & 0xFF;
-		v = (src[2] >> 2) & 0xFF;
-		y2 = (src[2] >> 12) & 0xFF;
-		PACK_TO_YUV422P(y1, u, v, y2, dst)
 
-		/* Pixel 5 and 6 */
-		y1 = (src[3] >> 2) & 0xFF;
-		u = (src[2] >> 22) & 0xFF;
-		v = (src[3] >> 12) & 0xFF;
-		y2 = (src[3] >> 22) & 0xFF;
-		PACK_TO_YUV422P(y1, u, v, y2, dst)
+	// This conversion routines only assumes there is an even number of pixels.
 
-		src += 4;
-		pixel_num += 6;
+	while(line++ < conv->height) {
+		// Convert as many chunks of 6 pixels as possible,
+		// until less than 6 pixels remain.
+		while(pixel < (conv->width - 5)) {
+			u = (*src >> 2) & 0xFF;
+			y1 = (*src >> 12) & 0xFF;
+			v = (*src >> 22) & 0xFF;
+			y2 = (src[1] >> 2) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+
+			u = (src[1] >> 12) & 0xFF;
+			y1 = (src[1] >> 22) & 0xFF;
+			v = (src[2] >> 2) & 0xFF;
+			y2 = (src[2] >> 12) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+
+			u = (src[2] >> 22) & 0xFF;
+			y1 = (src[3] >> 2) & 0xFF;
+			v = (src[3] >> 12) & 0xFF;
+			y2 = (src[3] >> 22) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+
+			pixel += 6;
+			src += 4;
+		}
+
+		// There can only be 2 or 4 pixels left since yuv422
+		// formats (inc v210) carry at the very least an even
+		// number of pixels.
+		if ((conv->width - pixel) == 2) {
+			u = (*src >> 2) & 0xFF;
+			y1 = (*src >> 12) & 0xFF;
+			v = (*src >> 22) & 0xFF;
+			y2 = (src[1] >> 2) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+		} else if ((conv->width - pixel) == 4) {
+			u = (*src >> 2) & 0xFF;
+			y1 = (*src >> 12) & 0xFF;
+			v = (*src >> 22) & 0xFF;
+			y2 = (src[1] >> 2) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+
+			u = (src[1] >> 12) & 0xFF;
+			y1 = (src[1] >> 22) & 0xFF;
+			v = (src[2] >> 2) & 0xFF;
+			y2 = (src[2] >> 12) & 0xFF;
+			PACK_TO_YUV422P(y1, u, v, y2, dst);
+		}
+
+		src = (uint32_t*) ((uint8_t*)srcBuffer + line * ROW_SIZE(PixFcV210, conv->width));
+		pixel = 0;
 	}
+
 }

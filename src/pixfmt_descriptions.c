@@ -127,7 +127,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 			PixFcYUV420P,
-			3, 2, 1, 64, 2, 1,
+			3, 2, 1, 32, 2, 1,
 			{
 				/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 						Decimal values:
@@ -160,7 +160,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		PixFcV210,
-		16, 6, 0, 1, 1, 48,
+		16, 6, 0, 16, 1, 48,
 		{
 			/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:
@@ -214,10 +214,10 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 				// 1 red pix - 1 black pix - 1 white pix - 1 green pix
 		    	// 1 bordeaux pix - 1 blue pix - 1 grey pix - 1 red pix
-				_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
-				_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
+				//_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
+				//_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
 			},
-			4,
+			2,
 		    "ARGB",
 	},
 
