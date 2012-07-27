@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-/*
+
 	// RGB downsample
 	check_nnb_422_downsample_ag_rb_vectors();
 	check_nnb_422_downsample_r_g_b_vectors();
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
     check_repack_yuv422p_to_uyvy();
     check_repack_yuyv_to_yuv422p();
     check_repack_uyvy_to_yuv422p();
-*/
+
 	// YUV to RGB convert
 	check_nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors();
 	check_convert_y_uv_vectors_to_rgb_vectors();
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
-/*	
+	
 	// YUV unpack
 	check_unpack_yuyv_to_y_uv_vectors();
 	check_unpack_uyvy_to_y_uv_vectors();
@@ -121,6 +121,6 @@ int main(int argc, char **argv) {
     // YUV upsample
     check_reconstruct_last_missing_uv();
     check_reconstruct_missing_uv();
-*/	
+	
 	return 0;
 }

@@ -1571,7 +1571,7 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
 	in_3_v16i_y_uvOdd_uvEven_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(sub128));\
 	in_3_v16i_y_uvOdd_uvEven_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(sub128));\
 	_M(yVect) = _mm_slli_epi16(_M(yVect), (16-yCoefLeftShift));\
-	_M(yVect) = _mm_mulhi_epu16(_M(yVect), _M(yCoeffs));\
+	_M(yVect) = _mm_mulhi_epi16(_M(yVect), _M(yCoeffs));\
 	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(uvRCoeffs));\
 	_M(uvOdd) = _mm_srai_epi32(_M(uvOdd), (uvRCoefLeftShift));\
 	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));\
@@ -1619,7 +1619,7 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
 	_M(yVect) = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[0], _M(yVect));\
 	in_3_v16i_y_uvOdd_uvEven_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(sub128));\
 	in_3_v16i_y_uvOdd_uvEven_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(sub128));\
-	_M(yVect) = _mm_mulhi_epu16(_M(yVect), _M(yCoeffs));\
+	_M(yVect) = _mm_mulhi_epi16(_M(yVect), _M(yCoeffs));\
 	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(uvRCoeffs));\
 	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));\
 	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(uvRCoeffs));\
@@ -1830,14 +1830,14 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
  * Num of pixel handled:	8
  *
  * R = 	[ 1.164		0		1.596	]	( Y - 16)
- * G = 	[ 1.164		-0.392	-0.813	]	( U - 128 )
- * B = 	[ 1.164		3.017	0		]	( V - 128 )
+ * G = 	[ 1.164		-0.392		-0.813	]	( U - 128 )
+ * B = 	[ 1.164		2.017		0	]	( V - 128 )
  *
- * Y coeffs left shifted by 15 bits
+ * Y coeffs left shifted by 14 bits
  * U & V coeffs left shifted by 7 bits
- * 		[ 38142		0		204		]
- * 		[ 38142		-50		-104	]
- * 		[ 38142		386		0		]
+ * 		[ 19071		0	204	]
+ * 		[ 19071		-50	-104	]
+ * 		[ 19071		258	0	]
  *
  *
  * INPUT:
@@ -1867,10 +1867,10 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
 DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE1(convert_y_uv_vectors_to_rgb_vectors_bt601_sse2_ssse3,
 											   0xFFF0FFF0FFF0FFF0LL,
 											   0xFF80FF80FF80FF80LL,
-											   0x94FE94FE94FE94FELL, 15,
+											   0x4A7F4A7F4A7F4A7FLL, 14,
 											   0x00CC000000CC0000LL, 7,
 											   0xFF98FFCEFF98FFCELL, 7,
-											   0x0000018200000182LL, 7);
+											   0x0000010200000102LL, 7);
 
 /*
  * Convert 3 vectors of 8 short Y, UVOdd, UVEven into 3 vectors of 8 short R, G & B
@@ -1885,11 +1885,11 @@ DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE1(convert_y_uv_vectors_to_rgb_vect
  * G = 	[ 1.164		-0.213	-0.533	]	( U - 128 )
  * B = 	[ 1.164		2.112	0		]	( V - 128 )
  *
- * Y coeffs left shifted by 15 bits
+ * Y coeffs left shifted by 14 bits
  * U & V coeffs left shifted by 7 bits
- * 		[ 38142		0		229		]
- * 		[ 38142		-27		-68		]
- * 		[ 38142		270		0		]
+ * 		[ 19071		0		229		]
+ * 		[ 19071		-27		-68		]
+ * 		[ 19071		270		0		]
  *
  *
  * INPUT:
@@ -1919,7 +1919,7 @@ DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE1(convert_y_uv_vectors_to_rgb_vect
 DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE1(convert_y_uv_vectors_to_rgb_vectors_bt709_sse2_ssse3,
 											   0xFFF0FFF0FFF0FFF0LL,
 											   0xFF80FF80FF80FF80LL,
-											   0x94FE94FE94FE94FELL, 15,
+											   0x4a7F4A7F4A7F4A7FLL, 14,
 											   0x00E5000000E50000LL, 7,
 											   0xFFBCFFE5FFBCFFE5LL, 7,
 											   0x0000010E0000010ELL, 7);
