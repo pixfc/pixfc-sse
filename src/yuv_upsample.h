@@ -103,7 +103,7 @@ EXTERN_INLINE void	reconstruct_missing_uv_sse2(__m128i* current_uv, __m128i* nex
  * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
  */
 EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3(__m128i* current_uv, __m128i* out) {
-	CONST_M128I(shuff1, 0xFF0AFF08FF06FF04LL, 0xFF0EFF0CFF0EFF0CLL);
+	CONST_M128I(shuff1, 0x0B0A090807060504LL, 0x0F0E0D0C0F0E0D0CLL);
 	M128I(avgB, 0x0LL, 0x0LL);
 
 	_M(avgB) = _mm_shuffle_epi8(*current_uv, _M(shuff1));				// PSHUFB	1	0.5
@@ -119,7 +119,7 @@ EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3_sse41(__m128i* current
 /*
  * Calculate missing chroma values by averaging previous and current chroma values
  *
- * TOTAL LATENCY:			4
+ * TOTAL LATENCY:			2
  *
  * INPUT:
  * U1 0		V1 0	U3 0	V3 0	U5 0	V5 0	U7 0	V7 0
@@ -129,18 +129,9 @@ EXTERN_INLINE void	reconstruct_last_missing_uv_sse2_ssse3_sse41(__m128i* current
  * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
  */
 EXTERN_INLINE void	reconstruct_missing_uv_sse2_ssse3(__m128i* current_uv, __m128i* next_uv, __m128i* out) {
-	CONST_M128I(shuff1, 0xFF0AFF08FF06FF04LL, 0xFFFFFFFFFF0EFF0CLL);
-	CONST_M128I(shuff2, 0xFFFFFFFFFFFFFFFFLL, 0xFF02FF00FFFFFFFFLL);
 	M128I(avgB, 0x0LL, 0x0LL);
-	M128I(tmp, 0x0LL, 0x0LL);
 
-	_M(avgB) = _mm_shuffle_epi8(*current_uv, _M(shuff1));				// PSHUFB	1	0.5
-	// U3 0		V3 0	U5 0	V5 0	U7 0	V7 0	0 0		0 0
-
-	_M(tmp) = _mm_shuffle_epi8(*next_uv, _M(shuff2));					// PSHUFB	1	0.5
-	// 0 0		0 0		0 0		0 0		0 0		0 0		U9 0	V9 0
-
-	_M(avgB) = _mm_or_si128(_M(tmp), _M(avgB));							// POR		1	0.33
+	_M(avgB) = _mm_alignr_epi8(*next_uv, *current_uv, 4);				// PALIGNR	1	05
 	// U3 0		V3 0	U5 0	V5 0	U7 0	V7 0	U9 0	V9 0
 
 	*out = _mm_avg_epu16(*current_uv, _M(avgB));						// PAVGW	1	0.5

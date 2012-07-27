@@ -33,14 +33,9 @@
 static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const struct ConversionBlock *block,
 		PixFcPixelFormat src_fmt, PixFcPixelFormat dest_fmt, uint32_t flags) {
 
-	dprint("Checking conversion block '%s'\n", block->name);
-	dprint("Block src / dst fmt: %s\t%s\n", pixfmt_descriptions[block->source_fmt].name,
-			pixfmt_descriptions[block->dest_fmt].name);
-
 	// If this block does not handle the requested conversion, error out.
 	if ((block->source_fmt != src_fmt) || (block->dest_fmt != dest_fmt)) {
-		dprint("Source / Destination mismatch\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		return PixFc_UnsupportedConversionError;
 	}
 
 	// If we were told to require conversion blocks performing NNB resampling,
@@ -51,58 +46,75 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	// as there is no other routine that would satisfy the NoSSE flag)
 	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))
 		&& ! ((flags & PixFcFlag_NoSSE) && ((flags & PixFcFlag_NNbResamplingOnly) == 0))){
-		dprint("Enforcing NNbResampling flag\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Enforcing NNbResampling flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
 	}
 	
 	// If we were told to disable SSE conversion blocks, make sure this block
 	// does not require any SSE features.
 	if ((flags & PixFcFlag_NoSSE) && (block->required_cpu_features != CPUID_FEATURE_NONE)) {
-		dprint("Enforcing FORCE_NO_SSE flag\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Enforcing FORCE_NO_SSE flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
 	}
 
 	// If we were told to use ITU-R Rec. BT601 conversion, make sure this block
 	// uses these equations.
 	if ((flags & PixFcFlag_BT601Conversion) && ! (block->attributes & BT601_CONVERSION)) {
-		dprint("Enforcing SD_FORMAT_CONVERSION flag\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Enforcing SD_FORMAT_CONVERSION flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
 	}
 
 	// If we were told to use ITU-R Rec. BT709 conversion, make sure this block
 	// uses these equations.
 	if ((flags & PixFcFlag_BT709Conversion) && ! (block->attributes & BT709_CONVERSION)) {
-		dprint("Enforcing HD_FORMAT_CONVERSION flag\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Enforcing HD_FORMAT_CONVERSION flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
 	}
 
 	// If the cpu does not have the required features, error out.
 	if (does_cpu_support(block->required_cpu_features) != 0) {
-		dprint("CPU feature mismatch:\n");
+		dprint("Skipping '%s' - CPU feature mismatch:\n", block->name);
 		dprint("Required CPU features:  %#08llx\n", (long long unsigned int)block->required_cpu_features);
 		dprint("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		return PixFc_UnsupportedConversionError;
 	}
 
 	// If we were told to use an SSE2-only routine, make sure that's the case
 	if ((flags & PixFcFlag_SSE2Only) && (block->required_cpu_features != CPUID_FEATURE_SSE2)) {
-		dprint("Enforcing FORCE_SSE2_ONLY flag\n");
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Enforcing FORCE_SSE2_ONLY flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
+	}
+
+	// If we were told to use an SSE2 and SSSE3 routine, make sure that's the case
+	if ((flags & PixFcFlag_SSE2_SSSE3Only) && (block->required_cpu_features != (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))) {
+		dprint("Skipping '%s' - Enforcing FORCE_SSE2_SSSE3_ONLY flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
+	}
+	
+	//
+	// At this stage, we have found a conversion block which matches the flags given to us.
+	
+	// Check the bytes-per-row value
+	if (conv->row_bytes != ROW_SIZE(block->source_fmt, conv->width)) {
+		dprint("Skipping '%s' - Invalid row bytes %u - expected %d\n", block->name, conv->row_bytes, ROW_SIZE(block->source_fmt, conv->width));
+		return PixFc_InvalidSourceImageRowSize;
 	}
 
 	// If the number of pixels is not multiple of the required value, error out.
 	if (conv->pixel_count % block->pixel_count_multiple != 0) {
-		dprint("Pixel count (%u) not multiple of %u\n", conv->pixel_count, block->pixel_count_multiple);
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Pixel count (%u) not multiple of %u\n", block->name, conv->pixel_count, block->pixel_count_multiple);
+		return PixFc_UnsupportedSourceImageDimension;
 	}
 
 	// If the height is not multiple of the required value, error out.
 	if (conv->pixel_count % block->height_multiple != 0) {
-		dprint("Height (%u) not multiple of %u\n", conv->pixel_count, block->height_multiple);
-		return PIXFC_CONVERSION_NOT_SUPPORTED;
+		dprint("Skipping '%s' - Height (%u) not multiple of %u\n", block->name, conv->pixel_count, block->height_multiple);
+		return PixFc_UnsupportedSourceImageDimension;
 	}
 
-	return PIXFC_OK;
+	dprint("Using '%s'\n", block->name);
+
+	return PixFc_OK;
 }
 
 
@@ -116,6 +128,7 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 
 	uint32_t						index;
 	const struct ConversionBlock *	block;
+	uint32_t						result;
 
 	// Go over the array of conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
@@ -124,25 +137,29 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 		// destination formats and if the CPU has the required features.
 		block = &conversion_blocks[index];
 
-		if (block_matches_and_is_supported(conv, block, src_fmt, dest_fmt, flags) == PIXFC_OK) {
+		result = block_matches_and_is_supported(conv, block, src_fmt, dest_fmt, flags);
+		if (result != PixFc_UnsupportedConversionError)
+		{
+			if (result == PixFc_OK) {
 
-			// We have a match, finish setting up the struct PixFcSSE
-			conv->convert = block->convert_fn;
-			conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
+				// We have a match, finish setting up the struct PixFcSSE
+				conv->convert = block->convert_fn;
+				conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
 
-			dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
-
-			return PIXFC_OK;
+				dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
+			}
+			
+			return result;
 		}
 	}
 
 	// No conversion blocks found
-	return PIXFC_CONVERSION_NOT_SUPPORTED;
+	return PixFc_UnsupportedConversionError;
 }
 
 
 uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
-		PixFcPixelFormat dest_fmt, uint32_t width, uint32_t height,
+		PixFcPixelFormat dest_fmt, uint32_t width, uint32_t height, uint32_t row_bytes,
 		uint32_t flags){
 
 	struct PixFcSSE *		conv;
@@ -150,12 +167,12 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 
 	// Make sure we have a valid pointer.
 	if (! pc)
-		return PIXFC_ERROR;
+		return PixFc_Error;
 
 	// Allocate and zero structure PixFcSSE
 	conv = (struct PixFcSSE *) malloc(sizeof(*conv));
 	if (! conv)
-		return PIXFC_OOM;
+		return PixFc_OOMError;
 	memset(conv, 0x0, sizeof(*conv));
 
 	// Initialise members
@@ -163,6 +180,7 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 	conv->dest_fmt = dest_fmt;
 	conv->width = width;
 	conv->height = height;
+	conv->row_bytes = row_bytes;
 	conv->pixel_count = width * height;
 
 	dprint("Requested src / dst fmt:\t%s\t%s\n", pixfmt_descriptions[src_fmt].name,
@@ -173,7 +191,7 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 	result = look_for_matching_conversion_block(conv, src_fmt, dest_fmt, flags);
 
 	// Return struct PixFcSSE if OK, release it otherwise
-	if (result == PIXFC_OK)
+	if (result == PixFc_OK)
 		*pc = conv;
 	else // Error or conversion not supported
 		destroy_pixfc(conv);

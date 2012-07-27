@@ -62,6 +62,11 @@ struct ConversionBlock{
 	// multiple of some value (or 1 if there is no such requirement).
 	uint32_t				pixel_count_multiple;
 	uint32_t				height_multiple;
+	
+	// Each line must have a multiple of this number of pixels,
+	// or 1 if not applicable. This value is used to calculate
+	// the size in bytes of each line using the ROW_SIZE() macro
+	uint8_t					row_pixel_multiple;	
 
 	char *					name;
 };

@@ -84,8 +84,8 @@ const InputFile		input_files[] = {
 	},
 	{
 		PixFcV210,
-		960, 780,
-		NULL,
+		1920, 1080,
+		"1920x1080.v210",
 	},
 	{
 		PixFcARGB,
@@ -147,15 +147,16 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 		return -1;
 	}
 
-	// make sure the buffer size has no decimal part
-	if (((width * height) * desc->bytes_per_pix_num) % desc->bytes_per_pix_denom != 0) {
+	// make sure the buffer size has no decimal part IFF the buffer size has no
+	// alignment requirements, ie row_pixel_multiple == 1.
+	if ((desc->row_pixel_multiple == 1) && (((width * height) * desc->bytes_per_pix_num) % desc->bytes_per_pix_denom != 0)) {
 		pixfc_log("buffer size error: (%d * %d) * %d %% %d != 0\n",
 				width, height, desc->bytes_per_pix_num, desc->bytes_per_pix_denom);
 		return -1;
 	}
 
 	// make sure the height is valid
-	if ((desc->height_multiple != 0) && (height % desc->height_multiple != 0)) {
+	if (height % desc->height_multiple != 0) {
 		pixfc_log("image height error: %d %% %d != 0\n", height, desc->height_multiple);
 		return -1;
 	}
@@ -305,6 +306,7 @@ void		fill_image(PixFcPixelFormat fmt, uint32_t buffer_size, void * buf) {
 		//
 		// Fill in the buffer 16 pixels at a time
 		// while alternating the fill patterns
+		// FIXME: we should be using row_bytes here...
 		if (((uintptr_t) buffer & 0x0F) == 0) {
 			while (buffer_size > 0) {
 				_mm_store_si128(buffer, _M(desc->fill_patterns[index]));
@@ -609,6 +611,8 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
 		flags |= PixFcFlag_NoSSE;
 	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
 		flags |= PixFcFlag_SSE2Only;
+	else if (conversion_blocks[index].required_cpu_features == (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))
+			flags |= PixFcFlag_SSE2_SSSE3Only;
 
 	if (conversion_blocks[index].attributes & BT601_CONVERSION)
 		flags |= PixFcFlag_BT601Conversion;
@@ -617,7 +621,7 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
 		flags |= PixFcFlag_BT709Conversion;
 
 	// Create struct pixfc for this conversion block
-	if (create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, flags) != 0) {
+	if (create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags) != 0) {
 		pixfc_log("Error create struct pixfc for conversion '%s' %ux%u\n", conversion_blocks[index].name, width, height);
 		return -3;
 	}

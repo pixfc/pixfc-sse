@@ -81,11 +81,9 @@ void		upsample_n_convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * p
 void		convert_v210_to_argb_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2,	sse2_ssse3_sse41);
 }
-/*
 void		upsample_n_convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
-*/
 void		convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_argb_vectors_sse2, sse2_ssse3);
 }
@@ -98,7 +96,6 @@ void		convert_v210_to_argb_sse2_ssse3(const struct PixFcSSE * pixfc, void* sourc
  * 		B G R A
  *
  */
-/*
 void		upsample_n_convert_v210_to_bgra_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	UPSAMPLE_AND_CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_bgra_vectors_sse2, sse2_ssse3_sse41);
 }
@@ -114,7 +111,7 @@ void		upsample_n_convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE * pixfc, 
 void		convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB32(pack_6_rgb_vectors_in_4_bgra_vectors_sse2,	sse2_ssse3);
 }
-*/
+
 
 /*
  *
@@ -124,7 +121,6 @@ void		convert_v210_to_bgra_sse2_ssse3(const struct PixFcSSE * pixfc, void* sourc
  *
  * 		R G B   2 4
  */
-/*
 void		upsample_n_convert_v210_to_rgb24_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	UPSAMPLE_AND_CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3_sse41);
 }
@@ -140,7 +136,7 @@ void		upsample_n_convert_v210_to_rgb24_sse2_ssse3(const struct PixFcSSE * pixfc,
 void		convert_v210_to_rgb24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_rgb24_vectors_sse2_ssse3, sse2_ssse3);
 }
-*/
+
 
 /*
  *
@@ -151,7 +147,6 @@ void		convert_v210_to_rgb24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
  * 		B G R 2 4
  *
  */
-/*
 void		upsample_n_convert_v210_to_bgr24_sse2_ssse3_sse41(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	UPSAMPLE_AND_CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3_sse41);
 }
@@ -167,58 +162,173 @@ void		upsample_n_convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc,
 void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
 }
-*/
+
+
 /*
  *
  * Non SSE conversion block (nearest neighbour upsampling)
  *
  */
+#define CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef) \
+	r = (yRCoef * y + (uRCoef * u) + (vRCoef * v)) >> 8;\
+	g = (yGCoef * y + (uGCoef * u) + (vGCoef * v)) >> 8;\
+	b = (yBCoef * y + (uBCoef * u) + (vBCoef * v)) >> 8;\
+	if (dest_fmt == PixFcARGB) {\
+		*(dst++) = 0;\
+		*(dst++) = CLIP_PIXEL(r);\
+		*(dst++) = CLIP_PIXEL(g);\
+		*(dst++) = CLIP_PIXEL(b);\
+	} else if (dest_fmt == PixFcBGRA) {\
+		*(dst++) = CLIP_PIXEL(b);\
+		*(dst++) = CLIP_PIXEL(g);\
+		*(dst++) = CLIP_PIXEL(r);\
+		*(dst++) = 0;\
+	} else  if (dest_fmt == PixFcRGB24) {\
+		*(dst++) = CLIP_PIXEL(r);\
+		*(dst++) = CLIP_PIXEL(g);\
+		*(dst++) = CLIP_PIXEL(b);\
+	} else  {	/* PixFcBGR24 */\
+		*(dst++) = CLIP_PIXEL(b);\
+		*(dst++) = CLIP_PIXEL(g);\
+		*(dst++) = CLIP_PIXEL(r);\
+	}\
+
+#define DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(fn_name, yOffset, uvOffset, yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef) \
+	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
+		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+		uint32_t 			pixel_num = 0;\
+		uint32_t			pixel_count = conv->pixel_count;\
+		uint32_t*			src = (uint32_t *) in;\
+		uint8_t*			dst = (uint8_t *) out;\
+		int32_t				r, g, b;\
+		int32_t				y, u, v;\
+		while(pixel_num < pixel_count){\
+			/* Pixel 1 and 2 */\
+			y = ((*src >> 10) & 0x3FF) - yOffset;\
+			u = (*src & 0x3FF) - uvOffset;\
+			v = ((*src >> 20) & 0x3FF) - uvOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			y = (src[1] & 0x3FF) - yOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			/* Pixel 3 and 4 */\
+			y = ((src[1] >> 20) & 0x3FF) - yOffset;\
+			u = ((src[1] >> 10) & 0x3FF) - uvOffset;\
+			v = (src[2] & 0x3FF) - uvOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			y = ((src[2] >> 10) & 0x3FF) - yOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			/* Pixel 5 and 6 */\
+			y = (src[3] & 0x3FF) - yOffset;\
+			u = ((src[2] >> 20) & 0x3FF) - uvOffset;\
+			v = ((src[3] >> 10) & 0x3FF) - uvOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			y = ((src[3] >> 20) & 0x3FF) - yOffset;\
+			CONVERT_N_STORE(yRCoef, uRCoef, vRCoef, yGCoef, uGCoef, vGCoef, yBCoef, uBCoef, vBCoef);\
+			src += 4;\
+			pixel_num += 6;\
+		}\
+	}
+
+// Full range
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_nonsse,
+		0, 512,
+		64, 0, 90,
+		64, -22, -46,
+		64, 113, 0)
+
+// bt601
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt601_nonsse,
+		64, 512,
+		74, 0, 102,
+		74, -25, -52,
+		74, 129, 0)
+
+// bt709
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse,
+		64, 512,
+		74, 0, 115,
+		74, -14, -34,
+		74, 135, 0)
+
+
+
+
+
 /*
-void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* in, void* out){
+ *
+ *	V 2 1 0
+ *
+ *	T O
+ *
+ *	Y U V 4 2 2 I
+ *
+ *
+ */
+// V210 to YUYU
+void		convert_v210_to_yuyv_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, ssse3_sse41);
+}
+
+void		convert_v210_to_yuyv_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, ssse3);
+}
+
+// V210 to UYVY
+void		convert_v210_to_uyvy_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, ssse3_sse41);
+}
+
+void		convert_v210_to_uyvy_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, ssse3);
+}
+
+#define PACK_TO_YUV422P(y1, u, v, y2, dst) \
+	if (dest_fmt == PixFcYUYV) {\
+		*dst++ = y1;\
+		*dst++ = u;\
+		*dst++ = y2;\
+		*dst++ = v;\
+		} else if (dest_fmt == PixFcUYVY) {\
+			*dst++ = u;\
+			*dst++ = y1;\
+			*dst++ = v;\
+			*dst++ = y2;\
+		} else {\
+			dprint("Unknown destination pixel format\n");\
+		}
+
+void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer) {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	uint32_t 			which_y = 0;
 	uint32_t 			pixel_num = 0;
 	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			src = (uint8_t *) in;
-	uint8_t*			dst = (uint8_t *) out;
+	uint32_t*			src = (uint32_t *) srcBuffer;
+	uint8_t*			dst = (uint8_t *) dstBuffer;
 	int32_t				r, g, b;
-	int32_t				y, u, v;
+	int32_t				y1, y2, u, v\
+	while(pixel_num < pixel_count){
+		/* Pixel 1 and 2 */
+		y1 = (*src >> 12) & 0xFF);
+		u = *src & 0xFF;
+		v = (*src >> 22) & 0xFF;
+		y2 = src[1] & 0xFF;
+		PACK_TO_YUV422P(y1, u, v, y2, dst)
+		
+		/* Pixel 3 and 4 */
+		y1 = (src[1] >> 22) & 0xFF;
+		u = (src[1] >> 12) & 0xFF;
+		v = src[2] & 0xFF;
+		y2 = (src[2] >> 12) & 0xFF;
+		PACK_TO_YUV422P(y1, u, v, y2, dst)
 
-	while(pixel_num++ < pixel_count){
-		y = (! which_y) ? (src[0] << 8) : src[2] << 8;
-		u = src[1] - 128;
-		v = src[3] - 128;
+		/* Pixel 5 and 6 */
+		y1 = src[3] & 0xFF;
+		u = (src[2] >> 22) & 0xFF;
+		v = (src[3] >> 12) & 0xFF;
+		y2 = (src[3] >> 22) & 0xFF;
+		PACK_TO_YUV422P(y1, u, v, y2, dst)
 
-		r = (y + (359 * v)) >> 8;
-		g = (y - (88 * u) - (183 * v)) >> 8;
-		b = (y + (454 * u)) >> 8;
-
-		if (dest_fmt == PixFcARGB) {
-			*(dst++) = 0;		//A
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else if (dest_fmt == PixFcBGRA) {
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = 0;		//A
-		} else  if (dest_fmt == PixFcRGB24) {
-			*(dst++) = CLIP_PIXEL(r);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(b);
-		} else  {	// PixFcBGR24
-			*(dst++) = CLIP_PIXEL(b);
-			*(dst++) = CLIP_PIXEL(g);
-			*(dst++) = CLIP_PIXEL(r);
-		}
-
-		if (which_y++) {
-			which_y = 0;
-			src += 4;
-		}
-	}
+		src += 4;
+		pixel_num += 6;
+	}\
+	
 }
-*/
-
-

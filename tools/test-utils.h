@@ -25,13 +25,26 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifndef WIN32
+#include <strings.h>
+#endif
 
 #include "pixfc-sse.h"
 
 // printf helper which prints file name and line number
+#ifndef WIN32
 #define pixfc_log(fmt, ...) 	do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
-								__FILE__, __LINE__, ## __VA_ARGS__);\
+								rindex(__FILE__, '/')+1,\
+								__LINE__, ## __VA_ARGS__);\
 								fflush(stderr); } while(0)
+#else
+#define pixfc_log(fmt, ...) 	do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
+								strrchr(__FILE__, '\\')+1,\
+								__LINE__, ## __VA_ARGS__);\
+								fflush(stderr); } while(0)
+#endif
+
+
 
 
 typedef struct {

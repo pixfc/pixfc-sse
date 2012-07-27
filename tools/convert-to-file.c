@@ -31,7 +31,8 @@
 
 // PIXFC FLAGS
 //#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
-#define PIXFC_FLAGS	 PixFcFlag_NNbResamplingOnly // | PixFcFlag_SSE2Only
+//#define PIXFC_FLAGS	 PixFcFlag_SSE2_SSSE3Only |PixFcFlag_NNbResamplingOnly  | PixFcFlag_BT709Conversion
+#define PIXFC_FLAGS	 PixFcFlag_SSE2_SSSE3Only //| PixFcFlag_BT709Conversion
 //#define PIXFC_FLAGS	PixFcFlag_NoSSE  |  PixFcFlag_NNbResamplingOnly
 //#define PIXFC_FLAGS	PixFcFlag_Default
 
@@ -149,7 +150,7 @@ int 		main(int argc, char **argv) {
 	pixfc_log("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
 
 	// create struct pixfc
-	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, PIXFC_FLAGS) != 0)
+	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), PIXFC_FLAGS) != 0)
 	{
 		pixfc_log("error creating struct pixfc\n");
 		free(in);

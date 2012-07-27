@@ -37,7 +37,7 @@
 const PixelFormatDescription		pixfmt_descriptions[] = {
 	{
 		    PixFcYUYV,
-		    2, 1, 0, 16, 0,
+		    2, 1, 0, 16, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL) ,
@@ -68,7 +68,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcUYVY,
-		    2, 1, 0, 16, 0,
+		    2, 1, 0, 16, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x9415952B4BFF4C54LL, 0xFE80FF801C6B1DFFLL),
@@ -97,7 +97,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 			PixFcYUV422P,
-			2, 1, 1, 32, 0,
+			2, 1, 1, 32, 1, 1,
 			{
 				/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 						Decimal values:
@@ -127,7 +127,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 			PixFcYUV420P,
-			3, 2, 1, 64, 2,
+			3, 2, 1, 64, 2, 1,
 			{
 				/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 						Decimal values:
@@ -160,7 +160,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		PixFcV210,
-		16, 6, 0, 48, 0,
+		16, 6, 0, 1, 1, 48,
 		{
 			/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:
@@ -200,7 +200,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 	
 	{
 		    PixFcARGB,
-		    4, 1, 0, 16, 0,
+		    4, 1, 0, 16, 1, 1,
 		    {
 		    	// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x0000FF000000FF00LL, 0x00FF000000FF0000LL),
@@ -223,7 +223,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcBGRA,
-		    4, 1, 0, 16, 0,
+		    4, 1, 0, 16, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x00FF000000FF0000LL, 0x0000FF000000FF00LL),
@@ -235,7 +235,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcRGB24,
-		    3, 1, 0, 16, 0,
+		    3, 1, 0, 16, 1, 1,
 		    {
 				// 2 groups of: 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0xFF000000FF0000FFLL, 0x00FF000000FF0000LL),
@@ -248,7 +248,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcBGR24,
-		    3, 1, 0, 16, 0,
+		    3, 1, 0, 16, 1, 1,
 		    {
 				// 2 groups of: 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0xFF00FF0000FF0000LL, 0xFF0000FF00FF0000LL),

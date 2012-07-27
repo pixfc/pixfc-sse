@@ -529,7 +529,7 @@ INLINE_NAME(unpack_1v_v210_to_y_uv_vectors_sse2_ssse3, __m128i* input, __m128i* 
 }
 
 
-
+#undef DEFINE_UNPACK_4_V210_VECTORS
 #define DEFINE_UNPACK_4_V210_VECTORS(instr_set) \
 INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128i* yuv1_8_out, __m128i* yuv9_16_out, __m128i* yuv17_24_out) {\
 	M128I(y1, 0x0LL, 0x0LL);\
@@ -538,11 +538,11 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	M128I(uv2, 0x0LL, 0x0LL);\
 	M128I(y3, 0x0LL, 0x0LL);\
 	M128I(uv3, 0x0LL, 0x0LL);\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &y1, &uv1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[0], &(_M(y1)), &(_M(uv1)));\
 	/* Y0		Y1		Y2		Y3		Y4		Y5		0		0 */\
 	/* U10		V10		U23		V23		U45		V45		0		0 */\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &y2, &uv2);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[1], &(_M(y2)), &(_M(uv2)));\
 	/* Y6		Y7		Y8		Y9		Y10		Y11		0		0 */\
 	/* U67		V67		U89		V89		U1011	V1011	0		0 */\
 	\
@@ -561,34 +561,32 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &y3, &uv3);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[2], &(_M(y3)), &(_M(uv3)));\
 	/* Y12		Y13		Y14		Y15		Y16		Y17		0		0 */\
 	/* U1213	V1213	U1415	V1415	U1617	V1617	0		0 */\
 	\
-	_M(y1) = _mm_slli_si128(_M(y3), 8);									/* PSLLDQ			1	0.5 */\
-	yuv9_16_out[2] = _mm_or_si128(_M(y1), _M(y2));							/* POR              1	0.33 */\
+	yuv9_16_out[0] = _mm_unpacklo_epi64(_M(y2), _M(y3));				/* PUNPCKLQDQ		1	0.5 */\
 	/* Y8		Y9		Y10		Y11		Y12		Y13		Y14		Y15 */\
 	_M(y3) = _mm_srli_si128(_M(y3), 8);									/* PSRLDQ			1	0.5 */\
 	/* Y16		Y17		0		0		0		0		0		0 */\
 	\
 	\
-	_M(uv1) = _mm_slli_si128(_M(uv3), 8);								/* PSLLDQ			1	0.5 */\
-	yuv9_16_out[3] = _mm_or_si128(_M(uv1), _M(uv2));							/* POR              1	0.33 */\
+	yuv9_16_out[1] = _mm_unpacklo_epi64(_M(uv2), _M(uv3));				/* PUNPCKLQDQ		1	0.5 */\
 	/* U89		V89		U1011	V1011	U1213	V1213	U1415	V1415 */\
 	_M(uv3) = _mm_srli_si128(_M(uv3), 8);								/* PSRLDQ			1	0.5 */\
 	/* U1617	V1617	0		0		0		0		0		0 */\
 	\
 	\
-	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &y1, &uv1);\
+	CALL_INLINE(unpack_1v_v210_to_y_uv_vectors_ ## instr_set, &input[3], &(_M(y1)), &(_M(uv1)));\
 	/* Y18		Y19		Y20		Y21		Y22		Y23		0		0 */\
 	/* U1819	V1819	U2021	V2021	U2223	V2223	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y1), 4);									/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[4] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
+	yuv17_24_out[0] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
 	/*	Y16		Y17		Y18		Y19		Y20		Y21		Y22		Y23 */\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv1), 4);								/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[5] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
+	yuv17_24_out[1] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
 	/* U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223 */\
 }
 
@@ -630,6 +628,80 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
  */
 DEFINE_UNPACK_4_V210_VECTORS(sse2_ssse3_sse41);
 DEFINE_UNPACK_4_V210_VECTORS(sse2_ssse3);
+
+/*
+ * The following v210 unpacking inline yields much worse conversion timings than the above inline
+ * I left it here for reference
+ */
+INLINE_NAME(old_unpack_4v_v210_to_y_uv_vectors_sse2_ssse3, __m128i* input, __m128i* yuv1_8_out, __m128i* yuv9_16_out, __m128i* yuv17_24_out){
+	uint32_t*	source = (uint32_t*) input;
+
+	yuv1_8_out[0] = _mm_setr_epi16(
+				((source[0] >> 10) & 0x3FF),	// Y0
+				(source[1] & 0x3FF),			// Y1
+				((source[1] >> 20) & 0x3FF),	// Y2
+				((source[2] >> 10) & 0x3FF),	// Y3
+				(source[3] & 0x3FF),			// Y4
+				((source[3] >> 20) & 0x3FF),	// Y5
+				((source[4] >> 10) & 0x3FF),	// Y6
+				(source[5] & 0x3FF)				// Y7
+			);
+
+	yuv1_8_out[1] = _mm_setr_epi16(
+				(source[0] & 0x3FF),			// U01
+				((source[0] >> 20) & 0x3FF),	// V01
+				((source[1] >> 10) & 0x3FF),	// U23
+				(source[2] & 0x3FF),			// V23
+				((source[2] >> 20) & 0x3FF),	// U45
+				((source[3] >> 10) & 0x3FF),	// V45
+				(source[4] & 0x3FF),			// U67
+				((source[4] >> 20) & 0x3FF)		// V67
+			);
+
+	yuv9_16_out[0] = _mm_setr_epi16(
+				((source[5] >> 20) & 0x3FF),	// Y8
+				((source[6] >> 10) & 0x3FF),	// Y9
+				(source[7] & 0x3FF),			// Y10
+				((source[7] >> 20) & 0x3FF),	// Y11
+				((source[8] >> 10) & 0x3FF),	// Y12
+				(source[9] & 0x3FF),			// Y13
+				((source[9] >> 20) & 0x3FF),	// Y14
+				((source[10] >> 10) & 0x3FF)	// Y15
+			);
+
+	yuv9_16_out[1] = _mm_setr_epi16(
+				((source[5] >> 10) & 0x3FF),	// U8 9
+				(source[6] & 0x3FF),			// V8 9
+				((source[6] >> 20) & 0x3FF),	// U10 11
+				((source[7] >> 10) & 0x3FF),	// V10 11
+				(source[8] & 0x3FF),			// U12 13
+				((source[8] >> 20) & 0x3FF),	// V12 13
+				((source[9] >> 10) & 0x3FF),	// U14 15
+				(source[10] & 0x3FF)			// V14 15
+			);
+
+	yuv17_24_out[0] = _mm_setr_epi16(
+				(source[11] & 0x3FF),			// Y16
+				((source[11] >> 20) & 0x3FF),	// Y17
+				((source[12] >> 10) & 0x3FF),	// Y18
+				(source[13] & 0x3FF),			// Y19
+				((source[13] >> 20) & 0x3FF),	// Y20
+				((source[14] >> 10) & 0x3FF),	// Y21
+				(source[15] & 0x3FF),			// Y22
+				((source[15] >> 20) & 0x3FF)	// Y23
+			);
+
+	yuv17_24_out[1] = _mm_setr_epi16(
+				((source[10] >> 20) & 0x3FF),	// U16 17
+				((source[11] >> 10) & 0x3FF),	// V16 17
+				(source[12] & 0x3FF),			// U18 19
+				((source[12] >> 20) & 0x3FF),	// V18 19
+				((source[13] >> 10) & 0x3FF),	// U20 21
+				(source[14] & 0x3FF),			// V20 21
+				((source[14] >> 20) & 0x3FF),	// U22 23
+				((source[15] >> 10) & 0x3FF)	// V22 23
+			);
+}
 
 #endif	// __INTEL_CPU__
 

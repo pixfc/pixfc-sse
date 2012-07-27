@@ -171,5 +171,29 @@ void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, vo
 void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
+
+
+/*
+ *
+ *	V 2 1 0
+ *
+ *	T O
+ *
+ *	Y U V 4 2 2 I
+ *
+ *
+ */
+// V210 to YUYV
+void		convert_v210_to_yuyv_ssse3_sse41(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void		convert_v210_to_yuyv_ssse3(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+
+// V210 to UYVY
+void		convert_v210_to_uyvy_ssse3_sse41(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+void		convert_v210_to_uyvy_ssse3(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+
+void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+
+
+
 #endif 		// CONVERSION_ROUTINES_FROM_V210_H_
 

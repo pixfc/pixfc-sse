@@ -43,11 +43,7 @@ typedef struct {
 
         /*
 		 * To find out the total size of an array large enough to store
-		 * an image in this format:
-		 * (width * height) * byte_per_pix_num / byte_per_pix_denom
-		 * - The result cannot have a decimal part, and
-		 * - The buffer size MUST BE MULTIPLE OF 16 for most conversion blocks
-		 *   to work.
+		 * an image in this format, use the IMG_SIZE() macro below.
 		 */
         uint32_t				bytes_per_pix_num;
         uint32_t				bytes_per_pix_denom;
@@ -56,7 +52,13 @@ typedef struct {
         uint8_t					is_planar;
 
         uint8_t					pixel_count_multiple;
-        uint8_t					height_multiple;	// 0 if not applicable
+        uint8_t					height_multiple;	// 1 if not applicable
+	
+		// Each line must have a multiple of this number of pixels,
+		// or 1 if not applicable. This value is used to calculate
+		// the size in bytes of each line: 
+		// (width + (row_pixel_multiple - 1) ) / row_pixel_multiple) * bytes_per_pix_num / bytes_per_pix_den
+		uint8_t					row_pixel_multiple;
 		
 		/*
 		 * An array of 16-byte vectors containing the fill pattern.
@@ -82,14 +84,20 @@ extern const PixelFormatDescription		pixfmt_descriptions[];
 extern const uint32_t					pixfmt_descriptions_count;
 
 /*
+ * This macro expands to the size in bytes of a single line in an image
+ * of the given width and pixel format.
+ */
+#define ROW_SIZE(fmt, width) \
+	( ((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
+		((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) / pixfmt_descriptions[(fmt)].row_pixel_multiple * \
+			pixfmt_descriptions[(fmt)].bytes_per_pix_num * pixfmt_descriptions[(fmt)].row_pixel_multiple / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
+	)
+
+/*
  * This macro expands to the size in bytes of an image of the given width and 
  * height in the given pixel format (of type PixFcPixelFormat).
  */
-#define IMG_SIZE(pixFcPixFormat, width, height)	\
-	( ((pixFcPixFormat)<0 || (pixFcPixFormat>=PixFcFormatCount)) ? 0 :\
-		(width * height * pixfmt_descriptions[(pixFcPixFormat)].bytes_per_pix_num\
-		 / pixfmt_descriptions[(pixFcPixFormat)].bytes_per_pix_denom)\
-	)
+#define IMG_SIZE(fmt, width, height) (ROW_SIZE(fmt, width) * (height))
 
 	
 
