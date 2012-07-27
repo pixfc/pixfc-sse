@@ -247,7 +247,7 @@ DEFINE_YUV422I_TO_ANY_RGB(convert_yuv422i_to_any_rgb_bt601_nonsse,
 							-16, -128, -128,
 							298, 0, 359,
 							298, -100, -208,
-							298, 772, 0)
+							298, 516, 0)
 
 DEFINE_YUV422I_TO_ANY_RGB(convert_yuv422i_to_any_rgb_bt709_nonsse,
 							-16, -128, -128,
