@@ -90,6 +90,7 @@ const InputFile		input_files[] = {
 	{
 		PixFcARGB,
 		1920, 1080,
+		//48,1,
 		NULL,
 	},
 	{
@@ -122,6 +123,75 @@ const InputFile* 	find_input_file_for_format(PixFcPixelFormat format){
 	}
 
 	return NULL;
+}
+
+void 				print_known_pixel_formats() {
+	uint32_t index = 0;
+
+	while(index < pixfmt_descriptions_count) {
+		printf("  %s\n", pixfmt_descriptions[index].name);
+		index++;
+	}
+}
+
+void 				print_known_flags() {
+	printf("  PixFcFlag_Default           = 0\n");
+	printf("  PixFcFlag_NoSSE             = 1\n");
+	printf("  PixFcFlag_SSE2Only          = 2\n");
+	printf("  PixFcFlag_SSE2_SSSE3Only    = 4\n");
+	printf("  PixFcFlag_BT601Conversion   = 128\n");
+	printf("  PixFcFlag_BT709Conversion   = 256\n");
+	printf("  PixFcFlag_NNbResamplingOnly = 16384\n");
+}
+
+void				print_flags(PixFcFlag flags) {
+	if ((flags & PixFcFlag_NoSSE) != 0)
+		printf("  NoSSE");
+
+	if ((flags & PixFcFlag_SSE2Only) != 0)
+		printf("  SSE2Only;");
+
+	if ((flags & PixFcFlag_SSE2_SSSE3Only) != 0)
+		printf("  SSE2_SSSE3Only");
+
+	if ((flags & PixFcFlag_BT601Conversion) != 0)
+		printf("  BT601Conversion");
+
+	if ((flags & PixFcFlag_BT709Conversion) != 0)
+		printf("  BT709Conversion");
+
+	if ((flags & PixFcFlag_NNbResamplingOnly) != 0)
+		printf("  NNbResamplingOnly");
+
+	if (flags == PixFcFlag_Default)
+		printf("  Default");
+
+	printf("\n");
+}
+
+PixFcFlag	get_matching_flags(char *flag_string) {
+	PixFcFlag	flags = PixFcFlag_Default;
+	uint32_t	flag_value = atoi(flag_string);
+
+	if ((flag_value & PixFcFlag_NoSSE) != 0)
+		flags |= PixFcFlag_NoSSE;
+
+	if ((flag_value & PixFcFlag_SSE2Only) != 0)
+			flags |= PixFcFlag_SSE2Only;
+
+	if ((flag_value & PixFcFlag_SSE2_SSSE3Only) != 0)
+			flags |= PixFcFlag_SSE2_SSSE3Only;
+
+	if ((flag_value & PixFcFlag_BT601Conversion) != 0)
+			flags |= PixFcFlag_BT601Conversion;
+
+	if ((flag_value & PixFcFlag_BT709Conversion) != 0)
+			flags |= PixFcFlag_BT709Conversion;
+
+	if ((flag_value & PixFcFlag_NNbResamplingOnly) != 0)
+			flags |= PixFcFlag_NNbResamplingOnly;
+
+	return flags;
 }
 
 PixFcPixelFormat	find_matching_pixel_format(char *format_string) {
@@ -546,7 +616,7 @@ static void write_anyrgb_buffer_to_ppm_file(PixFcPixelFormat fmt, uint32_t width
 
 	pixfc_log("done\n");
 }
-static void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
+void write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in) {
 	int32_t			fd;
 	uint32_t		count = 0;
 	uint8_t			*buffer = (uint8_t *) in;
@@ -588,7 +658,7 @@ void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t heigh
 }
 
 
-uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pixfc, uint32_t width, uint32_t height) {
+uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pixfc, uint32_t width, uint32_t height) {
 	uint32_t			flags = PixFcFlag_Default;
 
 	// Index valid ?
@@ -627,6 +697,28 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
 	}
 
 	return 0;
+}
+
+int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes) {
+	struct PixFcSSE *pixfc = NULL;
+	int32_t index = -1;
+	uint32_t result;
+
+	result = create_pixfc(&pixfc, src_fmt, dst_fmt, width, height, row_bytes, flags);
+	if (result == PixFc_OK) {
+		uint32_t i;
+		for(i = 0; i < conversion_blocks_count; i++) {
+			if (pixfc->convert == conversion_blocks[i].convert_fn) {
+				index = i;
+				break;
+			}
+		}
+
+		destroy_pixfc(pixfc);
+	} else
+		pixfc_log("Error looking for conversion block - create_pixfc returned %d\n", result);
+
+	return index;
 }
 
 

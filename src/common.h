@@ -32,6 +32,7 @@
 
 // Clamp a pixel component's value to 0-255
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
+#define CLIP_10BIT_PIXEL(x) (((x)>1023) ? 1023 : ((x)<0) ? 0 : (x))
 
 #ifdef __INTEL_CPU__
 
@@ -111,6 +112,21 @@
 		}\
 	}
 
+#define DO_REPACK2(repack_macro, repack_fn_suffix, ...) \
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro LeftParenthesis repack_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			repack_macro LeftParenthesis unaligned_dst_##repack_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro LeftParenthesis unaligned_src_##repack_fn, __VA_ARGS__ RightParenthesis\
+		} else {\
+			repack_macro LeftParenthesis unaligned_src_unaligned_dst_##repack_fn, __VA_ARGS__ RightParenthesis\
+		}\
+	}
+
 #else // ! Windows
 
 #define DO_CONVERSION_1U_1P(conversion_macro, unpack_fn, pack_fn, ...)\
@@ -173,6 +189,20 @@
 		}\
 	}
 
+#define DO_REPACK2(repack_macro, unpack_fn_prefix, pack_fn, ...) \
+	if (((uintptr_t)source_buffer & 0x0F) == 0) {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro(unpack_fn_prefix, pack_fn, __VA_ARGS__)\
+		} else {\
+			repack_macro(unpack_fn_prefix, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	} else {\
+		if (((uintptr_t)dest_buffer & 0x0F) == 0){\
+			repack_macro(unaligned_##unpack_fn_prefix, pack_fn, __VA_ARGS__)\
+		} else {\
+			repack_macro(unaligned_##unpack_fn_prefix, unaligned_##pack_fn, __VA_ARGS__)\
+		}\
+	}
 
 #endif
 
@@ -230,14 +260,18 @@ uint32_t			does_cpu_support(uint64_t);
 void 						print_xmm32(char *name, __m128i *reg);
 void 						print_xmm16(char *name, __m128i *reg);
 void 						print_xmm16u(char *name, __m128i *reg);
+void 						print_xmm10u(char *name, __m128i *reg);
 void						print_xmm8u(char *name, __m128i *reg);
+void						print_xmm8x(char *name, __m128i *reg);
 
 #else
 
 #define print_xmm32(...)
 #define print_xmm16(...)
 #define print_xmm16u(...)
+#define print_xmm10u(...)
 #define print_xmm8u(...)
+#define print_xmm8x(...)
 
 #endif	// DEBUG
 

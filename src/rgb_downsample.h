@@ -215,7 +215,7 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2(__m128i* in_3_v16i_r_g_
  */
 EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16i_r_g_b_vectors, __m128i *out_3_v16i_nnb_422_r_g_b_vectors)
 {
-	CONST_M128I(shuf_odd, 0xFF04FF04FF00FF00LL, 0xFF0CFF0CFF08FF08LL);
+	CONST_M128I(shuf_odd, 0x0504050401000100LL, 0x0D0C0D0C09080908LL);
 
 	out_3_v16i_nnb_422_r_g_b_vectors[0] = _mm_shuffle_epi8(in_3_v16i_r_g_b_vectors[0], _M(shuf_odd));// PSHUFB		1	0.5
 	// R1 0 R1 0	R3 0 R3	0	R5 0 R5	0	R7 0 R7 0
@@ -227,6 +227,10 @@ EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(__m128i* in_3_v16
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5	0	B7 0 B7	0
 }
 
+// No change for SSE41
+EXTERN_INLINE void	nnb_422_downsample_r_g_b_vectors_sse2_ssse3_sse41(__m128i* in, __m128i *out) {
+	nnb_422_downsample_r_g_b_vectors_sse2_ssse3(in, out);
+}
 
 /*
  * Theory behind the following 422 downsampling average filter is taken from:
@@ -652,7 +656,10 @@ EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(_
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
 }
 
-
+// No change for SSE41
+EXTERN_INLINE void	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3_sse41(__m128i* in_3_v16i_current_r_g_b_vectors, __m128i* in_3_v16i_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+	avg_422_downsample_r_g_b_vectors_n_save_previous_sse2_ssse3(in_3_v16i_current_r_g_b_vectors, in_3_v16i_previous_r_g_b_vectors, out_3_v16i_avg_422_r_g_b_vectors);
+}
 
 
 /*
@@ -690,6 +697,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2(_
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
+
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
@@ -775,11 +787,6 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2(_
 	// B1 0 xx 0	B3 0 xx 0	B5 0 B5 0	B7 0 B7 0
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shufflelo_epi16(_M(scratch1), 0xA0);	// PSHUFLW		1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
-
-	// Save current values in previous vectors
-	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
-	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
-	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
 
@@ -822,6 +829,11 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_s
 	M128I(scratch1, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
 	M128I(scratch3, 0x0LL, 0x0LL);
+
+	// Save current values in previous vectors
+	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
+	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
+	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 
 	//
 	// As it is the first vector in the image and we dont have a sample at t = -1,
@@ -901,13 +913,12 @@ EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_s
 	// Duplicate samples at t = {0,2,4,6}
 	out_3_v16i_avg_422_r_g_b_vectors[2] = _mm_shuffle_epi8(_M(scratch1),  _M(shuf_result));	// PSHUFB	1	0.5
 	// B1 0 B1 0	B3 0 B3 0	B5 0 B5 0	B7 0 B7 0
-
-	// Save current values in previous vectors
-	out_3_previous_r_g_b_vectors[0] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[0]);
-	out_3_previous_r_g_b_vectors[1] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[1]);
-	out_3_previous_r_g_b_vectors[2] = _mm_load_si128(&in_3_v16i_current_r_g_b_vectors[2]);
 }
 
+// No change for SSE41
+EXTERN_INLINE void	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_ssse3_sse41(__m128i* in_3_v16i_current_r_g_b_vectors,  __m128i* out_3_previous_r_g_b_vectors, __m128i *out_3_v16i_avg_422_r_g_b_vectors) {
+	avg_422_downsample_first_r_g_b_vectors_n_save_previous_sse2_ssse3(in_3_v16i_current_r_g_b_vectors,  out_3_previous_r_g_b_vectors, out_3_v16i_avg_422_r_g_b_vectors);
+}
 
 /*
  * Create 3 422 downsampled R, G, B vectors from 4 AG, RB vectors

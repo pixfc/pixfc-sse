@@ -64,6 +64,15 @@ void		convert_bgr24_to_yuv420p_sse2_ssse3(const struct PixFcSSE *, void*, void*)
 void		convert_bgr24_to_yuv420p_sse2(const struct PixFcSSE *, void*, void*);
 
 
+// BGR24 to V210			SSE2 SSSE3 SSE41
+void		convert_bgr24_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+// BGR24 to V210			SSE2
+void		convert_bgr24_to_v210_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+
+
 /*
  *
  *
@@ -109,6 +118,14 @@ void		convert_bgr24_to_yuv420p_bt601_sse2_ssse3(const struct PixFcSSE *, void*, 
 void		convert_bgr24_to_yuv420p_bt601_sse2(const struct PixFcSSE *, void*, void*);
 
 
+// BGR24 to V210		SSE2 SSSE3 SSE41
+void		convert_bgr24_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+
+// BGR24 to V210		SSE2 SSSE3
+void		convert_bgr24_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
 /*
  *
  *
@@ -152,6 +169,15 @@ void		downsample_n_convert_bgr24_to_yuv422p_bt709_sse2(const struct PixFcSSE *, 
 // BGR24 to YUV420P			SSE2 / SSSE3
 void		convert_bgr24_to_yuv420p_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 void		convert_bgr24_to_yuv420p_bt709_sse2(const struct PixFcSSE *, void*, void*);
+
+
+// BGR24 to V210			SSE2 SSSE3 SSE41
+void		convert_bgr24_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void*, void*);
+
+// BGR24 to V210			SSE2 SSSE3
+void		convert_bgr24_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+void		downsample_n_convert_bgr24_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
 
 
 

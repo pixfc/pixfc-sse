@@ -67,6 +67,25 @@ extern const uint32_t		input_files_size;
  */
 const InputFile* 	find_input_file_for_format(PixFcPixelFormat format);
 
+/*
+ * Print (using printf) the known pixel formats in PixFxPixelFormat
+ */
+void 			print_known_pixel_formats();
+
+/*
+ * Print (using printf) the known flags in PixFcFlag
+ */
+void 			print_known_flags();
+
+/*
+ * Convert the provided string to integer and return the PixFcFlag equivalent
+ */
+PixFcFlag		get_matching_flags(char *flag_string);
+
+/*
+ * Print (using printf) the value of the given flags
+ */
+void			print_flags(PixFcFlag flags);
 
 /*
  * Look for PixFcPixelFormat enum entry matching the given pixel format
@@ -116,6 +135,10 @@ int32_t 	get_buffer_from_file(PixFcPixelFormat fmt, uint32_t width, uint32_t hei
 void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * buffer);
 
 /*
+ * Write buffer as is to a file
+ */
+void 		write_raw_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t height, char *filename, void * in);
+/*
  *  This function returns the current system's uptime
  *  in nanoseconds (64 bit unsigned)
  */
@@ -142,6 +165,13 @@ void				do_timing(struct timings *timings);
  * if the CPU has the required features. Caller must release struct when done
  */
 uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pixfc, uint32_t width, uint32_t height);
+
+/*
+ * Given source/dest formats, flags, width, height and row bytes, this function
+ * returns the index of the conversion block which would be returned by create_pixfc,
+ * or -1 if error
+ */
+int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes);
 
 
 #if defined(__linux__) || defined(__APPLE__)

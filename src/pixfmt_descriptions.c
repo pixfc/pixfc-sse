@@ -204,7 +204,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 		    {
 		    	// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x0000FF000000FF00LL, 0x00FF000000FF0000LL),
-				_E(0xFF000000FF000000LL, 0xFFFFFF00FFFFFF00LL)
+				_E(0xFF000000FF000000LL, 0xFFFFFF00FFFFFF00LL),
 				//
 				// With average downsampling, converting the above to YUYV produces:
 				// 76   84   76  255	149   53  149   78		29  201   29   85	254  158  254  121
@@ -214,10 +214,10 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 				// 1 red pix - 1 black pix - 1 white pix - 1 green pix
 		    	// 1 bordeaux pix - 1 blue pix - 1 grey pix - 1 red pix
-				//_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
-				//_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
+				_E(0x000000000000FF00LL, 0x00FF0000FFFFFF00LL),
+				_E(0xFF00000000005100LL, 0x0000FF0088888800LL)
 			},
-			2,
+			4,
 		    "ARGB",
 	},
 

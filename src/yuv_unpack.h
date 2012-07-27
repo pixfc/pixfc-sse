@@ -59,7 +59,7 @@
 //#define GENERATE_UNALIGNED_INLINES 1
 #if GENERATE_UNALIGNED_INLINES == 1
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
-	#define CALL_INLINE(fn_suffix, ...)				unaligned_ ## fn_suffix(__VA_ARGS__)
+	#define CALL_INLINE(fn, ...)					unaligned_ ## fn(__VA_ARGS__)
 
 	// Interleaved YUV
 	#define UNALIGNED_YUV422I_INPUT_PREAMBLE		DECLARE_VECT_N_UNALIGN_LOAD(aligned_vector, input);
@@ -74,7 +74,7 @@
 
 #else
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
-	#define CALL_INLINE(fn_suffix, ...)				fn_suffix(__VA_ARGS__)
+	#define CALL_INLINE(fn, ...)					fn(__VA_ARGS__)
 
 	// Interleaved YUV
 	#define UNALIGNED_YUV422I_INPUT_PREAMBLE
@@ -547,14 +547,14 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	/* U67		V67		U89		V89		U1011	V1011	0		0 */\
 	\
 	_M(y3) = _mm_slli_si128(_M(y2), 12);								/* PSLLDQ			1	0.5 */\
-	yuv1_8_out[0] = _mm_or_si128(_M(y3), _M(y1));							/* POR              1	0.33 */\
+	yuv1_8_out[0] = _mm_or_si128(_M(y3), _M(y1));						/* POR              1	0.33 */\
 	/* Y0		Y1		Y2		Y3		Y4		Y5		Y6		Y7 */\
 	_M(y2) = _mm_srli_si128(_M(y2), 4);									/* PSRLDQ			1	0.5 */\
 	/* Y8		Y9		Y10		Y11		0		0		0		0 */\
 	\
 	\
 	_M(uv3) = _mm_slli_si128(_M(uv2), 12);								/* PSLLDQ			1	0.5 */\
-	yuv1_8_out[1] = _mm_or_si128(_M(uv3), _M(uv1));							/* POR              1	0.33 */\
+	yuv1_8_out[1] = _mm_or_si128(_M(uv3), _M(uv1));						/* POR              1	0.33 */\
 	/* U01		V01		U23		V23		U45		V45		U67		V67 */\
 	_M(uv2) = _mm_srli_si128(_M(uv2), 4);								/* PSRLDQ			1	0.5 */\
 	/* U89		V89		U1011	V1011	0		0		0		0 */\
@@ -582,11 +582,11 @@ INLINE_NAME(unpack_4v_v210_to_y_uv_vectors_ ## instr_set, __m128i* input, __m128
 	/* U1819	V1819	U2021	V2021	U2223	V2223	0		0 */\
 	\
 	_M(y1) = _mm_slli_si128(_M(y1), 4);									/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[0] = _mm_or_si128(_M(y1), _M(y3));							/* POR              1	0.33 */\
+	yuv17_24_out[0] = _mm_or_si128(_M(y1), _M(y3));						/* POR              1	0.33 */\
 	/*	Y16		Y17		Y18		Y19		Y20		Y21		Y22		Y23 */\
 	\
 	_M(uv1) = _mm_slli_si128(_M(uv1), 4);								/* PSLLDQ			1	0.5 */\
-	yuv17_24_out[1] = _mm_or_si128(_M(uv1), _M(uv3));							/* POR              1	0.33 */\
+	yuv17_24_out[1] = _mm_or_si128(_M(uv1), _M(uv3));					/* POR              1	0.33 */\
 	/* U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223 */\
 }
 

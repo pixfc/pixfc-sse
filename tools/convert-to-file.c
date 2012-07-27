@@ -29,15 +29,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-// PIXFC FLAGS
-//#define PIXFC_FLAGS	PixFcFlag_BT601Conversion
-//#define PIXFC_FLAGS	 PixFcFlag_SSE2_SSSE3Only |PixFcFlag_NNbResamplingOnly  | PixFcFlag_BT709Conversion
-#define PIXFC_FLAGS	 PixFcFlag_SSE2_SSSE3Only //| PixFcFlag_BT709Conversion
-//#define PIXFC_FLAGS	PixFcFlag_NoSSE  |  PixFcFlag_NNbResamplingOnly
-//#define PIXFC_FLAGS	PixFcFlag_Default
-
-
-
 
 /*
  * Global variables
@@ -47,19 +38,17 @@ PixFcPixelFormat		dst_fmt = PixFcARGB;
 char *					src_filename = NULL;
 uint32_t				w = 1280;
 uint32_t				h = 1024;
+PixFcFlag				flags = PixFcFlag_Default;
 
 static void 		print_usage(char *prog_name) {
-	uint32_t index = 0;
-
 	printf("Convert an image in a source pixel format to a destination pixel format.\n");
-	printf("Usage: %s <input format> [input file] <output format> <width> <height>\n", prog_name);
+	printf("Usage: %s <input format> [input file] <output format> <width> <height> <flags>\n", prog_name);
 	printf("Where <input format> and <output format> are one of:\n");
-	while(index < pixfmt_descriptions_count) {
-		printf("  %s\n", pixfmt_descriptions[index].name);
-		index++;
-	}
+	print_known_pixel_formats();
 	printf("If [input file] is specified and exists, read the source image from that file.\n");
 	printf("Otherwise, fill the source image with a predefined fill pattern.\n");
+	printf("<flags> is a bitmask from:\n");
+	print_known_flags();
 }
 
 // Parse arguments and set global variables accordingly
@@ -67,8 +56,8 @@ static void 		print_usage(char *prog_name) {
 static uint32_t		parse_args(int argc, char **argv){
 	uint32_t arg_index = 1;
 
-	// Need 4 or 5 args
-	if ((argc != 5) && (argc != 6)) {
+	// Need 5 or 6 args
+	if ((argc != 6) && (argc != 7)) {
 		printf("Invalid argument count\n");
 		return -1;
 	}
@@ -80,7 +69,7 @@ static uint32_t		parse_args(int argc, char **argv){
 	}
 
 	// If we have 6 args, the next arg is the input file
-	if (argc == 6)
+	if (argc == 7)
 		src_filename = argv[arg_index++]; // the filename is checked when the file is opened.
 
 	// Parse output format
@@ -94,6 +83,8 @@ static uint32_t		parse_args(int argc, char **argv){
 		printf("Invalid width / height (%d x %d)\n", w, h);
 		return -1;
 	}
+
+	flags = get_matching_flags(argv[arg_index++]);
 
 	return 0;
 }
@@ -148,9 +139,11 @@ int 		main(int argc, char **argv) {
 	pixfc_log("Image size:\t%d x %d\n", w, h);
 	pixfc_log("Input format:\t%s\n", pixfmt_descriptions[src_fmt].name);
 	pixfc_log("Output format:\t%s\n", pixfmt_descriptions[dst_fmt].name);
+	pixfc_log("Flags: ");
+	print_flags(flags);
 
 	// create struct pixfc
-	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), PIXFC_FLAGS) != 0)
+	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), flags) != 0)
 	{
 		pixfc_log("error creating struct pixfc\n");
 		free(in);

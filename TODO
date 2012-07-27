@@ -1,5 +1,6 @@
 PixFC-SSE TODO list:
 
+* optimise RGB24_TO_V210_NNB_LOOP_CORE
 * optimise yuv_to_rgb inline (use 8-bit left shifted coefs where possible) 
 * Investigate if 8-bit left-shifted coefficients can be used and whether they 
   provide acceptable results for yuv to rgb inlines

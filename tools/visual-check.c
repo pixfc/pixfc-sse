@@ -58,18 +58,30 @@ int 		main(int argc, char **argv) {
 	char 					out_filename[128] = {0};
 	char					*r;
 	PixFcPixelFormat		src_fmt = PixFcFormatCount;
+	PixFcPixelFormat		dst_fmt = PixFcFormatCount;
 	// In / out buffers
 	__m128i	*				in = NULL;
 	__m128i	*				out = NULL;	
 	
 	// Check if we should restrict to a single source format
-	if (argc == 2) {
+	if (argc >= 2) {
 		src_fmt = find_matching_pixel_format(argv[1]);
 		if (src_fmt != PixFcFormatCount)
 			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
 		else
 		{
-			printf("Unknown pixel format '%s'\n", argv[1]);
+			printf("Unknown source pixel format '%s'\n", argv[1]);
+			exit(1);
+		}
+	}
+
+	if (argc == 3) {
+		dst_fmt = find_matching_pixel_format(argv[2]);
+		if (dst_fmt != PixFcFormatCount)
+			printf("Using dest pixel format '%s'\n", pixfmt_descriptions[dst_fmt].name);
+		else
+		{
+			printf("Unknown dest pixel format '%s'\n", argv[2]);
 			exit(1);
 		}
 	}
@@ -80,6 +92,10 @@ int 		main(int argc, char **argv) {
 		if ((src_fmt != PixFcFormatCount) && (src_fmt != conversion_blocks[index].source_fmt))
 			continue;
 		
+		// Check if we have to restrict to the specified dest format
+		if ((dst_fmt != PixFcFormatCount) && (dst_fmt != conversion_blocks[index].dest_fmt))
+			continue;
+
 		// Make sure the CPU has the required features
 		if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
 			printf("  (skipped %s - CPU missing required features)\n",

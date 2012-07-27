@@ -102,6 +102,25 @@ void print_xmm16u(char *name, __m128i *reg) {
 			array[4], array[5], array[6], array[7]);
 }
 
+void print_xmm10u(char *name, __m128i *reg) {
+	// print register as 10bit unsigned
+	uint32_t*	array = (uint32_t *)reg;
+	printf("%s:\n %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu\n", name,
+			(unsigned short) (array[0] & 0x3FF),
+			(unsigned short) ((array[0] >> 10) & 0x3FF),
+			(unsigned short) ((array[0] >> 20) & 0x3FF),
+			(unsigned short) (array[1] & 0x3FF),
+			(unsigned short) ((array[1] >> 10) & 0x3FF),
+			(unsigned short) ((array[1] >> 20) & 0x3FF),
+			(unsigned short) (array[2] & 0x3FF),
+			(unsigned short) ((array[2] >> 10) & 0x3FF),
+			(unsigned short) ((array[2] >> 20) & 0x3FF),
+			(unsigned short) (array[3] & 0x3FF),
+			(unsigned short) ((array[3] >> 10) & 0x3FF),
+			(unsigned short) ((array[3] >> 20) & 0x3FF)
+		);
+}
+
 void print_xmm8u(char *name, __m128i *reg) {
 	// print register as 8bit signed
 	char*	array = (char *)reg;
@@ -112,16 +131,28 @@ void print_xmm8u(char *name, __m128i *reg) {
 			array[8], array[9], array[10], array[11],
 			array[12], array[13], array[14], array[15]);
 }
+
+void print_xmm8x(char *name, __m128i *reg) {
+	// print register as 8bit signed
+	char*	array = (char *)reg;
+	printf("%s:\n %02hhx %02hhx %02hhx %02hhx %02hhx %02hhx %02hhx %02hhx "
+			"%02hhx %02hhx %02hhx %02hhx %02hhx %02hhx %02hhx %02hhx\n", name,
+			array[0], array[1], array[2], array[3],
+			array[4], array[5], array[6], array[7],
+			array[8], array[9], array[10], array[11],
+			array[12], array[13], array[14], array[15]);
+}
 #else
 void print_xmm32(char *name, __m128i *reg) {}
-
 void print_xmm16(char *name, __m128i *reg) {}
-
 void print_xmm16u(char *name, __m128i *reg) {}
-
+void print_xmm10u(char *name, __m128i *reg) {}
 void print_xmm8u(char *name, __m128i *reg) {}
+void print_xmm8x(char *name, __m128i *reg) {}
 #endif
+
 #endif
+
 
 
 

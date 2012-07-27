@@ -130,6 +130,27 @@
 			)
 
 
+#define CONVERT_TO_V210(instr_set)\
+			DO_CONVERSION_1U_1P(\
+					RGB32_TO_V210_RECIPE,\
+					unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
+					pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+					convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709_sse2,\
+					convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709_sse2,\
+					instr_set\
+			)
+
+#define DOWNSAMPLE_N_CONVERT_TO_V210(instr_set)\
+			DO_CONVERSION_1U_1P(\
+					AVG_DOWNSAMPLE_RGB32_TO_V210_RECIPE,\
+					unpack_argb_to_r_g_b_vectors_sse2_ssse3,\
+					pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+					convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709_sse2,\
+					convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709_sse2,\
+					instr_set\
+			)
+
+
 // ARGB to YUYV			SSE2 SSSE3
 void		convert_argb_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
@@ -203,85 +224,22 @@ void		convert_argb_to_yuv420p_bt709_sse2(const struct PixFcSSE *pixfc, void* sou
 }
 
 
-
-void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out)
-{
-	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
-	PixFcPixelFormat 	src_fmt = conv->source_fmt;
-	uint32_t 			pixel_num = 0;
-	uint32_t			pixel_count = conv->pixel_count;
-	uint8_t*			src = (uint8_t *) in;
-	uint8_t*			dst = (uint8_t *) out;
-	uint8_t*			y_plane = dst;
-	uint8_t*			u_plane = dst + pixel_count;
-	uint8_t*			v_plane = u_plane + pixel_count / 2;
-	int32_t				r1, g1, b1, r2, g2, b2;
-	int32_t				y1, y2, u, v;
-
-	while(pixel_num < pixel_count){
-		if (src_fmt == PixFcARGB) {
-			src++;	// A
-			r1 = *(src++);
-			g1 = *(src++);
-			b1 = *(src++);
-			src++;	// A
-			r2 = *(src++);
-			g2 = *(src++);
-			b2 = *(src++);
-		} else if (src_fmt == PixFcBGRA) {
-			b1 = *(src++);
-			g1 = *(src++);
-			r1 = *(src++);
-			src++;	// A
-			b2 = *(src++);
-			g2 = *(src++);
-			r2 = *(src++);
-			src++;	// A
-		} else if (src_fmt == PixFcRGB24) {
-			r1 = *(src++);
-			g1 = *(src++);
-			b1 = *(src++);
-			r2 = *(src++);
-			g2 = *(src++);
-			b2 = *(src++);
-		} else if (src_fmt == PixFcBGR24) {
-			b1 = *(src++);
-			g1 = *(src++);
-			r1 = *(src++);
-			b2 = *(src++);
-			g2 = *(src++);
-			r2 = *(src++);
-		} else
-			printf("Unknown source pixel format in non-SSE conversion from RGB\n");
-
-
-		//
-		y1 = ((47 * r1 + 157 * g1 + 16 * b1) >> 8) + 16;
-		u = ((-26 * r1 - 87 * g1 + 112 * b1) >> 8) + 128;
-		v = ((112 * r1 - 102  * g1 - 10 * b1) >> 8) + 128;
-		y2 = ((47 * r2 + 157 * g2 + 16 * b2) >> 8) + 16;
-
-		if (dest_fmt == PixFcYUYV) {
-			*(dst++) = CLIP_PIXEL(y1);
-			*(dst++) = CLIP_PIXEL(u);
-			*(dst++) = CLIP_PIXEL(y2);
-			*(dst++) = CLIP_PIXEL(v);
-		} else if (dest_fmt == PixFcUYVY) {
-			*(dst++) = CLIP_PIXEL(u);
-			*(dst++) = CLIP_PIXEL(y1);
-			*(dst++) = CLIP_PIXEL(v);
-			*(dst++) = CLIP_PIXEL(y2);
-		} else if (dest_fmt == PixFcYUV422P) {
-			*(y_plane++) = CLIP_PIXEL(y1);
-			*(y_plane++) = CLIP_PIXEL(y2);
-			*(u_plane++) = CLIP_PIXEL(u);
-			*(v_plane++) = CLIP_PIXEL(v);
-		} else {
-			printf("Unknown output format in non-SSE conversion from RGB\n");
-		}
-
-		pixel_num += 2; // 2 pixels processed per loop
-	}
+// ARGB to V210			SSE2 SSSE3 SSE41
+void		convert_argb_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3_sse41);
 }
 
+void		downsample_n_convert_argb_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+
+// ARGB to V210			SSE2 SSSE3
+void		convert_argb_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3);
+}
+
+void		downsample_n_convert_argb_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3);
+}
 

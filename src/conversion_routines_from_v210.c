@@ -265,21 +265,21 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse,
  *
  */
 // V210 to YUYU
-void		convert_v210_to_yuyv_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
-	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, ssse3_sse41);
+void		convert_v210_to_yuyv_sse2_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(V210_TO_YUV422I_RECIPE, unpack_4v_v210_to_y_uv_vectors_, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3_sse41);
 }
 
-void		convert_v210_to_yuyv_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
-	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, ssse3);
+void		convert_v210_to_yuyv_sse2_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(V210_TO_YUV422I_RECIPE, unpack_4v_v210_to_y_uv_vectors_, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
 // V210 to UYVY
-void		convert_v210_to_uyvy_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
-	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, ssse3_sse41);
+void		convert_v210_to_uyvy_sse2_ssse3_sse41(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(V210_TO_YUV422I_RECIPE, unpack_4v_v210_to_y_uv_vectors_, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3_sse41);
 }
 
-void		convert_v210_to_uyvy_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
-	DO_REPACK(V210_TO_YUV422I_RECEIPE, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, ssse3);
+void		convert_v210_to_uyvy_sse2_ssse3(const struct PixFcSSE* pixfc, void* source_buffer, void* dest_buffer) {
+	DO_REPACK2(V210_TO_YUV422I_RECIPE, unpack_4v_v210_to_y_uv_vectors_, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
 }
 
 #define PACK_TO_YUV422P(y1, u, v, y2, dst) \
@@ -288,14 +288,14 @@ void		convert_v210_to_uyvy_ssse3(const struct PixFcSSE* pixfc, void* source_buff
 		*dst++ = u;\
 		*dst++ = y2;\
 		*dst++ = v;\
-		} else if (dest_fmt == PixFcUYVY) {\
-			*dst++ = u;\
-			*dst++ = y1;\
-			*dst++ = v;\
-			*dst++ = y2;\
-		} else {\
-			dprint("Unknown destination pixel format\n");\
-		}
+	} else if (dest_fmt == PixFcUYVY) {\
+		*dst++ = u;\
+		*dst++ = y1;\
+		*dst++ = v;\
+		*dst++ = y2;\
+	} else {\
+		dprint("Unknown destination pixel format\n");\
+	}
 
 void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer) {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
@@ -303,25 +303,24 @@ void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffe
 	uint32_t			pixel_count = conv->pixel_count;
 	uint32_t*			src = (uint32_t *) srcBuffer;
 	uint8_t*			dst = (uint8_t *) dstBuffer;
-	int32_t				r, g, b;
-	int32_t				y1, y2, u, v\
+	int32_t				y1, y2, u, v;
 	while(pixel_num < pixel_count){
 		/* Pixel 1 and 2 */
-		y1 = (*src >> 12) & 0xFF);
-		u = *src & 0xFF;
+		y1 = (*src >> 12) & 0xFF;
+		u = (*src >> 2) & 0xFF;
 		v = (*src >> 22) & 0xFF;
-		y2 = src[1] & 0xFF;
+		y2 = (src[1] >> 2) & 0xFF;
 		PACK_TO_YUV422P(y1, u, v, y2, dst)
 		
 		/* Pixel 3 and 4 */
 		y1 = (src[1] >> 22) & 0xFF;
 		u = (src[1] >> 12) & 0xFF;
-		v = src[2] & 0xFF;
+		v = (src[2] >> 2) & 0xFF;
 		y2 = (src[2] >> 12) & 0xFF;
 		PACK_TO_YUV422P(y1, u, v, y2, dst)
 
 		/* Pixel 5 and 6 */
-		y1 = src[3] & 0xFF;
+		y1 = (src[3] >> 2) & 0xFF;
 		u = (src[2] >> 22) & 0xFF;
 		v = (src[3] >> 12) & 0xFF;
 		y2 = (src[3] >> 22) & 0xFF;
@@ -329,6 +328,5 @@ void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffe
 
 		src += 4;
 		pixel_num += 6;
-	}\
-	
+	}
 }

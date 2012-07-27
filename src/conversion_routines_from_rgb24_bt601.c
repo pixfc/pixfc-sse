@@ -129,6 +129,25 @@
 					instr_set\
 			)
 
+#define CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				RGB24_TO_V210_RECIPE,\
+				unpack_rgb24_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601_sse2,\
+				convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601_sse2,\
+				instr_set\
+		)
+
+#define DOWNSAMPLE_N_CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				AVG_DOWNSAMPLE_RGB24_TO_V210_RECIPE,\
+				unpack_rgb24_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601_sse2,\
+				convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601_sse2,\
+				instr_set\
+		)
 
 // RGB24 to YUYV			SSE2 SSSE3
 void		convert_rgb24_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
@@ -195,7 +214,6 @@ void		downsample_n_convert_rgb24_to_yuv422p_bt601_sse2(const struct PixFcSSE *pi
 
 
 
-
 // RGB24 to YUV420P			SSE2 / SSSE3
 void		convert_rgb24_to_yuv420p_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_YUV420P(sse2_ssse3);
@@ -205,3 +223,24 @@ void		convert_rgb24_to_yuv420p_bt601_sse2(const struct PixFcSSE *pixfc, void* so
 	CONVERT2_TO_YUV420P(sse2);
 }
 
+
+
+
+// RGB24 to V210			SSE2 SSSE3 SSE41
+void		convert_rgb24_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+void		downsample_n_convert_rgb24_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+
+// RGB24 to V210			SSE2 SSSE3
+void		convert_rgb24_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3);
+}
+
+void		downsample_n_convert_rgb24_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3);
+}

@@ -26,7 +26,7 @@
 
 #include <emmintrin.h>
 #include <tmmintrin.h>
-
+#include <smmintrin.h>
 
 #ifndef GENERATE_UNALIGNED_INLINES
 #error "The GENERATE_UNALIGNED_INLINES macro is not defined"
@@ -46,12 +46,15 @@
 #undef INLINE_NAME
 #undef M128_STORE
 #undef M128_LOAD
+#undef CALL_INLINE
 
 #if GENERATE_UNALIGNED_INLINES == 1
+	#define CALL_INLINE(fn, ...)					unaligned_ ## fn(__VA_ARGS__)
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
 	#define M128_STORE(src, dst)					_mm_storeu_si128(&(dst), (src))
 	#define M128_LOAD(src)							_mm_loadu_si128(&(src))
 #else
+	#define CALL_INLINE(fn, ...)					fn(__VA_ARGS__)
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
 	#define M128_STORE(src, dst)					(dst) = (src)
 	#define M128_LOAD(src)							(src)
@@ -374,6 +377,207 @@ INLINE_NAME(pack_4_uv_vectors_to_yup_vectors_sse2, __m128i* in_4_uv_vectors, __m
 	M128_STORE(_mm_packus_epi16(_M(scratch3), _M(scratch4)), *out_v_plane);		// PACKUSWB		1	0.5
 	// V1 V2	V3 V4 	V5 V6	V7 V8	V9 V10	V11 V12	V13 V14 V15 V16
 }
+
+
+/*
+ * Pack 2 Y, UV vectors into 1 v210 vector (6 pixels)
+ *
+ * Total latency:				12
+ * Number of pixels handled:	16
+ *
+ * INPUT
+ *
+ * 2 vectors of 8 short
+ * yVect
+ * Y0		Y1		Y2		Y3		Y4		Y5		0		0
+ *
+ * uvVect
+ * U01		V01		U23		V23		U45		V45		0		0
+ *
+ * OUTPUT:
+ *
+ * 1 vector of 6 v210 pixels
+ * U01	Y0	V01	Y1	... U45	Y4	V45	Y5
+ *
+ *
+ */
+INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3_sse41, __m128i* input, __m128i* output) {
+	CONST_M128I(max_value, 0x03FF03FF03FF03FFLL, 0x03FF03FF03FF03FFLL);
+	CONST_M128I(shuffle_y, 0x050403020100FFFFLL, 0x0B0A09080706FFFFLL);
+	CONST_M128I(shuffle_uv, 0x0504FFFF03020100LL, 0x0B0AFFFF09080706LL);
+	CONST_M128I(blend_mask1, 0x00000000FFFFFFFFLL, 0x00000000FFFFFFFFLL);
+	CONST_M128I(blend_mask2, 0xFFFF0000FFFF0000LL, 0xFFFF0000FFFF0000LL);	
+	M128I(scratch, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+	
+	// Clamp to 0 - 1023
+	_M(scratch) = _mm_max_epi16(_mm_min_epi16(input[0], _M(max_value)), _M(scratch));//PMIN/PMAX	2	1
+	_M(scratch2) = _mm_max_epi16(_mm_min_epi16(input[1], _M(max_value)), _M(scratch2));//PMIN/PMAX	2	1
+	
+	_M(scratch) = _mm_shuffle_epi8(_M(scratch), _M(shuffle_y));						//	PSHUFB		1	0.5
+	//	0		Y0		Y1		Y2		0		Y3		Y4		Y5
+
+	_M(scratch2) = _mm_shuffle_epi8(_M(scratch2), _M(shuffle_uv));					//	PSHUFB		1	0.5
+	//	U01		V01		0		U23		V23		U45		0		V45
+	
+	//
+	_M(scratch3) = _mm_blendv_epi8(_M(scratch), _M(scratch2), _M(blend_mask1));		// PBLENDVB		1	1	
+	// U01		V01		Y1		Y2		V23		U45		Y4		Y5
+
+	_M(scratch2) = _mm_blendv_epi8(_M(scratch2), _M(scratch), _M(blend_mask1));		// PBLENDVB		1	1
+	// 0		Y0		0		U23		0		Y3		0		V45
+	
+	//
+	// 0		V01		0		Y2		0		U45		0		Y5	
+	_M(scratch) = _mm_slli_epi16(_M(scratch3), 4);									// PSLLW		1	1
+	_M(scratch) = _mm_blendv_epi8(_M(scratch3), _M(scratch), _M(blend_mask2));		// PBLENDVB		1	1
+	// (10-bit words)
+	// U01	0	V01		Y1	0	Y2		V23	0	U45		Y4	0	Y5
+	
+	//
+	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);									// PSRLD        1	1
+	M128_STORE(_mm_or_si128(_M(scratch), _M(scratch2)), *output);					// POR			1	0.33
+	// (10-bit words)
+	// U01	Y0	V01		Y1	U23	Y2		V23	Y3	U45		Y4	V45	Y5
+}
+
+/*
+ * Pack 2 Y, UV vectors into 1 v210 vector (6 pixels)
+ *
+ * Total latency:				16
+ * Number of pixels handled:	16
+ *
+ * INPUT
+ *
+ * 2 vectors of 8 short
+ * yVect
+ * Y0		Y1		Y2		Y3		Y4		Y5		0		0
+ *
+ * uvVect
+ * U01		V01		U23		V23		U45		V45		0		0
+ *
+ * OUTPUT:
+ *
+ * 1 vector of 6 v210 pixels
+ * U01	Y0	V01	Y1	... U45	Y4	V45	Y5
+ *
+ *
+ */
+INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3, __m128i* input, __m128i* output) {
+	CONST_M128I(max_value, 0x03FF03FF03FF03FFLL, 0x03FF03FF03FF03FFLL);
+	CONST_M128I(shuffle_11, 0xFFFF0302FFFFFFFFLL, 0xFFFF0908FFFFFFFFLL);
+	CONST_M128I(shuffle_12, 0xFFFFFFFFFFFF0100LL, 0xFFFFFFFFFFFF0706LL);
+	CONST_M128I(shuffle_21, 0x0504FFFFFFFFFFFFLL, 0x0B0AFFFFFFFFFFFFLL);
+	CONST_M128I(shuffle_22, 0xFFFFFFFF0302FFFFLL, 0xFFFFFFFF0908FFFFLL);
+	CONST_M128I(shuffle_31, 0xFFFFFFFF0100FFFFLL, 0xFFFFFFFF0706FFFFLL);
+	CONST_M128I(shuffle_32, 0x0504FFFFFFFFFFFFLL, 0x0B0AFFFFFFFFFFFFLL);
+	M128I(scratch, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+	
+	// Clamp to 0 - 1023
+	input[0] = _mm_max_epi16(_mm_min_epi16(input[0], _M(max_value)), _M(scratch));//PMIN/PMAX	2	1
+	input[1] = _mm_max_epi16(_mm_min_epi16(input[1], _M(max_value)), _M(scratch2));//PMIN/PMAX	2	1
+	
+	//
+	_M(scratch) = _mm_shuffle_epi8(input[0], _M(shuffle_11));		//	PSHUFB		1	0.5
+	//	0		0		Y1		0		0		0		Y4		0
+	
+	_M(scratch2) = _mm_shuffle_epi8(input[1], _M(shuffle_12));		//	PSHUFB		1	0.5
+	//	U01		0		0		0		V23		0		0		0
+
+	_M(scratch3) = _mm_or_si128(_M(scratch), _M(scratch2));			//	POR			1	0.33
+	//	U01		0		Y1		0		V23		0		Y4		0
+	
+	//
+	_M(scratch) = _mm_shuffle_epi8(input[0], _M(shuffle_21));		//	PSHUFB		1	0.5
+	//	0		0		0		Y2		0		0		0		Y5
+	
+	_M(scratch2) = _mm_shuffle_epi8(input[1], _M(shuffle_22));		//	PSHUFB		1	0.5
+	//	0		V01		0		0		0		U45		0		0
+	
+	_M(scratch) = _mm_or_si128(_M(scratch), _M(scratch2));			//	POR			1	0.33
+	_M(scratch) = _mm_slli_epi16(_M(scratch), 4);					//	PSLLW		1	1
+	//	0		V01		0		Y2		0		U45		0		Y5
+	
+	_M(scratch3) = _mm_or_si128(_M(scratch3), _M(scratch));			//	POR			1	0.33
+	// (10-bit words)
+	// U01	0	V01		Y1	0	Y2		V23	0	U45		Y4	0	Y5
+	
+	
+	//
+	_M(scratch) = _mm_shuffle_epi8(input[0], _M(shuffle_31));		//	PSHUFB		1	0.5
+	//	0		Y0		0		0		0		Y3		0		0
+	
+	_M(scratch2) = _mm_shuffle_epi8(input[1], _M(shuffle_32));		//	PSHUFB		1	0.5
+	//	0		0		0		U23		0		0		0		V45
+	
+	_M(scratch2) = _mm_or_si128(_M(scratch), _M(scratch2));			//	POR			1	0.33
+	// 0		Y0		0		U23		0		Y3		0		V45
+	
+	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);					// PSRLD        1	1
+	M128_STORE(_mm_or_si128(_M(scratch3), _M(scratch2)), *output);	// POR			1	0.33
+	// (10-bit words)
+	// U01	Y0	V01		Y1	U23	Y2		V23	Y3	U45		Y4	V45	Y5
+}
+
+
+#undef DEFINE_PACK_4_V210_VECTORS
+#define DEFINE_PACK_4_V210_VECTORS(instr_set) \
+INLINE_NAME(pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set, __m128i* input, __m128i* output) {\
+	__m128i scratch[2];\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, input, output);\
+	scratch[0] = _mm_alignr_epi8(input[2], input[0], 12);		/*	PALIGNR		1	1 */\
+	scratch[1] = _mm_alignr_epi8(input[3], input[1], 12);		/*	PALIGNR		1	1 */\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[1]);\
+	scratch[0] = _mm_alignr_epi8(input[4], input[2], 8);		/*	PALIGNR		1	1 */\
+	scratch[1] = _mm_alignr_epi8(input[5], input[3], 8);		/*	PALIGNR		1	1 */\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[2]);\
+	scratch[0] = _mm_srli_si128(input[4], 4);					/*	PSRLDQ		1	0.5 */\
+	scratch[1] = _mm_srli_si128(input[5], 4);					/*	PSRLDQ		1	0.5 */\
+	CALL_INLINE(pack_2_y_uv_vectors_to_1_v210_vector_ ## instr_set, scratch, &output[3]);\
+}
+
+/*
+ * Pack 6 vectors (Y, UV) into 4 v210 vectors (24 pixels) 
+ *
+ * Total latency:				18 (sse41) / 22 (ssse3)
+ * Number of pixels handled:	24
+ *
+ * INPUT
+ * 6 vectors of 8 short
+ * yVect1
+ * Y0		Y1		Y2		Y3		Y4		Y5		Y6		Y7
+ *
+ * uvVect1
+ * U01		V01		U23		V23		U45		V45		U67		V67
+ *
+ * yVect2
+ * Y8		Y9		Y10		Y11		Y12		Y13		Y14		Y15
+ *
+ * uvVect2
+ * U89		V89		U1011	V1011	U1213	V1213	U1415	V1516
+ *
+ * yVect3
+ * Y16		Y17		Y18		Y19		Y20		Y21		Y22		Y23
+ *
+ * uvVect3
+ * U1617	V1617	U1819	V1819	U2021	V2021	U2223	V2223
+ *
+ *
+ * OUTPUT:
+ * 4 vectors of 24 v210 pixels
+ * U01		Y0		V01		Y1	... U45	  Y4	V45	    Y5
+ * U67		Y6		V67		Y7	... U1011 Y10	V1011	Y11
+ * U1213	Y12		V1213	Y13	... U1617 Y16	V1617	Y17
+ * U1819	Y18		V1819	Y19	... U2223 Y22	V2223	Y23 
+ *
+ *
+ */
+DEFINE_PACK_4_V210_VECTORS(sse2_ssse3_sse41);
+DEFINE_PACK_4_V210_VECTORS(sse2_ssse3);
+
 
 #endif	// __INTEL_CPU__
 

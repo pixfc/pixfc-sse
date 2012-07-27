@@ -29,11 +29,13 @@
 #define GENERATE_UNALIGNED_INLINES 0
 #include "rgb_pack.h"
 #include "yuv_unpack.h"
+#include "yuv_pack.h"	// Used in v210 to yuv422i
 
 #undef  GENERATE_UNALIGNED_INLINES
 #define GENERATE_UNALIGNED_INLINES 1
 #include "rgb_pack.h"
 #include "yuv_unpack.h"
+#include "yuv_pack.h"	// Used in v210 to yuv422i
 
 #include "yuv_repack.h"
 #include "yuv_upsample.h"
@@ -665,13 +667,13 @@
 /*
  * Convert V210 to YUV422I
  */
-#define V210_TO_YUV422I_RECEIPE(pack_fn, instr_set) \
+#define V210_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, instr_set) \
 	__m128i*	v210_in = (__m128i*) source_buffer;\
 	__m128i*	yuv_out = (__m128i*) dest_buffer;\
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i		unpack_out[8];\
 	while(pixel_count > 0) {\
-		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[0], , &unpack_out[2], &unpack_out[4]);\
+		unpack_fn_prefix##instr_set(v210_in, &unpack_out[0], &unpack_out[2], &unpack_out[4]);\
 		v210_in += 4;\
 		unpack_out[0] = _mm_srai_epi16(unpack_out[0], 2);\
 		unpack_out[1] = _mm_srai_epi16(unpack_out[1], 2);\
@@ -681,7 +683,7 @@
 		yuv_out += 2;\
 		unpack_out[0] = _mm_srai_epi16(unpack_out[4], 2);\
 		unpack_out[1] = _mm_srai_epi16(unpack_out[5], 2);\
-		unpack_4v_v210_to_y_uv_vectors_##instr_set(v210_in, &unpack_out[2], , &unpack_out[4], &unpack_out[6]);\
+		unpack_fn_prefix##instr_set(v210_in, &unpack_out[2], &unpack_out[4], &unpack_out[6]);\
 		v210_in += 4;\
 		unpack_out[2] = _mm_srai_epi16(unpack_out[2], 2);\
 		unpack_out[3] = _mm_srai_epi16(unpack_out[3], 2);\
@@ -693,6 +695,7 @@
 		unpack_out[7] = _mm_srai_epi16(unpack_out[7], 2);\
 		pack_fn(&unpack_out[4], yuv_out);\
 		yuv_out += 2;\
+		pixel_count -= 48;\
 	}
 
 
