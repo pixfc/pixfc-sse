@@ -35,6 +35,11 @@
 static	PixFcPixelFormat		src_fmt = PixFcFormatCount;
 static	PixFcPixelFormat		dst_fmt = PixFcFormatCount;
 static  PixFcFlag				flags = PixFcFlag_Default;
+//
+static	PixFcPixelFormat		scalar_src_fmt = PixFcFormatCount;
+static	PixFcPixelFormat		scalar_dst_fmt = PixFcFormatCount;
+static  PixFcFlag				scalar_flags = PixFcFlag_Default;
+//
 static	uint8_t					max_diff = 0;
 static const InputFile*			in_file = NULL;
 // In / out buffers
@@ -54,6 +59,8 @@ static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w,
 		pixfc_log("Error create struct pixfc\n");
 		return -1;
 	}
+
+    pixfc_log("Checking  %s\n", conversion_blocks[index].name); 
 	
 	// Perform conversion
 	pixfc->convert(pixfc, in, out);
@@ -65,12 +72,22 @@ static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w,
 
 static int		do_scalar_image_conversion(PixFcPixelFormat src_fmt, PixFcPixelFormat dest_fmt,  void* in, void *out, uint32_t w, uint32_t h) {
 	struct PixFcSSE *	pixfc = NULL;
+    uint32_t            index;
+    uint32_t            scalar_flags = ((flags & ~(PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only)) | PixFcFlag_NoSSE);
+
+    index = find_conversion_block_index(src_fmt, dest_fmt, scalar_flags, w, h, ROW_SIZE(src_fmt, w));
+    if (index == -1) {
+        pixfc_log("Error finding scalar conversion block\n");
+        return -1;
+    }
 
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, src_fmt, dest_fmt, w, h, ROW_SIZE(src_fmt, w), PixFcFlag_NoSSE) != 0) {
+	if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
 		pixfc_log("Error create struct pixfc for scalar conversion\n");
 		return -1;
 	}
+
+    pixfc_log("Using scalar conversion '%s'\n", conversion_blocks[index].name); 
 
 	// Perform conversion
 	pixfc->convert(pixfc, in, out);
@@ -205,25 +222,21 @@ static void 		parse_args(int argc, char **argv) {
 
 	if (argc == 5){
 		src_fmt = find_matching_pixel_format(argv[2]);
-		if (src_fmt != PixFcFormatCount)
-			printf("Using source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
-		else
-		{
+		if (src_fmt == PixFcFormatCount) {
 			printf("Unknown pixel format '%s'\n", argv[2]);
 			exit(1);
 		}
 
 		dst_fmt = find_matching_pixel_format(argv[3]);
-		if (dst_fmt != PixFcFormatCount)
-			printf("Using dest pixel format '%s'\n", pixfmt_descriptions[dst_fmt].name);
-		else
-		{
+		if (dst_fmt == PixFcFormatCount) {
 			printf("Unknown pixel format '%s'\n", argv[3]);
 			exit(1);
 		}
 
+        printf("Using:\n - source pixel format '%s'\n", pixfmt_descriptions[src_fmt].name);
+        printf(" - dest pixel format '%s'\n", pixfmt_descriptions[dst_fmt].name);
 		flags = get_matching_flags(argv[4]);
-		printf("Using flags: ");
+		printf(" - flags: ");
 		print_flags(flags);
 	}
 }
@@ -265,19 +278,21 @@ static int 		setup_conversion_buffers() {
 		}
 	}
 
-	// Release previous output buffers and create new ones
-	ALIGN_FREE(out);
-	ALIGN_FREE(out_scalar);
+    if ((scalar_src_fmt != src_fmt) || (scalar_dst_fmt != dst_fmt) || (scalar_flags != flags )) {
+        // If there was a format change, release previous output buffers and create new ones
+        ALIGN_FREE(out);
+        ALIGN_FREE(out_scalar);
 
-	if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
-		pixfc_log("Error allocating output buffer");
-		return -1;
-	}
+        if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out) != 0) {
+            pixfc_log("Error allocating output buffer");
+            return -1;
+        }
 
-	if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out_scalar) != 0) {
-		pixfc_log("Error allocating scalar output buffer");
-		return -1;
-	}
+        if (allocate_aligned_buffer(dst_fmt, in_file->width, in_file->height, (void **)&out_scalar) != 0) {
+            pixfc_log("Error allocating scalar output buffer");
+            return -1;
+        }
+    }
 
 	return 0;
 }
@@ -288,9 +303,15 @@ static int		check_conversion_block(uint32_t index) {
 	if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
 		return -1;
 
-	// Do scalar conversion
-	if (do_scalar_image_conversion(src_fmt, dst_fmt, in, out_scalar, in_file->width, in_file->height) != 0)
-		return -1;
+	// Do scalar conversion if required
+    if ((scalar_src_fmt != src_fmt) || (scalar_dst_fmt != dst_fmt) || (scalar_flags != flags )) {
+       if (do_scalar_image_conversion(src_fmt, dst_fmt, in, out_scalar, in_file->width, in_file->height) != 0)
+            return -1;
+
+        scalar_flags = flags;
+        scalar_src_fmt = src_fmt;
+        scalar_dst_fmt = dst_fmt;
+    }
 
 	// Compare the two output buffers
 	if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
@@ -309,7 +330,7 @@ int 			main(int argc, char **argv) {
 	// Parse args
 	parse_args(argc, argv);
 
-	// Check if we have to restrict to a specified source & dest formats
+	// Check if we have to restrict to specified source & dest formats
 	if (src_fmt != PixFcFormatCount) {
 		if (setup_conversion_buffers() == 0) {
 			int32_t index;
@@ -339,6 +360,7 @@ int 			main(int argc, char **argv) {
 
 			src_fmt = conversion_blocks[index].source_fmt;
 			dst_fmt = conversion_blocks[index].dest_fmt;
+            flags = conversion_blocks[index].attributes;
 
 			if (setup_conversion_buffers() != 0) {
 				printf("Error setting up conversion buffers\n");

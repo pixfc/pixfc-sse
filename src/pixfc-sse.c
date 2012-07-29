@@ -44,8 +44,8 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	// (PixFcFlag_NNbResamplingOnly not set). (because Some non-SSE conversion
 	// blocks only do NNB resampling, so then return the non-SSE routine anyway
 	// as there is no other routine that would satisfy the NoSSE flag)
-	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))
-		&& ! ((flags & PixFcFlag_NoSSE) && ((flags & PixFcFlag_NNbResamplingOnly) == 0))){
+	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))) {
+	//	&& ! ((flags & PixFcFlag_NoSSE) && ((flags & PixFcFlag_NNbResamplingOnly) == 0))){
 		dprint("Skipping '%s' - Enforcing NNbResampling flag\n", block->name);
 		return PixFc_UnsupportedConversionError;
 	}
