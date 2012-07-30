@@ -59,45 +59,8 @@ list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
 )
 
 
-# No cross compiling support for Windows yet.
-# So only if not on Windows, add target CPU 
-# specific compiler options
-if(NOT WIN32)
-	if(PIXFC_TARGET_ARCH MATCHES "Intel")
-		add_definitions(-msse2 -mssse3 -msse4.1)
-		if(PIXFC_TARGET_ARCH MATCHES "x86$")
-			add_definitions(-m32)
-			message("Build setup for Intel 32-bit CPU")
-		elseif(PIXFC_TARGET_ARCH MATCHES "x86_64$")
-			add_definitions(-m64)
-			message("Build setup for Intel 64-bit CPU")
-		else(PIXFC_TARGET_ARCH MATCHES "x86$")
-			message(FATAL_ERROR "Unknown Intel CPU " ${PIXFC_TARGET_ARCH})
-		endif(PIXFC_TARGET_ARCH MATCHES "x86$")
-	elseif(PIXFC_TARGET_ARCH STREQUAL "ARM")
-		if(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
-			message(FATAL_ERROR "PIXFC_ARM_TARGET_PROCESSOR not defined - define in toolchain CMAKE file: " ${CMAKE_TOOLCHAIN_FILE})
-		endif(NOT DEFINED PIXFC_ARM_TARGET_PROCESSOR)
-
-		message("Build setup for ${PIXFC_ARM_TARGET_PROCESSOR} CPU")
-		add_definitions(-mtune=${PIXFC_ARM_TARGET_PROCESSOR})
-	endif(PIXFC_TARGET_ARCH MATCHES "Intel")
-endif(NOT WIN32)
-
-# Check if we are building in debug mode
+# if we are building in debug mode, put extern inlines into their own c files.
 if(DEBUG)
-	include_directories(AFTER .)
-	add_definitions(-DDEBUG)
-
-	# Add compiler specific flags	
-	if(APPLE)
-		add_definitions(-ggdb3 -O0 -Wall -Winline -Wno-implicit-function-declaration )
-	elseif(UNIX)
-		add_definitions(-ggdb3 -O0  -Wall -Winline -Wno-trigraphs -Wno-implicit-function-declaration)
-	elseif(WIN32)
-#		add_definitions(-Wno-implicit-function-declaration)
-	endif(APPLE)
-
 	# For each header file containing extern inlines, copy it to the binary dir into a source file
 	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
 		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c)
@@ -118,18 +81,12 @@ if(DEBUG)
 		list(APPEND PIXFC_SRC_LIST "${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_aligned.c" "${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}_unaligned.c")
 	endforeach(CUR_FILE)
 else(DEBUG)
-	if(WIN32)
-	else(WIN32)
-		add_definitions(-O3 -Wno-trigraphs)
-
-		# On Mac OS, memcpy is re-defined as a macro which introduces an "if" statement
-		# and kills performance of RGB24 slower-repacking routines. To disable this
-		# re-definition, we need to define the following:
-		if(APPLE)
-			add_definitions(-D_FORTIFY_SOURCE=0)
-		endif(APPLE)
-
-	endif(WIN32)
+	# On Mac OS, memcpy is re-defined as a macro which introduces an "if" statement
+	# and kills performance of RGB24 slower-repacking routines. To disable this
+	# re-definition, we need to define the following:
+	if(APPLE)
+		add_definitions(-D_FORTIFY_SOURCE=0)
+	endif(APPLE)
 endif(DEBUG)
 
 #
