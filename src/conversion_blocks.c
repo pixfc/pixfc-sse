@@ -45,6 +45,14 @@ DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID
 #define		DECLARE_NNB_BT709_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING, width_mult_count, height_mult_count, 1, desc_str_prefix " - bt.709 - NON-SSE - fast resampling")
 
+// AVG resampling NON-SSE {FR, bt.601, bt.709) macros
+#define		DECLARE_AVG_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		DEFAULT_ATTRIBUTE, width_mult_count, height_mult_count, 1, desc_str_prefix " - NON-SSE")
+#define		DECLARE_AVG_BT601_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION, width_mult_count, height_mult_count, 1, desc_str_prefix " - bt.601 - NON-SSE")
+#define		DECLARE_AVG_BT709_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION, width_mult_count, height_mult_count, 1, desc_str_prefix " - bt.709 - NON-SSE")
+
 //
 
 // NNB resampling SSE2 {FR, bt.601, bt.709) macros
@@ -252,6 +260,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, 1, "ARGB to YUYV"),
+	DECLARE_AVG_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
 
 	// ARGB to UYVY
 	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, 16, 1, 2, 1, 1, "ARGB to UYVY"),

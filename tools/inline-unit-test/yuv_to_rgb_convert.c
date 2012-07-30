@@ -144,7 +144,7 @@
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors, yuv_8bit_to_rgb_8bit_fr_coef, yuv_8bit_to_rgb_8bit_fr_off, CHECK_FN_8BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors, yuv_8bit_to_rgb_8bit_coef[0], yuv_8bit_to_rgb_8bit_off[0], CHECK_FN_8BIT);
 
 /*
  * Convert 3 vectors of 8 short Y, UVOdd, UVEven into 3 vectors of 8 short R, G & B
@@ -189,7 +189,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors, yuv_8bit_to_rgb_8bit_fr_coef, yuv_8bit_to_rgb_8bit_fr_off, CHECK_FN_8BIT);
+DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors, yuv_8bit_to_rgb_8bit_coef[0], yuv_8bit_to_rgb_8bit_off[0], CHECK_FN_8BIT);
 
 
 /*
@@ -259,7 +259,7 @@ DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors, yuv_8bit_to_rgb_8bit_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601, yuv_8bit_to_rgb_8bit_bt601_coef, yuv_8bit_to_rgb_8bit_bt601_off, CHECK_FN_8BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601, yuv_8bit_to_rgb_8bit_coef[1], yuv_8bit_to_rgb_8bit_off[1], CHECK_FN_8BIT);
 
 
 /*
@@ -306,7 +306,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb_8bit_bt709_coef, yuv_8bit_to_rgb_8bit_bt709_off, CHECK_FN_8BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2], CHECK_FN_8BIT);
 
 
 
@@ -361,7 +361,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt601, yuv_8bit_to_rgb_8bit_bt601_coef, yuv_8bit_to_rgb_8bit_bt601_off, CHECK_FN_8BIT);
+DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt601, yuv_8bit_to_rgb_8bit_coef[1], yuv_8bit_to_rgb_8bit_off[1], CHECK_FN_8BIT);
 
 /*
  * Convert 3 vectors of 8 short Y, UVOdd, UVEven into 3 vectors of 8 short R, G & B
@@ -407,7 +407,7 @@ DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt601, yuv_8bit_to_rgb
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb_8bit_bt709_coef, yuv_8bit_to_rgb_8bit_bt709_off, CHECK_FN_8BIT);
+DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2], CHECK_FN_8BIT);
 	
 
 /*
@@ -464,7 +464,7 @@ DECLARE_CONVERT_CHECK(convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601, yuv_10bit_to_rgb_8bit_bt601_coef, yuv_10bit_to_rgb_8bit_bt601_off, CHECK_FN_10BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601, yuv_10bit_to_rgb_8bit_coef[1], yuv_10bit_to_rgb_8bit_off[1], CHECK_FN_10BIT);
 
 /*
  * Convert 2 vectors of 8 short 10-bit Y, UV into 3 vectors of 8 short 8-bit R, G & B
@@ -510,7 +510,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_t
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_10bit_to_rgb_8bit_bt709_coef, yuv_10bit_to_rgb_8bit_bt709_off, CHECK_FN_10BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_10bit_to_rgb_8bit_coef[2], yuv_10bit_to_rgb_8bit_off[2], CHECK_FN_10BIT);
 
 
 /*
@@ -555,7 +555,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_t
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors, yuv_10bit_to_rgb_8bit_fr_coef, yuv_10bit_to_rgb_8bit_fr_off, CHECK_FN_10BIT);
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors, yuv_10bit_to_rgb_8bit_coef[0], yuv_10bit_to_rgb_8bit_off[0], CHECK_FN_10BIT);
 
 
 
@@ -606,7 +606,7 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_10bit_y_uv_vectors_t
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601, yuv_10bit_to_rgb_8bit_bt601_coef, yuv_10bit_to_rgb_8bit_bt601_off, CHECK_FN_10BIT);
+DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601, yuv_10bit_to_rgb_8bit_coef[1], yuv_10bit_to_rgb_8bit_off[1], CHECK_FN_10BIT);
 
 
 /*
@@ -653,7 +653,7 @@ DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601, yuv_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_10bit_to_rgb_8bit_bt709_coef, yuv_10bit_to_rgb_8bit_bt709_off, CHECK_FN_10BIT);
+DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_10bit_to_rgb_8bit_coef[2], yuv_10bit_to_rgb_8bit_off[2], CHECK_FN_10BIT);
 
 
 
@@ -700,6 +700,6 @@ DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_
  * bVect
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
-DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors, yuv_10bit_to_rgb_8bit_fr_coef, yuv_10bit_to_rgb_8bit_fr_off, CHECK_FN_10BIT);
+DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors, yuv_10bit_to_rgb_8bit_coef[0], yuv_10bit_to_rgb_8bit_off[0], CHECK_FN_10BIT);
 
 

@@ -173,7 +173,7 @@
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector, rgb_8bit_to_yuv_8bit_fr_coef, rgb_8bit_to_yuv_8bit_fr_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0], CHECK_FN_8BIT_3IN);
 
 
 /*
@@ -210,7 +210,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector, rgb_8bit_to_yuv_8bit_f
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt601, rgb_8bit_to_yuv_8bit_bt601_coef, rgb_8bit_to_yuv_8bit_bt601_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt601, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1], CHECK_FN_8BIT_3IN);
 
 /*
  * Convert 3 vectors of 8 short R, G, B into 1 vector of 8 short Y
@@ -246,7 +246,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt601, rgb_8bit_to_yuv_
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt709, rgb_8bit_to_yuv_8bit_bt709_coef, rgb_8bit_to_yuv_8bit_bt709_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt709, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2], CHECK_FN_8BIT_3IN);
 
 
 
@@ -284,7 +284,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_r_g_b_vectors_to_y_vector_bt709, rgb_8bit_to_yuv_
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector, rgb_8bit_to_yuv_10bit_fr_coef, rgb_8bit_to_yuv_10bit_fr_off, CHECK_FN_10BIT_3IN); 
+DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector, rgb_8bit_to_yuv_10bit_coef[0], rgb_8bit_to_yuv_10bit_off[0], CHECK_FN_10BIT_3IN);
 
 
 /*
@@ -321,7 +321,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector, rgb_8bit_to
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601, rgb_8bit_to_yuv_10bit_bt601_coef, rgb_8bit_to_yuv_10bit_bt601_off, CHECK_FN_10BIT_3IN); 
+DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601, rgb_8bit_to_yuv_10bit_coef[1], rgb_8bit_to_yuv_10bit_off[1], CHECK_FN_10BIT_3IN);
 
 
 /*
@@ -358,7 +358,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601, rgb_8
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709, rgb_8bit_to_yuv_10bit_bt709_coef, rgb_8bit_to_yuv_10bit_bt709_off, CHECK_FN_10BIT_3IN); 
+DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709, rgb_8bit_to_yuv_10bit_coef[2], rgb_8bit_to_yuv_10bit_off[2], CHECK_FN_10BIT_3IN);
 
 
 
@@ -411,7 +411,7 @@ DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709, rgb_8
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector, rgb_8bit_to_yuv_8bit_fr_coef, rgb_8bit_to_yuv_8bit_fr_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0], CHECK_FN_8BIT_3IN);
 
 /*
  * Convert 3 vectors of 8 short downsampled 422 R, G, B into 1 vector of 8 short U-V
@@ -447,7 +447,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector, rgb_
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601, rgb_8bit_to_yuv_8bit_bt601_coef, rgb_8bit_to_yuv_8bit_bt601_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1], CHECK_FN_8BIT_3IN);
 
 
 /*
@@ -483,7 +483,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709, rgb_8bit_to_yuv_8bit_bt709_coef, rgb_8bit_to_yuv_8bit_bt709_off, CHECK_FN_8BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2], CHECK_FN_8BIT_3IN);
 
 
 
@@ -522,7 +522,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709
  *
  */
 
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector, rgb_8bit_to_yuv_10bit_fr_coef, rgb_8bit_to_yuv_10bit_fr_off, CHECK_FN_10BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector, rgb_8bit_to_yuv_10bit_coef[0], rgb_8bit_to_yuv_10bit_off[0], CHECK_FN_10BIT_3IN);
 
 /*
  * Convert 3 vectors of 8 short downsampled 422 b-bit R, G, B into 1 vector of 8 short 10-bit U-V
@@ -558,7 +558,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_v
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601, rgb_8bit_to_yuv_10bit_bt601_coef, rgb_8bit_to_yuv_10bit_bt601_off, CHECK_FN_10BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601, rgb_8bit_to_yuv_10bit_coef[1], rgb_8bit_to_yuv_10bit_off[1], CHECK_FN_10BIT_3IN);
 
 
 /*
@@ -594,7 +594,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_v
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709, rgb_8bit_to_yuv_10bit_bt709_coef, rgb_8bit_to_yuv_10bit_bt709_off, CHECK_FN_10BIT_3IN);
+DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709, rgb_8bit_to_yuv_10bit_coef[2], rgb_8bit_to_yuv_10bit_off[2], CHECK_FN_10BIT_3IN);
 
 
 /*
@@ -647,7 +647,7 @@ DECLARE_RGB_TO_UV_CHECK(convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_v
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector, convert_ga_br_vectors_to_y_vector, rgb_8bit_to_yuv_8bit_fr_coef, rgb_8bit_to_yuv_8bit_fr_off, CHECK_FN_8BIT_4IN);
+DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector, convert_ga_br_vectors_to_y_vector, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0], CHECK_FN_8BIT_4IN);
 
 /*
  * Convert 4 vectors of 8 short AG, RB (or GA, BR) into 1 vector of 8 short Y
@@ -688,7 +688,7 @@ DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector, convert_ga_br_vector
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt601, convert_ga_br_vectors_to_y_vector_bt601, rgb_8bit_to_yuv_8bit_bt601_coef, rgb_8bit_to_yuv_8bit_bt601_off, CHECK_FN_8BIT_4IN);
+DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt601, convert_ga_br_vectors_to_y_vector_bt601, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1], CHECK_FN_8BIT_4IN);
 
 
 /*
@@ -730,7 +730,7 @@ DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt601, convert_ga_br_
  * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
  *
  */
-DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt709, convert_ga_br_vectors_to_y_vector_bt709, rgb_8bit_to_yuv_8bit_bt709_coef, rgb_8bit_to_yuv_8bit_bt709_off, CHECK_FN_8BIT_4IN);
+DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt709, convert_ga_br_vectors_to_y_vector_bt709, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2], CHECK_FN_8BIT_4IN);
 
 
 
@@ -783,7 +783,7 @@ DECLARE_AG_RB_TO_Y_CHECK(convert_ag_rb_vectors_to_y_vector_bt709, convert_ga_br_
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector, convert_downsampled_422_ga_br_vectors_to_uv_vector, rgb_8bit_to_yuv_8bit_fr_coef, rgb_8bit_to_yuv_8bit_fr_off, CHECK_FN_8BIT_2IN);
+DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector, convert_downsampled_422_ga_br_vectors_to_uv_vector, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0], CHECK_FN_8BIT_2IN);
 
 
 /*
@@ -816,7 +816,7 @@ DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector, co
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601, convert_downsampled_422_ga_br_vectors_to_uv_vector_bt601, rgb_8bit_to_yuv_8bit_bt601_coef, rgb_8bit_to_yuv_8bit_bt601_off, CHECK_FN_8BIT_2IN);
+DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt601, convert_downsampled_422_ga_br_vectors_to_uv_vector_bt601, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1], CHECK_FN_8BIT_2IN);
 
 /*
  * Convert 2 vectors of 8 short downsampled 422 AG, RB ( or GA, BR) into 1 vector of 8 short U-V
@@ -848,5 +848,5 @@ DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt6
  * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
  *
  */
-DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709, convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709, rgb_8bit_to_yuv_8bit_bt709_coef, rgb_8bit_to_yuv_8bit_bt709_off, CHECK_FN_8BIT_2IN);
+DECLARE_AG_RB_TO_UV_CHECK(convert_downsampled_422_ag_rb_vectors_to_uv_vector_bt709, convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2], CHECK_FN_8BIT_2IN);
 

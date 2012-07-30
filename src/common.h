@@ -34,6 +34,24 @@
 #define CLIP_PIXEL(x) 		(((x)>255) ? 255 : ((x)<0) ? 0 : (x))
 #define CLIP_10BIT_PIXEL(x) (((x)>1023) ? 1023 : ((x)<0) ? 0 : (x))
 
+
+extern const float        rgb_8bit_to_yuv_8bit_coef[][3][3];
+extern const int32_t      rgb_8bit_to_yuv_8bit_off[][3];
+
+extern const float        rgb_8bit_to_yuv_10bit_coef[][3][3];
+extern const int32_t      rgb_8bit_to_yuv_10bit_off[][3];
+
+extern const float        yuv_8bit_to_rgb_8bit_coef[][3][3];
+extern const int32_t      yuv_8bit_to_rgb_8bit_off[][3];
+
+extern const float        yuv_10bit_to_rgb_8bit_coef[][3][3];
+extern const int32_t      yuv_10bit_to_rgb_8bit_off[][3];
+
+
+// Conversion matrices left-shifted by 8
+extern const int32_t      rgb_8bit_to_yuv_8bit_coef_lhs8[][3][3];
+extern const int32_t      rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3];
+
 #ifdef __INTEL_CPU__
 
 //

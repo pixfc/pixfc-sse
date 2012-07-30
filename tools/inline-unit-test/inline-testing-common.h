@@ -129,35 +129,6 @@
 														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, }
 
 
-extern float        rgb_8bit_to_yuv_8bit_fr_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_8bit_fr_off[];
-extern float        rgb_8bit_to_yuv_8bit_bt601_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_8bit_bt601_off[];
-extern float        rgb_8bit_to_yuv_8bit_bt709_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_8bit_bt709_off[];
-
-extern float        rgb_8bit_to_yuv_10bit_fr_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_10bit_fr_off[];
-extern float        rgb_8bit_to_yuv_10bit_bt601_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_10bit_bt601_off[];
-extern float        rgb_8bit_to_yuv_10bit_bt709_coef[][3];
-extern int32_t      rgb_8bit_to_yuv_10bit_bt709_off[];
-
-
-extern float        yuv_8bit_to_rgb_8bit_fr_coef[][3];
-extern int32_t      yuv_8bit_to_rgb_8bit_fr_off[];
-extern float        yuv_8bit_to_rgb_8bit_bt601_coef[][3];
-extern int32_t      yuv_8bit_to_rgb_8bit_bt601_off[];
-extern float        yuv_8bit_to_rgb_8bit_bt709_coef[][3];
-extern int32_t      yuv_8bit_to_rgb_8bit_bt709_off[];
-
-extern float        yuv_10bit_to_rgb_8bit_fr_coef[][3];
-extern int32_t      yuv_10bit_to_rgb_8bit_fr_off[];
-extern float        yuv_10bit_to_rgb_8bit_bt601_coef[][3];
-extern int32_t      yuv_10bit_to_rgb_8bit_bt601_off[];
-extern float        yuv_10bit_to_rgb_8bit_bt709_coef[][3];
-extern int32_t      yuv_10bit_to_rgb_8bit_bt709_off[];
-
 
 #define dprintf(fmt, ...)  do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
                                 strrchr(__FILE__, '/')+1,\
