@@ -86,3 +86,4 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(src)
 add_subdirectory(tools)
+add_subdirectory(tools/inline-unit-test)

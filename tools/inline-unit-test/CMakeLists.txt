@@ -1,10 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
-project (PixFC_Inline_Unit_test C)
-
-include(../../cmake/DetectTarget.cmake)
-
-set(HEADER_DIR ..)
-include_directories(AFTER .. ../../include/common)
+include_directories(AFTER ../../src )
 
 if(FAKE_SSE4)
     add_definitions(-DFAKE_SSE41_BLENDV)
@@ -27,7 +21,7 @@ list(APPEND INLINE_FILENAME
 list(APPEND SOURCE_LIST
 	inline-unit-test.c
 	inline-testing-common.c
-	../common.c
+	../../src/common.c
 )
 # add inline source file to source file list
 foreach(CUR_FILE ${INLINE_FILENAME})
@@ -36,7 +30,7 @@ endforeach(CUR_FILE)
 
 # List of header files (build from INLINE_FILENAME list)
 foreach(CUR_FILE ${INLINE_FILENAME})
-        list(APPEND HEADER_LIST "../${CUR_FILE}.h")
+        list(APPEND HEADER_LIST "../../src/${CUR_FILE}.h")
 endforeach(CUR_FILE)
 
 
