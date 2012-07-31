@@ -61,6 +61,8 @@ list(APPEND EXTERN_INLINE_ALIGN_HEADER_LIST
 
 # if we are building in debug mode, put extern inlines into their own c files.
 if(DEBUG)
+	include_directories(AFTER ../src)
+
 	# For each header file containing extern inlines, copy it to the binary dir into a source file
 	foreach(CUR_FILE ${EXTERN_INLINE_HEADER_LIST})
 		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${CUR_FILE}.h ${CMAKE_CURRENT_BINARY_DIR}/${CUR_FILE}.c)
