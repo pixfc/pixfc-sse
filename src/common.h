@@ -51,6 +51,7 @@ extern const int32_t      yuv_10bit_to_rgb_8bit_off[][3];
 // Conversion matrices left-shifted by 8
 extern const int32_t      rgb_8bit_to_yuv_8bit_coef_lhs8[][3][3];
 extern const int32_t      rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3];
+extern const int32_t      yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3];
 
 #ifdef __INTEL_CPU__
 

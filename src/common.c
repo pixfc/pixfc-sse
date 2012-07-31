@@ -161,6 +161,25 @@ const int32_t       rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3] =
 		 { 450, -409, -41}},
 	};
 
+const int32_t       yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3] =
+	{
+		// Full range
+		{{ 256,   0,  358},
+		 { 256, -88, -182},
+		 { 256, 452,    0}},
+
+		// bt601
+		{{ 298,    0,  409},
+		 { 298, -100, -208},
+		 { 298,  516,    0}},
+
+		// bt709
+		{{ 298,   0,  459},
+		 { 298,  -5, -136},
+		 { 298, 541,    0}},
+	};
+
+
 
 // CPU features are obtained the first time and stored here.
 static uint64_t		cpu_features = 0;
@@ -235,7 +254,7 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
 
 #ifdef DEBUG
-#if 1
+#if 0
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 16bit signed
 	int32_t*	array = (int32_t *)reg;

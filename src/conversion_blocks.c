@@ -261,6 +261,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, 1, "ARGB to YUYV"),
 	DECLARE_AVG_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
+	DECLARE_AVG_BT601_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422_bt601, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
+	DECLARE_AVG_BT709_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422_bt709, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
 
 	// ARGB to UYVY
 	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, 16, 1, 2, 1, 1, "ARGB to UYVY"),

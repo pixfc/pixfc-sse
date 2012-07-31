@@ -342,7 +342,7 @@ DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt601_nonsse, rgb_8bit_to_yuv_8bi
 DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[2], 8, rgb_8bit_to_yuv_8bit_off[2])
 
 
-
+// these functions assume an even number of pixels
 #define 	DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(fn_name, coeffs, coef_shift, offsets) \
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
