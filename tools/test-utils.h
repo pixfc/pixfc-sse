@@ -161,6 +161,11 @@ struct timings {
 void				do_timing(struct timings *timings);
 
 /*
+ * Synthesize PixFcFlags for the given conversion routine
+ */
+PixFcFlag			synthesize_pixfc_flags(uint32_t index);
+
+/*
  * Create a struct PicFcSSE struct  for the conversion block at the provided index
  * if the CPU has the required features. Caller must release struct when done
  */

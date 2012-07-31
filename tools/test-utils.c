@@ -657,6 +657,34 @@ void 		write_buffer_to_file(PixFcPixelFormat fmt, uint32_t width, uint32_t heigh
 		write_raw_buffer_to_file(fmt, width, height, filename, buffer);
 }
 
+PixFcFlag	synthesize_pixfc_flags(uint32_t index) {
+	PixFcFlag flags = PixFcFlag_Default;
+	
+	// Index valid ?
+	if (index >= conversion_blocks_count) {
+		pixfc_log("Invalid conversion block index\n");
+		return flags;
+	}
+	
+	// Synthesize the flags based on the conversion block's flags
+	if (conversion_blocks[index].attributes & NNB_RESAMPLING)
+		flags |= PixFcFlag_NNbResamplingOnly;
+	
+	if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+		flags |= PixFcFlag_NoSSE;
+	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
+		flags |= PixFcFlag_SSE2Only;
+	else if (conversion_blocks[index].required_cpu_features == (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))
+		flags |= PixFcFlag_SSE2_SSSE3Only;
+	
+	if (conversion_blocks[index].attributes & BT601_CONVERSION)
+		flags |= PixFcFlag_BT601Conversion;
+	
+	if (conversion_blocks[index].attributes & BT709_CONVERSION)
+		flags |= PixFcFlag_BT709Conversion;
+	
+	return flags;
+}
 
 uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pixfc, uint32_t width, uint32_t height) {
 	uint32_t	flags = PixFcFlag_Default;
@@ -674,22 +702,8 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 		return -2;
 	}
 
-	// Synthesize the flags to pass to create_pixfc() based on the conversion block's flags
-	if (conversion_blocks[index].attributes & NNB_RESAMPLING)
-		flags |= PixFcFlag_NNbResamplingOnly;
-
-	if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
-		flags |= PixFcFlag_NoSSE;
-	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
-		flags |= PixFcFlag_SSE2Only;
-	else if (conversion_blocks[index].required_cpu_features == (CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3))
-			flags |= PixFcFlag_SSE2_SSSE3Only;
-
-	if (conversion_blocks[index].attributes & BT601_CONVERSION)
-		flags |= PixFcFlag_BT601Conversion;
-
-	if (conversion_blocks[index].attributes & BT709_CONVERSION)
-		flags |= PixFcFlag_BT709Conversion;
+	// Create flags for this conversion block
+	flags = synthesize_pixfc_flags(index);
 
 	// Create struct pixfc for this conversion block
 	result = create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags);
