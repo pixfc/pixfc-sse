@@ -179,7 +179,23 @@ const int32_t       yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3] =
 		 { 298, 541,    0}},
 	};
 
+const int32_t       yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3] =
+	{
+		// full range
+		{{ 64,   0,  90},
+		 { 64, -22, -46},
+		 { 64, 113,   0}},
 
+		 // bt601
+		{{ 74,   0,	102},
+		 { 74, -25,	-52},
+		 { 74, 129,	  0}},
+
+		 // bt709
+		{{ 74,   0, 115},
+		 { 74, -14,	-34},
+		 { 74, 135,   0}},
+	};
 
 // CPU features are obtained the first time and stored here.
 static uint64_t		cpu_features = 0;

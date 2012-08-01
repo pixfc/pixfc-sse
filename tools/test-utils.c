@@ -724,7 +724,9 @@ int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat d
 	if (result == PixFc_OK) {
 		uint32_t i;
 		for(i = 0; i < conversion_blocks_count; i++) {
-			if (pixfc->convert == conversion_blocks[i].convert_fn) {
+			if ((pixfc->convert == conversion_blocks[i].convert_fn)
+					&& (conversion_blocks[i].source_fmt == src_fmt)
+					&& (conversion_blocks[i].dest_fmt == dst_fmt)){
 				index = i;
 				break;
 			}

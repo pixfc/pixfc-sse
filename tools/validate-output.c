@@ -65,10 +65,13 @@ static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w,
 }
 
 static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
-	uint32_t i;
-	uint32_t buffer_size = IMG_SIZE(fmt, width, height);
-	uint8_t* sse_start = out_sse;
+	uint32_t 	i;
+	uint32_t 	buffer_size = IMG_SIZE(fmt, width, height);
+	uint8_t		*sse_start = out_sse;
+	uint32_t	max_diff_seen = 0;
 	for(i = 0; i < buffer_size; i++) {
+		if(abs(*out_scalar - *out_sse) > max_diff_seen)
+				max_diff_seen = abs(*out_scalar - *out_sse);
 		if(abs(*out_scalar - *out_sse) > max_diff) {
 			printf("Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",
 					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width + 1,
@@ -81,10 +84,14 @@ static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, P
 		out_sse++;
 	}
 
+	printf("Max diff seen: %u\n", max_diff_seen);
+
 	return 0;
 }
 
 #define COMPARE_VALUES(component)\
+	if(abs(scalar_val - sse_val) > max_diff_seen)\
+		max_diff_seen = abs(scalar_val - sse_val);\
 	if(abs(scalar_val - sse_val) > max_diff) {\
 		printf(component " @ Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",\
 		(pixel + 1), line,\
@@ -93,13 +100,15 @@ static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, P
 		return -1;\
 	}
 static int		compare_v210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
-	uint32_t line = 0;
-	uint32_t pixel = 0;
-	uint32_t bytes_per_row = ROW_SIZE(fmt,  width);
-	uint32_t* scalar_ptr = out_scalar;
-	uint32_t* sse_ptr = out_sse;
-	uint16_t scalar_val;
-	uint16_t sse_val;
+	uint32_t 	line = 0;
+	uint32_t 	pixel = 0;
+	uint32_t 	bytes_per_row = ROW_SIZE(fmt,  width);
+	uint32_t* 	scalar_ptr = out_scalar;
+	uint32_t* 	sse_ptr = out_sse;
+	uint16_t 	scalar_val;
+	uint16_t 	sse_val;
+	uint32_t	max_diff_seen = 0;
+
 	while(line++ < height) {
 		while(pixel < width){
 			scalar_val = (*scalar_ptr & 0x3FF);
@@ -156,6 +165,8 @@ static int		compare_v210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar,
 		sse_ptr = out_sse + line * bytes_per_row / 4;
 		pixel = 0;
 	}
+
+	printf("Max diff seen: %u\n", max_diff_seen);
 
 	return 0;
 }
@@ -265,9 +276,9 @@ static uint32_t		setup_output_buffers(uint32_t refresh_scalar_buffer, PixFcPixel
 
 	return 0;
 }
-static int		check_conversion_block(uint32_t index) {
-	PixFcPixelFormat 	src_fmt = conversion_blocks[index].source_fmt;
-	PixFcPixelFormat 	dst_fmt = conversion_blocks[index].dest_fmt;
+static int		check_sse_conversion_block(uint32_t sse_conv_index) {
+	PixFcPixelFormat 	src_fmt = conversion_blocks[sse_conv_index].source_fmt;
+	PixFcPixelFormat 	dst_fmt = conversion_blocks[sse_conv_index].dest_fmt;
 	int32_t				scalar_conv_index;
 	uint32_t			scalar_conv_changed = 0;
 	PixFcFlag			scalar_flags;
@@ -284,7 +295,7 @@ static int		check_conversion_block(uint32_t index) {
 	}
 
 	// Enforce flags if specified on the command line
-	sse_flags = synthesize_pixfc_flags(index);
+	sse_flags = synthesize_pixfc_flags(sse_conv_index);
 	if ((restrict_to_flags != PixFcFlag_Default) && (sse_flags != restrict_to_flags))
 		return 0;
 
@@ -297,15 +308,25 @@ static int		check_conversion_block(uint32_t index) {
 		return -1;
 	}
 
-	printf("Comparing '%s' with ", conversion_blocks[index].name);
+	printf("Comparing '%s' with ", conversion_blocks[sse_conv_index].name);
 
 	// Find the non-sse conversion block matching the given conversion block at 'index'
 	scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
 	if (scalar_conv_index == -1) {
-		pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[index].name);
+		pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[sse_conv_index].name);
 		return -1;
 	}
 	
+	// Sanity checks
+	if ((conversion_blocks[scalar_conv_index].source_fmt != src_fmt) || (conversion_blocks[scalar_conv_index].dest_fmt != dst_fmt)) {
+		pixfc_log("SSE and scalar conversions' source and dest formats do not match.\n");
+		return -1;
+	}
+	if (conversion_blocks[sse_conv_index].attributes != conversion_blocks[scalar_conv_index].attributes) {
+		pixfc_log("SSE and scalar conversions' flags do not match.\n");
+		return -1;
+	}
+
 	printf("%s\n", conversion_blocks[scalar_conv_index].name);
 
 	// Check if the scalar conversion routine has changed.
@@ -321,7 +342,7 @@ static int		check_conversion_block(uint32_t index) {
 	}
 
 	// Do SSE conversion
-	if (do_image_conversion(index, in, out, in_file->width, in_file->height) != 0)
+	if (do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height) != 0)
 		return -1;
 
 	// Do scalar conversion if required
@@ -332,9 +353,15 @@ static int		check_conversion_block(uint32_t index) {
 
 	// Compare the two output buffers
 	if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
-		printf("Dumping scalar and sse buffers for inspection.\n");
-		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, "sse_buffer.raw", out);
-		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, "scalar_buffer.raw", out_scalar);
+		char sse_filename[128] = {0};
+		char scalar_filename[128] = {0};
+
+		snprintf(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+		snprintf(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+
+		printf("Dumping scalar and sse buffers\n");
+		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
+		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
 		return 1;
 	} else {
 		printf("OK\n");
@@ -368,7 +395,7 @@ int 			main(int argc, char **argv) {
 			continue;
 		}
 
-		if (check_conversion_block(index) != 0)
+		if (check_sse_conversion_block(index) != 0)
 			break;
 
 		// Add a blank line if the next conversion block uses different
