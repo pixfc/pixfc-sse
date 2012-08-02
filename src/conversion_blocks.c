@@ -129,8 +129,13 @@ DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt
  * - Fast Nearest NeighBour resampling NON-SSE full range
  * - Fast Nearest NeighBour resampling NON-SSE bt.601
  * - Fast Nearest NeighBour resampling NON-SSE bt.709
+ *
+ * - Average resampling NON-SSE full range
+ * - Average  resampling NON-SSE bt.601
+ * - Average  resampling NON-SSE bt.709
+ *
  */
-#define		DECLARE_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, row_pix_mult, desc_str_prefix)\
+#define		DECLARE_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, row_pix_mult, desc_str_prefix)\
 DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK	(convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK	(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
@@ -145,7 +150,10 @@ DECLARE_AVG_BT601_SSE2_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt601, src_fm
 DECLARE_AVG_BT709_SSE2_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
 
 
@@ -231,8 +239,12 @@ DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, no
  * - Fast Nearest NeighBour resampling NON-SSE full range
  * - Fast Nearest NeighBour resampling NON-SSE bt.601
  * - Fast Nearest NeighBour resampling NON-SSE bt.709
+ *
+ * - Average resampling NON-SSE full range
+ * - Average resampling NON-SSE bt.601
+ * - Average resampling NON-SSE bt.709
  */
-#define		DECLARE_V210_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, row_pix_mult, desc_str_prefix)\
+#define		DECLARE_V210_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, row_pix_mult, desc_str_prefix)\
 DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
@@ -247,7 +259,10 @@ DECLARE_AVG_BT601_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt601, 
 DECLARE_AVG_BT709_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
 DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
 
 
@@ -259,87 +274,84 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// ARGB to YUYV
-	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, 1, "ARGB to YUYV"),
-	DECLARE_AVG_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
-	DECLARE_AVG_BT601_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422_bt601, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
-	DECLARE_AVG_BT709_CONV_BLOCK(downsample_n_convert_rgb_to_yuv422_bt709, PixFcARGB, PixFcYUYV, 2, 1, "ARGB to YUYV"),
+	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, 1, "ARGB to YUYV"),
 
 	// ARGB to UYVY
-	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, 16, 1, 2, 1, 1, "ARGB to UYVY"),
+	DECLARE_CONV_BLOCKS(convert_argb_to_uyvy, downsample_n_convert_argb_to_uyvy, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcUYVY, 16, 1, 2, 1, 1, "ARGB to UYVY"),
 
 	// ARGB to YUV422P
-	DECLARE_CONV_BLOCKS(convert_argb_to_yuv422p, downsample_n_convert_argb_to_yuv422p, convert_rgb_to_yuv422, PixFcARGB, PixFcYUV422P, 32, 1, 2, 1, 1, "ARGB to YUV422P"),
+	DECLARE_CONV_BLOCKS(convert_argb_to_yuv422p, downsample_n_convert_argb_to_yuv422p, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUV422P, 32, 1, 2, 1, 1, "ARGB to YUV422P"),
 
 	// ARGB to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_argb_to_yuv420p, convert_rgb_to_yuv420, PixFcARGB, PixFcYUV420P, 32, 2, 2, 2, 1, "ARGB to YUV420P"),
 
 	// ARGB to v210
-	DECLARE_V210_CONV_BLOCKS(convert_argb_to_v210, downsample_n_convert_argb_to_v210, convert_rgb_to_v210, PixFcARGB, PixFcV210, 16, 1, 2, 1, 48, "ARGB to v210"),
+	DECLARE_V210_CONV_BLOCKS(convert_argb_to_v210, downsample_n_convert_argb_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcARGB, PixFcV210, 16, 1, 2, 1, 48, "ARGB to v210"),
 
 
 	//
 	// BGRA to YUYV
-	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, 16, 1, 2, 1, 1, "BGRA to YUYV"),
+	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, 16, 1, 2, 1, 1, "BGRA to YUYV"),
 
 	// BGRA to UYVYconvert_fn_prefix
-	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, 16, 1, 2, 1, 1, "BGRA to UYVY"),
+	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, 16, 1, 2, 1, 1, "BGRA to UYVY"),
 
 	// BGRA to YUV422P
-	DECLARE_CONV_BLOCKS(convert_bgra_to_yuv422p, downsample_n_convert_bgra_to_yuv422p, convert_rgb_to_yuv422, PixFcBGRA, PixFcYUV422P, 32, 1, 2, 1, 1, "BGRA to YUV422P"),
+	DECLARE_CONV_BLOCKS(convert_bgra_to_yuv422p, downsample_n_convert_bgra_to_yuv422p, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGRA, PixFcYUV422P, 32, 1, 2, 1, 1, "BGRA to YUV422P"),
 
 	// BGRA to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_bgra_to_yuv420p, convert_rgb_to_yuv420, PixFcBGRA, PixFcYUV420P, 32, 2, 2, 2, 1, "BGRA to YUV420P"),
 
 	// BGRA to v210
-	DECLARE_V210_CONV_BLOCKS(convert_bgra_to_v210, downsample_n_convert_bgra_to_v210, convert_rgb_to_v210, PixFcBGRA, PixFcV210, 16, 1, 2, 1, 48, "BGRA to v210"),
+	DECLARE_V210_CONV_BLOCKS(convert_bgra_to_v210, downsample_n_convert_bgra_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcBGRA, PixFcV210, 16, 1, 2, 1, 48, "BGRA to v210"),
 
 
 	//
 	// RGB24 to YUYV
-	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, 16, 1, 2, 1, 1, "RGB24 to YUYV"),
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuyv, downsample_n_convert_rgb24_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcRGB24, PixFcYUYV, 16, 1, 2, 1, 1, "RGB24 to YUYV"),
 
 	// RGB24 to UYVY
-	DECLARE_CONV_BLOCKS(convert_rgb24_to_uyvy, downsample_n_convert_rgb24_to_uyvy, convert_rgb_to_yuv422, PixFcRGB24, PixFcUYVY, 16, 1, 2, 1, 1, "RGB24 to UYVY"),
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_uyvy, downsample_n_convert_rgb24_to_uyvy, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcRGB24, PixFcUYVY, 16, 1, 2, 1, 1, "RGB24 to UYVY"),
 
 	// RGB24 to YUV422P
-	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuv422p, downsample_n_convert_rgb24_to_yuv422p, convert_rgb_to_yuv422, PixFcRGB24, PixFcYUV422P, 32, 1, 2, 1, 1, "RGB24 to YUV422P"),
+	DECLARE_CONV_BLOCKS(convert_rgb24_to_yuv422p, downsample_n_convert_rgb24_to_yuv422p, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcRGB24, PixFcYUV422P, 32, 1, 2, 1, 1, "RGB24 to YUV422P"),
 
 	// RGB24 to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_rgb24_to_yuv420p, convert_rgb_to_yuv420, PixFcRGB24, PixFcYUV420P, 32, 2, 2, 2, 1, "RGB24 to YUV420P"),
 
 	// RGB24 to v210
-	DECLARE_V210_CONV_BLOCKS(convert_rgb24_to_v210, downsample_n_convert_rgb24_to_v210, convert_rgb_to_v210, PixFcRGB24, PixFcV210, 16, 1, 2, 1, 48, "RGB24 to v210"),
+	DECLARE_V210_CONV_BLOCKS(convert_rgb24_to_v210, downsample_n_convert_rgb24_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcRGB24, PixFcV210, 16, 1, 2, 1, 48, "RGB24 to v210"),
 
 
 	//
 	// BGR24 to YUYV
-	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, 16, 1, 2, 1, 1, "BGR24 to YUYV"),
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuyv, downsample_n_convert_bgr24_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGR24, PixFcYUYV, 16, 1, 2, 1, 1, "BGR24 to YUYV"),
 
 	// BGR24 to UYVY
-	DECLARE_CONV_BLOCKS(convert_bgr24_to_uyvy, downsample_n_convert_bgr24_to_uyvy, convert_rgb_to_yuv422, PixFcBGR24, PixFcUYVY, 16, 1, 2, 1, 1, "BGR24 to UYVY"),
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_uyvy, downsample_n_convert_bgr24_to_uyvy, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGR24, PixFcUYVY, 16, 1, 2, 1, 1, "BGR24 to UYVY"),
 
 	// BGR24 to YUV422P
-	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuv422p, downsample_n_convert_bgr24_to_yuv422p, convert_rgb_to_yuv422, PixFcBGR24, PixFcYUV422P, 32, 1, 2, 1, 1, "BGR24 to YUV422P"),
+	DECLARE_CONV_BLOCKS(convert_bgr24_to_yuv422p, downsample_n_convert_bgr24_to_yuv422p, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGR24, PixFcYUV422P, 32, 1, 2, 1, 1, "BGR24 to YUV422P"),
 
 	// BGR24 to YUV420P (NNB only for now)
 	DECLARE_NNB_ONLY_CONV_BLOCKS(convert_bgr24_to_yuv420p, convert_rgb_to_yuv420, PixFcBGR24, PixFcYUV420P, 32, 2, 2, 2, 1, "BGR24 to YUV420P"),
 
 	// BGR24 to v210
-	DECLARE_V210_CONV_BLOCKS(convert_bgr24_to_v210, downsample_n_convert_bgr24_to_v210, convert_rgb_to_v210, PixFcBGR24, PixFcV210, 16, 1, 2, 1, 48, "BGR24 to v210"),
+	DECLARE_V210_CONV_BLOCKS(convert_bgr24_to_v210, downsample_n_convert_bgr24_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcBGR24, PixFcV210, 16, 1, 2, 1, 48, "BGR24 to v210"),
 
 
 	//
 	// YUYV to ARGB
-	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcARGB, 16, 1, 2, 1, 1, "YUYV to ARGB"),
+	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcARGB, 16, 1, 2, 1, 1, "YUYV to ARGB"),
 
 	// YUYV to BGRA
-	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgra, upsample_n_convert_yuyv_to_bgra, convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcBGRA, 16, 1, 2, 1, 1, "YUYV to BGRA"),
+	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgra, upsample_n_convert_yuyv_to_bgra, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcBGRA, 16, 1, 2, 1, 1, "YUYV to BGRA"),
 
 	// YUYV to RGB24
-	DECLARE_CONV_BLOCKS(convert_yuyv_to_rgb24, upsample_n_convert_yuyv_to_rgb24, convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcRGB24, 16, 1, 2, 1, 1, "YUYV to RGB24"),
+	DECLARE_CONV_BLOCKS(convert_yuyv_to_rgb24, upsample_n_convert_yuyv_to_rgb24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcRGB24, 16, 1, 2, 1, 1, "YUYV to RGB24"),
 
 	// YUYV to BGR24
-	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgr24, upsample_n_convert_yuyv_to_bgr24, convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcBGR24, 16, 1, 2, 1, 1, "YUYV to BGR24"),
+	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgr24, upsample_n_convert_yuyv_to_bgr24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcBGR24, 16, 1, 2, 1, 1, "YUYV to BGR24"),
 
 	// YUYV to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_yuyv_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcYUYV, PixFcYUV422P, 32, 1, 2, 1, 1, "YUYV to YUV422P"),
@@ -350,16 +362,16 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// UYVY to ARGB
-	DECLARE_CONV_BLOCKS(convert_uyvy_to_argb, upsample_n_convert_uyvy_to_argb, convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcARGB, 16, 1, 2, 1, 1, "UYVY to ARGB"),
+	DECLARE_CONV_BLOCKS(convert_uyvy_to_argb, upsample_n_convert_uyvy_to_argb, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcARGB, 16, 1, 2, 1, 1, "UYVY to ARGB"),
 
 	// UYVY to BGRA
-	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgra, upsample_n_convert_uyvy_to_bgra, convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGRA, 16, 1, 2, 1, 1, "UYVY to BGRA"),
+	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgra, upsample_n_convert_uyvy_to_bgra, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGRA, 16, 1, 2, 1, 1, "UYVY to BGRA"),
 
 	// UYVY to RGB24
-	DECLARE_CONV_BLOCKS(convert_uyvy_to_rgb24, upsample_n_convert_uyvy_to_rgb24, convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcRGB24, 16, 1, 2, 1, 1, "UYVY to RGB24"),
+	DECLARE_CONV_BLOCKS(convert_uyvy_to_rgb24, upsample_n_convert_uyvy_to_rgb24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcRGB24, 16, 1, 2, 1, 1, "UYVY to RGB24"),
 
 	// UYVY to BGR24
-	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgr24, upsample_n_convert_uyvy_to_bgr24, convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGR24, 16, 1, 2, 1, 1, "UYVY to BGR24"),
+	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgr24, upsample_n_convert_uyvy_to_bgr24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGR24, 16, 1, 2, 1, 1, "UYVY to BGR24"),
 
 	// UYVY to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_uyvy_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcUYVY, PixFcYUV422P, 32, 1, 2, 1, 1, "UYVY to YUV422P"),
@@ -370,16 +382,16 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// YUV422P to ARGB
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_argb, upsample_n_convert_yuv422p_to_argb, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcARGB, 32, 1, 1, 1, 1, "YUV422P to ARGB"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_argb, upsample_n_convert_yuv422p_to_argb, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcARGB, 32, 1, 1, 1, 1, "YUV422P to ARGB"),
 
 	// YUV422P to BGRA
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgra, upsample_n_convert_yuv422p_to_bgra, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGRA, 32, 1, 1, 1, 1, "YUV422P to BGRA"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgra, upsample_n_convert_yuv422p_to_bgra, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGRA, 32, 1, 1, 1, 1, "YUV422P to BGRA"),
 
 	// YUV422P to RGB24
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_rgb24, upsample_n_convert_yuv422p_to_rgb24, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcRGB24, 32, 1, 1, 1, 1, "YUV422P to RGB24"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_rgb24, upsample_n_convert_yuv422p_to_rgb24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcRGB24, 32, 1, 1, 1, 1, "YUV422P to RGB24"),
 
 	// YUV422P to BGR24
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, 32, 1, 1, 1, 1, "YUV422P to BGR24"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, 32, 1, 1, 1, 1, "YUV422P to BGR24"),
 
 	// YUV422P to YUYV
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, 1, "YUV422P to YUYV"),
@@ -406,16 +418,16 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// v210 to ARGB
-	DECLARE_V210_CONV_BLOCKS(convert_v210_to_argb, upsample_n_convert_v210_to_argb, convert_v210_to_any_rgb, PixFcV210, PixFcARGB, 16, 1, 2, 1, 48, "v210 to ARGB"),
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_argb, upsample_n_convert_v210_to_argb, convert_v210_to_any_rgb, upsample_n_convert_v210_to_any_rgb, PixFcV210, PixFcARGB, 16, 1, 2, 1, 48, "v210 to ARGB"),
 
 	// v210 to BGRA
-	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgra, upsample_n_convert_v210_to_bgra, convert_v210_to_any_rgb, PixFcV210, PixFcBGRA, 16, 1, 2, 1, 48, "v210 to BGRA"),
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgra, upsample_n_convert_v210_to_bgra, convert_v210_to_any_rgb, upsample_n_convert_v210_to_any_rgb, PixFcV210, PixFcBGRA, 16, 1, 2, 1, 48, "v210 to BGRA"),
 
 	// v210 to RGB24
-	DECLARE_V210_CONV_BLOCKS(convert_v210_to_rgb24, upsample_n_convert_v210_to_rgb24, convert_v210_to_any_rgb, PixFcV210, PixFcRGB24, 16, 1, 2, 1, 48, "v210 to RGB24"),
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_rgb24, upsample_n_convert_v210_to_rgb24, convert_v210_to_any_rgb, upsample_n_convert_v210_to_any_rgb, PixFcV210, PixFcRGB24, 16, 1, 2, 1, 48, "v210 to RGB24"),
 
 	// v210 to BGR24
-	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgr24, upsample_n_convert_v210_to_bgr24, convert_v210_to_any_rgb, PixFcV210, PixFcBGR24, 16, 1, 2, 1, 48, "v210 to BGR24"),
+	DECLARE_V210_CONV_BLOCKS(convert_v210_to_bgr24, upsample_n_convert_v210_to_bgr24, convert_v210_to_any_rgb, upsample_n_convert_v210_to_any_rgb, PixFcV210, PixFcBGR24, 16, 1, 2, 1, 48, "v210 to BGR24"),
 
 	// v210 to YUYV
 	DECLARE_V210_REPACK_CONV_BLOCK(convert_v210_to_yuyv, convert_v210_to_yuv422i, PixFcV210, PixFcYUYV, 16, 1, 2, 1, 48, "v210 to YUYV"),

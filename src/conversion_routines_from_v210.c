@@ -190,10 +190,10 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
 			*(dst++) = CLIP_PIXEL(r);\
 		}
 
-#define CONVERT_N_STORE(coeffs, coef_shift) \
-	r = ((coeffs[0][0] * y) + (coeffs[0][1] * u) + (coeffs[0][2] * v)) >> coef_shift;\
-	g = ((coeffs[1][0] * y) + (coeffs[1][1] * u) + (coeffs[1][2] * v)) >> coef_shift;\
-	b = ((coeffs[2][0] * y) + (coeffs[2][1] * u) + (coeffs[2][2] * v)) >> coef_shift;\
+#define CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v) \
+	r = ((coeffs[0][0] * ((y) + offsets[0])) + (coeffs[0][1] * ((u) + offsets[1])) + (coeffs[0][2] * ((v) + offsets[2]))) >> coef_shift;\
+	g = ((coeffs[1][0] * ((y) + offsets[0])) + (coeffs[1][1] * ((u) + offsets[1])) + (coeffs[1][2] * ((v) + offsets[2]))) >> coef_shift;\
+	b = ((coeffs[2][0] * ((y) + offsets[0])) + (coeffs[2][1] * ((u) + offsets[1])) + (coeffs[2][2] * ((v) + offsets[2]))) >> coef_shift;\
 	PACK_RGB()
 
 // These conversion routines only assume an even number of pixels.
@@ -212,26 +212,26 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
 			   until less than 6 pixels remain. */\
 			while(pixel < (conv->width - 5)) {\
 				/* Pixel 1 and 2 */\
-				y = ((*src >> 10) & 0x3FF) - offsets[0];\
-				u = (*src & 0x3FF) - offsets[1];\
-				v = ((*src >> 20) & 0x3FF) - offsets[2];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = (src[1] & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = ((*src >> 10) & 0x3FF);\
+				u = (*src & 0x3FF);\
+				v = ((*src >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 				/* Pixel 3 and 4 */\
-				y = ((src[1] >> 20) & 0x3FF) - offsets[0];\
-				u = ((src[1] >> 10) & 0x3FF) - offsets[1];\
-				v = (src[2] & 0x3FF) - offsets[2];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = ((src[2] >> 10) & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = ((src[1] >> 20) & 0x3FF);\
+				u = ((src[1] >> 10) & 0x3FF);\
+				v = (src[2] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[2] >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 				/* Pixel 5 and 6 */\
-				y = (src[3] & 0x3FF) - offsets[0];\
-				u = ((src[2] >> 20) & 0x3FF) - offsets[1];\
-				v = ((src[3] >> 10) & 0x3FF) - offsets[2];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = ((src[3] >> 20) & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = (src[3] & 0x3FF);\
+				u = ((src[2] >> 20) & 0x3FF);\
+				v = ((src[3] >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[3] >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 				src += 4;\
 				pixel += 6;\
 			}\
@@ -239,26 +239,26 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
 			   formats (inc v210) carry at the very least an even
 			   number of pixels. */\
 			if ((conv->width - pixel) == 2) {\
-				y = ((*src >> 10) & 0x3FF) - offsets[0];\
-				u = (*src & 0x3FF) - offsets[1];\
-				v = ((*src >> 20) & 0x3FF) - offsets[1];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = (src[1] & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = ((*src >> 10) & 0x3FF);\
+				u = (*src & 0x3FF);\
+				v = ((*src >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 			} else if ((conv->width - pixel) == 4) {\
-				y = ((*src >> 10) & 0x3FF) - offsets[0];\
-				u = (*src & 0x3FF) - offsets[1];\
-				v = ((*src >> 20) & 0x3FF) - offsets[1];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = (src[1] & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = ((*src >> 10) & 0x3FF);\
+				u = (*src & 0x3FF);\
+				v = ((*src >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 				/* Pixel 3 and 4 */\
-				y = ((src[1] >> 20) & 0x3FF) - offsets[0];\
-				u = ((src[1] >> 10) & 0x3FF) - offsets[1];\
-				v = (src[2] & 0x3FF) - offsets[1];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
-				y = ((src[2] >> 10) & 0x3FF) - offsets[0];\
-				CONVERT_N_STORE(coeffs, coef_shift);\
+				y = ((src[1] >> 20) & 0x3FF);\
+				u = ((src[1] >> 10) & 0x3FF);\
+				v = (src[2] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[2] >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 			}\
 			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
 			pixel = 0;\
@@ -270,6 +270,104 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_nonsse, yuv_10b
 DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt601_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_8bit_off[1])
 DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_8bit_off[2])
 
+
+// These conversion routines only assume an even number of pixels.
+#define DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(fn_name, coeffs, coef_shift, offsets) \
+	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
+		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+		uint32_t 			pixel = 0;\
+		uint32_t			line = 0;\
+		uint32_t*			src = (uint32_t *) in;\
+		uint8_t*			dst = (uint8_t *) out;\
+		int32_t				r, g, b;\
+		int32_t				y, u, v, next_u, next_v;\
+		\
+		while(line++ < conv->height) {\
+			u = (*src & 0x3FF);\
+			v = ((*src >> 20) & 0x3FF);\
+			/* Convert as many chunks of 6 pixels as possible,
+			   until 6 or less pixels remain as they must be handled seperately. */\
+			while(pixel < (conv->width - 6)) {\
+				/* Pixel 1 and 2 */\
+				y = ((*src >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				next_u = ((src[1] >> 10) & 0x3FF); /* belongs to pix 3 & 4 */\
+				next_v = (src[2] & 0x3FF); /* belongs to pix 3 & 4 */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				/* Pixel 3 and 4 */\
+				y = ((src[1] >> 20) & 0x3FF);\
+				u = next_u; v = next_v;\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[2] >> 10) & 0x3FF);\
+				next_u = ((src[2] >> 20) & 0x3FF); /* belongs to pix 5 & 6 */\
+				next_v = ((src[3] >> 10) & 0x3FF);/* belongs to pix 5 & 6 */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				/* Pixel 5 and 6 */\
+				y = (src[3] & 0x3FF);\
+				u = next_u; v = next_v;\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[3] >> 20) & 0x3FF);\
+				next_u = (src[4] & 0x3FF); /* belongs to pixels 1 and 2 in next set of 6 v210 pix */\
+				next_v = ((src[4] >> 20) & 0x3FF); /* belongs to pixels 1 and 2 in next set of 6 v210 pix */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				u = next_u; v = next_v;\
+				src += 4;\
+				pixel += 6;\
+			}\
+			/* There can only be 2, 4 or 6 pixels left since yuv422
+			   formats (inc v210) carry at the very least an even
+			   number of pixels. */\
+			if ((conv->width - pixel) == 2) {\
+				y = ((*src >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+			} else if ((conv->width - pixel) == 4) {\
+				y = ((*src >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				next_u = ((src[1] >> 10) & 0x3FF); /* belongs to pix 3 & 4 */\
+				next_v = (src[2] & 0x3FF); /* belongs to pix 3 & 4 */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				u = next_u; v = next_v;\
+				/* Pixel 3 and 4 */\
+				y = ((src[1] >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[2] >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+			} else if ((conv->width - pixel) == 6) {\
+				/* Pixel 1 and 2 */\
+				y = ((*src >> 10) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = (src[1] & 0x3FF);\
+				next_u = ((src[1] >> 10) & 0x3FF); /* belongs to pix 3 & 4 */\
+				next_v = (src[2] & 0x3FF); /* belongs to pix 3 & 4 */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				/* Pixel 3 and 4 */\
+				y = ((src[1] >> 20) & 0x3FF);\
+				u = next_u; v = next_v;\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[2] >> 10) & 0x3FF);\
+				next_u = ((src[2] >> 20) & 0x3FF); /* belongs to pix 5 & 6 */\
+				next_v = ((src[3] >> 10) & 0x3FF);/* belongs to pix 5 & 6 */\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, ((u + next_u) / 2), ((v + next_v) / 2));\
+				/* Pixel 5 and 6 */\
+				y = (src[3] & 0x3FF);\
+				u = next_u; v = next_v;\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+				y = ((src[3] >> 20) & 0x3FF);\
+				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
+			}\
+			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			pixel = 0;\
+		}\
+	}
+
+
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_10bit_to_rgb_8bit_off[0])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_bt601_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_8bit_off[1])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_bt709_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_8bit_off[2])
 
 
 

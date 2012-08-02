@@ -67,7 +67,7 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 // V210 to anyRGB		NON SSE
 void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* , void* , void*);
-
+void 		upsample_n_convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
@@ -119,7 +119,7 @@ void		convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, vo
 
 // V210 to anyRGB		NON SSE
 void 		convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
-
+void 		upsample_n_convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
@@ -169,7 +169,7 @@ void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, vo
 
 // V210 to anyRGB		NON SSE
 void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
-
+void 		upsample_n_convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
 
 
 
