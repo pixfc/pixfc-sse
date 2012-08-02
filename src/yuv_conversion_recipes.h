@@ -677,9 +677,19 @@
 	__m128i		convert_out[6];\
 	while(pixel_count > 0) {\
 		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
+		print_xmm16u("Y", unpack_out);\
+		print_xmm16u("UV", &unpack_out[1]);\
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		print_xmm16u("R", &convert_out[0]);\
+		print_xmm16u("G", &convert_out[1]);\
+		print_xmm16u("B", &convert_out[2]);\
 		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], unpack_out);\
+		print_xmm16u("Y", unpack_out);\
+		print_xmm16u("UV", &unpack_out[1]);\
 		conv_fn_prefix##instr_set(unpack_out, &convert_out[3]);\
+		print_xmm16u("R", &convert_out[3]);\
+		print_xmm16u("G", &convert_out[4]);\
+		print_xmm16u("B", &convert_out[5]);\
 		pack_fn(convert_out, rgb_out_buf);\
 		yuyv_8pixels += 2;\
 		rgb_out_buf += output_stride;\
@@ -1094,10 +1104,16 @@
  */
 #define YUV422I_TO_V210_CORE(unpack_fn, pack_fn) \
 	unpack_fn(yuv_in, &unpack_out[0]);\
+	/*print_xmm16u("M24 Y1-8", &unpack_out[0]);\
+	print_xmm16u("M24 UV1-8", &unpack_out[1]);*/\
 	yuv_in++;\
 	unpack_fn(yuv_in, &unpack_out[2]);\
+	/*print_xmm16u("M24 Y9-16", &unpack_out[2]);\
+	print_xmm16u("M24 UV9-16", &unpack_out[3]);*/\
 	yuv_in++;\
 	unpack_fn(yuv_in, &unpack_out[4]);\
+	/*print_xmm16u("M24 Y17-24", &unpack_out[4]);\
+	print_xmm16u("M24 UV17-24", &unpack_out[5]);*/\
 	yuv_in++;\
 	unpack_out[0] = _mm_slli_epi16(unpack_out[0], 2);\
 	unpack_out[1] = _mm_slli_epi16(unpack_out[1], 2);\
@@ -1105,11 +1121,19 @@
 	unpack_out[3] = _mm_slli_epi16(unpack_out[3], 2);\
 	unpack_out[4] = _mm_slli_epi16(unpack_out[4], 2);\
 	unpack_out[5] = _mm_slli_epi16(unpack_out[5], 2);\
+	print_xmm16u("M24 Y1-8 10 bits", &unpack_out[0]);\
+	print_xmm16u("M24 UV1-8 10 bits", &unpack_out[1]);\
+	print_xmm16u("M24 Y9-16 10 bits", &unpack_out[2]);\
+	print_xmm16u("M24 UV9-16 10 bits", &unpack_out[3]);\
+	print_xmm16u("M24 Y17-24 10 bits", &unpack_out[4]);\
+	print_xmm16u("M24 UV17-24 10 bits", &unpack_out[5]);\
 	pack_fn(unpack_out, v210_out);\
 	v210_out += 4;
 
 #define YUV422I_TO_V210_8PIX_LEFTOVER(unpack_fn, pack_fn) \
 	unpack_fn(yuv_in, &unpack_out[0]);\
+	/*print_xmm16u("L8 Y1-8", &unpack_out[0]);\
+	print_xmm16u("L8 UV1-8", &unpack_out[1]);*/\
 	yuv_in++;\
 	unpack_out[0] = _mm_slli_epi16(unpack_out[0], 2);\
 	unpack_out[1] = _mm_slli_epi16(unpack_out[1], 2);\
@@ -1117,20 +1141,36 @@
 	unpack_out[3] = _mm_setzero_si128();\
 	unpack_out[4] = _mm_setzero_si128();\
 	unpack_out[5] = _mm_setzero_si128();\
+	print_xmm16u("L8 Y1-8 10 bits", &unpack_out[0]);\
+	print_xmm16u("L8 UV1-8 10 bits", &unpack_out[1]);\
+	print_xmm16u("L8 Y9-16 10 bits", &unpack_out[2]);\
+	print_xmm16u("L8 UV9-16 10 bits", &unpack_out[3]);\
+	print_xmm16u("L8 Y17-24 10 bits", &unpack_out[4]);\
+	print_xmm16u("L8 UV17-24 10 bits", &unpack_out[5]);\
 	pack_fn(unpack_out, v210_out);\
 	v210_out += 4;\
 
 #define YUV422I_TO_V210_16PIX_LEFTOVER(unpack_fn, pack_fn) \
 	unpack_fn(yuv_in, &unpack_out[0]);\
+	/*print_xmm16u("L16 Y1-8", &unpack_out[0]);\
+	print_xmm16u("L16 UV1-8", &unpack_out[1]);*/\
 	yuv_in++;\
-	unpack_fn(yuv_in, &unpack_out[1]);\
+	unpack_fn(yuv_in, &unpack_out[2]);\
+	/*print_xmm16u("L16 Y9-16", &unpack_out[2]);\
+	print_xmm16u("L16 UV9-16", &unpack_out[3]);*/\
 	yuv_in++;\
 	unpack_out[0] = _mm_slli_epi16(unpack_out[0], 2);\
 	unpack_out[1] = _mm_slli_epi16(unpack_out[1], 2);\
-	unpack_out[3] = _mm_slli_epi16(unpack_out[2], 2);\
-	unpack_out[2] = _mm_slli_epi16(unpack_out[3], 2);\
+	unpack_out[2] = _mm_slli_epi16(unpack_out[2], 2);\
+	unpack_out[3] = _mm_slli_epi16(unpack_out[3], 2);\
 	unpack_out[4] = _mm_setzero_si128();\
 	unpack_out[5] = _mm_setzero_si128();\
+	print_xmm16u("L16 Y1-8 10 bits", &unpack_out[0]);\
+	print_xmm16u("L16 UV1-8 10 bits", &unpack_out[1]);\
+	print_xmm16u("L16 Y9-16 10 bits", &unpack_out[2]);\
+	print_xmm16u("L16 UV9-16 10 bits", &unpack_out[3]);\
+	print_xmm16u("L16 Y17-24 10 bits", &unpack_out[4]);\
+	print_xmm16u("L16 UV17-24 10 bits", &unpack_out[5]);\
 	pack_fn(unpack_out, v210_out);\
 	v210_out += 4;\
 

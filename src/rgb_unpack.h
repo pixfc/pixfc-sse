@@ -345,6 +345,9 @@ INLINE_NAME(unpack_bgra_to_ga_br_vectors_sse2, __m128i* input, __m128i* out_4_v1
 	CONST_M128I(mask_off_ga, 0x00FF00FF00FF00FFLL, 0x00FF00FF00FF00FFLL);
 	UNALIGNED_RGB32_INPUT_PREAMBLE;
 	
+	print_xmm8u("BGRA1-4", &(INPUT_VECT[0]));
+	print_xmm8u("BGRA5-8", &(INPUT_VECT[1]));
+
 	out_4_v16i_ga_br_vectors[0] = _mm_srli_epi16(INPUT_VECT[0], 8);					// PSRLW	1	1
 	// G1 0		A1 0	G2 0	A2 0	G3 0	A3 0	G4 0	A4 0
 

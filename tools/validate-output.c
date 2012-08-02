@@ -327,7 +327,7 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		return -1;
 	}
 
-	printf("%s\n", conversion_blocks[scalar_conv_index].name);
+	printf("'%s' %dx%d\n", conversion_blocks[scalar_conv_index].name, in_file->width, in_file->height);
 
 	// Check if the scalar conversion routine has changed.
 	if (scalar_conv_index != prev_scalar_conv_index) {
@@ -360,8 +360,8 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		snprintf(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
 
 		printf("Dumping scalar and sse buffers\n");
-		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
-		write_raw_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
+		write_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
+		write_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
 		return 1;
 	} else {
 		printf("OK\n");

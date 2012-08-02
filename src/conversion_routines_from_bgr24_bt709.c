@@ -112,8 +112,8 @@
 						unpack_bgr24_to_r_g_b_vectors_,\
 						pack_2_y_vectors_to_1_y_vector_sse2,\
 						pack_4_uv_vectors_to_yup_vectors_sse2,\
-						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
 						instr_set\
 			)
 
@@ -123,8 +123,8 @@
 						unpack_bgr24_to_ga_br_vectors_,\
 						pack_2_y_vectors_to_1_y_vector_sse2,\
 						pack_4_uv_vectors_to_yup_vectors_sse2,\
-						convert_ga_br_vectors_to_y_vector_bt601_sse2,\
-						convert_downsampled_422_ga_br_vectors_to_uv_vector_bt601_sse2,\
+						convert_ga_br_vectors_to_y_vector_bt709_sse2,\
+						convert_downsampled_422_ga_br_vectors_to_uv_vector_bt709_sse2,\
 						instr_set\
 			)
 

@@ -251,6 +251,8 @@ uint32_t	allocate_aligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t 
 		return -1;
 	}
 
+	memset(*buffer, 0x0, IMG_SIZE(fmt, width, height));
+
 	return 0;
 }
 

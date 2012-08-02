@@ -60,14 +60,30 @@
 // NNB Core conversion loop, common to RGB32 to YUV422 planar & interleaved NNB conversions
 #define RGB32_TO_YUV422_NNB_LOOP_CORE(unpack_fn, downsample_fn, y_conv_fn, uv_conv_fn)\
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm16u("R 1-8", &unpack_out[0]);\
+	print_xmm16u("G 1-8", &unpack_out[1]);\
+	print_xmm16u("B 1-8", &unpack_out[2]);\
 	y_conv_fn(unpack_out, convert_out);\
+	print_xmm16u("Y1-8", convert_out);\
 	downsample_fn(unpack_out, unpack_out);\
+	print_xmm16u("downsampled R (odd)", unpack_out);\
+	print_xmm16u("downsampled G (odd)", &unpack_out[1]);\
+	print_xmm16u("downsampled B (odd)", &unpack_out[2]);\
 	uv_conv_fn(unpack_out, &convert_out[1]);\
+	print_xmm16u("downsampled UV", &convert_out[1]);\
 	rgb_in += 2;\
 	unpack_fn(rgb_in, unpack_out);\
+	print_xmm16u("R 1-8", &unpack_out[0]);\
+	print_xmm16u("G 1-8", &unpack_out[1]);\
+	print_xmm16u("B 1-8", &unpack_out[2]);\
 	y_conv_fn(unpack_out, &convert_out[2]);\
+	print_xmm16u("Y1-8", &convert_out[2]);\
 	downsample_fn(unpack_out, unpack_out);\
+	print_xmm16u("downsampled R (odd)", unpack_out);\
+	print_xmm16u("downsampled G (odd)", &unpack_out[1]);\
+	print_xmm16u("downsampled B (odd)", &unpack_out[2]);\
 	uv_conv_fn(unpack_out, &convert_out[3]);\
+	print_xmm16u("downsampled UV", &convert_out[3]);\
 	rgb_in += 2;\
 	pixel_count -= 16;
 

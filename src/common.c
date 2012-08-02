@@ -175,7 +175,7 @@ const int32_t       yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3] =
 
 		// bt709
 		{{ 298,   0,  459},
-		 { 298,  -5, -136},
+		 { 298, -55, -136},
 		 { 298, 541,    0}},
 	};
 
@@ -270,7 +270,7 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
 
 #ifdef DEBUG
-#if 0
+#if 1
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 16bit signed
 	int32_t*	array = (int32_t *)reg;

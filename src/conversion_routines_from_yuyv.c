@@ -389,6 +389,7 @@ void		convert_yuv422i_to_v210_nonsse(const struct PixFcSSE* pixfc, void* source_
 		while(pixel < pixfc->width - 5) {
 			UNPACK_YUV422I(y1, u, v, y2, src);
 			*dst = u << 2;
+			//printf("M6 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 			*dst |= y1 << 12;
 			*(dst++) |= v << 22;
 			*dst = y2 << 2;
@@ -397,11 +398,13 @@ void		convert_yuv422i_to_v210_nonsse(const struct PixFcSSE* pixfc, void* source_
 			*(dst++) |= y1 << 22;
 			*dst = v << 2;
 			*dst |= y2 << 12;
+			//printf("M6 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 			UNPACK_YUV422I(y1, u, v, y2, src);
 			*(dst++) |= u << 22;
 			*dst = y1 << 2;
 			*dst |= v << 12;
 			*(dst++) |= y2 << 22;
+			//printf("M6 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 			pixel += 6;
 		}
 
@@ -413,17 +416,20 @@ void		convert_yuv422i_to_v210_nonsse(const struct PixFcSSE* pixfc, void* source_
 			*dst |= y1 << 12;
 			*(dst++) |= v << 22;
 			*dst = y2 << 2;
+			//printf("L2 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 		} else if ((pixfc->width - pixel) == 4) {
 			UNPACK_YUV422I(y1, u, v, y2, src);
 			*dst = u << 2;
 			*dst |= y1 << 12;
 			*(dst++) |= v << 22;
 			*dst = y2 << 2;
+			//printf("L4 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 			UNPACK_YUV422I(y1, u, v, y2, src);
 			*dst |= u << 12;
 			*(dst++) |= y1 << 22;
 			*dst = v << 2;
 			*dst |= y2 << 12;
+			//printf("L4 %d %d %d %d\n", (u<<2), (y1<<2), (v<<2), (y2<<2));
 		}
 
 		dst = (uint32_t*) ((uint8_t*)dest_buffer + line * ROW_SIZE(PixFcV210, pixfc->width));

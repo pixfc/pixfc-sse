@@ -68,8 +68,8 @@
 						unpack_bgra_to_r_g_b_vectors_,\
 						pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2,\
 						pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2,\
-						convert_r_g_b_vectors_to_y_vector_bt709_sse2,\
-						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709_sse2,\
+						convert_r_g_b_vectors_to_y_vector_bt601_sse2,\
+						convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601_sse2,\
 						instr_set\
 			)
 

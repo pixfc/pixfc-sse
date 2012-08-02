@@ -245,9 +245,8 @@ DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_bt709_nonsse, yuv_8bit_to_r
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y1, y2, u, v, next_u, next_v;\
-		int32_t				prev_u, prev_v;\
-		u = *u_src;\
-		v = *v_src;\
+		u = *u_src++;\
+		v = *v_src++;\
 		while(pixel_num < pixel_count - 2){ /* handle the last two pixels out of the loop*/\
 			y1 = *y_src++ + offsets[0];\
 			y2 = *y_src++ + offsets[0];\
@@ -257,8 +256,8 @@ DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_bt709_nonsse, yuv_8bit_to_r
 			b = ((y1 * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
 			PACK_RGB(r, g, b, dst);\
 			\
-			next_u = *u_src + offsets[1];\
-			next_v = *v_src + offsets[2];\
+			next_u = *u_src++ + offsets[1];\
+			next_v = *v_src++ + offsets[2];\
 			u = ((u + next_u) / 2 + offsets[1]);\
 			v = ((v + next_v) / 2 + offsets[2]);\
 			r = ((y2 * coeffs[0][0])+ (u * coeffs[0][1]) +(v * coeffs[0][2])) >> coef_shift;\
