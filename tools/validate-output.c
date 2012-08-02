@@ -93,7 +93,7 @@ static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, P
 	if(abs(scalar_val - sse_val) > max_diff_seen)\
 		max_diff_seen = abs(scalar_val - sse_val);\
 	if(abs(scalar_val - sse_val) > max_diff) {\
-		printf(component " @ Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",\
+		printf(component " @ Pixel %ux%u (offset: %llu) differ by %u : SSE: %hu - Scalar: %hu\n",\
 		(pixel + 1), line,\
 		(unsigned long long)((sse_ptr - out_sse) * 4),\
 		abs(scalar_val - sse_val), sse_val, scalar_val);\

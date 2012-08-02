@@ -2,12 +2,14 @@
 # TODO: update tools so they only use the public interface rather than internal headers
 include_directories(AFTER include ../src)
 
-if(WIN32 OR APPLE)
-	list(APPEND TOOLS_LIBS pixfc-sse)
-else(WIN32 OR APPLE)
-	list(APPEND TOOLS_LIBS pixfc-sse rt)
+list(APPEND TOOLS_LIBS pixfc-sse)
+
+if(APPLE)
 	add_definitions(-Wno-trigraphs)
-endif(WIN32 OR APPLE)
+elseif(LINUX)
+	list(APPEND TOOLS_LIBS rt)
+	add_definitions(-Wno-trigraphs)
+endif(APPLE)
 
 #
 # UNIT TESTING TARGET
