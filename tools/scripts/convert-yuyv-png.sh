@@ -50,10 +50,10 @@ elif [ "${ext}" = "YUV422p" ]; then
 	# then to png using mplayer
 	
 	# Ensure yuv422p_to_yuyv exists, otherwise build it
-	if [ ! -x "$(dirname $0)/yuv422p_to_yuyv" ]; then
-		gcc "$(dirname $0)/yuv422p_to_yuyv.c" -o "$(dirname $0)/yuv422p_to_yuyv"
+	if [ ! -x "$(dirname $0)/../yuv422p_to_yuyv" ]; then
+		gcc "$(dirname $0)/../yuv422p_to_yuyv.c" -o "$(dirname $0)/../yuv422p_to_yuyv"
 	fi  
-	cmd="$(dirname $0)/yuv422p_to_yuyv WIDTH HEIGHT"
+	cmd="$(dirname $0)/../yuv422p_to_yuyv WIDTH HEIGHT"
 	cmd2="mplayer -demuxer rawvideo -rawvideo format=yuy2:w=WIDTH:h=HEIGHT -vo png:z=0 output.YUYV"
 elif [ "${ext}" = "YUV420p" ]; then
 	cmd="mplayer -demuxer rawvideo -rawvideo format=i420:w=WIDTH:h=HEIGHT -vo png:z=0"
