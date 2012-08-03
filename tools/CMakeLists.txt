@@ -6,7 +6,7 @@ list(APPEND TOOLS_LIBS pixfc-sse)
 
 if(APPLE)
 	add_definitions(-Wno-trigraphs)
-elseif(LINUX)
+elseif(UNIX)
 	list(APPEND TOOLS_LIBS rt)
 	add_definitions(-Wno-trigraphs)
 endif(APPLE)
