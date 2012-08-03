@@ -356,8 +356,8 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		char sse_filename[128] = {0};
 		char scalar_filename[128] = {0};
 
-		snprintf(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
-		snprintf(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+		SNPRINTF(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+		SNPRINTF(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
 
 		printf("Dumping scalar and sse buffers\n");
 		write_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
@@ -371,7 +371,7 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 }
 
 int 			main(int argc, char **argv) {
-	int32_t				index;
+	uint32_t				index;
 
 	// Parse args
 	parse_args(argc, argv);
