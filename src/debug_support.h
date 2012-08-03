@@ -23,8 +23,25 @@
 
 #if defined(__linux__) || defined(__APPLE__)
 
+// According to http://sourceforge.net/apps/mediawiki/predef/index.php?title=Standards
+// and http://lists.debian.org/debian-mentors/2002/10/msg00216.html
+#ifdef __STDC_VERSION__
+	#if (__STDC_VERSION__ == 199901L)
+		#define C99_ENV
+	#endif
+#endif
+
 #ifndef DEBUG
-	#define EXTERN_INLINE							extern inline
+	/*
+	 * Meanign of inline / static inline / extern inline is different in C99 std
+	 * http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
+	 *
+	 */
+	#ifdef C99_ENV
+		#define EXTERN_INLINE						inline
+	#else
+		#define EXTERN_INLINE						extern inline
+	#endif
 #else
 	#define EXTERN_INLINE
 #endif
