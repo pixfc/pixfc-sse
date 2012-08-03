@@ -256,8 +256,8 @@ DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_bt709_nonsse, yuv_8bit_to_r
 			b = ((y1 * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
 			PACK_RGB(r, g, b, dst);\
 			\
-			next_u = *u_src++ + offsets[1];\
-			next_v = *v_src++ + offsets[2];\
+			next_u = *u_src++;\
+			next_v = *v_src++;\
 			u = ((u + next_u) / 2 + offsets[1]);\
 			v = ((v + next_v) / 2 + offsets[2]);\
 			r = ((y2 * coeffs[0][0])+ (u * coeffs[0][1]) +(v * coeffs[0][2])) >> coef_shift;\

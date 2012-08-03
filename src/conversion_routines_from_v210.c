@@ -418,7 +418,7 @@ void		convert_v210_to_uyvy_sse2_ssse3(const struct PixFcSSE* pixfc, void* source
 void		convert_v210_to_yuv422i_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer) {
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;
 	uint32_t 			pixel = 0;
-	uint32_t			line = conv->height;
+	uint32_t			line = 0;
 	uint32_t*			src = (uint32_t *) srcBuffer;
 	uint8_t*			dst = (uint8_t *) dstBuffer;
 	int32_t				y1, y2, u, v;

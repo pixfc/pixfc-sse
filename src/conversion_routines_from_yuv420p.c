@@ -193,7 +193,7 @@ void		convert_yuv420p_to_bgr24_bt709_sse2(const struct PixFcSSE * pixfc, void* s
  * Non SSE conversion block (nearest neighbour upsampling)
  *
  */
-#define 	DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(fn_name, y_off, u_off, v_off, ry_coef, ru_coef, rv_coef, gy_coef, gu_coef, gv_coef, by_coef, bu_coef, bv_coef) \
+#define 	DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(fn_name, coeffs, coef_shift, offsets) \
 void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 	uint32_t			output_stride = ((dest_fmt == PixFcARGB) || (dest_fmt == PixFcBGRA)) ? 4 : 3;\
@@ -211,16 +211,16 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	int32_t				y, u, v;\
 	while(lines_remaining > 0){\
 		while(pixels_remaining_on_line-- > 0) {\
-			y = *y_src_line1++ + y_off;\
-			u = *u_src + u_off;\
-			v = *v_src + v_off;\
-			r_line1 = ((y * ry_coef) + (ru_coef * u) + (rv_coef * v)) >> 8;\
-			g_line1 = ((y * gy_coef) + (gu_coef * u) + (gv_coef * v)) >> 8;\
-			b_line1 = ((y * by_coef) + (bu_coef * u) + (bv_coef * v)) >> 8;\
-			y = *y_src_line2++ + y_off;\
-			r_line2 = ((y * ry_coef) + (ru_coef * u) + (rv_coef * v)) >> 8;\
-			g_line2 = ((y * gy_coef) + (gu_coef * u) + (gv_coef * v)) >> 8;\
-			b_line2 = ((y * by_coef) + (bu_coef * u) + (bv_coef * v)) >> 8;\
+			y = *y_src_line1++ + offsets[0];\
+			u = *u_src + offsets[1];\
+			v = *v_src + offsets[2];\
+			r_line1 = ((y * coeffs[0][0]) + (u * coeffs[0][1]) + (v * coeffs[0][2])) >> coef_shift;\
+			g_line1 = ((y * coeffs[1][0]) + (u * coeffs[1][1]) + (v * coeffs[1][2])) >> coef_shift;\
+			b_line1 = ((y * coeffs[2][0]) + (u * coeffs[2][1]) + (v * coeffs[2][2])) >> coef_shift;\
+			y = *y_src_line2++ + offsets[0];\
+			r_line2 = ((y * coeffs[0][0]) + (u * coeffs[0][1]) + (v * coeffs[0][2])) >> coef_shift;\
+			g_line2 = ((y * coeffs[1][0]) + (u * coeffs[1][1]) + (v * coeffs[1][2])) >> coef_shift;\
+			b_line2 = ((y * coeffs[2][0]) + (u * coeffs[2][1]) + (v * coeffs[2][2])) >> coef_shift;\
 			if ((pixels_remaining_on_line & 0x1) == 0) {\
 				u_src++;\
 				v_src++;\
@@ -268,10 +268,10 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	}\
 }
 
-DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse,         0, -128, -128, 256, 0, 359, 256,  -88, -183, 256, 454, 0);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_8bit_off[0]);
 
-DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt601_nonsse, -16, -128, -128, 298, 0, 408, 298, -100, -208, 298, 772, 0);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt601_nonsse,  yuv_8bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_8bit_off[1]);
 
-DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse, -16, -128, -128, 298, 0, 459, 298,  -54, -136, 298, 540, 0);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse,  yuv_8bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_8bit_off[2]);
 
 
