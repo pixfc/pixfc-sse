@@ -89,7 +89,7 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		// conversion block supported by the CPU. However, if either of these 2 flags is present,
 		// return PixFc_NoCPUSupport since the user requested a specific SSE version, but the CPU
 		// does not support it.
-		return ((! (flags & PixFcFlag_SSE2_SSSE3Only)) || (! (flags & PixFcFlag_SSE2Only))) ? PixFc_UnsupportedConversionError : PixFc_NoCPUSupport;
+		return ((! (flags & PixFcFlag_SSE2_SSSE3Only)) && (! (flags & PixFcFlag_SSE2Only))) ? PixFc_UnsupportedConversionError : PixFc_NoCPUSupport;
 	}
 
 	
