@@ -227,27 +227,13 @@ static uint32_t		setup_input_buffer(const InputFile* in_file) {
 		// Release previous image and load image in new format
 		ALIGN_FREE(in);
 
-		if (in_file->filename != NULL) {
-			char 	in_filename[128] = {0};
-			strcat(in_filename, PATH_TO_TEST_IMG);
-			strcat(in_filename, in_file->filename);
-
-			// Load buffer from specified file
-			if (get_buffer_from_file(in_file->format, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
-				pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
-				return -1;
+		// Try to get RGB image if possible
+		if (fill_buffer_with_rgb_image(in_file->format, in_file->width, in_file->height, (void**) &in) != 0) {
+			// Otherwise, use whatever is specified in the InputFile struct
+			if (get_buffer_from_input_file(in_file, (void **) &in) != 0) {
+				pixfc_log("Error setting up input buffer");
+				return 1;
 			}
-		} else {
-			// no input file, assume its an RGB format
-			// try to generate the image from RGB buffer from GIMP
-
-			// allocate buffer
-			if (allocate_aligned_buffer(in_file->format, in_file->width, in_file->height, (void **) &in)){
-				pixfc_log("Error allocating memory\n");
-				return -1;
-			}
-			if (fill_argb_image_with_rgb_buffer(in_file->format, in_file->width, in_file->height, in) != 0)
-				fill_image(in_file->format, IMG_SIZE(in_file->format, in_file->width, in_file->height), in);
 		}
 
 		prev_input_format = in_file->format;
@@ -256,13 +242,21 @@ static uint32_t		setup_input_buffer(const InputFile* in_file) {
 	return 0;
 }
 
-static uint32_t		setup_output_buffers(uint32_t refresh_scalar_buffer, PixFcPixelFormat dest_format, uint32_t width, uint32_t height) {
-    ALIGN_FREE(out);
+static int32_t		setup_output_buffers(uint32_t refresh_scalar_buffer, PixFcPixelFormat dest_format, uint32_t width, uint32_t height) {
+    uint32_t	result;
+    __m128i *	output_buffer = NULL;
 
-    if (allocate_aligned_buffer(dest_format, width, height, (void **)&out) != 0) {
+    result = allocate_aligned_buffer(dest_format, width, height, (void **)&output_buffer);
+    if (result == -2) {
+		pixfc_log("Invalid width / height for SSE conversion of pixel format '%s'\n", pixfmt_descriptions[dest_format].name);
+		return -2;
+	} else if (result != 0) {
     	pixfc_log("Error allocating SSE output buffer\n");
         return -1;
     }
+
+    ALIGN_FREE(out);
+    out = output_buffer;
 
     //  Re-allocate scalar buffer only if required
     if (refresh_scalar_buffer != 0) {
@@ -284,87 +278,99 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 	PixFcFlag			scalar_flags;
 	PixFcFlag			sse_flags;
 	const InputFile*	in_file = NULL;
+	uint32_t			in_file_index = 0;
+	uint32_t			result;
 	//
 	static int32_t		prev_scalar_conv_index = -1;
+	static uint32_t		prev_scalar_conv_width = 0;
+	static uint32_t		prev_scalar_conv_height = 0;
 
 	// Find input file
-	in_file = find_input_file_for_format(src_fmt);
-	if (in_file == NULL) {
+	while ((in_file = find_input_file_for_format(src_fmt, in_file_index++)) != NULL) {
+		// Enforce flags if specified on the command line
+		sse_flags = synthesize_pixfc_flags(sse_conv_index);
+		if ((restrict_to_flags != PixFcFlag_Default) && (sse_flags != restrict_to_flags))
+			return 0;
+
+		// Synthetise scalar conversion flags from the SSE conversion flags.
+		scalar_flags = (sse_flags & (~(PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only))) | PixFcFlag_NoSSE;
+
+		// prepare input buffers
+		if (setup_input_buffer(in_file) != 0) {
+			pixfc_log("Error setting up input buffer\n");
+			return -1;
+		}
+
+		printf("Comparing '%s' with ", conversion_blocks[sse_conv_index].name);
+
+		// Find the non-sse conversion block matching the given conversion block at 'index'
+		scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
+		if (scalar_conv_index == -1) {
+			pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[sse_conv_index].name);
+			return -1;
+		}
+
+		// Sanity checks
+		if ((conversion_blocks[scalar_conv_index].source_fmt != src_fmt) || (conversion_blocks[scalar_conv_index].dest_fmt != dst_fmt)) {
+			pixfc_log("SSE and scalar conversions' source and dest formats do not match.\n");
+			return -1;
+		}
+		if (conversion_blocks[sse_conv_index].attributes != conversion_blocks[scalar_conv_index].attributes) {
+			pixfc_log("SSE and scalar conversions' flags do not match.\n");
+			return -1;
+		}
+
+		printf("'%s' %dx%d\n", conversion_blocks[scalar_conv_index].name, in_file->width, in_file->height);
+
+		// Check if the scalar conversion routine and/or if the resolution has changed.
+		if ((scalar_conv_index != prev_scalar_conv_index) || (in_file->width != prev_scalar_conv_width) || (in_file->height != prev_scalar_conv_height)) {
+			scalar_conv_changed = 1;
+			prev_scalar_conv_index = scalar_conv_index;
+			prev_scalar_conv_width = in_file->width;
+			prev_scalar_conv_height = in_file->height;
+		}
+
+		// Prepare output buffers
+		result = setup_output_buffers(scalar_conv_changed, dst_fmt, in_file->width, in_file->height);
+		if (result == -2)
+			// invalid width / height for given dest pixel format, move on to next conversion
+			continue;
+		else if (result != 0) {
+			pixfc_log("Error setting up output buffer\n");
+			return -1;
+		}
+
+
+		// Do SSE conversion
+		if (do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height) != 0)
+			return -1;
+
+		// Do scalar conversion if required
+		if (scalar_conv_changed) {
+		   if (do_image_conversion(scalar_conv_index, in, out_scalar, in_file->width, in_file->height) != 0)
+				return -1;
+		}
+
+		// Compare the two output buffers
+		if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
+			char sse_filename[128] = {0};
+			char scalar_filename[128] = {0};
+	
+			SNPRINTF(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+			SNPRINTF(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+	
+			printf("Dumping scalar and sse buffers\n");
+			write_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
+			write_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
+			return 1;
+		} else {
+			printf("OK\n");
+		}
+	}
+
+	if ((in_file == NULL) && (in_file_index == 1)){
 		pixfc_log("Error looking for input file for format '%s'\n", pixfmt_descriptions[src_fmt].name);
 		return -1;
-	}
-
-	// Enforce flags if specified on the command line
-	sse_flags = synthesize_pixfc_flags(sse_conv_index);
-	if ((restrict_to_flags != PixFcFlag_Default) && (sse_flags != restrict_to_flags))
-		return 0;
-
-	// Synthetise scalar conversion flags from the SSE conversion flags.
-	scalar_flags = (sse_flags & (~(PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only))) | PixFcFlag_NoSSE;
-
-	// prepare input buffers
-	if (setup_input_buffer(in_file) != 0) {
-		pixfc_log("Error setting up input buffer\n");
-		return -1;
-	}
-
-	printf("Comparing '%s' with ", conversion_blocks[sse_conv_index].name);
-
-	// Find the non-sse conversion block matching the given conversion block at 'index'
-	scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
-	if (scalar_conv_index == -1) {
-		pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[sse_conv_index].name);
-		return -1;
-	}
-	
-	// Sanity checks
-	if ((conversion_blocks[scalar_conv_index].source_fmt != src_fmt) || (conversion_blocks[scalar_conv_index].dest_fmt != dst_fmt)) {
-		pixfc_log("SSE and scalar conversions' source and dest formats do not match.\n");
-		return -1;
-	}
-	if (conversion_blocks[sse_conv_index].attributes != conversion_blocks[scalar_conv_index].attributes) {
-		pixfc_log("SSE and scalar conversions' flags do not match.\n");
-		return -1;
-	}
-
-	printf("'%s' %dx%d\n", conversion_blocks[scalar_conv_index].name, in_file->width, in_file->height);
-
-	// Check if the scalar conversion routine has changed.
-	if (scalar_conv_index != prev_scalar_conv_index) {
-		scalar_conv_changed = 1;
-		prev_scalar_conv_index = scalar_conv_index;
-	}
-	
-	// Prepare output buffers
-	if (setup_output_buffers(scalar_conv_changed, dst_fmt, in_file->width, in_file->height) != 0) {
-		pixfc_log("Error setting up output buffers\n");
-		return -1;
-	}
-
-	// Do SSE conversion
-	if (do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height) != 0)
-		return -1;
-
-	// Do scalar conversion if required
-    if (scalar_conv_changed) {
-       if (do_image_conversion(scalar_conv_index, in, out_scalar, in_file->width, in_file->height) != 0)
-            return -1;
-    }
-
-	// Compare the two output buffers
-	if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
-		char sse_filename[128] = {0};
-		char scalar_filename[128] = {0};
-
-		SNPRINTF(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
-		SNPRINTF(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
-
-		printf("Dumping scalar and sse buffers\n");
-		write_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
-		write_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
-		return 1;
-	} else {
-		printf("OK\n");
 	}
 
 	return 0;

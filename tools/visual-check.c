@@ -108,36 +108,16 @@ int 		main(int argc, char **argv) {
 			// Release previous image and load image in new format
 			ALIGN_FREE(in);
 			
-			in_file = find_input_file_for_format(conversion_blocks[index].source_fmt);
+			in_file = find_input_file_for_format(conversion_blocks[index].source_fmt, 0);
 			if (in_file == NULL) {
 				pixfc_log("Error looking for input file for format '%s'\n",
 					   pixfmt_descriptions[conversion_blocks[index].source_fmt].name);
 				return 1;
 			}
 			
-			if (in_file->filename != NULL) {
-				char 	in_filename[128] = {0};
-				strcat(in_filename, PATH_TO_TEST_IMG);
-				strcat(in_filename, in_file->filename);
-
-				// Load buffer from specified file
-				if (get_buffer_from_file(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in_filename, (void **)&in) < 0) {
-					pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
-					return 1;
-				}
-			} else {
-				// no input file, assume its an RGB format
-				// try to generate the image from RGB buffer from GIMP
-
-				// allocate buffer
-				if (allocate_aligned_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, (void **) &in)){
-					pixfc_log("Error allocating memory\n");
-					return -1;
-				}
-				if (fill_argb_image_with_rgb_buffer(conversion_blocks[index].source_fmt, in_file->width, in_file->height, in) != 0) {
-					pixfc_log("Error getting buffer from RGB GIMP image\n");
-					return 1;
-				}
+			if (get_buffer_from_input_file(in_file, (void **) &in) != 0) {
+				pixfc_log("Error setting up input buffer");
+				return 1;
 			}
 		}
 		

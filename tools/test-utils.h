@@ -63,9 +63,18 @@ extern const InputFile		input_files[];
 extern const uint32_t		input_files_size;
 
 /*
- * Return the InputFile matching the given format, or NULL
+ * There might be several InputFile for the given format.
+ * Return the InputFile matching the given format at the given index (starting at 0), or NULL
  */
-const InputFile* 	find_input_file_for_format(PixFcPixelFormat format);
+const InputFile* 	find_input_file_for_format(PixFcPixelFormat format, uint32_t index);
+
+/*
+ * Allocate a buffer large enough for the given format, width and height, and
+ * fill it with whatever if directed by the InputFile struct
+ * Returns 0 if OK, -1 otherwise
+ */
+int32_t 		get_buffer_from_input_file(const InputFile*, void **buffer);
+
 
 /*
  * Print (using printf) the known pixel formats in PixFxPixelFormat
@@ -107,7 +116,8 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 /*
  * Validate the image dimensions (with function above) and allocate a 16-byte aligned memory buffer
  * large enough to contain an image in the give pixel format. The buffer can be released with free().
- * Returns 0 if OK, -1 otherwise
+ * Returns 0 if OK, -1 if memory allocation fails, -2 if the width / height are invalid for SSE conversion
+ * in the given pixel format
  */
 uint32_t	allocate_aligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t height, void **buffer);
 
@@ -197,7 +207,7 @@ int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelForma
 
 // Aligned allocation
 #define ALIGN_MALLOC(var, size, alignment)		do { int ret = posix_memalign((void **) &(var), (alignment), (size)); if (ret != 0) var = NULL; }while(0)
-#define ALIGN_FREE(var)							do { if (var) free(var); } while(0)
+#define ALIGN_FREE(var)							do { if (var) { free(var); (var) = NULL; } } while(0)
 
 #else
 

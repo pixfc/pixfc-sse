@@ -113,17 +113,22 @@ int 		main(int argc, char **argv) {
 			return 1;
 		}
 	} else {
-		// Otherwise, allocate a buffer of the given width and height
-		// and fill in buffer with predefined pattern
-		if (allocate_aligned_buffer(src_fmt, w, h, (void **)&in) != 0) {
-			pixfc_log("Error allocating in buffer\n");
-			return 1;
-		}
+		const InputFile *in_file;
 
-		// First, try to fill in buffer from GIMP image - if that fails,
-		// then use the pixel values from pixfmt_description
-		if (fill_argb_image_with_rgb_buffer(src_fmt, w, h, in) != 0)
-			fill_image(src_fmt, IMG_SIZE(src_fmt, w, h), in);
+		// Try instantiating an RGB image (will fail if src_fmt is not RGB)
+		if (fill_buffer_with_rgb_image(src_fmt, rgb_image_width, rgb_image_height,(void **) &in) != 0) {
+			// Otherwise, use one of our own InputFile to generate the input buffer
+			in_file = find_input_file_for_format(src_fmt, 0);
+			if (in_file == NULL) {
+				pixfc_log("Error looking for input file for format '%s'\n", pixfmt_descriptions[src_fmt].name);
+				return 1;
+			}
+
+			if (get_buffer_from_input_file(in_file, (void **) &in) != 0) {
+				pixfc_log("Error setting up input buffer");
+				return 1;
+			}
+		}
 
 		// save input buffer
 		write_buffer_to_file(src_fmt, w, h, "input", in);
@@ -146,8 +151,8 @@ int 		main(int argc, char **argv) {
 	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), flags) != 0)
 	{
 		pixfc_log("error creating struct pixfc\n");
-		free(in);
-		free(out);
+		ALIGN_FREE(in);
+		ALIGN_FREE(out);
 		return 1;
 	}
 

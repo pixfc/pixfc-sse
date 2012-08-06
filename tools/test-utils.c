@@ -24,6 +24,7 @@
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
 #include "test-utils.h"
+#include "rgb_image.h"
 
 #ifdef __INTEL_CPU__
 #include <emmintrin.h>
@@ -60,69 +61,98 @@ void _mm_storeu_si128(__m128i *dest, __m128i src) {
 	#endif
 #endif
 
-
+/*
+ * This array must be sorted as follows:
+ * - all elements describing the same pixel format must be contiguous (ie all PixFcYUYV must be next to each other),
+ * - the first element for a pixel format must be the one with the highest resolution and the subsequent elements
+ *   must be sorted be descending resolution.
+ */
 const InputFile		input_files[] = {
-	{
-		PixFcYUYV,
-		1280, 1024,
-		"1280x1024.yuyv",
-	},
-	{
-		PixFcUYVY,
-		1920, 1080,
-		"1920x1080.uyvy",
-	},
-	{
-		PixFcYUV422P,
-		1280, 1024,
-		"1280x1024.yuv422p",
-	},
-	{
-		PixFcYUV420P,
-		1280, 1024,
-		"1280x1024.yuv420p",
-	},
-	{
-		PixFcV210,
-		1920, 1080,
-		"1920x1080.v210",
-	},
-	{
-		PixFcARGB,
-		1920, 1080,
-		//48,1,
-		NULL,
-	},
-	{
-		PixFcBGRA,
-		1920, 1080,
-		NULL,
-	},
-	{
-		PixFcRGB24,
-		1920, 1080,
-		NULL,
-	},
-	{
-		PixFcBGR24,
-		1920, 1080,
-		NULL,
-	},
+
+	{	PixFcYUYV,		1280, 	1024,		"1280x1024.yuyv",	},
+	{	PixFcYUYV,		48, 	1,			NULL,				},
+	{	PixFcYUYV,		32, 	1,			NULL,				},
+	{	PixFcYUYV,		16, 	1,			NULL,				},
+
+	{	PixFcUYVY,		1920, 	1080,		"1920x1080.uyvy",	},
+	{	PixFcUYVY,		48, 	1,			NULL,				},
+	{	PixFcUYVY,		32, 	1,			NULL,				},
+	{	PixFcUYVY,		16, 	1,			NULL,				},
+
+	{	PixFcYUV422P,	1280, 	1024,		"1280x1024.yuv422p",},
+	{	PixFcYUV422P,	32, 	1,			NULL,				},
+
+	{	PixFcYUV420P,	1280, 	1024,		"1280x1024.yuv420p",},
+	{	PixFcYUV420P,	32, 	2,			NULL,				},
+
+	{	PixFcV210,		1920, 	1080,		"1920x1080.v210",	},
+	{	PixFcV210,		1280, 	720,		NULL,				},
+	{	PixFcV210,		48, 	1,			NULL,				},
+	{	PixFcV210,		32, 	1,			NULL,				},
+	{	PixFcV210,		16, 	1,			NULL,				},
+
+	{	PixFcARGB,		1920, 	1080,		NULL,				},
+	{	PixFcARGB,		32,		2,			NULL,				}, // to test to YUV420p
+	{	PixFcARGB,		48, 	1,			NULL,				}, // to test to v210
+	{	PixFcARGB,		16, 	1,			NULL,				}, // to test to v210
+
+	{	PixFcBGRA,		1920, 	1080,		NULL,				},
+	{	PixFcBGRA,		32, 	2,			NULL,				},
+	{	PixFcBGRA,		48, 	1,			NULL,				},
+	{	PixFcBGRA,		16, 	1,			NULL,				},
+
+	{	PixFcRGB24,		1920, 	1080,		NULL,				},
+	{	PixFcRGB24,		32, 	2,			NULL,				},
+	{	PixFcRGB24,		48, 	1,			NULL,				},
+	{	PixFcRGB24,		16, 	1,			NULL,				},
+
+	{	PixFcBGR24,		1920, 	1080,		NULL,				},
+	{	PixFcBGR24,		32, 	2,			NULL,				},
+	{	PixFcBGR24,		48, 	1,			NULL,				},
+	{	PixFcBGR24,		16, 	1,			NULL,				},
 };
 const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
 
 
 //
 // Return the InputFile matching the given format, or NULL
-const InputFile* 	find_input_file_for_format(PixFcPixelFormat format){
-	uint32_t	index = input_files_size;
+const InputFile* 	find_input_file_for_format(PixFcPixelFormat format, uint32_t index){
+	uint32_t	count = 0;
 
-	while (index-- > 0) {
-		if (input_files[index].format == format)
-			return &input_files[index];
+	while (count < input_files_size) {
+		if ((input_files[count].format == format) && (index-- == 0))
+			return &input_files[count];
+
+		count++;
 	}
 
 	return NULL;
+}
+
+int32_t 		get_buffer_from_input_file(const InputFile* in_file, void **buffer) {
+	if (in_file->filename != NULL) {
+			char 	in_filename[128] = {0};
+			strcat(in_filename, PATH_TO_TEST_IMG);
+			strcat(in_filename, in_file->filename);
+
+			// Load buffer from specified file
+			if (get_buffer_from_file(in_file->format, in_file->width, in_file->height, in_filename, buffer) < 0) {
+				pixfc_log("Error getting buffer from input file '%s'\n", in_file->filename);
+				return -1;
+			}
+		} else {
+			// no input file, fill the buffer with a know pattern
+
+			// allocate buffer
+			if (allocate_aligned_buffer(in_file->format, in_file->width, in_file->height, buffer)){
+				pixfc_log("Error allocating memory\n");
+				return -1;
+			}
+
+			fill_image(in_file->format, IMG_SIZE(in_file->format, in_file->width, in_file->height), buffer);
+		}
+
+	return 0;
 }
 
 void 				print_known_pixel_formats() {
@@ -241,7 +271,7 @@ uint32_t	allocate_aligned_buffer(PixFcPixelFormat fmt, uint32_t width, uint32_t 
 	// validate buffer dimensions
 	if (validate_image_dimensions(fmt, width, height) != 0) {
 		pixfc_log("buffer size error\n");
-		return -1;
+		return -2;
 	}
 
 	//  allocate image buffer
