@@ -12,6 +12,17 @@ elseif(UNIX)
 endif(APPLE)
 
 #
+# TIME CONVERSIONS TARGET
+#
+# Create groups for XCode and VS
+source_group("source files" FILES time_conversions.c test-utils.c)
+source_group("header files" FILES test-utils.h)
+# Create app
+add_executable(time_conversions time_conversions.c test-utils.c test-utils.h)
+target_link_libraries(time_conversions ${TOOLS_LIBS})
+
+
+#
 # UNIT TESTING TARGET
 #
 # Create groups for XCode and VS

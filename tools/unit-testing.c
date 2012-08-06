@@ -298,10 +298,9 @@ uint32_t	check_pixfc_flags() {
 	}
 	pixfc_log("OK !\n");
 
-
 	// NoSSE flag
 	pixfc_log("Checking NoSSE flag\n");
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE, convert_v210_to_any_rgb_nonsse) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE, upsample_n_convert_v210_to_any_rgb_nonsse) != 0) {
 		pixfc_log("NoSSE flag check failed\n");
 		return -1;
 	}
@@ -428,7 +427,7 @@ static uint32_t do_conversion(uint32_t index, uint32_t w, uint32_t h) {
 	return 0;
 }
 
-static uint32_t check_v210_conversion_buffer_sizes() {
+static uint32_t check_conversion_buffer_sizes() {
 	static const uint32_t	w_16_1[] = {16, 16*2, 16*3, 16*4, 16*5, 16*6, 16, 16*2, 16*3, 16*4, 16*5, 16*6, 720, 720, 960, 960+16, 960+32, 960+48, 1280, 1920};
 	static const uint32_t	h_16_1[] = {1,  1,    1,    1,    1,    1,    2,  2,    2,    2,    2,    2,    480, 576, 720,  720,    720,    720,   1024, 1080};
 	static const uint32_t 	size_count_16_1 = sizeof(w_16_1)/sizeof(w_16_1[0]);
@@ -504,11 +503,16 @@ static uint32_t check_v210_conversion_buffer_sizes() {
 
 /*
  * Here we run a few tests to make sure things are sound internally
- * and also to print some averages of conversion latency.
  */
 int 				main(int argc, char **argv) {
 	PixFcPixelFormat	source_fmt = PixFcFormatCount;
 	PixFcPixelFormat	dest_fmt = PixFcFormatCount;
+
+	// SSE2 / SSSE3 and SSE41 are required to run this app.
+	if (does_cpu_support(CPUID_FEATURE_SSE41 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE2) != 0) {
+		pixfc_log("CPU does not support required SSE features - exiting\n");
+		return 1;
+	}
 
 	if (argc >= 2)
 		source_fmt = find_matching_pixel_format(argv[1]);
@@ -531,10 +535,10 @@ int 				main(int argc, char **argv) {
 	pixfc_log("\n");
 	pixfc_log("\n");
 	pixfc_log("Running PixFcFlags checks ...\n");
-	if (check_pixfc_flags()!= 0)
+	if (check_pixfc_flags()!= 0) {
 		pixfc_log("FAILED\n");
-		// dont exit as this one may fail if the CPU doesnt have SSSE3
-	else
+		return -1;
+	} else
 		pixfc_log("PASSED\n");
 
 
@@ -558,8 +562,8 @@ int 				main(int argc, char **argv) {
 
 	pixfc_log("\n");
 	pixfc_log("\n");
-	pixfc_log("Testing v210 conversions with multiple buffer sizes\n");
-	if (check_v210_conversion_buffer_sizes() != 0) {
+	pixfc_log("Testing conversions with multiple buffer sizes\n");
+	if (check_conversion_buffer_sizes() != 0) {
 		pixfc_log("FAILED\n");
 		return -1;
 	}

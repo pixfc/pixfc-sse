@@ -24,7 +24,6 @@
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
 #include "test-utils.h"
-#include "rgb_image.h"
 
 #ifdef __INTEL_CPU__
 #include <emmintrin.h>

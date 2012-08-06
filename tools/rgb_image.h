@@ -61,12 +61,12 @@
 #define RGB_IMAGE_H_
 
 #ifdef WIN32
-static unsigned int rgb_image_width = 0;
-static unsigned int rgb_image_height = 0;
+extern unsigned int rgb_image_width;
+extern unsigned int rgb_image_height;
 #else
 /*  GIMP header image file format (RGB) */
-static unsigned int rgb_image_width = 1920;
-static unsigned int rgb_image_height = 1080;
+extern unsigned int rgb_image_width;
+extern unsigned int rgb_image_height;
 #endif
 
 /*

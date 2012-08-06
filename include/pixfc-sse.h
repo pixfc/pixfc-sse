@@ -100,7 +100,6 @@ typedef enum {
 
 	//
 	// Force the use of a non-SSE conversion routine.
-	// (Using this flag implies PixFcFlag_NNbResamplingOnly).
 	PixFcFlag_NoSSE	=				(1 << 0),
 	// Force the use of a SSE2-only conversion routine
 	// (ie. exclude Non-SSE, SSSE3 and SSE41 conversion routines)
@@ -162,6 +161,9 @@ void			destroy_pixfc(struct PixFcSSE*);
  * Error codes
  */
 enum {
+	// The SSE features required are not available on the executing CPU.
+	PixFc_NoCPUSupport = -6,
+
 	// Source image has an invalid row size
 	PixFc_InvalidSourceImageRowSize = -5,
 	

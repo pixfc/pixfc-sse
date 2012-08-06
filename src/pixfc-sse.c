@@ -39,13 +39,8 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	}
 
 	// If we were told to require conversion blocks performing NNB resampling,
-	// enforce it, but keep going if the user asked for a non-SSE routine
-	// (PixFcFlag_NoSSE) but did not specify NNB resampling
-	// (PixFcFlag_NNbResamplingOnly not set). (because Some non-SSE conversion
-	// blocks only do NNB resampling, so then return the non-SSE routine anyway
-	// as there is no other routine that would satisfy the NoSSE flag)
+	// enforce it.
 	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))) {
-	//	&& ! ((flags & PixFcFlag_NoSSE) && ((flags & PixFcFlag_NNbResamplingOnly) == 0))){
 		dprint("Skipping '%s' - Enforcing NNbResampling flag\n", block->name);
 		return PixFc_UnsupportedConversionError;
 	}
@@ -71,14 +66,6 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PixFc_UnsupportedConversionError;
 	}
 
-	// If the cpu does not have the required features, error out.
-	if (does_cpu_support(block->required_cpu_features) != 0) {
-		dprint("Skipping '%s' - CPU feature mismatch:\n", block->name);
-		dprint("Required CPU features:  %#08llx\n", (long long unsigned int)block->required_cpu_features);
-		dprint("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
-		return PixFc_UnsupportedConversionError;
-	}
-
 	// If we were told to use an SSE2-only routine, make sure that's the case
 	if ((flags & PixFcFlag_SSE2Only) && (block->required_cpu_features != CPUID_FEATURE_SSE2)) {
 		dprint("Skipping '%s' - Enforcing FORCE_SSE2_ONLY flag\n", block->name);
@@ -90,6 +77,21 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		dprint("Skipping '%s' - Enforcing FORCE_SSE2_SSSE3_ONLY flag\n", block->name);
 		return PixFc_UnsupportedConversionError;
 	}
+
+	// If the cpu does not have the required features, error out.
+	if (does_cpu_support(block->required_cpu_features) != 0) {
+		dprint("Skipping '%s' - CPU feature mismatch:\n", block->name);
+		dprint("Required CPU features:  %#08llx\n", (long long unsigned int)block->required_cpu_features);
+		dprint("Supported CPU features: %#08llx\n", (long long unsigned int)get_cpu_features());
+
+		// If both 'PixFcFlag_SSE2_SSSE3Only' and 'PixFcFlag_SSE2Only' are not set,
+		// then return PixFc_UnsupportedConversionError, so we keep looking for a potential
+		// conversion block supported by the CPU. However, if either of these 2 flags is present,
+		// return PixFc_NoCPUSupport since the user requested a specific SSE version, but the CPU
+		// does not support it.
+		return ((! (flags & PixFcFlag_SSE2_SSSE3Only)) || (! (flags & PixFcFlag_SSE2Only))) ? PixFc_UnsupportedConversionError : PixFc_NoCPUSupport;
+	}
+
 	
 	//
 	// At this stage, we have found a conversion block which matches the flags given to us.
