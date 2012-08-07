@@ -4,8 +4,8 @@ Linux desk 2.6.32-28-generic #55-Ubuntu SMP Mon Jan 10 23:42:43 UTC 2011 x86_64 
 gcc (Ubuntu 4.4.3-4ubuntu5) 4.4.3
 
 
-Mac OSX 10.6.6
-i686-apple-darwin10-gcc-4.2.1 (GCC) 4.2.1 (Apple Inc. build 5664)
+Mac OSX 10.7.4
+Apple clang version 3.1 (tags/Apple/clang-318.0.58) (based on LLVM 3.1svn)
 
 =========        Hardware        =========
 processor	: 0

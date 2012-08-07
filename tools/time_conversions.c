@@ -107,7 +107,7 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelF
 	pixfc_log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
 	printf("%-80s\t%10s\t%10s\t%10s\t%10s\n","Conversion Block Name", "Avg Time(ms)", "Avg User(ms)",
 			"Avg Sys(ms)", "Total Ctx Sw");
-	fprintf(file, "Conversion Block Name,Avg Time(ms),Avg User Time(ms),Avg Sys Time(ms),Total Ctx Sw\n");
+	fprintf(file, "Source,Destination,Standard,SSE,Resampling,Avg Time(ms),Avg User Time(ms),Avg Sys Time(ms),Total Ctx Sw\n");
 
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {

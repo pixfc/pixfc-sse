@@ -93,7 +93,7 @@ DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_sse2_ssse3, 	src_fmt, dst_fmt, 		CP
 
 // NNB resampling SSE41 {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
-DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3_sse41, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	NNB_RESAMPLING, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix " - Fr - SSE2/SSSE3/SSE41 - fast resampling")
+DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3_sse41, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	NNB_RESAMPLING, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix " - FR - SSE2/SSSE3/SSE41 - fast resampling")
 #define		DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_sse2_ssse3_sse41, 	src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	BT601_CONVERSION | NNB_RESAMPLING, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix " - bt.601 - SSE2/SSSE3/SSE41 - fast resampling")
 #define		DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix)\
