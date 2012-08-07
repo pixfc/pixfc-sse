@@ -770,6 +770,30 @@ int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat d
 	return index;
 }
 
+int32_t	make_conv_block_name_csv_friendly(uint32_t index, char **csv_name)
+{
+	char src_fmt[32] = {0};
+	char dest_fmt[32] = {0};
+	char conv_std[32] = {0};
+	char sse_features[32] = {0};
+	char resampling[32] = {0};
+	char csv_friendly_name[255] = {0};
+	
+	// Split the name
+	if (sscanf(conversion_blocks[index].name, "%s to %s - %s - %s - %20c", src_fmt, dest_fmt, conv_std, sse_features, resampling) != 5) {
+		pixfc_log("Error parsing conversion block name '%s' to CSV name\n", conversion_blocks[index].name);
+		return -1;
+	}
+	
+	SNPRINTF(csv_friendly_name, sizeof(csv_friendly_name), "%s,%s,%s,%s,%s", src_fmt, dest_fmt, conv_std, sse_features, resampling);
+	
+	*csv_name = STRDUP(csv_friendly_name);
+	if (*csv_name == NULL)
+		return -1;
+	
+	return 0;
+}
+
 
 // Return the amount of ticks in nanoseconds elapsed since startup
 ticks		getticks() {

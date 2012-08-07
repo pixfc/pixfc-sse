@@ -188,6 +188,13 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
  */
 int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes);
 
+/*
+ * Make conversion block name CSV friendly by replacing " - " with ", "
+ * CSV friendly name is returned in csv_name and must be freed by caller.
+ * Return 0 if O, -1 if error
+ */
+int32_t				make_conv_block_name_csv_friendly(uint32_t index, char **csv_name);
+
 
 #if defined(__linux__) || defined(__APPLE__)
 
@@ -203,6 +210,8 @@ int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelForma
 #define READ									read
 #define WRITE									write
 #define	SNPRINTF								snprintf
+#define STRDUP									strdup
+#define SSCANF									sscanf
 #define CLOSE									close
 
 // Aligned allocation
@@ -225,6 +234,8 @@ int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelForma
 #define READ									_read
 #define WRITE									_write
 #define SNPRINTF								_snprintf
+#define STRDUP									_strdup
+#define SSCANF									_sscanf
 #define CLOSE									_close
 
 // Aligned allocation

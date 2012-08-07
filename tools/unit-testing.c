@@ -129,12 +129,13 @@ static int			check_unaligned_conversions() {
 
 static uint32_t		check_conversion_enumeration() {
 	uint32_t 			index;
-	struct PixFcSSE * 	pixfc = NULL;
+	struct PixFcSSE		*pixfc = NULL;
 	uint32_t			w = 96, h = 2;
+	char				*csv_name = NULL;
 
 	for(index = 0; index < conversion_blocks_count; index++) {
 		pixfc_log("Checking '%s' ... \n", conversion_blocks[index].name);
-
+		
 		if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
 			pixfc_log("Unable to test conversion block\n");
 			continue;
@@ -152,6 +153,11 @@ static uint32_t		check_conversion_enumeration() {
 
 		if (pixfc->dest_fmt!= conversion_blocks[index].dest_fmt) {
 			pixfc_log("Wrong destination format returned for index %u\n", index);
+			return -1;
+		}
+		
+		if (make_conv_block_name_csv_friendly(index, &csv_name) != 0) {
+			pixfc_log("Error creating CSV friendly name for this conversion block\n");
 			return -1;
 		}
 		pixfc_log(" OK !\n");

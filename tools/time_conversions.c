@@ -90,12 +90,24 @@ done:
 
 static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt) {
 	uint32_t			index = 0;
-	struct PixFcSSE *	pixfc;
+	struct PixFcSSE		*pixfc;
 	struct timings		timings;
-
+	FILE				*file;
+	char				filename[255] = {0};
+	char				*csv_conv_name = NULL;
+	
+	SNPRINTF(filename, sizeof(filename), "timings_%dx%d_%d_runs_per_conversion.csv", WIDTH, HEIGHT, NUM_RUNS);
+	
+	file = fopen(filename, "w");
+	if (file == NULL) {
+		pixfc_log("Error opening the CSV file for writing\n");
+		return -1;
+	}
+	
 	pixfc_log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
-	printf("%-80s\t%10s\t%10s\t%10s\t%5s\n","Conversion Block Name", "Avg Time", "Avg User Time",
-			"Avg Sys Time", "Ctx Sw");
+	printf("%-80s\t%10s\t%10s\t%10s\t%10s\n","Conversion Block Name", "Avg Time(ms)", "Avg User(ms)",
+			"Avg Sys(ms)", "Total Ctx Sw");
+	fprintf(file, "Conversion Block Name,Avg Time(ms),Avg User Time(ms),Avg Sys Time(ms),Total Ctx Sw\n");
 
 	// Loop over all conversion blocks
 	for(index = 0; index < conversion_blocks_count; index++) {
@@ -119,13 +131,21 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelF
 
 		destroy_pixfc(pixfc);
 
-		printf("%-80s\t%10f\t%10f\t%10f\t%5.1f\n",
+		printf("%-80s\t%10f\t%10f\t%10f\t%10llu\n",
 				conversion_blocks[index].name,
 				(double)((double)timings.total_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.user_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.sys_time_ns / (double) (NUM_RUNS * 1000000)),
-				(double)((double)(timings.vcs + timings.ivcs) / (double) NUM_RUNS )
+				timings.vcs + timings.ivcs
 		);
+		make_conv_block_name_csv_friendly(index, &csv_conv_name);
+		fprintf(file, "%s,%.3f,%.3f,%.3f,%llu\n",
+				csv_conv_name,
+				(double)((double)timings.total_time_ns / (double) (NUM_RUNS * 1000000)),
+				(double)((double)timings.user_time_ns / (double) (NUM_RUNS * 1000000)),
+				(double)((double)timings.sys_time_ns / (double) (NUM_RUNS * 1000000)),
+				timings.vcs + timings.ivcs);
+		free(csv_conv_name);
 
 		// Add a blank line if the next conversion block uses different
 		// source or destinaton format
@@ -136,6 +156,8 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelF
 								conversion_blocks[index].dest_fmt)))
 			printf("\n");
 	}
+	
+	fclose(file);
 
 	return 0;
 }
