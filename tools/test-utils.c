@@ -148,7 +148,7 @@ int32_t 		get_buffer_from_input_file(const InputFile* in_file, void **buffer) {
 				return -1;
 			}
 
-			fill_image(in_file->format, IMG_SIZE(in_file->format, in_file->width, in_file->height), buffer);
+			fill_image(in_file->format, IMG_SIZE(in_file->format, in_file->width, in_file->height), *buffer);
 		}
 
 	return 0;
