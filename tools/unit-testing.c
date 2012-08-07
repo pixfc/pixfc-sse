@@ -31,116 +31,6 @@
 #include "platform_util.h"
 #include "test-utils.h"
 
-#define		WIDTH				1920
-#define 	HEIGHT				1080
-#define		NUM_RUNS			100
-#define		NUM_INPUT_BUFFERS	5
-
-
-
-static int		time_conversion_block(struct PixFcSSE *pixfc, struct timings *timings) {
-	void *					input[NUM_INPUT_BUFFERS] = {0};
-	void *					output = NULL;
-	uint32_t				w = WIDTH;
-	uint32_t				h = HEIGHT;
-	uint32_t				run_count;
-	uint32_t				i;		// index into the input buffer array
-	int						result = -1;
-
-	// Allocate and fill source buffers
-	for ( i = 0; i < NUM_INPUT_BUFFERS; i++) {
-		if (allocate_aligned_buffer(pixfc->source_fmt, w, h, &input[i]) != 0) {
-			pixfc_log("Error allocating input buffer\n");
-			goto done;
-		}
-
-		fill_image(pixfc->source_fmt, (w * h), input[i]);
-	}
-
-	// Allocate destination buffers
-	if (allocate_aligned_buffer(pixfc->dest_fmt, w, h, &output) != 0){
-		pixfc_log("Error allocating out buffer\n");
-		goto done;
-	}
-
-	i = 0;
-	for(run_count = 0; run_count < NUM_RUNS; run_count++) {
-		// Perform conversion
-		do_timing(NULL);
-		pixfc->convert(pixfc, input[i], output);
-		do_timing(timings);
-
-		// Force context switch to invalidate caches
-		MSSLEEP(15);
-
-		// Move on to next buffer
-		i = (i + 1) < NUM_INPUT_BUFFERS ? (i + 1) : 0;
-	}
-
-	// All went well
-	result = 0;
-
-done:
-	// Free resources
-	i = NUM_INPUT_BUFFERS;
-	while (i-- > 0)
-		ALIGN_FREE(input[i]);
-	ALIGN_FREE(output);
-
-	return result;
-}
-
-static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt) {
-	uint32_t			index = 0;
-	struct PixFcSSE *	pixfc;
-	struct timings		timings;
-
-	pixfc_log("Input size: %d x %d - %d run(s) per conversion routine.\n", WIDTH, HEIGHT, NUM_RUNS);
-	printf("%-80s\t%10s\t%10s\t%10s\t%5s\n","Conversion Block Name", "Avg Time", "Avg User Time",
-			"Avg Sys Time", "Ctx Sw");
-
-	// Loop over all conversion blocks
-	for(index = 0; index < conversion_blocks_count; index++) {
-		if ((source_fmt != PixFcFormatCount) && (conversion_blocks[index].source_fmt != source_fmt))
-			continue;
-
-		if ((dest_fmt != PixFcFormatCount) && (conversion_blocks[index].dest_fmt != dest_fmt))
-			continue;
-
-		if (create_pixfc_for_conversion_block(index, &pixfc, WIDTH, HEIGHT) != 0) {
-			printf("Unable to test conversion block '%s'\n", conversion_blocks[index].name);
-			continue;
-		}
-
-		// Reset timing info
-		memset((void *)&timings, 0, sizeof(timings));
-
-		// Time this conversion block
-		if (time_conversion_block(pixfc, &timings) != 0)
-			return -1;
-
-		destroy_pixfc(pixfc);
-
-		printf("%-80s\t%10f\t%10f\t%10f\t%5.1f\n",
-				conversion_blocks[index].name,
-				(double)((double)timings.total_time_ns / (double) (NUM_RUNS * 1000000)),
-				(double)((double)timings.user_time_ns / (double) (NUM_RUNS * 1000000)),
-				(double)((double)timings.sys_time_ns / (double) (NUM_RUNS * 1000000)),
-				(double)((double)(timings.vcs + timings.ivcs) / (double) NUM_RUNS )
-		);
-
-		// Add a blank line if the next conversion block uses different
-		// source or destinaton format
-		if (((index + 1) < conversion_blocks_count)
-				&& ((conversion_blocks[(index + 1)].source_fmt !=
-						conversion_blocks[index].source_fmt)
-						|| (conversion_blocks[(index + 1)].dest_fmt !=
-								conversion_blocks[index].dest_fmt)))
-			printf("\n");
-	}
-
-	return 0;
-}
 
 static uint32_t			check_formats_enum() {
 	uint32_t		index;
@@ -237,7 +127,7 @@ static int			check_unaligned_conversions() {
 	return 0;
 }
 
-uint32_t		check_conversion_enumeration() {
+static uint32_t		check_conversion_enumeration() {
 	uint32_t 			index;
 	struct PixFcSSE * 	pixfc = NULL;
 	uint32_t			w = 96, h = 2;
@@ -270,7 +160,7 @@ uint32_t		check_conversion_enumeration() {
 	return 0;
 }
 
-uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt, PixFcFlag flag, ConversionBlockFn expected_conv_fn) {
+static uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt, PixFcFlag flag, ConversionBlockFn expected_conv_fn) {
 	struct PixFcSSE *	pixfc;
 	uint32_t			result = -1;
 
@@ -289,7 +179,7 @@ uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt, 
 
 // Checks that passing PixFcFlags_* results in the right conversion block
 // being chosen.
-uint32_t	check_pixfc_flags() {
+static uint32_t	check_pixfc_flags() {
 	// Default flag
 	pixfc_log("Checking default flag\n");
 	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_Default, upsample_n_convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
@@ -315,6 +205,15 @@ uint32_t	check_pixfc_flags() {
 	}
 	pixfc_log("OK !\n");
 
+	
+	pixfc_log("Checking NNB flag\n");
+	// NNBflag - This one is expected to fail
+	if (do_flag_check(PixFcV210, PixFcYUYV, PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) == 0) {
+		pixfc_log("NNB flags check failed\n");
+		return -1;
+	}
+	pixfc_log("OK !\n");
+
 
 	pixfc_log("Checking SSE2Only flag\n");
 	// SSE2Only flag
@@ -323,6 +222,7 @@ uint32_t	check_pixfc_flags() {
 		return -1;
 	}
 	pixfc_log("OK !\n");
+
 	
 	pixfc_log("Checking SSE2Only flag\n");
 	// SSE2_SSSE3Only flag
@@ -331,7 +231,6 @@ uint32_t	check_pixfc_flags() {
 		return -1;
 	}
 	pixfc_log("OK !\n");
-	
 
 
 	pixfc_log("Checking SSE2Only | NNB flag\n");
@@ -514,12 +413,6 @@ int 				main(int argc, char **argv) {
 		return 1;
 	}
 
-	if (argc >= 2)
-		source_fmt = find_matching_pixel_format(argv[1]);
-
-	if (argc == 3)
-		dest_fmt = find_matching_pixel_format(argv[2]);
-
 	pixfc_log("\n");
 	pixfc_log("\t\tU N I T   T E S T I N G\n");
 
@@ -568,17 +461,7 @@ int 				main(int argc, char **argv) {
 		return -1;
 	}
 	pixfc_log("PASSED\n");
-
-	pixfc_log("\n");
-	pixfc_log("\n");
-	pixfc_log("Checking conversion block timing ... \n");
-	if (time_conversion_blocks(source_fmt, dest_fmt) != 0) {
-		pixfc_log("FAILED\n");
-		return -1;
-	}
-	pixfc_log("PASSED\n");
-
-	pixfc_log("\n");
+	
 	return 0;
 }
 
