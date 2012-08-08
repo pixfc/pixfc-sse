@@ -63,14 +63,14 @@
 		uint32_t  pixel_count;\
 		\
 		for(pixel_count = 0; pixel_count < 8; pixel_count += 2) {\
-			out[0] = (in[0] + offset[0]) * coeffs[0][0] + (in[8] + offset[1]) * coeffs[0][1] + (in[8 + 1] + offset[2]) * coeffs[0][2];\
-			out[8] = (in[0] + offset[0]) * coeffs[1][0] + (in[8] + offset[1]) * coeffs[1][1] + (in[8 + 1] + offset[2]) * coeffs[1][2];\
-			out[16]= (in[0] + offset[0]) * coeffs[2][0] + (in[8] + offset[1]) * coeffs[2][1] + (in[8 + 1] + offset[2]) * coeffs[2][2];\
+			out[0] = (uint16_t)((in[0] + offset[0]) * coeffs[0][0] + (in[8] + offset[1]) * coeffs[0][1] + (in[8 + 1] + offset[2]) * coeffs[0][2]);\
+			out[8] = (uint16_t)((in[0] + offset[0]) * coeffs[1][0] + (in[8] + offset[1]) * coeffs[1][1] + (in[8 + 1] + offset[2]) * coeffs[1][2]);\
+			out[16]= (uint16_t)((in[0] + offset[0]) * coeffs[2][0] + (in[8] + offset[1]) * coeffs[2][1] + (in[8 + 1] + offset[2]) * coeffs[2][2]);\
 			out++;\
 			in++;\
-			out[0] = (in[0] + offset[0]) * coeffs[0][0] + (in[8 - 1] + offset[1]) * coeffs[0][1] + (in[8] + offset[2]) * coeffs[0][2];\
-			out[8] = (in[0] + offset[0]) * coeffs[1][0] + (in[8 - 1] + offset[1]) * coeffs[1][1] + (in[8] + offset[2]) * coeffs[1][2];\
-			out[16]= (in[0] + offset[0]) * coeffs[2][0] + (in[8 - 1] + offset[1]) * coeffs[2][1] + (in[8] + offset[2]) * coeffs[2][2];\
+			out[0] = (uint16_t)((in[0] + offset[0]) * coeffs[0][0] + (in[8 - 1] + offset[1]) * coeffs[0][1] + (in[8] + offset[2]) * coeffs[0][2]);\
+			out[8] = (uint16_t)((in[0] + offset[0]) * coeffs[1][0] + (in[8 - 1] + offset[1]) * coeffs[1][1] + (in[8] + offset[2]) * coeffs[1][2]);\
+			out[16]= (uint16_t)((in[0] + offset[0]) * coeffs[2][0] + (in[8 - 1] + offset[1]) * coeffs[2][1] + (in[8] + offset[2]) * coeffs[2][2]);\
 			out++;\
 			in++;\
 		}\
@@ -86,14 +86,14 @@
 		uint32_t  pixel_count;\
 		\
 		for(pixel_count = 0; pixel_count < 8; pixel_count += 2) {\
-			out[0] = (in[0] + offset[0]) * coeffs[0][0] + (in[8] + offset[1]) * coeffs[0][1] + (in[8 + 1] + offset[2]) * coeffs[0][2];\
-			out[8] = (in[0] + offset[0]) * coeffs[1][0] + (in[8] + offset[1]) * coeffs[1][1] + (in[8 + 1] + offset[2]) * coeffs[1][2];\
-			out[16]= (in[0] + offset[0]) * coeffs[2][0] + (in[8] + offset[1]) * coeffs[2][1] + (in[8 + 1] + offset[2]) * coeffs[2][2];\
+			out[0] = (uint16_t)((in[0] + offset[0]) * coeffs[0][0] + (in[8] + offset[1]) * coeffs[0][1] + (in[8 + 1] + offset[2]) * coeffs[0][2]);\
+			out[8] = (uint16_t)((in[0] + offset[0]) * coeffs[1][0] + (in[8] + offset[1]) * coeffs[1][1] + (in[8 + 1] + offset[2]) * coeffs[1][2]);\
+			out[16]= (uint16_t)((in[0] + offset[0]) * coeffs[2][0] + (in[8] + offset[1]) * coeffs[2][1] + (in[8 + 1] + offset[2]) * coeffs[2][2]);\
 			out++;\
 			in++;\
-			out[0] = (in[0] + offset[0]) * coeffs[0][0] + (in[16 - 1] + offset[1]) * coeffs[0][1] + (in[16] + offset[2]) * coeffs[0][2];\
-			out[8] = (in[0] + offset[0]) * coeffs[1][0] + (in[16 - 1] + offset[1]) * coeffs[1][1] + (in[16] + offset[2]) * coeffs[1][2];\
-			out[16]= (in[0] + offset[0]) * coeffs[2][0] + (in[16 - 1] + offset[1]) * coeffs[2][1] + (in[16] + offset[2]) * coeffs[2][2];\
+			out[0] = (uint16_t)((in[0] + offset[0]) * coeffs[0][0] + (in[16 - 1] + offset[1]) * coeffs[0][1] + (in[16] + offset[2]) * coeffs[0][2]);\
+			out[8] = (uint16_t)((in[0] + offset[0]) * coeffs[1][0] + (in[16 - 1] + offset[1]) * coeffs[1][1] + (in[16] + offset[2]) * coeffs[1][2]);\
+			out[16]= (uint16_t)((in[0] + offset[0]) * coeffs[2][0] + (in[16 - 1] + offset[1]) * coeffs[2][1] + (in[16] + offset[2]) * coeffs[2][2]);\
 			out++;\
 			in++;\
 		}\

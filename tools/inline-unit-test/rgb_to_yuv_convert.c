@@ -53,7 +53,7 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 0; pixel_count < 8; pixel_count++) {\
-            *out++ = in[0] * coeffs[0][0] + in[8] * coeffs[0][1] + in[16] * coeffs[0][2] + offset[0];\
+            *out++ = (uint16_t)(in[0] * coeffs[0][0] + in[8] * coeffs[0][1] + in[16] * coeffs[0][2]) + offset[0];\
             in++;\
         }\
     }\
@@ -67,8 +67,8 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 0; pixel_count < 4; pixel_count++) {\
-            *out++ = in[0] * coeffs[1][0] + in[8] * coeffs[1][1] + in[16] * coeffs[1][2] + offset[1];\
-            *out++ = in[1] * coeffs[2][0] + in[8 + 1] * coeffs[2][1] + in[16 + 1] * coeffs[2][2] + offset[2];\
+            *out++ = (uint16_t)(in[0] * coeffs[1][0] + in[8] * coeffs[1][1] + in[16] * coeffs[1][2]) + offset[1];\
+            *out++ = (uint16_t)(in[1] * coeffs[2][0] + in[8 + 1] * coeffs[2][1] + in[16 + 1] * coeffs[2][2]) + offset[2];\
             in += 2;\
         }\
     }\
@@ -83,7 +83,7 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 1; pixel_count <= 8; pixel_count++) {\
-            *out++ = in[8] * coeffs[0][0] + in[1] * coeffs[0][1] + in[8 + 1] * coeffs[0][2] + offset[0];\
+            *out++ = (uint16_t)(in[8] * coeffs[0][0] + in[1] * coeffs[0][1] + in[8 + 1] * coeffs[0][2]) + offset[0];\
             in += 2;\
             if(pixel_count==4)\
                 in += 8;\
@@ -97,7 +97,7 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 1; pixel_count <= 8; pixel_count++) {\
-            *out++ = in[8 + 1] * coeffs[0][0] + in[0] * coeffs[0][1] + in[8] * coeffs[0][2] + offset[0];\
+            *out++ = (uint16_t)(in[8 + 1] * coeffs[0][0] + in[0] * coeffs[0][1] + in[8] * coeffs[0][2]) + offset[0];\
             in += 2;\
             if(pixel_count==4)\
                 in += 8;\
@@ -115,8 +115,8 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 0; pixel_count < 4; pixel_count++) {\
-            *out++ = in[8] * coeffs[1][0] + in[1] * coeffs[1][1] + in[8 + 1] * coeffs[1][2] + offset[1];\
-            *out++ = in[8] * coeffs[2][0] + in[1] * coeffs[2][1] + in[8 + 1] * coeffs[2][2] + offset[2];\
+            *out++ = (uint16_t)(in[8] * coeffs[1][0] + in[1] * coeffs[1][1] + in[8 + 1] * coeffs[1][2]) + offset[1];\
+            *out++ = (uint16_t)(in[8] * coeffs[2][0] + in[1] * coeffs[2][1] + in[8 + 1] * coeffs[2][2]) + offset[2];\
             in += 2;\
         }\
     }\
@@ -128,8 +128,8 @@
         uint32_t  pixel_count;\
         \
         for(pixel_count = 0; pixel_count < 4; pixel_count++) {\
-            *out++ = in[8 + 1] * coeffs[1][0] + in[0] * coeffs[1][1] + in[8] * coeffs[1][2] + offset[1];\
-            *out++ = in[8 + 1] * coeffs[2][0] + in[0] * coeffs[2][1] + in[8] * coeffs[2][2] + offset[2];\
+            *out++ = (uint16_t)(in[8 + 1] * coeffs[1][0] + in[0] * coeffs[1][1] + in[8] * coeffs[1][2]) + offset[1];\
+            *out++ = (uint16_t)(in[8 + 1] * coeffs[2][0] + in[0] * coeffs[2][1] + in[8] * coeffs[2][2]) + offset[2];\
             in += 2;\
         }\
     }\

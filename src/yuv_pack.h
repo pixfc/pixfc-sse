@@ -439,6 +439,7 @@ INLINE_NAME(pack_2_y_uv_vectors_to_1_v210_vector_sse2_ssse3_sse41, __m128i* inpu
 	_M(scratch) = _mm_blendv_epi8(_M(scratch3), _M(scratch), _M(blend_mask2));		// PBLENDVB		1	1
 	// (10-bit words)
 	// U01	0	V01		Y1	0	Y2		V23	0	U45		Y4	0	Y5
+	print_xmm10u("scratch", _AM(scratch));
 	
 	//
 	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);									// PSRLD        1	1
