@@ -57,7 +57,7 @@ typedef long long __m128i __attribute__ ((__vector_size__ (16), __may_alias__));
  * Here starts the Microsoft __m128i awesomeness
  */
 
-#define CONST_M128I_ARRAY(var, num_elem)		__declspec(align(16)) const __int64 var[2][(num_elem)]
+#define CONST_M128I_ARRAY(var, num_elem)		__declspec(align(16)) const __int64 var[(num_elem)][2]
 #define CONST_M128I(var, val64_1, val64_2)		__declspec(align(16)) static const __int64 var[] = { (val64_1), (val64_2) }
 #define M128I(var, val64_1, val64_2)			__declspec(align(16)) __int64 var[] = { (val64_1), (val64_2)}
 #define	_M(var)									(*((__m128i *)(var)))

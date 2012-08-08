@@ -184,10 +184,8 @@ void		convert_yuyv_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_buf
 	} else {\
 		printf("unknown source pixel format\n");\
 	}\
-	printf("Y %hhu U %hhu Y %hhu V %hhu\n", y1, u, y2, v);
 
 #define PACK_RGB(r, g, b, dst) \
-	printf("R %hhu G %hhu B %hhu\n", r, g, b);\
 	if (dest_fmt == PixFcARGB) {\
 		*(dst++) = 0;\
 		*(dst++) = CLIP_PIXEL(r);\

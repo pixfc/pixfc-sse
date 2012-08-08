@@ -130,10 +130,19 @@
 
 
 
+#ifndef WIN32
 #define dprintf(fmt, ...)  do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
                                 strrchr(__FILE__, '/')+1,\
                                 __LINE__, ## __VA_ARGS__);\
                                 fflush(stderr); } while(0)
+#else
+#define dprintf(fmt, ...)  do { fprintf (stderr, "[ %s:%-3d ] " fmt,\
+                                strrchr(__FILE__, '\\')+1,\
+                                __LINE__, ## __VA_ARGS__);\
+                                fflush(stderr); } while(0)
+
+#endif
+
 #ifdef DEBUG
 	void	print_xmm8u_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm10leu_array(uint32_t count, char *prefix, void *array);

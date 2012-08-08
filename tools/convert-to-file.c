@@ -115,8 +115,8 @@ int 		main(int argc, char **argv) {
 	} else {
 		const InputFile *in_file;
 
-		// Try instantiating an RGB image (will fail if src_fmt is not RGB)
-		if (fill_buffer_with_rgb_image(src_fmt, rgb_image_width, rgb_image_height,(void **) &in) != 0) {
+		// Try instantiating an RGB image (will fail if src_fmt is not RGB, or if the dimentsions dont match)
+		if (fill_buffer_with_rgb_image(src_fmt, w, h,(void **) &in) != 0) {
 			// Otherwise, use one of our own InputFile to generate the input buffer
 			in_file = find_input_file_for_format(src_fmt, 0);
 			if (in_file == NULL) {
@@ -124,9 +124,22 @@ int 		main(int argc, char **argv) {
 				return 1;
 			}
 
-			if (get_buffer_from_input_file(in_file, (void **) &in) != 0) {
-				pixfc_log("Error setting up input buffer");
-				return 1;
+			// if the dimensions of the input file match the requeted dimensions,
+			// use the input file.
+			if ((in_file->width == w) && (in_file->height == h))
+			{
+				if (get_buffer_from_input_file(in_file, (void **) &in) != 0) {
+					pixfc_log("Error setting up input buffer");
+					return 1;
+				}
+			} else {
+				// fill buffer with know pattern
+				if (allocate_aligned_buffer(src_fmt, w, h, (void**)&in)){
+					pixfc_log("Error allocating memory\n");
+					return -1;
+				}
+
+				fill_image(src_fmt, IMG_SIZE(src_fmt, w, h), in);
 			}
 		}
 

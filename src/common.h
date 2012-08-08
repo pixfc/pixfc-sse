@@ -31,8 +31,8 @@
 #endif
 
 // Clamp a pixel component's value to 0-255
-#define CLIP_PIXEL(x) 		((x) & 0xFF)
-#define CLIP_10BIT_PIXEL(x) ((x) & 0x3FF)
+#define CLIP_PIXEL(x) 		(uint8_t)( ((x) > 255) ? 255 : ((x) < 0) ? 0 : (x) )
+#define CLIP_10BIT_PIXEL(x) ( ((x) > 1023) ? 1023 : ((x) < 0) ? 0 : (x) )
 
 
 extern const float        rgb_8bit_to_yuv_8bit_coef[][3][3];
