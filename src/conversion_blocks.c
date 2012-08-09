@@ -293,7 +293,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGRA to YUYV
 	DECLARE_CONV_BLOCKS(convert_bgra_to_yuyv, downsample_n_convert_bgra_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGRA, PixFcYUYV, 16, 1, 2, 1, 1, "BGRA to YUYV"),
 
-	// BGRA to UYVYconvert_fn_prefix
+	// BGRA to UYVY
 	DECLARE_CONV_BLOCKS(convert_bgra_to_uyvy, downsample_n_convert_bgra_to_uyvy, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcBGRA, PixFcUYVY, 16, 1, 2, 1, 1, "BGRA to UYVY"),
 
 	// BGRA to YUV422P
