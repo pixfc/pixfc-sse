@@ -33,12 +33,12 @@
 
 #ifndef DEBUG
 	/*
-	 * Meanign of inline / static inline / extern inline is different in C99 std
+	 * Meaning of inline / static inline / extern inline is different in C99 std
 	 * http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
 	 *
 	 */
 	#ifdef C99_ENV
-		#define EXTERN_INLINE						inline
+		#define EXTERN_INLINE						inline 
 	#else
 		#define EXTERN_INLINE						extern inline
 	#endif
