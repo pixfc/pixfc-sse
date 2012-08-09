@@ -33,7 +33,7 @@ foreach(CUR_FILE ${INLINE_FILENAME})
         list(APPEND HEADER_LIST "../../src/${CUR_FILE}.h")
 endforeach(CUR_FILE)
 
-
+list(APPEND HEADER_LIST "inline-testing-common.h" "../../include/common/platform_util.h" "../../src/common.h")
 
 source_group("source files" FILES ${SOURCE_LIST})
 source_group("header files" FILES ${HEADER_LIST})
