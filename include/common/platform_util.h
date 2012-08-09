@@ -47,7 +47,7 @@ typedef long long __m128i __attribute__ ((__vector_size__ (16), __may_alias__));
  * http://permalink.gmane.org/gmane.comp.lib.cairo/14414
  */
 #define CONST_M128I_ARRAY(var, num_elem)				const __m128i var[(num_elem)]
-#define CONST_M128I_ARRAY_VAL(var, ignored, ...)		const __m128i var[]={__VA_ARGS__}
+#define M128I_ARRAY_VAL(var, ignored, ...)				__m128i var[]={__VA_ARGS__}
 #define CONST_M128I(var, val64_1, val64_2)				static const __m128i var = { val64_1, val64_2 }
 #define M128I(var, val64_1, val64_2)					__m128i var = { val64_1, val64_2 }
 // Use the macros below to access one __m128i element declared with the above macros.
@@ -61,7 +61,7 @@ typedef long long __m128i __attribute__ ((__vector_size__ (16), __may_alias__));
  */
 
 #define CONST_M128I_ARRAY(var, num_elem)				__declspec(align(16)) const __int64 var[(num_elem)][2]
-#define CONST_M128I_ARRAY_VAL(var, num_elem, ...)		__declspec(align(16)) const __int64 var[(num_elem)][2]={__VA_ARGS__}
+#define M128I_ARRAY_VAL(var, num_elem, ...)				__declspec(align(16)) __int64 var[(num_elem)][2]={__VA_ARGS__}
 #define CONST_M128I(var, val64_1, val64_2)				__declspec(align(16)) static const __int64 var[] = { (val64_1), (val64_2) }
 #define M128I(var, val64_1, val64_2)					__declspec(align(16)) __int64 var[] = { (val64_1), (val64_2)}
 // Use the macros below to access a variable declared with the above macros.
