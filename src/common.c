@@ -206,7 +206,7 @@ uint32_t			does_cpu_support(uint64_t mask) {
 }
 
 // Retrieve the features supported by the CPU
-INLINE uint64_t		get_cpu_features() {
+uint64_t		get_cpu_features() {
 	uint32_t	features[4]= {0};	// CPU feature Lo in [3], Hi in [2]
 
 #ifdef __INTEL_CPU__

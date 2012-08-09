@@ -771,7 +771,7 @@ extern const int32_t      yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3];
  * 32 bits, EDX in the lowest ones). Use the following macros to
  * determine which features are supported.
  */
-INLINE uint64_t		get_cpu_features();
+uint64_t		get_cpu_features();
 #define CPUID_FEATURE_SSE2	0x0000000004000000LL
 #define CPUID_FEATURE_SSE3	0x0000000100000000LL
 #define CPUID_FEATURE_SSSE3	0x0000020000000000LL
