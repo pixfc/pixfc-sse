@@ -410,8 +410,6 @@ static uint32_t check_conversion_buffer_sizes() {
  * Here we run a few tests to make sure things are sound internally
  */
 int 				main(int argc, char **argv) {
-	PixFcPixelFormat	source_fmt = PixFcFormatCount;
-	PixFcPixelFormat	dest_fmt = PixFcFormatCount;
 
 	// SSE2 / SSSE3 and SSE41 are required to run this app.
 	if (does_cpu_support(CPUID_FEATURE_SSE41 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE2) != 0) {
