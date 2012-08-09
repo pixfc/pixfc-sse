@@ -29,8 +29,7 @@
 
 #define CHECK_FN_10BIT_3IN(fn_suffix, out_count)\
     uint32_t    check_ ## fn_suffix() {\
-        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_8BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
-        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_10BIT_VECT, out_count, MAX_DIFF_8BIT,  compare_16bit_output);\
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_3_8BIT_VECT, out_count, MAX_DIFF_10BIT,  compare_16bit_output);\
         return 0;\
     }
 
