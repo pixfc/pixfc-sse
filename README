@@ -7,75 +7,26 @@ worst case scenario, PixFC-SSE falls back to a standard, non-SSE optimised
 conversion function if the CPU has no SSE features. This way, PixFC-SSE 
 guarantees the conversion will always happen.
 
+
 The latest version of PixFC-SSE can be found at 
 http://pixfc-sse.googlecode.com
 
 
-== HOWTO ==
+== USAGE ==
+PixFC comes with a simple command-line app (time_conversions) to quickly test 
+how fast it performs on a machine.
+
 Using PixFC in your own application is simple:
-- you first build PixFC as a static library,
+- you first build PixFC as a static library (or download a binary package 
+  containing a pre-compiled PixFC static library from the website),
 - update your application to use the conversion functions in PixFC and,
 - link the PixFC static library to your application.
 
-The next sections explain each of these steps.
-
-
-== BUILD ==
-PixFC-SSE uses CMake to support cross-platform builds. PixFC-SSE currently
-builds as a static library which you then link to your application. Building
-the PixFC-SSE static library depends on the target platform. First go to the 
-build/ directory, then:
-
-- On Linux platforms, run 'cmake ..' to generate a Makefile. Then run 'make' 
-  to build the static library (located in src/libpixfc-sse.a).
-
-- On Windows, run 'cmake -G "Visual Studio 10 Win64" ..' to create a Visual 
-  Studio 2010 64-bit solution. Use "Visual Studio 9 2008 Win64" for Visual 
-  Studio 2008. Remove "Win64" to build a 32-bit version of the library. Then,
-  open the solution file (pixfc-sse.sln) to build the static library (located in
-  src/Release/pixfc-sse.lib).
-  
-- On Mac, run 'cmake ..' to generate a Makefile like on Linux, or run
-  'cmake -G Xcode ..' to generate an XCode project which you then open to build
-  the static library (located in src/Release/libpixfc-sse.a).
-
-- On all platforms, you can generate Eclipse project files by running
-  'cmake -G "Eclipse CDT4 - Unix Makefiles" ..' . You must then copy the 2
-  files named .project and .cproject one directory up. Then import PixFC in
-  Eclipse.
- 
-More generators are available depending on the target platform. Run 
-'cmake --help' for more information.
-
-
-== USAGE ==
-In your application, include the PixFC header file where appropriate (the
-header file is located in include/pixfc-sse.h). The use-case is then very
-simple:
-- Create a struct PixFcSSE by calling create_pixfc(...). You specify the input
-  and output formats, resolution, and optional flags to control the selection
-  of the conversion routine.
-- Then, every time you need to convert an image, call pixfc->convert(...) .
-- Release the struct PixFcSSE when you no longer need it by calling
-  destroy_pixfc(...).
-
-Take a look at example.c for a concrete example.
-
-Note that, you must add include/win to the include path on Windows.
-
-
-== LINKING ==
-Link the PixFC static library built previously to your application.
-On Linux, you must also link your executable with -lrt.
-
-
-== PERFORMANCE TESTING ==
-You can run timing tests to see how well PixFC-SSE performs on your 
-platform: build and run the 'unit-test' target. Please take the time to 
-submit unit testing information to the PixFC-SSE mailing list at 
-http://groups.google.com/group/pixfc-sse
-along with details of your platform (OS version, CPU name & model), compiler 
-version and IDE version.
+Please refer to the PixFC wiki at http://pixfc-sse.googlecode.com for the
+latest instructions on how to :
+- build PixFC from source,
+- test PixFC's performance
+- include PixFC in your application.
 
 
 == SUPPORT / CONTACT ==

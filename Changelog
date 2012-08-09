@@ -1,3 +1,9 @@
+v0.4:
+ - Added conversion to / from v210
+ - Added non-SSE avergage resampling conversions 
+ - Fix all broken conversions
+ - Added inline and conversion blocks unit testing framework
+
 v0.3:
  - Added conversion to / from YUV420P
 

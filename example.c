@@ -59,7 +59,8 @@ int main(int argc, char ** argv){
 	uint64_t	yuyv_fill_pattern[] = { 0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL };
 	char *		fill_ptr;
 
-	// Allocate buffers (must be 16-byte aligned)
+	// Allocate buffers 
+	// (should be 16-byte aligned for best performance, but dont have to)
 	if (posix_memalign(&input, 16, input_buf_size) != 0) {
 		fprintf(stderr, "Error allocating input buffer\n");
 		return 1;
