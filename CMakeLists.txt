@@ -74,7 +74,7 @@ if(DEBUG)
         endif(APPLE)
 else(DEBUG)
         if(NOT WIN32)
-                add_definitions(-O3)
+                add_definitions(-O3 -Wall -Winline -Wno-implicit-function-declaration)
         endif(NOT WIN32)
 endif(DEBUG)
 

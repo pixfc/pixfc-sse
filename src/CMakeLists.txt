@@ -91,7 +91,6 @@ else(DEBUG)
 	endif(APPLE)
 endif(DEBUG)
 
-add_definitions(-Winline)
 
 #
 # LIBPIXFC-SSE TARGET
