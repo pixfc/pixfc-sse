@@ -757,6 +757,7 @@ extern const int32_t      yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3];
 #define DO_CONVERSION_1U_2P(conversion_macro, unpack_fn, pack1_fn, pack2_fn, ...)
 #define DO_CONVERSION_3U_1P(conversion_macro, unpack1_fn, unpack2_fn, unpack3_fn, pack_fn, ...)
 #define DO_REPACK(repack_macro, repack_fn_suffix, ...) 
+#define DO_REPACK2(...)
 
 #endif // __INTEL_CPU__
 
