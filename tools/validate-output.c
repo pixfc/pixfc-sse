@@ -385,6 +385,7 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 
 int 			main(int argc, char **argv) {
 	uint32_t				index;
+	uint32_t				result = 0;
 
 	// Parse args
 	parse_args(argc, argv);
@@ -408,7 +409,8 @@ int 			main(int argc, char **argv) {
 			continue;
 		}
 
-		if (check_sse_conversion_block(index) != 0)
+		result = check_sse_conversion_block(index);
+		if (result != 0)
 			break;
 
 		// Add a blank line if the next conversion block uses different
@@ -424,9 +426,8 @@ int 			main(int argc, char **argv) {
 	ALIGN_FREE(in);
 	ALIGN_FREE(out);			   
 	ALIGN_FREE(out_scalar);
-
 	
-	return 0;
+	return result;
 }
 
 
