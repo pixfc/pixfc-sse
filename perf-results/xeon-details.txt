@@ -1,7 +1,7 @@
 =========        Software        =========
-Ubuntu 10.04.2
-Linux desk 2.6.32-28-generic #55-Ubuntu SMP Mon Jan 10 23:42:43 UTC 2011 x86_64 GNU/Linux
-gcc (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+Ubuntu 12.04
+Linux desk 3.2.0-29-generic #46-Ubuntu SMP Fri Jul 27 17:03:23 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
+gcc (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3
 
 
 Mac OSX 10.7.4
