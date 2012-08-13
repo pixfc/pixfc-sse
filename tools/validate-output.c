@@ -180,7 +180,7 @@ static int		compare_output_buffers(void* out_sse, void* out_scalar, PixFcPixelFo
 }
 
 static void 	print_usage(char *prog_name) {
-	printf("Usage: %s threshold [<src_pix_fmt> <dest_pix_fmt> <flags>]\n", prog_name);
+	printf("Usage: %s [ threshold ] [<src_pix_fmt> <dest_pix_fmt> <flags>]\n", prog_name);
 	printf("Compare SSE conversion with scalar conversion, and stop if a difference\n");
 	printf("between two values is greater than the provided threshold.\n");
 	printf("Where <src_pix_fmt> and <dest_pix_fmt> are one of:\n");
@@ -190,30 +190,37 @@ static void 	print_usage(char *prog_name) {
 }
 
 static void 		parse_args(int argc, char **argv) {
+	uint32_t	pix_fmt_offset = 1;
+		
 	// Check and parse args
-	if ((argc != 2) && (argc != 5)) {
+	if ((argc != 1) && (argc != 2) && (argc != 4) && (argc != 5)) {
 		print_usage(argv[0]);
 		exit(1);
 	}
 
-	max_diff = atoi(argv[1]);
+	if ((argc == 2) || (argc == 5)) {
+		max_diff = atoi(argv[1]);
+		pix_fmt_offset = 2;
+	} else {
+		max_diff = 5;
+	}
 
-	if (argc == 5){
-		restrict_to_src_fmt = find_matching_pixel_format(argv[2]);
+	if ((argc == 4) || (argc == 5)){
+		restrict_to_src_fmt = find_matching_pixel_format(argv[pix_fmt_offset]);
 		if (restrict_to_src_fmt == PixFcFormatCount) {
-			printf("Unknown pixel format '%s'\n", argv[2]);
+			printf("Unknown pixel format '%s'\n", argv[pix_fmt_offset]);
 			exit(1);
 		}
 
-		restrict_to_dst_fmt = find_matching_pixel_format(argv[3]);
+		restrict_to_dst_fmt = find_matching_pixel_format(argv[pix_fmt_offset + 1]);
 		if (restrict_to_dst_fmt == PixFcFormatCount) {
-			printf("Unknown pixel format '%s'\n", argv[3]);
+			printf("Unknown pixel format '%s'\n", argv[pix_fmt_offset + 1]);
 			exit(1);
 		}
 
         printf("Using:\n - source pixel format '%s'\n", pixfmt_descriptions[restrict_to_src_fmt].name);
         printf(" - dest pixel format '%s'\n", pixfmt_descriptions[restrict_to_dst_fmt].name);
-		restrict_to_flags = get_matching_flags(argv[4]);
+		restrict_to_flags = get_matching_flags(argv[pix_fmt_offset + 2]);
 		printf(" - flags: ");
 		print_flags(restrict_to_flags);
 	}
