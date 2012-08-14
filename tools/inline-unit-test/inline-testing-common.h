@@ -97,7 +97,7 @@
 
 // 0, 1, 2, /**/ 63,64,65 /**/, 127,128,129 /**/,  511, 512, 513 /**/
 // 840, 841, 842, /**/ 939, 940, 941, /**/ 960, 961, 962, /**/ 1021, 1022, 1023
-#define DECLARE_2_RGB_10BIT_LE_VECT(var)	M128I_ARRAY_VAL(var, 2, \
+#define DECLARE_2_RGB_10BIT_VECT(var)	M128I_ARRAY_VAL(var, 2, \
 														{ 0x3F00110400042000LL, 0xFF0118207F001208LL }, \
 														{ 0xABB3DE3A4827AD34LL, 0xFDFBFF3FC0072F3CLL }, )
 

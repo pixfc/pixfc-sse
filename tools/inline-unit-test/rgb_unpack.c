@@ -532,7 +532,7 @@ void unpack_2_r210_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 
 uint32_t    check_unpack_2_r210_to_r_g_b_vectors(){
 	CHECK_INLINE_1IN(unpack_2_r210_to_r_g_b_vectors_scalar, unpack_2_r210_to_r_g_b_vectors_sse2_ssse3,
-			DECLARE_2_RGB_10BIT_LE_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
 	return 0;
 }
 

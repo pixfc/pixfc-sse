@@ -1160,7 +1160,7 @@ INLINE_NAME(unpack_bgr24_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* o
  * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
  */
 INLINE_NAME(unpack_2_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* output) {
-	CONST_M128I(keep_low_component,		0x000003FF000003FFLL, 0x000003FF000003FFLL);
+	CONST_M128I(keep_low_component,	0x000003FF000003FFLL, 0x000003FF000003FFLL);
 	CONST_M128I(shuffle_le, 0x0405060700010203LL, 0x0C0D0E0F08090A0BLL);
 	M128I(scratch, 0x0LL, 0x0LL);
 	M128I(scratch2, 0x0LL, 0x0LL);
@@ -1188,11 +1188,11 @@ INLINE_NAME(unpack_2_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* 
 	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
 
 	
-	_M(scratch) = _mm_srai_epi32(_M(scratch3), 10);									// PSRAD		1	1
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 10);									// PSRLD		1	1
 	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
 	// G1		0		G2		0		G3		0		G4		0
 	
-	_M(scratch2) = _mm_srai_epi32(_M(scratch4), 10);								// PSRAD		1	1
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 10);								// PSRLD		1	1
 	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
 	// G5		0		G6		0		G7		0		G8		0
 	
@@ -1200,15 +1200,15 @@ INLINE_NAME(unpack_2_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* 
 	// G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
 
 	
-	_M(scratch) = _mm_srai_epi32(_M(scratch3), 10);									// PSRAD		1	1
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 20);									// PSRLD		1	1
 	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
 	// R1		0		R2		0		R3		0		R4		0
 	
-	_M(scratch2) = _mm_srai_epi32(_M(scratch4), 10);								// PSRAD		1	1
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 20);								// PSRLD		1	1
 	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
 	// R5		0		R6		0		R7		0		R8		0
 	
-	output[2] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	output[0] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
 	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
 }
 
