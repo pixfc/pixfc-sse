@@ -504,6 +504,7 @@ uint32_t    check_unpack_bgr24_to_r_g_b_vectors(){
  */
 void unpack_2_r210_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 	uint8_t		le_input[32] = {0};
+	uint8_t*	le_in = le_input;
 	uint8_t*	input = (uint8_t *) in;
 	uint32_t*	input32 = (uint32_t *)le_input;
 	uint16_t*	output = (uint16_t *)out;
@@ -511,26 +512,27 @@ void unpack_2_r210_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 	
 	// Switch r210 buffer's endianness
 	for(index = 0; index < 8; index++) {
-		le_input[3] = input[0];
-		le_input[2] = input[1];
-		le_input[1] = input[2];
-		le_input[0] = input[3];
+		le_in[3] = input[0];
+		le_in[2] = input[1];
+		le_in[1] = input[2];
+		le_in[0] = input[3];
 		
-		le_input += 4;
+		le_in += 4;
 		input += 4;
 	}
 	
 	for(index = 0; index < 8; index++) {
-		out[0] = (input32[0] >> 20) & 0x3FF;	// R
-		out[8] = (input32[0] >> 10) & 0x3FF;	// G
-		out[16]= (input32[0]) & 0x3FF;			// B
-		input++;
+		output[0] = (input32[0] >> 20) & 0x3FF;	// R
+		output[8] = (input32[0] >> 10) & 0x3FF;	// G
+		output[16]= (input32[0]) & 0x3FF;		// B
+		input32++;
 		output++;
 	}
 }
 
 uint32_t    check_unpack_2_r210_to_r_g_b_vectors(){
-	CHECK_SSE2_SSSE3_INLINE_1IN(unpack_2_r210_to_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 6, MAX_DIFF_8BIT, compare_16bit_output);
+	CHECK_INLINE_1IN(unpack_2_r210_to_r_g_b_vectors_scalar, unpack_2_r210_to_r_g_b_vectors_sse2_ssse3,
+			DECLARE_2_RGB_10BIT_LE_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
 	return 0;
 }
 
