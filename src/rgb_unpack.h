@@ -1138,8 +1138,8 @@ INLINE_NAME(unpack_bgr24_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* o
 /*
  * Unpack 2 r210 vectors (8 pixels) into 3 R, G, B vectors 
  *
- * Total latency:				8
- * Number of pixels handled:	15
+ * Total latency:				15
+ * Number of pixels handled:	8
  *
  * INPUT
  * 2 vectors of 4 r210 pixels

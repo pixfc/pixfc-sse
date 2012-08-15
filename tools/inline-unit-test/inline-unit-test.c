@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-/*
+
 	// RGB downsample
 	check_nnb_422_downsample_ag_rb_vectors();
 	check_nnb_422_downsample_r_g_b_vectors();
@@ -37,6 +37,8 @@ int main(int argc, char **argv) {
     check_pack_6_rgb_vectors_in_4_argb_vectors();
     check_6_rgb_vectors_in_3_rgb24_vectors();
     check_6_rgb_vectors_in_3_bgr24_vectors();
+	check_pack_3_r_g_b_vectors_to_2_r210();
+	check_pack_6_r_g_b_vectors_to_4_r210();
 
     // RGB unpack
     check_unpack_argb_to_ag_rb_vectors();
@@ -46,8 +48,8 @@ int main(int argc, char **argv) {
     check_unpack_rgb24_to_ag_rb_vectors();
     check_unpack_rgb24_to_r_g_b_vectors();
     check_unpack_bgr24_to_ga_br_vectors();
-    check_unpack_bgr24_to_r_g_b_vectors();*/
-    check_unpack_2_r210_to_r_g_b_vectors();/*
+    check_unpack_bgr24_to_r_g_b_vectors();
+    check_unpack_2_r210_to_r_g_b_vectors();
 
     // RGB to YUV convert
     check_convert_r_g_b_vectors_to_y_vector();
@@ -122,6 +124,6 @@ int main(int argc, char **argv) {
     // YUV upsample
     check_reconstruct_last_missing_uv();
     check_reconstruct_missing_uv();
-	*/
+	
 	return 0;
 }

@@ -232,3 +232,110 @@ uint32_t check_6_rgb_vectors_in_3_bgr24_vectors() {
 }
 
 
+/*
+ * Pack 3 R, G, B vectors (8 pixels) into 2 r210 vectors
+ *
+ * Total latency:				16
+ * Number of pixels handled:	15
+ *
+ * INPUT
+ * 3 vectors of 8 short
+ * rVect
+ * R1		R2		R3		R4  	R5  	R6  	R7  	R8  
+ *
+ * gVect
+ * G1 		G2		G3		G4		G5		G6		G7		G8 
+ *
+ * bVect
+ * B1 		B2		B3		B4		B5		B6		B7		B8 
+ *
+ *
+ * OUTPUT:
+ * 2 vectors of 4 r210 pixels
+ *  R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *  R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *
+ */
+void pack_3_r_g_b_vectors_to_2_r210_scalar(__m128i* input, __m128i* output) {
+	uint32_t temp;
+	uint16_t *in = (uint16_t *) input;
+	uint8_t *in8 = (uint8_t *) &temp;
+	uint8_t *out8 = (uint8_t *) output;
+	uint32_t index;
+	
+	for(index = 0; index < 8; index++) {
+		temp = ((uint32_t)in[16] & 0x3FF);		// B
+		temp |= (((uint32_t)in[8] & 0x3FF) << 10);// G
+		temp |= (((uint32_t)in[0] & 0x3FF) << 20);// R
+
+		out8[3] = in8[0];
+		out8[2] = in8[1];
+		out8[1] = in8[2];
+		out8[0] = in8[3];
+		
+		out8 += 4;
+		in++;
+	}	
+}
+
+uint32_t	check_pack_3_r_g_b_vectors_to_2_r210() {
+   CHECK_INLINE_1IN(pack_3_r_g_b_vectors_to_2_r210_scalar, pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, DECLARE_3_10BIT_VECT, 2, MAX_DIFF_8BIT, compare_10bit_be_output);
+	
+	return 0;
+}
+
+/*
+ * Pack 3 R, G, B vectors (8 pixels) into 2 r210 vectors
+ *
+ * Total latency:				32
+ * Number of pixels handled:	16
+ *
+ * INPUT
+ * 6 vectors of 8 short
+ * R1 		R2		R3		R4		R5		R6		R7		R8
+ * G1 		G2		G3		G4		G5		G6		G7		G8
+ * B1 		B2		B3		B4		B5		B6		B7		B8
+ *
+ * R9 		R10 	R11 	R12 	R13 	R14 	R15 	R16
+ * G9 		G10 	G11 	G12 	G13		G14 	G15 	G16
+ * B9 		B10 	B11 	B12 	B13 	B14 	B15 	B16
+ *
+ *
+ * OUTPUT:
+ * 2 vectors of 4 r210 pixels
+ *  R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *  R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *  R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *  R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ */
+void pack_6_r_g_b_vectors_to_4_r210_scalar(__m128i* input, __m128i* output) {
+	uint32_t temp;
+	uint16_t *in = (uint16_t *) input;
+	uint8_t *in8 = (uint8_t *) &temp;
+	uint8_t *out8 = (uint8_t *) output;
+	uint32_t index;
+	
+	for(index = 1; index <= 16; index++) {
+		temp = ((uint32_t)in[16] & 0x3FF);		// B
+		temp |= (((uint32_t)in[8] & 0x3FF) << 10);// G
+		temp |= (((uint32_t)in[0] & 0x3FF) << 20);// R
+		
+		out8[3] = in8[0];
+		out8[2] = in8[1];
+		out8[1] = in8[2];
+		out8[0] = in8[3];
+		
+		out8 += 4;
+		in++;
+		
+		if (index == 8)
+			in += 16;
+	}	
+}
+
+uint32_t	check_pack_6_r_g_b_vectors_to_4_r210() {
+	CHECK_INLINE_1IN(pack_6_r_g_b_vectors_to_4_r210_scalar, pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_10bit_be_output);
+	
+	return 0;
+}

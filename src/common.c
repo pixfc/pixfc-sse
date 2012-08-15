@@ -272,10 +272,17 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 #ifdef DEBUG
 #if 1
 void print_xmm32(char *name, __m128i *reg) {
-	// print register as 16bit signed
+	// print register as 32bit signed
 	int32_t*	array = (int32_t *)reg;
 	printf("%s:\n %9d %9d %9d %9d\n", name,
 			array[0], array[1], array[2], array[3]);
+}
+
+void print_xmm32x(char *name, __m128i *reg) {
+	// print register as 32bit hex
+	int32_t*	array = (int32_t *)reg;
+	printf("%s:\n %08x %08x %08x %08x\n", name,
+		   array[0], array[1], array[2], array[3]);
 }
 
 void print_xmm16(char *name, __m128i *reg) {
@@ -292,6 +299,14 @@ void print_xmm16u(char *name, __m128i *reg) {
 	printf("%s:\n %4hu %4hu %4hu %4hu %4hu %4hu %4hu %4hu\n", name,
 			array[0], array[1], array[2], array[3],
 			array[4], array[5], array[6], array[7]);
+}
+
+void print_xmm16x(char *name, __m128i *reg) {
+	// print register as 16bit hex
+	short*	array = (short *)reg;
+	printf("%s:\n %4hx %4hx %4hx %4hx %4hx %4hx %4hx %4hx\n", name,
+		   array[0], array[1], array[2], array[3],
+		   array[4], array[5], array[6], array[7]);
 }
 
 void print_xmm10u(char *name, __m128i *reg) {
@@ -336,8 +351,10 @@ void print_xmm8x(char *name, __m128i *reg) {
 }
 #else
 void print_xmm32(char *name, __m128i *reg) {}
+void print_xmm32x(char *name, __m128i *reg) {}
 void print_xmm16(char *name, __m128i *reg) {}
 void print_xmm16u(char *name, __m128i *reg) {}
+void print_xmm16x(char *name, __m128i *reg) {}
 void print_xmm10u(char *name, __m128i *reg) {}
 void print_xmm8u(char *name, __m128i *reg) {}
 void print_xmm8x(char *name, __m128i *reg) {}
