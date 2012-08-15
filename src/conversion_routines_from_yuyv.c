@@ -218,7 +218,7 @@ void		convert_yuyv_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_buf
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
-		int32_t				y1, u, v, y2;\
+		int32_t				y1 = 0, u = 0, v = 0, y2 = 0;\
 		while(pixel_num < pixel_count){\
 			UNPACK_YUV422I(y1, u, v, y2, src);\
 			y1 += offsets[0];\
@@ -251,8 +251,8 @@ DEFINE_YUV422I_TO_ANY_RGB(convert_yuv422i_to_any_rgb_bt709_nonsse, yuv_8bit_to_r
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
-		int32_t				y1, u, v, y2;\
-		int32_t				next_y1, next_u, next_v, next_y2;\
+		int32_t				y1 = 0, u = 0, v = 0, y2 = 0;\
+		int32_t				next_y1 = 0, next_u = 0, next_v = 0, next_y2 = 0;\
 		UNPACK_YUV422I(y1, u, v, y2, src);\
 		while(pixel_num < pixel_count - 2){ /* handle the last 2 pixels outside the loop*/\
 			r = ((coeffs[0][0] * (y1 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
@@ -380,7 +380,7 @@ void		convert_yuv422i_to_v210_nonsse(const struct PixFcSSE* pixfc, void* source_
 	uint32_t 			pixel = 0;
 	uint8_t*			src = (uint8_t *) source_buffer;
 	uint32_t*			dst = (uint32_t *) dest_buffer;
-	int32_t				y1, y2, u, v;
+	int32_t				y1 = 0, y2 = 0, u = 0, v = 0;
 
 	// This conversion function only assumes an even number of pixels
 

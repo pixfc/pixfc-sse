@@ -136,7 +136,7 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelF
 				(double)((double)timings.total_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.user_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.sys_time_ns / (double) (NUM_RUNS * 1000000)),
-				timings.vcs + timings.ivcs
+				(unsigned long long)timings.vcs + timings.ivcs
 		);
 		make_conv_block_name_csv_friendly(index, &csv_conv_name);
 		fprintf(file, "%s,%.3f,%.3f,%.3f,%llu\n",
@@ -144,7 +144,7 @@ static uint32_t		time_conversion_blocks(PixFcPixelFormat source_fmt, PixFcPixelF
 				(double)((double)timings.total_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.user_time_ns / (double) (NUM_RUNS * 1000000)),
 				(double)((double)timings.sys_time_ns / (double) (NUM_RUNS * 1000000)),
-				timings.vcs + timings.ivcs);
+				(unsigned long long)timings.vcs + timings.ivcs);
 		free(csv_conv_name);
 
 		// Add a blank line if the next conversion block uses different
