@@ -427,8 +427,8 @@ void 	pack_6_r_g_b_vectors_to_4_r10k_scalar(__m128i* input, __m128i* output) {
 
 	for(index = 1; index <= 16; index++) {
 		temp = (((uint32_t)in[16] & 0x3FF) << 2); // B
-		temp |= (((uint32_t)in[8] & 0x3FF) << 10);// G
-		temp |= (((uint32_t)in[0] & 0x3FF) << 20);// R
+		temp |= (((uint32_t)in[8] & 0x3FF) << 12);// G
+		temp |= (((uint32_t)in[0] & 0x3FF) << 22);// R
 
 		out8[3] = in8[0];
 		out8[2] = in8[1];
