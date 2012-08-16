@@ -604,9 +604,10 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, __m128i* input, __m128i* 
  *  R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
  *
  */
-#define pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3(input, output) \
-	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[0], &output[0]);\
-	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[3], &output[2])
+INLINE_NAME(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, __m128i* input, __m128i* output) {
+	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[0], &output[0]);
+	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[3], &output[2]);
+}
 
 
 /*
@@ -713,8 +714,10 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, __m128i* input, __m128i* 
  *  R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
  *
  */
-#define pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3(input, output) \
-	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[0], &output[0]);\
-	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[3], &output[2])
+INLINE_NAME(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, __m128i* input, __m128i* output) {
+	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[0], &output[0]);
+	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[3], &output[2]);
+}
+
 #endif 	// __INTEL_CPU__
 
