@@ -110,8 +110,8 @@ void   compare_8bit_output(int8_t check_last, void *scalar_out, void *sse_out, u
         if (abs(scalar[index] - sse[index]) > max_diff) {
 			dprintf("== %s\n", prefix);
 			dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hhu - scalar: %hhu\n", (unsigned char)(index % 16), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 16), abs(sse[index]-scalar[index]), sse[index], scalar[index]);
-			print_xmm8u("SSE   ", (__m128i*) &sse[(index / 16) * 16]);
-			print_xmm8u("Scalar", (__m128i*) &scalar[(index / 16) * 16]);
+			print_xmm8u("SSE   ", (__m128i*) &sse[index / 16]);
+			print_xmm8u("Scalar", (__m128i*) &scalar[index / 16]);
 			break;
 		}
 	}
@@ -169,9 +169,9 @@ void   compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_ou
         sse_val = *sse & 0x3FF;
         if (abs(scalar_val - sse_val) > max_diff) {
 			dprintf("== %s\n", prefix);
-			dprintf("Value @ 0 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar - sse), (unsigned int)sse_val, (unsigned int)scalar_val);
-			print_xmm10u("SSE   ", (__m128i*) &sse[(index / 12) * 12]);
-			print_xmm10u("Scalar", (__m128i*) &scalar[(index / 12) * 12]);
+			dprintf("Value @ 0 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar_val - sse_val), (unsigned int)sse_val, (unsigned int)scalar_val);
+			print_xmm10u("SSE   ", (__m128i*) &sse[index / 12]);
+			print_xmm10u("Scalar", (__m128i*) &scalar[index / 12]);
 			break;
 		}
 
@@ -179,9 +179,9 @@ void   compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_ou
         sse_val = (*sse >> 10) & 0x3FF;
         if (abs(scalar_val - sse_val) > max_diff) {
 			dprintf("== %s\n", prefix);
-			dprintf("Value @ 1 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar - sse), (unsigned int)sse_val, (unsigned int)scalar_val);
-			print_xmm10u("SSE   ", (__m128i*) &sse[(index / 12) * 12]);
-			print_xmm10u("Scalar", (__m128i*) &scalar[(index / 12) * 12]);
+			dprintf("Value @ 1 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar_val - sse_val), (unsigned int)sse_val, (unsigned int)scalar_val);
+			print_xmm10u("SSE   ", (__m128i*) &sse[index / 12]);
+			print_xmm10u("Scalar", (__m128i*) &scalar[index / 12]);
 			break;
 		}
 
@@ -189,9 +189,9 @@ void   compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_ou
         sse_val = (*sse >> 20) & 0x3FF;
         if (abs(scalar_val - sse_val) > max_diff) {
 			dprintf("== %s\n", prefix);
-			dprintf("Value @ 2 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar - sse), (unsigned int)sse_val, (unsigned int)scalar_val);
-			print_xmm10u("SSE   ", (__m128i*) &sse[(index / 12) * 12]);
-			print_xmm10u("Scalar", (__m128i*) &scalar[(index / 12) * 12]);
+			dprintf("Value @ 2 in '%s' vector %u differs by %u: sse: %u - scalar: %u\n", check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 12), abs(scalar_val - sse_val), (unsigned int)sse_val, (unsigned int)scalar_val);
+			print_xmm10u("SSE   ", (__m128i*) &sse[index / 12]);
+			print_xmm10u("Scalar", (__m128i*) &scalar[index / 12]);
 			break;
 		}
 
@@ -215,8 +215,8 @@ void  compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, u
 		if (abs(scalar[index] - sse[index]) > max_diff) {
 			dprintf("== %s\n", prefix);
 			dprintf("Value @ %hhu in '%s' vector %u differs by %u: sse: %hd - scalar: %hd\n", (unsigned char)(index % 8), check_last == 0 ? "OUTPUT" : "PREVIOUS", (index / 8), abs(sse[index]-scalar[index]), sse[index], scalar[index]);
-			print_xmm16("SSE   ", (__m128i*) &sse[(index / 8) * 8]);
-			print_xmm16("Scalar", (__m128i*) &scalar[(index / 8) * 8]);
+			print_xmm16("SSE   ", (__m128i*) &sse[index / 8]);
+			print_xmm16("Scalar", (__m128i*) &scalar[index / 8]);
 			break;
 		}
 	}
