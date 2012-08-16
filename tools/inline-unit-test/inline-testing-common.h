@@ -26,8 +26,10 @@
 #include "platform_util.h"
 #include "common.h"
 
-#define MAX_DIFF_8BIT      2
-#define MAX_DIFF_10BIT     3
+#define MAX_DIFF_8BIT		2
+#define MAX_DIFF_10BIT		3
+#define MAX_DIFF_PACKING	0
+#define MAX_DIFF_UNPACKING	0
 
 
 

@@ -72,7 +72,7 @@ void repack_yuv422p_to_yuyv_scalar(__m128i* y_input, __m128i* u_input, __m128i* 
 }
 
 uint32_t check_repack_yuv422p_to_yuyv() {
-    DO_CHECK_INLINE_3IN(repack_yuv422p_to_yuyv_scalar, repack_yuv422p_to_yuyv_sse2, DECLARE_2_8BIT_VECT, DECLARE_1_8BIT_VECT, DECLARE_1_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output); 
+    DO_CHECK_INLINE_3IN(repack_yuv422p_to_yuyv_scalar, repack_yuv422p_to_yuyv_sse2, DECLARE_2_8BIT_VECT, DECLARE_1_8BIT_VECT, DECLARE_1_8BIT_VECT, 4, MAX_DIFF_PACKING, compare_8bit_output); 
 
     return 0;
 }
@@ -127,7 +127,7 @@ void repack_yuv422p_to_uyvy_scalar(__m128i* y_input, __m128i* u_input, __m128i* 
 }
 
 uint32_t check_repack_yuv422p_to_uyvy() {
-    DO_CHECK_INLINE_3IN(repack_yuv422p_to_uyvy_scalar, repack_yuv422p_to_uyvy_sse2, DECLARE_2_8BIT_VECT, DECLARE_1_8BIT_VECT, DECLARE_1_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_8bit_output); 
+    DO_CHECK_INLINE_3IN(repack_yuv422p_to_uyvy_scalar, repack_yuv422p_to_uyvy_sse2, DECLARE_2_8BIT_VECT, DECLARE_1_8BIT_VECT, DECLARE_1_8BIT_VECT, 4, MAX_DIFF_PACKING, compare_8bit_output); 
 
     return 0;
 }
@@ -179,8 +179,8 @@ void repack_yuyv_to_yuv422p_scalar(__m128i* input, __m128i* y_output, __m128i* u
 }
 
 uint32_t check_repack_yuyv_to_yuv422p() {
-    CHECK_INLINE_1IN_3OUT2(repack_yuyv_to_yuv422p_scalar, repack_yuyv_to_yuv422p_sse2, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 0); 
-    CHECK_INLINE_1IN_3OUT2(repack_yuyv_to_yuv422p_scalar, repack_yuyv_to_yuv422p_sse2_ssse3, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 0); 
+    CHECK_INLINE_1IN_3OUT2(repack_yuyv_to_yuv422p_scalar, repack_yuyv_to_yuv422p_sse2, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 0); 
+    CHECK_INLINE_1IN_3OUT2(repack_yuyv_to_yuv422p_scalar, repack_yuyv_to_yuv422p_sse2_ssse3, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 0); 
 
     return 0;
 }
@@ -232,8 +232,8 @@ void repack_uyvy_to_yuv422p_scalar(__m128i* input, __m128i* y_output, __m128i* u
 }
 
 uint32_t check_repack_uyvy_to_yuv422p() {
-    CHECK_INLINE_1IN_3OUT2(repack_uyvy_to_yuv422p_scalar, repack_uyvy_to_yuv422p_sse2, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 0); 
-    CHECK_INLINE_1IN_3OUT2(repack_uyvy_to_yuv422p_scalar, repack_uyvy_to_yuv422p_sse2_ssse3, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 0); 
+    CHECK_INLINE_1IN_3OUT2(repack_uyvy_to_yuv422p_scalar, repack_uyvy_to_yuv422p_sse2, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 0); 
+    CHECK_INLINE_1IN_3OUT2(repack_uyvy_to_yuv422p_scalar, repack_uyvy_to_yuv422p_sse2_ssse3, DECLARE_4_8BIT_VECT, 2, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 0); 
 
     return 0;
 }

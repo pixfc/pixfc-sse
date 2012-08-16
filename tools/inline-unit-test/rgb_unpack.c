@@ -71,7 +71,7 @@ void unpack_argb_to_ag_rb_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_argb_to_ag_rb_vectors() {
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_argb_to_ag_rb_vectors_, DECLARE_2_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_argb_to_ag_rb_vectors_, DECLARE_2_8BIT_VECT, 4, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -116,7 +116,7 @@ void unpack_argb_to_r_g_b_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_argb_to_r_g_b_vectors(){
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_argb_to_r_g_b_vectors_, DECLARE_2_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_argb_to_r_g_b_vectors_, DECLARE_2_8BIT_VECT, 3, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -169,7 +169,7 @@ void unpack_bgra_to_ga_br_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_bgra_to_ga_br_vectors() {
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgra_to_ga_br_vectors_, DECLARE_2_8BIT_VECT, 4, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgra_to_ga_br_vectors_, DECLARE_2_8BIT_VECT, 4, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -216,7 +216,7 @@ void unpack_bgra_to_r_g_b_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_bgra_to_r_g_b_vectors(){
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgra_to_r_g_b_vectors_, DECLARE_2_8BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgra_to_r_g_b_vectors_, DECLARE_2_8BIT_VECT, 3, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -284,7 +284,7 @@ void unpack_rgb24_to_ag_rb_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_rgb24_to_ag_rb_vectors() {
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_rgb24_to_ag_rb_vectors_, DECLARE_4_8BIT_VECT, 8, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_rgb24_to_ag_rb_vectors_, DECLARE_4_8BIT_VECT, 8, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -345,7 +345,7 @@ void unpack_rgb24_to_r_g_b_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_rgb24_to_r_g_b_vectors(){
-    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_rgb24_to_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 6, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_SSE2_SSSE3_INLINE_1IN(unpack_rgb24_to_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 6, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -412,7 +412,7 @@ void unpack_bgr24_to_ga_br_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_bgr24_to_ga_br_vectors() {
-    CHECK_INLINE_1IN(unpack_bgr24_to_ga_br_vectors_scalar, unpack_bgr24_to_ga_br_vectors_sse2, DECLARE_3_8BIT_VECT, 8, MAX_DIFF_8BIT, compare_16bit_output);
+    CHECK_INLINE_1IN(unpack_bgr24_to_ga_br_vectors_scalar, unpack_bgr24_to_ga_br_vectors_sse2, DECLARE_3_8BIT_VECT, 8, MAX_DIFF_UNPACKING, compare_16bit_output);
     return 0;
 }
 
@@ -473,7 +473,7 @@ void unpack_bgr24_to_r_g_b_vectors_scalar(__m128i* input, __m128i* output) {
 }
 
 uint32_t    check_unpack_bgr24_to_r_g_b_vectors(){
-   CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgr24_to_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 6, MAX_DIFF_8BIT, compare_16bit_output);
+   CHECK_SSE2_SSSE3_INLINE_1IN(unpack_bgr24_to_r_g_b_vectors_, DECLARE_3_8BIT_VECT, 6, MAX_DIFF_UNPACKING, compare_16bit_output);
    return 0;
 }
 
@@ -532,7 +532,7 @@ void unpack_2_r210_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 
 uint32_t    check_unpack_2_r210_to_r_g_b_vectors(){
 	CHECK_INLINE_1IN(unpack_2_r210_to_r_g_b_vectors_scalar, unpack_2_r210_to_r_g_b_vectors_sse2_ssse3,
-			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_UNPACKING, compare_16bit_output);
 	return 0;
 }
 
@@ -591,6 +591,6 @@ void unpack_2_r10k_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 
 uint32_t    check_unpack_2_r10k_to_r_g_b_vectors(){
 	CHECK_INLINE_1IN(unpack_2_r10k_to_r_g_b_vectors_scalar, unpack_2_r10k_to_r_g_b_vectors_sse2_ssse3,
-			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_8BIT, compare_16bit_output);
+			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_UNPACKING, compare_16bit_output);
 	return 0;
 }
