@@ -272,6 +272,8 @@ DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, sr
  */
 const struct  ConversionBlock		conversion_blocks[] = {
 
+	DECLARE_CONV_BLOCK(upsample_n_convert_yuyv_to_r210_sse2_ssse3, PixFcYUYV, PixFcR210, CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	DEFAULT_ATTRIBUTE, 16, 1, 1, "YUYV to r210"),
+
 	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, 1, "ARGB to YUYV"),

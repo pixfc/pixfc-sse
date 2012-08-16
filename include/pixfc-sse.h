@@ -43,14 +43,16 @@ typedef enum {
 	PixFcUYVY,
 	PixFcYUV422P,
 	PixFcYUV420P,
-	PixFcV210,		// 10-bit YUV - row bytes is (width + 47) / 48 * 128
+	PixFcV210,		// 10-bit YUV - row is (width + 47) / 48 * 128 bytes long (integer math !!)
 					// see https://developer.apple.com/quicktime/icefloe/dispatch019.html#v210
 
 	// RGB formats
-	PixFcARGB,	// 32-bit ARGB
-	PixFcBGRA,	// 32-bit BGRA
-	PixFcRGB24,	// 24-bit RGB
-	PixFcBGR24,	// 24-bit BGR
+	PixFcARGB,	// 32-bit ARGB (4 x 8-bit components)
+	PixFcBGRA,	// 32-bit BGRA (4 x 8-bit components)
+	PixFcRGB24,	// 24-bit RGB (3 x 8-bit components)
+	PixFcBGR24,	// 24-bit BGR (2 x 8-bit components)
+	PixFcR210,  // 10-bit RGB (3 x 10-bit components) - row is (width + 63) / 64 * 256 bytes long (integer math !!)
+				// see http://www.bitjazz.com/en/products/sheervideo/faq/formats/pixel_formats.php#r210
 
 	//
 	PixFcFormatCount

@@ -83,9 +83,21 @@ typedef struct {
 extern const PixelFormatDescription		pixfmt_descriptions[];
 extern const uint32_t					pixfmt_descriptions_count;
 
+
 /*
- * This macro expands to the size in bytes of a single line in an image
- * of the given width and pixel format.
+ * This macro returns the actual width (in pixels) of an image line in the memory buffer:
+ * For pixel formats with no padding bytes at the end of a line (yuyv for instance), the actual width is returned.
+ * For pixel formats with padding bytes at the end of every line (v210 for instance requires each line to have a multiple
+ * of 48 pixels even though not all of them are used), the width is rounded up to the required alignment and returned.
+ */
+#define ALIGNED_WIDTH(fmt, width) \
+	(\
+		((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
+			((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) & ~(pixfmt_descriptions[(fmt)].row_pixel_multiple)\
+	)
+
+/*
+ * This macro expands to the size in bytes (including any padding bytes) of a single line in an image of the given width and pixel format.
  */
 #define ROW_SIZE(fmt, width) \
 	( ((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
@@ -93,10 +105,14 @@ extern const uint32_t					pixfmt_descriptions_count;
 			pixfmt_descriptions[(fmt)].bytes_per_pix_num * pixfmt_descriptions[(fmt)].row_pixel_multiple / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
 	)
 
+/*
+ * This macro expands to the number of padding bytes at the end of a line, if any.
+ */
 #define PADDING_SIZE(fmt, width) \
 	(\
 			ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
 	)
+
 
 /*
  * This macro expands to the size in bytes of an image of the given width and 
@@ -104,7 +120,20 @@ extern const uint32_t					pixfmt_descriptions_count;
  */
 #define IMG_SIZE(fmt, width, height) (ROW_SIZE(fmt, width) * (height))
 
-	
+/*
+ * This macro defines a variable that contains the number of padding __m128i vectors left at the end of a line
+ */
+#define DECLARE_PADDING_VECT_COUNT(var, fmt, width) \
+	uint32_t (var) = 0;\
+	do {\
+		uint32_t padding_size = PADDING_SIZE(fmt, width);\
+		if ((padding_size % 16) != 0) {\
+			dprint("Padding size %u %% 16 != 0 !!!\n", padding_size);\
+		}\
+		else {\
+			(var) = padding_size / 16;\
+		}\
+	} while(0)
 
 #endif 		// PIXFMT_DESCRIPTIONS_H_
 
