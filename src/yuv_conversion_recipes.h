@@ -128,12 +128,24 @@
 		pixel_count = pixfc->width - 16;\
 		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
 		while(pixel_count > 0) {\
+			print_xmm16u("Y1-8", unpack_out);\
+			print_xmm16u("UV1-8odd", &unpack_out[1]);\
 			unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
+			print_xmm16u("Y9-16", &unpack_out[3]);\
+			print_xmm16u("UV9-16odd", &unpack_out[4]);\
 			unpack_fn_prefix##instr_set(&yuyv_8pixels[2], &unpack_out[6]);\
 			reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+			print_xmm16u("UV1-8even", &unpack_out[2]);\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm16("R1-8", &convert_out[0]);\
+			print_xmm16("G1-8", &convert_out[1]);\
+			print_xmm16("B1-8", &convert_out[2]);\
 			reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+			print_xmm16u("UV9-16even", &unpack_out[5]);\
 			conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+			print_xmm16("R9-16", &convert_out[3]);\
+			print_xmm16("G9-16", &convert_out[4]);\
+			print_xmm16("B9-16", &convert_out[5]);\
 			pack_fn(convert_out, rgb_out_buf);\
 			yuyv_8pixels += 2;\
 			rgb_out_buf += output_stride;\
@@ -141,7 +153,11 @@
 			unpack_out[0] = _mm_load_si128(&unpack_out[6]);\
 			unpack_out[1] = _mm_load_si128(&unpack_out[7]);\
 		}\
+		print_xmm16u("Y1-8", unpack_out);\
+		print_xmm16u("UV1-8odd", &unpack_out[1]);\
 		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], &unpack_out[3]);\
+		print_xmm16u("Y9-16", &unpack_out[3]);\
+		print_xmm16u("UV9-16odd", &unpack_out[4]);\
 		reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
 		reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
@@ -646,10 +662,10 @@
  *
  *
  * Expansion for a conversion to ARGB:
- *
+ *	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);
  *	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;
  *	__m128i*	argb_4pixels = (__m128i *) dest_buffer;
- *	uint32_t	pixel_count = pixfc->pixel_count;
+ *	uint32_t	pixel_count;
  *	__m128i		unpack_out[2];
  *	__m128i		convert_out[6];
  *
@@ -679,31 +695,37 @@
  *
  */
 #define YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
 	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
-	uint32_t	pixel_count = pixfc->pixel_count;\
+	uint32_t	pixel_count;\
+	uint32_t 	lines_remaining = pixfc->height;\
 	__m128i		unpack_out[2];\
 	__m128i		convert_out[6];\
-	while(pixel_count > 0) {\
-		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
-		print_xmm16u("Y", unpack_out);\
-		print_xmm16u("UV", &unpack_out[1]);\
-		conv_fn_prefix##instr_set(unpack_out, convert_out);\
-		print_xmm16u("R", &convert_out[0]);\
-		print_xmm16u("G", &convert_out[1]);\
-		print_xmm16u("B", &convert_out[2]);\
-		unpack_fn_prefix##instr_set(&yuyv_8pixels[1], unpack_out);\
-		print_xmm16u("Y", unpack_out);\
-		print_xmm16u("UV", &unpack_out[1]);\
-		conv_fn_prefix##instr_set(unpack_out, &convert_out[3]);\
-		print_xmm16u("R", &convert_out[3]);\
-		print_xmm16u("G", &convert_out[4]);\
-		print_xmm16u("B", &convert_out[5]);\
-		pack_fn(convert_out, rgb_out_buf);\
-		yuyv_8pixels += 2;\
-		rgb_out_buf += output_stride;\
-		pixel_count -= 16;\
-	};\
+	while(lines_remaining-- > 0) {\
+		pixel_count = pixfc->width;\
+		while(pixel_count > 0) {\
+			unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
+			print_xmm16u("Y", unpack_out);\
+			print_xmm16u("UV", &unpack_out[1]);\
+			conv_fn_prefix##instr_set(unpack_out, convert_out);\
+			print_xmm16u("R", &convert_out[0]);\
+			print_xmm16u("G", &convert_out[1]);\
+			print_xmm16u("B", &convert_out[2]);\
+			unpack_fn_prefix##instr_set(&yuyv_8pixels[1], unpack_out);\
+			print_xmm16u("Y", unpack_out);\
+			print_xmm16u("UV", &unpack_out[1]);\
+			conv_fn_prefix##instr_set(unpack_out, &convert_out[3]);\
+			print_xmm16u("R", &convert_out[3]);\
+			print_xmm16u("G", &convert_out[4]);\
+			print_xmm16u("B", &convert_out[5]);\
+			pack_fn(convert_out, rgb_out_buf);\
+			yuyv_8pixels += 2;\
+			rgb_out_buf += output_stride;\
+			pixel_count -= 16;\
+		}\
+		rgb_out_buf += padding_vect_to_eol;\
+	}
 
 /*
  * NNB upsampling v210 to RGB

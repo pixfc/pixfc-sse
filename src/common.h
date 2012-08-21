@@ -44,6 +44,9 @@ extern const int32_t      rgb_8bit_to_yuv_10bit_off[][3];
 extern const float        yuv_8bit_to_rgb_8bit_coef[][3][3];
 extern const int32_t      yuv_8bit_to_rgb_8bit_off[][3];
 
+extern const float        yuv_8bit_to_rgb_10bit_coef[][3][3];
+extern const int32_t      yuv_8bit_to_rgb_10bit_off[][3];
+
 extern const float        yuv_10bit_to_rgb_8bit_coef[][3][3];
 extern const int32_t      yuv_10bit_to_rgb_8bit_off[][3];
 
@@ -53,6 +56,7 @@ extern const int32_t      rgb_8bit_to_yuv_8bit_coef_lhs8[][3][3];
 extern const int32_t      rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3];
 extern const int32_t      yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3];
 extern const int32_t      yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3];
+extern const int32_t      yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3];
 
 #ifdef __INTEL_CPU__
 

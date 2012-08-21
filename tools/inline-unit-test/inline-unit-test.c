@@ -107,14 +107,20 @@ int main(int argc, char **argv) {
 	check_convert_y_uv_vectors_to_rgb_vectors();
 	check_nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601();
 	check_nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors();
 	check_convert_y_uv_vectors_to_rgb_vectors_bt601();
 	check_convert_y_uv_vectors_to_rgb_vectors_bt709();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709();
 	
 	// YUV unpack
 	check_unpack_yuyv_to_y_uv_vectors();

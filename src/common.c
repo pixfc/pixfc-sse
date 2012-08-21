@@ -74,6 +74,9 @@ const int32_t     rgb_8bit_to_yuv_10bit_off[][3] =
 	};
 
 
+//
+//	YUV to RGB
+//
 
 const float       yuv_8bit_to_rgb_8bit_coef[][3][3] =
 	{
@@ -100,6 +103,33 @@ const int32_t     yuv_8bit_to_rgb_8bit_off[][3] =
 		{ -16, -128, -128}	// bt709
 	};
 
+
+const float       yuv_8bit_to_rgb_10bit_coef[][3][3] =
+	{
+		// full range
+		{{ 4.0f,	0.0f,	 5.6f   },
+		 { 4.0f,	-1.372f,-2.844f },
+		 { 4.0f,    7.06f,   0.0f   }},
+	
+		// bt601
+		{{ 4.656f,	0.0f,	 6.384f },
+		 { 4.656f,	-1.568f,-3.252f },
+		 { 4.656f,	8.068f,	 0.0f   }},
+			
+		// bt709
+		{{ 4.656f, 	0.0f,	 7.172f },
+ 		 { 4.656f,	-0.852f,-2.132f },
+		 { 4.656f,	8.448f,	 0.0f   }},
+	};
+
+const int32_t     yuv_8bit_to_rgb_10bit_off[][3] =
+	{
+		{   0, -128, -128},	// full range
+		{ -16, -128, -128},	// bt601
+		{ -16, -128, -128}	// bt709
+	};
+
+
 const float       yuv_10bit_to_rgb_8bit_coef[][3][3] =
 	{
 		// full range
@@ -125,6 +155,13 @@ const int32_t     yuv_10bit_to_rgb_8bit_off[][3] =
 	};
 
 
+/*
+ *
+ *  8 - B I T   L E F T   S H I F T E D
+ *
+ *	I N T E G E R   C O E F F I C I E N T S
+ *
+ */
 const int32_t       rgb_8bit_to_yuv_8bit_coef_lhs8[][3][3] =
 	{
 		// Full range
@@ -161,6 +198,9 @@ const int32_t       rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3] =
 		 { 450, -409, -41}},
 	};
 
+//
+//	YUV to RGB
+//
 const int32_t       yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3] =
 	{
 		// Full range
@@ -195,6 +235,22 @@ const int32_t       yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3] =
 		{{ 74,   0, 115},
 		 { 74, -14,	-34},
 		 { 74, 135,   0}},
+	};
+
+const int32_t       yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3] =
+	{
+		// Full range
+		{{ 1024,	 0,		 1434 },
+		 { 1024,	-351,	-728  },
+		 { 1024,	 1807,	 0    }},		
+		// bt601
+		{{ 1192,	 0,		 1634 },
+		 { 1192,	-401,	-833  },
+		 { 1192,	 2065,	 0    }},		
+		// bt709
+		{{ 1192,	 0,		 1836 },
+		 { 1192,	-218,	-546  },
+		 { 1192,	 2163,	 0    }}
 	};
 
 // CPU features are obtained the first time and stored here.
@@ -270,7 +326,7 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
 
 #ifdef DEBUG
-#if 0
+#if 1
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 32bit signed
 	int32_t*	array = (int32_t *)reg;

@@ -28,10 +28,23 @@
         return 0;\
     }
 
+#define CHECK_FN_8BIT_SSSE3_1(fn_suffix)\
+		uint32_t    check_ ## fn_suffix() {\
+		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_3_8BIT_VECT, 3, MAX_DIFF_8BIT,  compare_16bit_output);\
+		return 0;\
+	}
+
 #define CHECK_FN_8BIT_2(fn_suffix)\
 	uint32_t    check_ ## fn_suffix() {\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_1_Y_UV_8BIT_VECT1,  3, MAX_DIFF_8BIT,  compare_16bit_output);\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2, DECLARE_1_Y_UV_8BIT_VECT2, 3, MAX_DIFF_8BIT,  compare_16bit_output);\
+		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_8BIT_VECT1,  3, MAX_DIFF_8BIT,  compare_16bit_output);\
+		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_8BIT_VECT2, 3, MAX_DIFF_8BIT,  compare_16bit_output);\
+		return 0;\
+	}
+
+#define CHECK_FN_8BIT_SSSE3_2(fn_suffix)\
+	uint32_t    check_ ## fn_suffix() {\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_8BIT_VECT1,  3, MAX_DIFF_8BIT,  compare_16bit_output);\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_8BIT_VECT2, 3, MAX_DIFF_8BIT,  compare_16bit_output);\
 		return 0;\
@@ -308,8 +321,141 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_
  */
 DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709, yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2], CHECK_FN_8BIT);
 
+/*
+ * Convert 2 vectors of 8 short Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using full range YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			16 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 4		0			1.4*4		]	( Y )
+ * G = 	[ 4		-0.343*4	-0.711*4	]	( U - 128 )
+ * B = 	[ 4		1.765*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 4		0			1434		]
+ * 		[ 4		-351		-728		]	U, V coeffs left shifted by 8
+ * 		[ 4		1807		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors, yuv_8bit_to_rgb_10bit_coef[0], yuv_8bit_to_rgb_10bit_off[0], CHECK_FN_8BIT_SSSE3);
 
+/*
+ * Convert 2 vectors of 8 short Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			20 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164*4		0			1.596*4		]	( Y - 16)
+ * G = 	[ 1.164*4		-0.392*4	-0.813*4	]	( U - 128 )
+ * B = 	[ 1.164*4		2.017*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 2384		0			1634		]	Y coeff left shifted by 9 bits
+ * 		[ 2384		-401		-833		]	U, V coeffs left shifted by 8 bits
+ * 		[ 2384		2065		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
+		nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601,
+		yuv_8bit_to_rgb_10bit_coef[1], yuv_8bit_to_rgb_10bit_off[1], CHECK_FN_8BIT_SSSE3);
 
+/*
+ * Convert 2 vectors of 8 short Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt709 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			20 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164*4		0			1.793*4		]	( Y - 16)
+ * G = 	[ 1.164*4		-0.213*4	-0.533*4	]	( U - 128 )
+ * B = 	[ 1.164*4		2.112*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 2384		0			1836		]	Y coeff left shifted by 9 bits
+ * 		[ 2384		-218		-546		]	U, V coeffs left shifted by 8 bits
+ * 		[ 2384		2163		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
+		nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709,
+		yuv_8bit_to_rgb_10bit_coef[2], yuv_8bit_to_rgb_10bit_off[2], CHECK_FN_8BIT_SSSE3);
 
 /*
  *
@@ -702,4 +848,138 @@ DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709, yuv_
  */
 DECLARE_CONVERT_CHECK(convert_10bit_y_uv_vectors_to_8bit_rgb_vectors, yuv_10bit_to_rgb_8bit_coef[0], yuv_10bit_to_rgb_8bit_off[0], CHECK_FN_10BIT);
 
+/*
+ * Convert 2 vectors of 8 short 8-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using full range YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			33 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 4		0			1.4*4		]	( Y )
+ * G = 	[ 4		-0.343*4	-0.711*4	]	( U - 128 )
+ * B = 	[ 4		1.765*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 4		0			1434		]
+ * 		[ 4		-351		-728		]	U, V coeffs left shifted by 8
+ * 		[ 4		1807		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect Odd
+ * U1 0		V1 0	U3 0	V3 0	U5 0	V5 0	U7 0	V7 0
+ *
+ * uvVect Even
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_CONVERT_CHECK(convert_8bit_y_uv_vectors_to_10bit_rgb_vectors, yuv_8bit_to_rgb_10bit_coef[0], yuv_8bit_to_rgb_10bit_off[0], CHECK_FN_8BIT_SSSE3);
 
+/*
+ * Convert 3 vectors of 8 short 8-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			35 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164*4		0			1.596*4		]	( Y - 16)
+ * G = 	[ 1.164*4		-0.392*4	-0.813*4	]	( U - 128 )
+ * B = 	[ 1.164*4		2.017*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 2384		0			1634		]	Y coeff left shifted by 9 bits
+ * 		[ 2384		-401		-833		]	U, V coeffs left shifted by 8 bits
+ * 		[ 2384		2065		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect Odd
+ * U1 0		V1 0	U3 0	V3 0	U5 0	V5 0	U7 0	V7 0
+ *
+ * uvVect Even
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_CONVERT_CHECK(
+		convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601,
+		yuv_8bit_to_rgb_10bit_coef[1], yuv_8bit_to_rgb_10bit_off[1], CHECK_FN_8BIT_SSSE3);
+
+/*
+ * Convert 3 vectors of 8 short 8-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			35 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164*4		0			1.793*4		]	( Y - 16)
+ * G = 	[ 1.164*4		-0.213*4	-0.533*4	]	( U - 128 )
+ * B = 	[ 1.164*4		2.112*4		0			]	( V - 128 )
+ *
+ *
+ * 		[ 2384		0			1836		]	Y coeff left shifted by 9 bits
+ * 		[ 2384		-218		-546		]	U, V coeffs left shifted by 8 bits
+ * 		[ 2384		2163		0			]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect Odd
+ * U1 0		V1 0	U3 0	V3 0	U5 0	V5 0	U7 0	V7 0
+ *
+ * uvVect Even
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_CONVERT_CHECK(
+		convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709,
+		yuv_8bit_to_rgb_10bit_coef[2], yuv_8bit_to_rgb_10bit_off[2], CHECK_FN_8BIT_SSSE3);

@@ -69,14 +69,14 @@ void _mm_storeu_si128(__m128i *dest, __m128i src) {
 const InputFile		input_files[] = {
 
 	{	PixFcYUYV,		1280, 	1024,		"1280x1024.yuyv",	},
-	{	PixFcYUYV,		48, 	1,			NULL,				},
-	{	PixFcYUYV,		32, 	1,			NULL,				},
-	{	PixFcYUYV,		16, 	1,			NULL,				},
+	{	PixFcYUYV,		48, 	2,			NULL,				},
+	{	PixFcYUYV,		32, 	2,			NULL,				},
+	{	PixFcYUYV,		16, 	2,			NULL,				},
 
 	{	PixFcUYVY,		1920, 	1080,		"1920x1080.uyvy",	},
-	{	PixFcUYVY,		48, 	1,			NULL,				},
-	{	PixFcUYVY,		32, 	1,			NULL,				},
-	{	PixFcUYVY,		16, 	1,			NULL,				},
+	{	PixFcUYVY,		48, 	2,			NULL,				},
+	{	PixFcUYVY,		32, 	2,			NULL,				},
+	{	PixFcUYVY,		16, 	2,			NULL,				},
 
 	{	PixFcYUV422P,	1280, 	1024,		"1280x1024.yuv422p",},
 	{	PixFcYUV422P,	32, 	1,			NULL,				},
@@ -86,29 +86,29 @@ const InputFile		input_files[] = {
 
 	{	PixFcV210,		1920, 	1080,		"1920x1080.v210",	},
 	{	PixFcV210,		1280, 	720,		NULL,				},
-	{	PixFcV210,		48, 	1,			NULL,				},
-	{	PixFcV210,		32, 	1,			NULL,				},
-	{	PixFcV210,		16, 	1,			NULL,				},
+	{	PixFcV210,		48, 	2,			NULL,				},
+	{	PixFcV210,		32, 	2,			NULL,				},
+	{	PixFcV210,		16, 	2,			NULL,				},
 
 	{	PixFcARGB,		1920, 	1080,		NULL,				},
+	{	PixFcARGB,		48, 	2,			NULL,				}, // to test to v210
 	{	PixFcARGB,		32,		2,			NULL,				}, // to test to YUV420p
-	{	PixFcARGB,		48, 	1,			NULL,				}, // to test to v210
-	{	PixFcARGB,		16, 	1,			NULL,				}, // to test to v210
+	{	PixFcARGB,		16, 	2,			NULL,				}, // to test to v210
 
 	{	PixFcBGRA,		1920, 	1080,		NULL,				},
+	{	PixFcBGRA,		48, 	2,			NULL,				},
 	{	PixFcBGRA,		32, 	2,			NULL,				},
-	{	PixFcBGRA,		48, 	1,			NULL,				},
-	{	PixFcBGRA,		16, 	1,			NULL,				},
+	{	PixFcBGRA,		16, 	2,			NULL,				},
 
 	{	PixFcRGB24,		1920, 	1080,		NULL,				},
+	{	PixFcRGB24,		48, 	2,			NULL,				},
 	{	PixFcRGB24,		32, 	2,			NULL,				},
-	{	PixFcRGB24,		48, 	1,			NULL,				},
-	{	PixFcRGB24,		16, 	1,			NULL,				},
+	{	PixFcRGB24,		16, 	2,			NULL,				},
 
 	{	PixFcBGR24,		1920, 	1080,		NULL,				},
+	{	PixFcBGR24,		48, 	2,			NULL,				},
 	{	PixFcBGR24,		32, 	2,			NULL,				},
-	{	PixFcBGR24,		48, 	1,			NULL,				},
-	{	PixFcBGR24,		16, 	1,			NULL,				},
+	{	PixFcBGR24,		16, 	2,			NULL,				},
 };
 const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
 

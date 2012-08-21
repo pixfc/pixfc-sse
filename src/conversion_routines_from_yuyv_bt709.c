@@ -64,6 +64,26 @@
 		)
 
 
+#define UPSAMPLE_AND_CONVERT_TO_RGB10(pack_fn, instr_set) \
+		DO_CONVERSION_1U_1P(\
+				UPSAMPLE_YUV422I_TO_RGB_RECIPE,\
+				unpack_yuyv_to_y_uv_vectors_,\
+				pack_fn,\
+				convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709_,\
+				4,\
+				instr_set\
+		)
+
+#define CONVERT_TO_RGB10(pack_fn, instr_set)\
+		DO_CONVERSION_1U_1P(\
+				YUV422I_TO_RGB_RECIPE,\
+				unpack_yuyv_to_y_uv_vectors_,\
+				pack_fn,\
+				nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709_,\
+				4,\
+				instr_set\
+		)
+
 /*
  *
  * 		Y U Y V
@@ -165,4 +185,23 @@ void		convert_yuyv_to_bgr24_bt709_sse2(const struct PixFcSSE * pixfc, void* sour
 	CONVERT_TO_RGB24(pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, sse2);
 }
 
+
+
+
+/*
+ *
+ * 		Y U V Y
+ *
+ * 		to
+ *
+ * 		R 2 1 0
+ *
+ */
+void		upsample_n_convert_yuyv_to_r210_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuyv_to_r210_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, sse2_ssse3);
+}
 

@@ -544,6 +544,10 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, __m128i* input, __m128i* 
 	_M(scratch_b) = _mm_max_epi16(_mm_min_epi16(input[2], _M(max_value)), _M(scratch_b));//PMIN/PMAX	2	1
 	_M(scratch_g) = _mm_max_epi16(_mm_min_epi16(input[1], _M(max_value)), _M(scratch_g));//PMIN/PMAX	2	1
 	_M(scratch_r) = _mm_max_epi16(_mm_min_epi16(input[0], _M(max_value)), _M(scratch_r));//PMIN/PMAX	2	1
+	
+	print_xmm16u("R", &scratch_r);
+	print_xmm16u("G", &scratch_g);
+	print_xmm16u("B", &scratch_b);
 	// Place the values in the right spot.
 	_M(scratch_r) = _mm_slli_epi16(_M(scratch_r), 4);						// PSLLW		1	1
 

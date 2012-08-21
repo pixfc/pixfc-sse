@@ -266,13 +266,49 @@ DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, sr
 
 
 
+
+
+/*
+ * R210 conversion blocks (SSE2/SSSE3, no SSE2-only conversions)
+ *
+ * The following macro declares the following conversion blocks:
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 full range
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.601
+ * - Fast Nearest NeighBour resampling SSE2/SSSE3 bt.709
+ *
+ * - Average resampling SSE2/SSSE3 full range
+ * - Average resampling SSE2/SSSE3 bt.601
+ * - Average resampling SSE2/SSSE3 bt.709
+ *
+ * - Fast Nearest NeighBour resampling NON-SSE full range
+ * - Fast Nearest NeighBour resampling NON-SSE bt.601
+ * - Fast Nearest NeighBour resampling NON-SSE bt.709
+ *
+ * - Average resampling NON-SSE full range
+ * - Average resampling NON-SSE bt.601
+ * - Average resampling NON-SSE bt.709
+ */
+#define		DECLARE_R210_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, row_pix_mult, desc_str_prefix)\
+DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK				(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK				(resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_AVG_BT601_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_AVG_BT709_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, row_pix_mult, desc_str_prefix),\
+DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
+
+
 /*
  * In this array, conversion blocks for a given pair of source and destination
  * formats must be sorted: fastest first, slowest last !!!
  */
 const struct  ConversionBlock		conversion_blocks[] = {
-
-	//DECLARE_CONV_BLOCK(upsample_n_convert_yuyv_to_r210_sse2_ssse3, PixFcYUYV, PixFcR210, CPUID_FEATURE_SSE2 | CPUID_FEATURE_SSSE3 | CPUID_FEATURE_SSE41, 	DEFAULT_ATTRIBUTE, 16, 1, 1, "YUYV to r210"),
 
 	//
 	// ARGB to YUYV
@@ -355,6 +391,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// YUYV to BGR24
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_bgr24, upsample_n_convert_yuyv_to_bgr24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcBGR24, 16, 1, 2, 1, 1, "YUYV to BGR24"),
 
+	// YUYV to r210
+	DECLARE_R210_CONV_BLOCKS(convert_yuyv_to_r210, upsample_n_convert_yuyv_to_r210, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcYUYV, PixFcR210, 16, 1, 2, 1, 64, "YUYV to r210"),
+
 	// YUYV to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_yuyv_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcYUYV, PixFcYUV422P, 32, 1, 2, 1, 1, "YUYV to YUV422P"),
 
@@ -374,6 +413,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// UYVY to BGR24
 	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgr24, upsample_n_convert_uyvy_to_bgr24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGR24, 16, 1, 2, 1, 1, "UYVY to BGR24"),
+
+	// UYVY to r210
+	DECLARE_R210_CONV_BLOCKS(convert_uyvy_to_r210, upsample_n_convert_uyvy_to_r210, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcUYVY, PixFcR210, 16, 1, 2, 1, 64, "YUYV to r210"),
 
 	// UYVY to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_uyvy_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcUYVY, PixFcYUV422P, 32, 1, 2, 1, 1, "UYVY to YUV422P"),
