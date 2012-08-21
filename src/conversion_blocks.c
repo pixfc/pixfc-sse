@@ -426,16 +426,19 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
 	// YUV422P to ARGB
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_argb, upsample_n_convert_yuv422p_to_argb, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcARGB, 32, 1, 1, 1, 1, "YUV422P to ARGB"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_argb, upsample_n_convert_yuv422p_to_argb, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcARGB, 32, 1, 2, 1, 1, "YUV422P to ARGB"),
 
 	// YUV422P to BGRA
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgra, upsample_n_convert_yuv422p_to_bgra, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGRA, 32, 1, 1, 1, 1, "YUV422P to BGRA"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgra, upsample_n_convert_yuv422p_to_bgra, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGRA, 32, 1, 2, 1, 1, "YUV422P to BGRA"),
 
 	// YUV422P to RGB24
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_rgb24, upsample_n_convert_yuv422p_to_rgb24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcRGB24, 32, 1, 1, 1, 1, "YUV422P to RGB24"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_rgb24, upsample_n_convert_yuv422p_to_rgb24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcRGB24, 32, 1, 2, 1, 1, "YUV422P to RGB24"),
 
 	// YUV422P to BGR24
-	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, 32, 1, 1, 1, 1, "YUV422P to BGR24"),
+	DECLARE_CONV_BLOCKS(convert_yuv422p_to_bgr24, upsample_n_convert_yuv422p_to_bgr24, convert_yuv422p_to_any_rgb, upsample_n_convert_yuv422p_to_any_rgb, PixFcYUV422P, PixFcBGR24, 32, 1, 2, 1, 1, "YUV422P to BGR24"),
+
+	// YUV422P to r210
+	DECLARE_R210_CONV_BLOCKS(convert_yuv422p_to_r210, upsample_n_convert_yuv422p_to_r210, convert_yuv422p_to_any_10bit_rgb, upsample_n_convert_yuv422p_to_any_10bit_rgb, PixFcYUV422P, PixFcR210, 32, 1, 2, 1, 64, "YUV422P to r210"),
 
 	// YUV422P to YUYV
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, 1, "YUV422P to YUYV"),

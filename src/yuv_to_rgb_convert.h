@@ -1620,7 +1620,7 @@ EXTERN_INLINE void nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			16 cycles
+ * Total latency: 			17 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 4		0			1.4*4		]	( Y )
@@ -1669,7 +1669,7 @@ DEFINE_NNB_Y_UV_TO_RGB_SSE2_SSSE3_INLINE4(nnb_upsample_n_convert_8bit_y_uv_vecto
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			20 cycles
+ * Total latency: 			19 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1.164*4		0			1.596*4		]	( Y - 16)
@@ -1720,7 +1720,7 @@ DEFINE_NNB_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			20 cycles
+ * Total latency: 			19 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1.164*4		0			1.793*4		]	( Y - 16)

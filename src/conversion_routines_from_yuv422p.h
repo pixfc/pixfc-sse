@@ -65,10 +65,16 @@ void		upsample_n_convert_yuv422p_to_bgr24_sse2(const struct PixFcSSE *, void *, 
 void		convert_yuv422p_to_bgr24_sse2(const struct PixFcSSE *, void *, void *);
 
 
+// YUV422P to R210		SSE2 SSSE3
+void		upsample_n_convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+
 // YUV422P to anyRGB		NON SSE
 void 		convert_yuv422p_to_any_rgb_nonsse(const struct PixFcSSE*, void*, void*);
 void 		upsample_n_convert_yuv422p_to_any_rgb_nonsse(const struct PixFcSSE*, void*, void*);
-
+void 		convert_yuv422p_to_any_10bit_rgb_nonsse(const struct PixFcSSE*, void*, void*);
+void 		upsample_n_convert_yuv422p_to_any_10bit_rgb_nonsse(const struct PixFcSSE*, void*, void*);
 
 
 
@@ -118,10 +124,16 @@ void		upsample_n_convert_yuv422p_to_bgr24_bt601_sse2(const struct PixFcSSE *, vo
 void		convert_yuv422p_to_bgr24_bt601_sse2(const struct PixFcSSE *, void *, void *);
 
 
+// YUV422P to R210		SSE2 SSSE3
+void		upsample_n_convert_yuv422p_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_yuv422p_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+
 // YUV422P to anyRGB		NON SSE
 void 		convert_yuv422p_to_any_rgb_bt601_nonsse(const struct PixFcSSE*, void*, void*);
 void 		upsample_n_convert_yuv422p_to_any_rgb_bt601_nonsse(const struct PixFcSSE*, void*, void*);
-
+void 		convert_yuv422p_to_any_10bit_rgb_bt601_nonsse(const struct PixFcSSE*, void*, void*);
+void 		upsample_n_convert_yuv422p_to_any_10bit_rgb_bt601_nonsse(const struct PixFcSSE*, void*, void*);
 
 
 
@@ -169,9 +181,16 @@ void		upsample_n_convert_yuv422p_to_bgr24_bt709_sse2(const struct PixFcSSE *, vo
 void		convert_yuv422p_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
 
 
+// YUV422P to R210		SSE2 SSSE3
+void		upsample_n_convert_yuv422p_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_yuv422p_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void*, void*);
+
+
 // YUV422P to anyRGB		NON SSE
 void 		convert_yuv422p_to_any_rgb_bt709_nonsse(const struct PixFcSSE*, void*, void*);
 void 		upsample_n_convert_yuv422p_to_any_rgb_bt709_nonsse(const struct PixFcSSE*, void*, void*);
+void 		convert_yuv422p_to_any_10bit_rgb_bt709_nonsse(const struct PixFcSSE*, void*, void*);
+void 		upsample_n_convert_yuv422p_to_any_10bit_rgb_bt709_nonsse(const struct PixFcSSE*, void*, void*);
 
 
 /*

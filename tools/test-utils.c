@@ -79,7 +79,7 @@ const InputFile		input_files[] = {
 	{	PixFcUYVY,		16, 	2,			NULL,				},
 
 	{	PixFcYUV422P,	1280, 	1024,		"1280x1024.yuv422p",},
-	{	PixFcYUV422P,	32, 	1,			NULL,				},
+	{	PixFcYUV422P,	32, 	2,			NULL,				},
 
 	{	PixFcYUV420P,	1280, 	1024,		"1280x1024.yuv420p",},
 	{	PixFcYUV420P,	32, 	2,			NULL,				},
