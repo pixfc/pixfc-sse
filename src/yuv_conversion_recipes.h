@@ -116,7 +116,7 @@
  *
  */
 #define UPSAMPLE_YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
-	/* number of __m128i vectors left until the end of line */\
+	/* number of __m128i padding vectors left until the end of line */\
 	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
@@ -147,6 +147,8 @@
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
 		conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
 		pack_fn(convert_out, rgb_out_buf);\
+		yuyv_8pixels += 2;\
+		rgb_out_buf += output_stride;\
 		rgb_out_buf += padding_vect_to_eol;\
 	}
 

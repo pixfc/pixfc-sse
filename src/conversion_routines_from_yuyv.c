@@ -268,38 +268,43 @@ DEFINE_YUV422I_TO_ANY_RGB(convert_yuv422i_to_any_rgb_bt709_nonsse, yuv_8bit_to_r
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t 			lines_remaining = conv->height;\
+		uint32_t			pixel_count;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y1, u, v, y2;\
 		int32_t				next_y1, next_u, next_v, next_y2;\
-		UNPACK_YUV422I(y1, u, v, y2, src);\
-		while(pixel_num < pixel_count - 2){ /* handle the last 2 pixels outside the loop*/\
+		while(lines_remaining-- > 0){\
+			pixel_count = conv->width - 2; /* handle the last 2 pixels outside the loop*/\
+			UNPACK_YUV422I(y1, u, v, y2, src);\
+			while(pixel_count > 0){\
+				r = ((coeffs[0][0] * (y1 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
+				g = ((coeffs[1][0] * (y1 + offsets[0])) + (coeffs[1][1] * (u + offsets[1])) + (coeffs[1][2] * (v + offsets[2]))) >> coef_shift;\
+				b = ((coeffs[2][0] * (y1 + offsets[0])) + (coeffs[2][1] * (u + offsets[1])) + (coeffs[2][2] * (v + offsets[2]))) >> coef_shift;\
+				PACK_RGB(r, g, b, dst);\
+				UNPACK_YUV422I(next_y1, next_u, next_v, next_y2, src);\
+				r = ((coeffs[0][0] * (y2 + offsets[0])) + (coeffs[0][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[0][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
+				g = ((coeffs[1][0] * (y2 + offsets[0])) + (coeffs[1][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[1][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
+				b = ((coeffs[2][0] * (y2 + offsets[0])) + (coeffs[2][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[2][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
+				PACK_RGB(r, g, b, dst);\
+				y1 = next_y1;\
+				y2 = next_y2;\
+				u = next_u;\
+				v = next_v;\
+				pixel_count -= 2;\
+			}\
 			r = ((coeffs[0][0] * (y1 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
 			g = ((coeffs[1][0] * (y1 + offsets[0])) + (coeffs[1][1] * (u + offsets[1])) + (coeffs[1][2] * (v + offsets[2]))) >> coef_shift;\
 			b = ((coeffs[2][0] * (y1 + offsets[0])) + (coeffs[2][1] * (u + offsets[1])) + (coeffs[2][2] * (v + offsets[2]))) >> coef_shift;\
 			PACK_RGB(r, g, b, dst);\
-			UNPACK_YUV422I(next_y1, next_u, next_v, next_y2, src);\
-			r = ((coeffs[0][0] * (y2 + offsets[0])) + (coeffs[0][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[0][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
-			g = ((coeffs[1][0] * (y2 + offsets[0])) + (coeffs[1][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[1][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
-			b = ((coeffs[2][0] * (y2 + offsets[0])) + (coeffs[2][1] * ((u + next_u) / 2 + offsets[1])) + (coeffs[2][2] * ((v + next_v) / 2 + offsets[2]))) >> coef_shift;\
+			r = ((coeffs[0][0] * (y2 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
+			g = ((coeffs[1][0] * (y2 + offsets[0])) + (coeffs[1][1] * (u + offsets[1])) + (coeffs[1][2] * (v + offsets[2]))) >> coef_shift;\
+			b = ((coeffs[2][0] * (y2 + offsets[0])) + (coeffs[2][1] * (u + offsets[1])) + (coeffs[2][2] * (v + offsets[2]))) >> coef_shift;\
 			PACK_RGB(r, g, b, dst);\
-			y1 = next_y1;\
-			y2 = next_y2;\
-			u = next_u;\
-			v = next_v;\
-			pixel_num += 2;\
+			dst += padding_bytes;\
 		}\
-		r = ((coeffs[0][0] * (y1 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
-		g = ((coeffs[1][0] * (y1 + offsets[0])) + (coeffs[1][1] * (u + offsets[1])) + (coeffs[1][2] * (v + offsets[2]))) >> coef_shift;\
-		b = ((coeffs[2][0] * (y1 + offsets[0])) + (coeffs[2][1] * (u + offsets[1])) + (coeffs[2][2] * (v + offsets[2]))) >> coef_shift;\
-		PACK_RGB(r, g, b, dst);\
-		r = ((coeffs[0][0] * (y2 + offsets[0])) + (coeffs[0][1] * (u + offsets[1])) + (coeffs[0][2] * (v + offsets[2]))) >> coef_shift;\
-		g = ((coeffs[1][0] * (y2 + offsets[0])) + (coeffs[1][1] * (u + offsets[1])) + (coeffs[1][2] * (v + offsets[2]))) >> coef_shift;\
-		b = ((coeffs[2][0] * (y2 + offsets[0])) + (coeffs[2][1] * (u + offsets[1])) + (coeffs[2][2] * (v + offsets[2]))) >> coef_shift;\
-		PACK_RGB(r, g, b, dst);\
 	}
 
 DEFINE_UPSAMPLE_N_CONVERT_YUV422I_TO_ANY_RGB(upsample_n_convert_yuv422i_to_any_rgb_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_8bit_off[0]);
