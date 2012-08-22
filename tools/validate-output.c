@@ -363,7 +363,7 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		printf("Comparing '%s' with ", conversion_blocks[sse_conv_index].name);
 
 		// Find the non-sse conversion block matching the given conversion block at 'index'
-		scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
+		scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width), ROW_SIZE(dst_fmt, in_file->width));
 		if (scalar_conv_index == -1) {
 			pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[sse_conv_index].name);
 			return -1;

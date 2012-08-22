@@ -166,13 +166,15 @@ static uint32_t		check_conversion_enumeration() {
 	return 0;
 }
 
-static uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt, PixFcFlag flag, ConversionBlockFn expected_conv_fn) {
+static uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat dest_fmt, PixFcFlag flag, PixFcFlag expected_flags, ConversionBlockFn expected_conv_fn) {
 	struct PixFcSSE *	pixfc;
 	uint32_t			result = -1;
 
-	if (create_pixfc(&pixfc, source_fmt, dest_fmt, 96, 2, ROW_SIZE(source_fmt, 96), flag) == 0) {
+	if (create_pixfc(&pixfc, source_fmt, dest_fmt, 96, 2, ROW_SIZE(source_fmt, 96), ROW_SIZE(dest_fmt, 96), flag) == 0) {
 		if (pixfc->convert != expected_conv_fn)
 			pixfc_log("Wrong conversion function\n");
+		else if (expected_flags != pixfc->flags)
+			pixfc_log("Wrong flags returned: %08x - expected %08x\n", pixfc->flags, expected_flags);
 		else
 			result = 0;
 
@@ -183,12 +185,30 @@ static uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat des
 	return result;
 }
 
-// Checks that passing PixFcFlags_* results in the right conversion block
-// being chosen.
+// Run various checks on conversion routines' flags
 static uint32_t	check_pixfc_flags() {
+	uint32_t index;
+
+	// Here, we check all conversion routines and make sure that if the
+	// NONSSE_FLOAT_CONVERSION attribute is set, required_cpu_feature
+	// is set to CPUID_FEATURE_NONE
+	for(index = 0; index < conversion_blocks_count; index++){
+		if (((conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION) != 0) &&
+				(conversion_blocks[index].required_cpu_features != CPUID_FEATURE_NONE)) {
+			pixfc_log("NONSSE_FLOAT_CONVERSION attribute set but required_cpu_features != CPUID_FEATURE_NONE on conversion '%s'\n",
+					conversion_blocks[index].name);
+			return -1;
+		}
+	}
+
+
+	//
+	// Checks that passing PixFcFlags_* results in the right conversion block
+	// being chosen and the right flags being set in struct pixfc->flags
+
 	// Default flag
 	pixfc_log("Checking default flag\n");
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_Default, upsample_n_convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_Default, PixFcFlag_SSE2_SSSE3_SSE41Only ,upsample_n_convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
 		pixfc_log("Default flag check failed\n");
 		return -1;
 	}
@@ -196,7 +216,7 @@ static uint32_t	check_pixfc_flags() {
 
 	// NoSSE flag
 	pixfc_log("Checking NoSSE flag\n");
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE, upsample_n_convert_v210_to_any_rgb_nonsse) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE, PixFcFlag_NoSSE, upsample_n_convert_v210_to_any_rgb_nonsse) != 0) {
 		pixfc_log("NoSSE flag check failed\n");
 		return -1;
 	}
@@ -205,7 +225,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking NoSSE | NNB flag\n");
 	// NoSSE | NNBflag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) != 0) {
 		pixfc_log("NoSSE | NNB flags check failed\n");
 		return -1;
 	}
@@ -214,7 +234,7 @@ static uint32_t	check_pixfc_flags() {
 	
 	pixfc_log("Checking NNB flag\n");
 	// NNBflag - This one is expected to fail
-	if (do_flag_check(PixFcV210, PixFcYUYV, PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) == 0) {
+	if (do_flag_check(PixFcV210, PixFcYUYV, PixFcFlag_NNbResamplingOnly, PixFcFlag_SSE2_SSSE3_SSE41Only | PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) == 0) {
 		pixfc_log("NNB flags check failed\n");
 		return -1;
 	}
@@ -223,7 +243,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking SSE2Only flag\n");
 	// SSE2Only flag
-	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only, downsample_n_convert_argb_to_yuyv_sse2) != 0) {
+	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only, PixFcFlag_SSE2Only, downsample_n_convert_argb_to_yuyv_sse2) != 0) {
 		pixfc_log("SSE2Only flag check failed\n");
 		return -1;
 	}
@@ -232,7 +252,7 @@ static uint32_t	check_pixfc_flags() {
 	
 	pixfc_log("Checking SSE2Only flag\n");
 	// SSE2_SSSE3Only flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_SSE2_SSSE3Only, upsample_n_convert_v210_to_argb_sse2_ssse3) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_SSE2_SSSE3Only, PixFcFlag_SSE2_SSSE3Only, upsample_n_convert_v210_to_argb_sse2_ssse3) != 0) {
 		pixfc_log("SSE2_SSSE3Only flag check failed\n");
 		return -1;
 	}
@@ -241,7 +261,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking SSE2Only | NNB flag\n");
 	// SSE2Only | NNB flag
-	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, convert_argb_to_yuyv_sse2) != 0) {
+	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, convert_argb_to_yuyv_sse2) != 0) {
 		pixfc_log("SSE2Only | NNB flags check failed\n");
 		return -1;
 	}
@@ -250,7 +270,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking Bt601 flag\n");
 	// BT601 flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion, upsample_n_convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion, PixFcFlag_BT601Conversion | PixFcFlag_SSE2_SSSE3_SSE41Only, upsample_n_convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
 		pixfc_log("Bt601 flag check failed\n");
 		return -1;
 	}
@@ -259,7 +279,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking Bt601 | NNB flag\n");
 	// BT601 | NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly, convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly, PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
 		pixfc_log("Bt601 | NNB flags check failed\n");
 		return -1;
 	}
@@ -268,7 +288,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking Bt709 flag\n");
 	// BT709 flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion, upsample_n_convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion, PixFcFlag_BT709Conversion | PixFcFlag_SSE2_SSSE3_SSE41Only, upsample_n_convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
 		pixfc_log("Bt709 flag check failed\n");
 		return -1;
 	}
@@ -277,7 +297,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking Bt709 | NNB flag\n");
 	// BT709 | NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly, convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly, PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
 		pixfc_log("Bt709 | NNB flags check failed\n");
 		return -1;
 	}
@@ -286,7 +306,7 @@ static uint32_t	check_pixfc_flags() {
 
 	pixfc_log("Checking NNBOnly flag\n");
 	// NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NNbResamplingOnly, convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
+	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NNbResamplingOnly, PixFcFlag_NNbResamplingOnly| PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
 		pixfc_log("NNB flag check failed\n");
 		return -1;
 	}

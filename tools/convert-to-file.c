@@ -161,7 +161,7 @@ int 		main(int argc, char **argv) {
 	print_flags(flags);
 
 	// create struct pixfc
-	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), flags) != 0)
+	if (create_pixfc(&pixfc, src_fmt, dst_fmt, w, h, ROW_SIZE(src_fmt, w), ROW_SIZE(dst_fmt, w), flags) != 0)
 	{
 		pixfc_log("error creating struct pixfc\n");
 		ALIGN_FREE(in);

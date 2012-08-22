@@ -737,7 +737,13 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 	flags = synthesize_pixfc_flags(index);
 
 	// Create struct pixfc for this conversion block
-	result = create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags);
+	result = create_pixfc(pixfc,
+			conversion_blocks[index].source_fmt,
+			conversion_blocks[index].dest_fmt,
+			width, height,
+			ROW_SIZE(conversion_blocks[index].source_fmt, width),
+			ROW_SIZE(conversion_blocks[index].dest_fmt, width),
+			flags);
 	if (result != 0) {
 		pixfc_log("Error (%d) creating struct pixfc for conversion '%s' %ux%u\n", result, conversion_blocks[index].name, width, height);
 		return -3;
@@ -746,12 +752,12 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 	return 0;
 }
 
-int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes) {
+int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t src_row_bytes, uint32_t dest_row_bytes) {
 	struct PixFcSSE *pixfc = NULL;
 	int32_t index = -1;
 	uint32_t result;
 
-	result = create_pixfc(&pixfc, src_fmt, dst_fmt, width, height, row_bytes, flags);
+	result = create_pixfc(&pixfc, src_fmt, dst_fmt, width, height, src_row_bytes, dest_row_bytes, flags);
 	if (result == PixFc_OK) {
 		uint32_t i;
 		for(i = 0; i < conversion_blocks_count; i++) {

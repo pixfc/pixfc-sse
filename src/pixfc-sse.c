@@ -97,9 +97,13 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 	// At this stage, we have found a conversion block which matches the flags given to us.
 	
 	// Check the bytes-per-row value
-	if (conv->row_bytes != ROW_SIZE(block->source_fmt, conv->width)) {
-		dprint("Skipping '%s' - Invalid row bytes %u - expected %d\n", block->name, conv->row_bytes, ROW_SIZE(block->source_fmt, conv->width));
-		return PixFc_InvalidSourceImageRowSize;
+	if (conv->source_row_bytes != ROW_SIZE(block->source_fmt, conv->width)) {
+		dprint("Skipping '%s' - Invalid source row bytes %u - expected %d\n", block->name, conv->source_row_bytes, ROW_SIZE(block->source_fmt, conv->width));
+		return PixFc_InvalidSourceBufferRowSize;
+	}
+	if (conv->dest_row_bytes != ROW_SIZE(block->dest_fmt, conv->width)) {
+		dprint("Skipping '%s' - Invalid dest row bytes %u - expected %d\n", block->name, conv->dest_row_bytes, ROW_SIZE(block->dest_fmt, conv->width));
+		return PixFc_InvalidDestBufferRowSize;
 	}
 
 	// If the width is not multiple of the required value, error out.
@@ -146,9 +150,33 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 
 				// We have a match, finish setting up the struct PixFcSSE
 				conv->convert = block->convert_fn;
-				conv->uses_sse = (block->required_cpu_features == CPUID_FEATURE_NONE) ? 0 : 1;
 
-				dprint("Found conversion block (uses SSE ? %s)\n", (conv->uses_sse == 1) ? "yes" : "no");
+				// Some non-sse conversion (like YUYV to v210) only exist in integer math version.
+				// If we were asked to return a non-sse float conversion, but we are returning
+				// a non-sse integer conversion instead, update the flags.
+				if ((flags & PixFcFlag_NoSSEFloat) != 0 && (block->attributes & NONSSE_FLOAT_CONVERSION) == 0) {
+					// Turn off NoSSEFLoat, turn on NoSSE
+					flags &= ~(PixFcFlag_NoSSEFloat);
+					flags |= PixFcFlag_NoSSE;
+				}
+
+				// Make sure there is a flag which indicates what CPU features this conversion uses
+				if ((flags & (PixFcFlag_NoSSE| PixFcFlag_NoSSEFloat | PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only | PixFcFlag_SSE2_SSSE3_SSE41Only)) == 0) {
+					// Set the correct flag for this conversion
+					if ((block->required_cpu_features & CPUID_FEATURE_SSE41) != 0)
+						flags |= PixFcFlag_SSE2_SSSE3_SSE41Only;
+					else if ((block->required_cpu_features & CPUID_FEATURE_SSSE3) != 0)
+						flags |= PixFcFlag_SSE2_SSSE3Only;
+					else if ((block->required_cpu_features & CPUID_FEATURE_SSE2) != 0)
+						flags |= PixFcFlag_SSE2Only;
+					else if ((block->required_cpu_features & CPUID_FEATURE_NONE) != 0 && (block->attributes & NONSSE_FLOAT_CONVERSION) != 0)
+						flags |= PixFcFlag_NoSSEFloat;
+					else if ((block->required_cpu_features & CPUID_FEATURE_NONE) != 0 && (block->attributes & NONSSE_FLOAT_CONVERSION) == 0)
+						flags |= PixFcFlag_NoSSE;
+				}
+				conv->flags = flags;
+
+				dprint("Found conversion block (flags: 0x%08x)\n", conv->flags);
 			}
 			
 			return result;
@@ -161,8 +189,8 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 
 
 uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
-		PixFcPixelFormat dest_fmt, uint32_t width, uint32_t height, uint32_t row_bytes,
-		uint32_t flags){
+		PixFcPixelFormat dest_fmt, uint32_t width, uint32_t height, uint32_t src_row_bytes,
+		uint32_t dest_row_bytes, uint32_t flags){
 
 	struct PixFcSSE *		conv;
 	uint32_t				result;
@@ -182,7 +210,8 @@ uint32_t		create_pixfc(struct PixFcSSE** pc, PixFcPixelFormat src_fmt,
 	conv->dest_fmt = dest_fmt;
 	conv->width = width;
 	conv->height = height;
-	conv->row_bytes = row_bytes;
+	conv->source_row_bytes = src_row_bytes;
+	conv->dest_row_bytes = dest_row_bytes;
 	conv->pixel_count = width * height;
 
 	dprint("Requested src / dst fmt:\t%s\t%s\n", pixfmt_descriptions[src_fmt].name,

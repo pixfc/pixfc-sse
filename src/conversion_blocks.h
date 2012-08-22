@@ -27,13 +27,15 @@
  * Attributes for conversion blocks
  */
 
-#define DEFAULT_ATTRIBUTE						0
+#define DEFAULT_ATTRIBUTE			0
 // Set if a conversion routine uses nearest neighbour resampling
 #define NNB_RESAMPLING				(1 << 1)
 // Set if a conversion routine uses the conversion equations for SD formats (bt601)
 #define BT601_CONVERSION			(1 << 2)
 // Set if a conversion routine uses the conversion equations for HD formats (bt709)
 #define BT709_CONVERSION			(1 << 3)
+// Set if a conversion routine uses non-SSE float math (implies required_cpu_features == CPUID_FEATURE_NONE)
+#define NONSSE_FLOAT_CONVERSION		(1 << 4)
 
 /*
  * A ConversionBlock is a structure grouping together 
@@ -62,11 +64,6 @@ struct ConversionBlock{
 	// multiple of some value (or 1 if there is no such requirement).
 	uint32_t				width_multiple;
 	uint32_t				height_multiple;
-	
-	// Each line must have a multiple of this number of pixels,
-	// or 1 if not applicable. This value is used to calculate
-	// the size in bytes of each line using the ROW_SIZE() macro
-	uint8_t					row_pixel_multiple;	
 
 	char *					name;
 };

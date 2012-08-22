@@ -49,7 +49,8 @@ int main(int argc, char ** argv){
 
 	uint32_t	width = 1280;
 	uint32_t	height = 1024;
-	uint32_t	input_row_size = width * 2;	// size of each row in byte
+	uint32_t	input_row_size = width * 2;	// size of each row in YUYV input buffer (in bytes)
+	uint32_t	output_row_size = width * 4;	// size of each row in ARGB output buffer (in bytes)
 	uint32_t	input_buf_size = input_row_size * height;	// size of YUYV input buffer
 	uint32_t	output_buf_size = width * height * 4;	// size of ARGB output buffer
 	uint32_t	bytes_left;
@@ -83,7 +84,7 @@ int main(int argc, char ** argv){
 
 
 	// Create struct pixfc
-	if (create_pixfc(&pixfc, input_format, output_format, width, height, input_row_size, PixFcFlag_Default) != 0) {
+	if (create_pixfc(&pixfc, input_format, output_format, width, height, input_row_size, output_row_size, PixFcFlag_Default) != 0) {
 		fprintf(stderr, "Error creating struct pixfc\n");
 		free(output);
 		free(input);
