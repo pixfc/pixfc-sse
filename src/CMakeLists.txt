@@ -8,6 +8,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_yuyv.c
 	conversion_routines_from_yuyv_bt601.c
 	conversion_routines_from_yuyv_bt709.c
+	conversion_routines_from_yuyv_scalar.c
 	conversion_routines_from_yuv422p.c
 	conversion_routines_from_yuv422p_bt601.c
 	conversion_routines_from_yuv422p_bt709.c
@@ -18,6 +19,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_argb.c
 	conversion_routines_from_argb_bt601.c
 	conversion_routines_from_argb_bt709.c
+	conversion_routines_from_argb_scalar.c
 	conversion_routines_from_bgra.c
 	conversion_routines_from_bgra_bt601.c
 	conversion_routines_from_bgra_bt709.c
@@ -30,6 +32,7 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_v210.c
 	conversion_routines_from_v210_bt601.c
 	conversion_routines_from_v210_bt709.c
+	conversion_routines_from_v210_scalar.c
 )
 
 # header files
