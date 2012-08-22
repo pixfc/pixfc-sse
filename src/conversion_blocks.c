@@ -37,7 +37,7 @@
 
 //
 
-// NNB resampling NON-SSE {FR, bt.601, bt.709) macros
+// NNB resampling NON-SSE integer {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NNB_RESAMPLING, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE - fast resampling")
 #define		DECLARE_NNB_BT601_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
@@ -45,13 +45,29 @@ DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID
 #define		DECLARE_NNB_BT709_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING, width_mult_count, height_mult_count,  desc_str_prefix " - bt.709 - NON-SSE - fast resampling")
 
-// AVG resampling NON-SSE {FR, bt.601, bt.709) macros
+// AVG resampling NON-SSE integer {FR, bt.601, bt.709) macros
 #define		DECLARE_AVG_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		DEFAULT_ATTRIBUTE, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE - avg resampling")
 #define		DECLARE_AVG_BT601_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSE - avg resampling")
 #define		DECLARE_AVG_BT709_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.709 - NON-SSE - avg resampling")
+
+// NNB resampling NON-SSE float {FR, bt.601, bt.709) macros
+#define		DECLARE_NNB_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - fast resampling")
+#define		DECLARE_NNB_BT601_FLOAT_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSE-Float - fast resampling")
+#define		DECLARE_NNB_BT709_FLOAT_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count,  desc_str_prefix " - bt.709 - NON-SSE-Float - fast resampling")
+
+// AVG resampling NON-SSE float {FR, bt.601, bt.709) macros
+#define		DECLARE_AVG_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - avg resampling")
+#define		DECLARE_AVG_BT601_FLOAT_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSE-Float- avg resampling")
+#define		DECLARE_AVG_BT709_FLOAT_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.709 - NON-SSE-Float - avg resampling")
 
 //
 
@@ -153,7 +169,14 @@ DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_
 DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_FLOAT_CONV_BLOCK			(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_FLOAT_CONV_BLOCK		(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_FLOAT_CONV_BLOCK		(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
 
 
 
@@ -182,7 +205,11 @@ DECLARE_NNB_BT601_SSE2_CONV_BLOCK		(convert_fn_prefix##_bt601, src_fmt, dst_fmt,
 DECLARE_NNB_BT709_SSE2_CONV_BLOCK		(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_FLOAT_CONV_BLOCK			(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
 
 
 
@@ -200,18 +227,24 @@ DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2_ssse3, 		src_fmt, dst_fmt, 		CPUID_F
 DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2, 		src_fmt, dst_fmt, 		CPUID_FEATURE_SSE2, 	DEFAULT_ATTRIBUTE, width_mult_count, height_mult_count, desc_str_prefix " - FR - SSE2 - no resampling")
 #define		DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
 DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	DEFAULT_ATTRIBUTE, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix " - FR - NON-SSE - no resampling")
+// There are no float non-sse repacking routine, so we map to the existing integer non-sse routine.
+#define		DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse,		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	NONSSE_FLOAT_CONVERSION, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - no resampling")
+
 
 // The following macro defines non-sse, sse2 and ssse3 repacking conversion blocks
 #define		DECLARE_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
 DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
-DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
 // The following macro defines non-sse, ssse3 and sse41 repacking conversion blocks
 #define		DECLARE_V210_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
 DECLARE_REPACK_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
-DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
 
 
@@ -245,16 +278,16 @@ DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, no
  * - Average resampling NON-SSE bt.709
  */
 #define		DECLARE_V210_CONV_BLOCKS(convert_fn_prefix, resample_n_convert_fn_prefix, non_sse_convert_fn_prefix, non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
-DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK		(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_NNB_SSE2_SSSE3_SSE41_CONV_BLOCK			(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK	(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
-DECLARE_AVG_SSE2_SSSE3_SSE41_CONV_BLOCK		(resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_SSE2_SSSE3_SSE41_CONV_BLOCK			(resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT601_SSE2_SSSE3_SSE41_CONV_BLOCK	(resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT709_SSE2_SSSE3_SSE41_CONV_BLOCK	(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK				(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK		(convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
-DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK				(resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK			(resample_n_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT601_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT709_SSE2_SSSE3_CONV_BLOCK		(resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
 DECLARE_NNB_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
@@ -262,7 +295,14 @@ DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_
 DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_FLOAT_CONV_BLOCK			(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_FLOAT_CONV_BLOCK		(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_FLOAT_CONV_BLOCK		(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_FLOAT_CONV_BLOCK		(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
 
 
 
@@ -300,7 +340,13 @@ DECLARE_NNB_BT601_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_
 DECLARE_NNB_BT709_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_AVG_BT601_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
-DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+DECLARE_AVG_BT709_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_FLOAT_CONV_BLOCK					(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT601_FLOAT_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_NNB_BT709_FLOAT_CONV_BLOCK			(non_sse_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_FLOAT_CONV_BLOCK					(non_sse_resample_n_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT601_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt601, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_AVG_BT709_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt709, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
 
 
@@ -443,11 +489,12 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// YUV422P to YUYV
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, "YUV422P to YUYV"),
 	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 2, 1, "YUV422P to YUYV"),
+	DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 2, 1, "YUV422P to YUYV"),
 
 	// YUV422P to UYVY
 	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, 1, "YUV422P to UYVY"),
 	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 2, 1, "YUV422P to UYVY"),
-
+	DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 2, 1, "YUV422P to UYVY"),
 	
 	//
 	// YUV420P to ARGB

@@ -38,6 +38,8 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PixFc_UnsupportedConversionError;
 	}
 
+	// TODO: Update here when new flags are added
+
 	// If we were told to require conversion blocks performing NNB resampling,
 	// enforce it.
 	if ((((flags & PixFcFlag_NNbResamplingOnly) == 0) != ((block->attributes & NNB_RESAMPLING) == 0))) {
@@ -45,10 +47,15 @@ static uint32_t		block_matches_and_is_supported(struct PixFcSSE* conv, const str
 		return PixFc_UnsupportedConversionError;
 	}
 	
-	// If we were told to disable SSE conversion blocks, make sure this block
-	// does not require any SSE features.
-	if ((flags & PixFcFlag_NoSSE) && (block->required_cpu_features != CPUID_FEATURE_NONE)) {
+	// If we were told to use a non-SSE integer conversion block, enforce it
+	if ((flags & PixFcFlag_NoSSE) && ((block->required_cpu_features != CPUID_FEATURE_NONE) || (block->attributes & NONSSE_FLOAT_CONVERSION))) {
 		dprint("Skipping '%s' - Enforcing FORCE_NO_SSE flag\n", block->name);
+		return PixFc_UnsupportedConversionError;
+	}
+
+	// If we were told to use a non-SSE float conversion block, enforce it
+	if ((flags & PixFcFlag_NoSSEFloat) && ((block->required_cpu_features != CPUID_FEATURE_NONE) || ((block->attributes & NONSSE_FLOAT_CONVERSION) == 0))) {
+		dprint("Skipping '%s' - Enforcing FORCE_NO_SSE_FLOAT flag\n", block->name);
 		return PixFc_UnsupportedConversionError;
 	}
 
@@ -151,15 +158,7 @@ static uint32_t	look_for_matching_conversion_block(struct PixFcSSE* conv,
 				// We have a match, finish setting up the struct PixFcSSE
 				conv->convert = block->convert_fn;
 
-				// Some non-sse conversion (like YUYV to v210) only exist in integer math version.
-				// If we were asked to return a non-sse float conversion, but we are returning
-				// a non-sse integer conversion instead, update the flags.
-				if ((flags & PixFcFlag_NoSSEFloat) != 0 && (block->attributes & NONSSE_FLOAT_CONVERSION) == 0) {
-					// Turn off NoSSEFLoat, turn on NoSSE
-					flags &= ~(PixFcFlag_NoSSEFloat);
-					flags |= PixFcFlag_NoSSE;
-				}
-
+				// TODO: Update here when new flags are added
 				// Make sure there is a flag which indicates what CPU features this conversion uses
 				if ((flags & (PixFcFlag_NoSSE| PixFcFlag_NoSSEFloat | PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only | PixFcFlag_SSE2_SSSE3_SSE41Only)) == 0) {
 					// Set the correct flag for this conversion

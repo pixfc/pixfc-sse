@@ -53,8 +53,11 @@ void		convert_yuv420p_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void*, void*)
 void		convert_yuv420p_to_bgr24_sse2(const struct PixFcSSE *, void *, void *);
 
 
-// YUV420P to anyRGB		NON SSE
+// YUV420P to anyRGB		NON SSE integer
 void 		convert_yuv420p_to_any_rgb_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
+
+// YUV420P to anyRGB		NON SSE float
+void 		convert_yuv420p_to_any_rgb_nonsse_float(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -93,9 +96,11 @@ void		convert_yuv420p_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void*, 
 void		convert_yuv420p_to_bgr24_bt601_sse2(const struct PixFcSSE *, void *, void *);
 
 
-// YUV420P to anyRGB		NON SSE
+// YUV420P to anyRGB		NON SSE integer
 void 		convert_yuv420p_to_any_rgb_bt601_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
+// YUV420P to anyRGB		NON SSE float
+void 		convert_yuv420p_to_any_rgb_bt601_nonsse_float(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 
 
@@ -131,8 +136,10 @@ void		convert_yuv420p_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void*, 
 void		convert_yuv420p_to_bgr24_bt709_sse2(const struct PixFcSSE *, void *, void *);
 
 
-// YUV420P to anyRGB		NON SSE
+// YUV420P to anyRGB		NON SSE integer
 void 		convert_yuv420p_to_any_rgb_bt709_nonsse(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
+// YUV420P to anyRGB		NON SSE float
+void 		convert_yuv420p_to_any_rgb_bt709_nonsse_float(const struct PixFcSSE* conv, void* srcBuffer, void* dstBuffer);
 
 #endif /* CONVERSION_ROUTINES_FROM_YUV420_H_ */

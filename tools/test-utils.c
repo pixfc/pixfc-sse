@@ -164,24 +164,38 @@ void 				print_known_pixel_formats() {
 }
 
 void 				print_known_flags() {
-	printf("  PixFcFlag_Default           = 0\n");
-	printf("  PixFcFlag_NoSSE             = 1\n");
-	printf("  PixFcFlag_SSE2Only          = 2\n");
-	printf("  PixFcFlag_SSE2_SSSE3Only    = 4\n");
-	printf("  PixFcFlag_BT601Conversion   = 128\n");
-	printf("  PixFcFlag_BT709Conversion   = 256\n");
-	printf("  PixFcFlag_NNbResamplingOnly = 16384\n");
+
+	// TODO: Update here when new flags are added
+
+	printf("  PixFcFlag_Default                = %d\n", PixFcFlag_Default);
+	printf("  PixFcFlag_NoSSE                  = %d\n", PixFcFlag_NoSSE);
+	printf("  PixFcFlag_NoSSEFloat             = %d\n", PixFcFlag_NoSSEFloat);
+	printf("  PixFcFlag_SSE2Only               = %d\n", PixFcFlag_SSE2Only);
+	printf("  PixFcFlag_SSE2_SSSE3Only         = %d\n", PixFcFlag_SSE2_SSSE3Only);
+	printf("  PixFcFlag_SSE2_SSSE3_SSE41Only   = %d\n", PixFcFlag_SSE2_SSSE3_SSE41Only);
+	printf("  PixFcFlag_BT601Conversion        = %d\n", PixFcFlag_BT601Conversion);
+	printf("  PixFcFlag_BT709Conversion        = %d\n", PixFcFlag_BT709Conversion);
+	printf("  PixFcFlag_NNbResamplingOnly      = %d\n", PixFcFlag_NNbResamplingOnly);
 }
 
 void				print_flags(PixFcFlag flags) {
+
+	// TODO: Update here when new flags are added
+
 	if ((flags & PixFcFlag_NoSSE) != 0)
 		printf("  NoSSE");
+
+	if ((flags & PixFcFlag_NoSSEFloat) != 0)
+		printf("  NoSSEFloat");
 
 	if ((flags & PixFcFlag_SSE2Only) != 0)
 		printf("  SSE2Only;");
 
 	if ((flags & PixFcFlag_SSE2_SSSE3Only) != 0)
 		printf("  SSE2_SSSE3Only");
+
+	if ((flags & PixFcFlag_SSE2_SSSE3_SSE41Only) != 0)
+			printf("  SSE2_SSSE3_SSE41Only");
 
 	if ((flags & PixFcFlag_BT601Conversion) != 0)
 		printf("  BT601Conversion");
@@ -202,14 +216,22 @@ PixFcFlag	get_matching_flags(char *flag_string) {
 	PixFcFlag	flags = PixFcFlag_Default;
 	uint32_t	flag_value = atoi(flag_string);
 
+	// TODO: Update here when new flags are added
+
 	if ((flag_value & PixFcFlag_NoSSE) != 0)
 		flags |= PixFcFlag_NoSSE;
+
+	if ((flag_value & PixFcFlag_NoSSEFloat) != 0)
+		flags |= PixFcFlag_NoSSEFloat;
 
 	if ((flag_value & PixFcFlag_SSE2Only) != 0)
 			flags |= PixFcFlag_SSE2Only;
 
 	if ((flag_value & PixFcFlag_SSE2_SSSE3Only) != 0)
 			flags |= PixFcFlag_SSE2_SSSE3Only;
+
+	if ((flag_value & PixFcFlag_SSE2_SSSE3_SSE41Only) != 0)
+			flags |= PixFcFlag_SSE2_SSSE3_SSE41Only;
 
 	if ((flag_value & PixFcFlag_BT601Conversion) != 0)
 			flags |= PixFcFlag_BT601Conversion;
@@ -697,11 +719,15 @@ PixFcFlag	synthesize_pixfc_flags(uint32_t index) {
 		return flags;
 	}
 	
+	// TODO: Update here when new flags are added
+
 	// Synthesize the flags based on the conversion block's flags
 	if (conversion_blocks[index].attributes & NNB_RESAMPLING)
 		flags |= PixFcFlag_NNbResamplingOnly;
 	
-	if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+	if ((conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE) && (conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION))
+		flags |= PixFcFlag_NoSSEFloat;
+	else if ((conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE) && ! (conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION))
 		flags |= PixFcFlag_NoSSE;
 	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
 		flags |= PixFcFlag_SSE2Only;

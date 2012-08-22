@@ -40,7 +40,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 		    2, 1, 0, 16, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
-				_E(0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL) ,
+		    	_E(0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL) ,
 	            /*		Decimal values:
 	                    76      84      75      255
 	                    149     43      148     21

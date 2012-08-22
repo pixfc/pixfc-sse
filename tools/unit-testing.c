@@ -26,6 +26,10 @@
 #include "conversion_blocks.h"
 #include "conversion_routines_from_v210.h"
 #include "conversion_routines_from_argb.h"
+#include "conversion_routines_from_bgr24.h"
+#include "conversion_routines_from_yuyv.h"
+#include "conversion_routines_from_yuv422p.h"
+#include "conversion_routines_from_yuv420p.h"
 #include "pixfc-sse.h"
 #include "pixfmt_descriptions.h"
 #include "platform_util.h"
@@ -189,6 +193,8 @@ static uint32_t 	do_flag_check(PixFcPixelFormat source_fmt, PixFcPixelFormat des
 static uint32_t	check_pixfc_flags() {
 	uint32_t index;
 
+	// TODO: Update here when new flags are added
+
 	// Here, we check all conversion routines and make sure that if the
 	// NONSSE_FLOAT_CONVERSION attribute is set, required_cpu_feature
 	// is set to CPUID_FEATURE_NONE
@@ -202,115 +208,217 @@ static uint32_t	check_pixfc_flags() {
 	}
 
 
+#define	CHECK_FLAGS(label, src_fmt, dst_fmt, flags_to_check, expected_result_flags, expected_conv_fn) \
+	do { \
+		pixfc_log("Checking " label " flags\n");\
+		if (do_flag_check(src_fmt, dst_fmt, flags_to_check, expected_result_flags ,expected_conv_fn) != 0) {\
+			pixfc_log(label " flags check failed\n");\
+			return -1;\
+		}\
+		pixfc_log("OK !\n");\
+	}while(0)
+
+#define	CHECK_FLAGS_FAIL(label, src_fmt, dst_fmt, flags_to_check, expected_result_flags, expected_conv_fn) \
+	do { \
+		pixfc_log("Checking " label " flags\n");\
+		if (do_flag_check(src_fmt, dst_fmt, flags_to_check, expected_result_flags ,expected_conv_fn) == 0) {\
+			pixfc_log(label " flags check failed\n");\
+			return -1;\
+		}\
+		pixfc_log("OK !\n");\
+	}while(0)
+
 	//
 	// Checks that passing PixFcFlags_* results in the right conversion block
 	// being chosen and the right flags being set in struct pixfc->flags
 
 	// Default flag
-	pixfc_log("Checking default flag\n");
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_Default, PixFcFlag_SSE2_SSSE3_SSE41Only ,upsample_n_convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
-		pixfc_log("Default flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
-
-	// NoSSE flag
-	pixfc_log("Checking NoSSE flag\n");
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE, PixFcFlag_NoSSE, upsample_n_convert_v210_to_any_rgb_nonsse) != 0) {
-		pixfc_log("NoSSE flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
+	CHECK_FLAGS("default", PixFcV210, PixFcARGB,
+			PixFcFlag_Default, PixFcFlag_SSE2_SSSE3_SSE41Only,
+			upsample_n_convert_v210_to_argb_sse2_ssse3_sse41);
 
 
-	pixfc_log("Checking NoSSE | NNB flag\n");
-	// NoSSE | NNBflag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) != 0) {
-		pixfc_log("NoSSE | NNB flags check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
 
-	
-	pixfc_log("Checking NNB flag\n");
-	// NNBflag - This one is expected to fail
-	if (do_flag_check(PixFcV210, PixFcYUYV, PixFcFlag_NNbResamplingOnly, PixFcFlag_SSE2_SSSE3_SSE41Only | PixFcFlag_NNbResamplingOnly, convert_v210_to_any_rgb_nonsse) == 0) {
-		pixfc_log("NNB flags check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
+	//
+	// NoSSE
+	CHECK_FLAGS("NoSSE", PixFcV210, PixFcARGB,
+			PixFcFlag_NoSSE, PixFcFlag_NoSSE,
+			upsample_n_convert_v210_to_any_rgb_nonsse);
 
 
-	pixfc_log("Checking SSE2Only flag\n");
-	// SSE2Only flag
-	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only, PixFcFlag_SSE2Only, downsample_n_convert_argb_to_yuyv_sse2) != 0) {
-		pixfc_log("SSE2Only flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
-
-	
-	pixfc_log("Checking SSE2Only flag\n");
-	// SSE2_SSSE3Only flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_SSE2_SSSE3Only, PixFcFlag_SSE2_SSSE3Only, upsample_n_convert_v210_to_argb_sse2_ssse3) != 0) {
-		pixfc_log("SSE2_SSSE3Only flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
+	// NoSSE | NNB
+	CHECK_FLAGS("NoSSE | NNB ", PixFcV210, PixFcARGB,
+			PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSE  | PixFcFlag_NNbResamplingOnly,
+			convert_v210_to_any_rgb_nonsse);
 
 
-	pixfc_log("Checking SSE2Only | NNB flag\n");
-	// SSE2Only | NNB flag
-	if (do_flag_check(PixFcARGB, PixFcYUYV, PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly, convert_argb_to_yuyv_sse2) != 0) {
-		pixfc_log("SSE2Only | NNB flags check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
+	// NoSSE | BT601
+	CHECK_FLAGS("NoSSE | BT601", PixFcYUYV, PixFcARGB,
+			PixFcFlag_NoSSE  | PixFcFlag_BT601Conversion,
+			PixFcFlag_NoSSE  | PixFcFlag_BT601Conversion,
+			upsample_n_convert_yuv422i_to_any_rgb_bt601_nonsse);
+
+	// NoSSE | BT709
+	CHECK_FLAGS("NoSSE | BT709", PixFcUYVY, PixFcARGB,
+			PixFcFlag_NoSSE  | PixFcFlag_BT709Conversion,
+			PixFcFlag_NoSSE  | PixFcFlag_BT709Conversion,
+			upsample_n_convert_yuv422i_to_any_rgb_bt709_nonsse);
+
+	// NoSSE | BT601 | NNB
+	CHECK_FLAGS("NoSSE | BT601 | NNB", PixFcYUV420P, PixFcARGB,
+			PixFcFlag_NoSSE  | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSE  | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_yuv420p_to_any_rgb_bt601_nonsse);
+
+	// NoSSE | BT709 | NNB
+	CHECK_FLAGS("NoSSE | BT709 | NNB", PixFcYUYV, PixFcBGRA,
+			PixFcFlag_NoSSE  | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSE  | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_yuv422i_to_any_rgb_bt709_nonsse);
 
 
-	pixfc_log("Checking Bt601 flag\n");
-	// BT601 flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion, PixFcFlag_BT601Conversion | PixFcFlag_SSE2_SSSE3_SSE41Only, upsample_n_convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
-		pixfc_log("Bt601 flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
 
 
-	pixfc_log("Checking Bt601 | NNB flag\n");
-	// BT601 | NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly, PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_bt601_sse2_ssse3_sse41) != 0) {
-		pixfc_log("Bt601 | NNB flags check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
-
-
-	pixfc_log("Checking Bt709 flag\n");
-	// BT709 flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion, PixFcFlag_BT709Conversion | PixFcFlag_SSE2_SSSE3_SSE41Only, upsample_n_convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
-		pixfc_log("Bt709 flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
-
-
-	pixfc_log("Checking Bt709 | NNB flag\n");
-	// BT709 | NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly, PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_bt709_sse2_ssse3_sse41) != 0) {
-		pixfc_log("Bt709 | NNB flags check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
-
-
-	pixfc_log("Checking NNBOnly flag\n");
+	//
 	// NNB flag
-	if (do_flag_check(PixFcV210, PixFcARGB, PixFcFlag_NNbResamplingOnly, PixFcFlag_NNbResamplingOnly| PixFcFlag_SSE2_SSSE3_SSE41Only, convert_v210_to_argb_sse2_ssse3_sse41) != 0) {
-		pixfc_log("NNB flag check failed\n");
-		return -1;
-	}
-	pixfc_log("OK !\n");
+	CHECK_FLAGS("NNB", PixFcV210, PixFcARGB,
+			PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NNbResamplingOnly| PixFcFlag_SSE2_SSSE3_SSE41Only,
+			convert_v210_to_argb_sse2_ssse3_sse41);
+
+	// BT601
+	CHECK_FLAGS("BT601", PixFcV210, PixFcARGB,
+			PixFcFlag_BT601Conversion,
+			PixFcFlag_BT601Conversion | PixFcFlag_SSE2_SSSE3_SSE41Only,
+			upsample_n_convert_v210_to_argb_bt601_sse2_ssse3_sse41);
+
+	// BT709
+	CHECK_FLAGS("BT709", PixFcYUYV, PixFcR210,
+			PixFcFlag_BT709Conversion,
+			PixFcFlag_BT709Conversion | PixFcFlag_SSE2_SSSE3Only,
+			upsample_n_convert_yuyv_to_r210_bt709_sse2_ssse3);
+
+
+	// BT601 | NNB
+	CHECK_FLAGS("BT601 | NNB", PixFcV210, PixFcARGB,
+			PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3_SSE41Only,
+			convert_v210_to_argb_bt601_sse2_ssse3_sse41);
+
+	// BT709 | NNB
+	CHECK_FLAGS("BT709 | NNB", PixFcYUYV, PixFcR210,
+			PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly | PixFcFlag_SSE2_SSSE3Only,
+			convert_yuyv_to_r210_bt709_sse2_ssse3);
+
+
+
+
+	//
+	// NoSSEFloat flag
+	CHECK_FLAGS("NoSSEFloat", PixFcV210, PixFcARGB,
+			PixFcFlag_NoSSEFloat, PixFcFlag_NoSSEFloat,
+			upsample_n_convert_v210_to_any_rgb_nonsse_float);
+
+	// NoSSEFloat | NNB flag
+	CHECK_FLAGS("NoSSEFloat | NNB", PixFcV210, PixFcARGB,
+			PixFcFlag_NoSSEFloat | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSEFloat | PixFcFlag_NNbResamplingOnly,
+			convert_v210_to_any_rgb_nonsse_float);
+
+	// NoSSEFloat | BT601 flag
+	CHECK_FLAGS("NoSSEFloat | BT601", PixFcYUV422P, PixFcRGB24,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT601Conversion,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT601Conversion,
+			upsample_n_convert_yuv422p_to_any_rgb_bt601_nonsse_float);
+
+	// NoSSEFloat | BT709 flag
+	CHECK_FLAGS("NoSSEFloat | BT709", PixFcUYVY, PixFcBGR24,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT709Conversion,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT709Conversion,
+			upsample_n_convert_yuv422i_to_any_rgb_bt709_nonsse_float);
+
+	// NoSSEFloat | BT601 | NNB  flag
+	CHECK_FLAGS("NoSSEFloat | BT601 | NNB", PixFcYUV422P, PixFcRGB24,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_yuv422p_to_any_rgb_bt601_nonsse_float);
+
+	// NoSSEFloat | BT709 | NNB  flag
+	CHECK_FLAGS("NoSSEFloat | BT709 | NNB", PixFcUYVY, PixFcBGR24,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_NoSSEFloat | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_yuv422i_to_any_rgb_bt709_nonsse_float);
+
+
+	// NoSSEFloat flag with repacking routines
+	CHECK_FLAGS("NoSSEFloat w/ repacking fn", PixFcYUYV, PixFcV210,
+			PixFcFlag_NoSSEFloat, PixFcFlag_NoSSEFloat,
+			convert_yuv422i_to_v210_nonsse);
+
+
+
+
+	//
+	// NNB - This one is expected to fail
+	CHECK_FLAGS_FAIL("NNB", PixFcV210, PixFcYUYV,
+			PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_SSE2_SSSE3_SSE41Only | PixFcFlag_NNbResamplingOnly,
+			convert_v210_to_any_rgb_nonsse);
+
+
+
+
+	//
+	// SSE2Only
+	CHECK_FLAGS("SSE2Only", PixFcARGB, PixFcYUYV,
+			PixFcFlag_SSE2Only, PixFcFlag_SSE2Only,
+			downsample_n_convert_argb_to_yuyv_sse2);
+
+	// SSE2Only | NNB flag
+	CHECK_FLAGS("SSE2Only | NNB ", PixFcARGB, PixFcYUYV,
+			PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_SSE2Only | PixFcFlag_NNbResamplingOnly,
+			convert_argb_to_yuyv_sse2);
+	
+	// SSE2Only | BT601
+	CHECK_FLAGS("SSE2Only | BT601", PixFcARGB, PixFcYUYV,
+			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion,
+			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion,
+			downsample_n_convert_argb_to_yuyv_bt601_sse2);
+
+	// SSE2Only | B709
+	CHECK_FLAGS("SSE2Only | BT709", PixFcARGB, PixFcYUYV,
+			PixFcFlag_SSE2Only | PixFcFlag_BT709Conversion,
+			PixFcFlag_SSE2Only | PixFcFlag_BT709Conversion,
+			downsample_n_convert_argb_to_yuyv_bt709_sse2);
+
+	// SSE2Only | BT601 | NNB
+	CHECK_FLAGS("SSE2Only | BT601 | NNB", PixFcRGB24, PixFcUYVY,
+			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_bgr24_to_uyvy_bt601_sse2);
+
+	// SSE2Only | B709 | NNB
+	CHECK_FLAGS("SSE2Only | BT709 | NNB", PixFcBGR24, PixFcYUV422P,
+			PixFcFlag_SSE2Only | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			PixFcFlag_SSE2Only | PixFcFlag_BT709Conversion | PixFcFlag_NNbResamplingOnly,
+			convert_bgr24_to_yuv422p_bt709_sse2);
+
+
+
+	//
+	// SSE2_SSSE3Only flag
+	CHECK_FLAGS("SSE2_SSSE3Only", PixFcV210, PixFcARGB,
+			PixFcFlag_SSE2_SSSE3Only, PixFcFlag_SSE2_SSSE3Only,
+			upsample_n_convert_v210_to_argb_sse2_ssse3);
+
+	// SSE2_SSSE3_SSE41Only flag
+	CHECK_FLAGS("SSE2_SSSE3_SSE41Only", PixFcV210, PixFcARGB,
+			PixFcFlag_SSE2_SSSE3_SSE41Only, PixFcFlag_SSE2_SSSE3_SSE41Only,
+			upsample_n_convert_v210_to_argb_sse2_ssse3_sse41);
+
 
 	return 0;
 }
