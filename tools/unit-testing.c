@@ -27,6 +27,7 @@
 #include "conversion_routines_from_v210.h"
 #include "conversion_routines_from_argb.h"
 #include "conversion_routines_from_bgr24.h"
+#include "conversion_routines_from_rgb24.h"
 #include "conversion_routines_from_yuyv.h"
 #include "conversion_routines_from_yuv422p.h"
 #include "conversion_routines_from_yuv420p.h"
@@ -398,7 +399,7 @@ static uint32_t	check_pixfc_flags() {
 	CHECK_FLAGS("SSE2Only | BT601 | NNB", PixFcRGB24, PixFcUYVY,
 			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
 			PixFcFlag_SSE2Only | PixFcFlag_BT601Conversion | PixFcFlag_NNbResamplingOnly,
-			convert_bgr24_to_uyvy_bt601_sse2);
+			convert_rgb24_to_uyvy_bt601_sse2);
 
 	// SSE2Only | B709 | NNB
 	CHECK_FLAGS("SSE2Only | BT709 | NNB", PixFcBGR24, PixFcYUV422P,

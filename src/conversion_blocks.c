@@ -55,19 +55,19 @@ DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID
 
 // NNB resampling NON-SSE float {FR, bt.601, bt.709) macros
 #define		DECLARE_NNB_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - fast resampling")
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSEFloat - fast resampling")
 #define		DECLARE_NNB_BT601_FLOAT_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSE-Float - fast resampling")
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSEFloat - fast resampling")
 #define		DECLARE_NNB_BT709_FLOAT_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count,  desc_str_prefix " - bt.709 - NON-SSE-Float - fast resampling")
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NNB_RESAMPLING | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count,  desc_str_prefix " - bt.709 - NON-SSEFloat - fast resampling")
 
 // AVG resampling NON-SSE float {FR, bt.601, bt.709) macros
 #define		DECLARE_AVG_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - avg resampling")
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse_float, 			src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - FR - NON-SSEFloat - avg resampling")
 #define		DECLARE_AVG_BT601_FLOAT_CONV_BLOCK(bt601_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSE-Float- avg resampling")
+DECLARE_CONV_BLOCK(bt601_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT601_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.601 - NON-SSEFloat - avg resampling")
 #define		DECLARE_AVG_BT709_FLOAT_CONV_BLOCK(bt709_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.709 - NON-SSE-Float - avg resampling")
+DECLARE_CONV_BLOCK(bt709_convert_fn_prefix##_nonsse_float, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 		BT709_CONVERSION | NONSSE_FLOAT_CONVERSION, width_mult_count, height_mult_count, desc_str_prefix " - bt.709 - NON-SSEFloat - avg resampling")
 
 //
 
@@ -229,7 +229,7 @@ DECLARE_CONV_BLOCK(convert_fn_prefix##_sse2, 		src_fmt, dst_fmt, 		CPUID_FEATURE
 DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse, 		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	DEFAULT_ATTRIBUTE, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix " - FR - NON-SSE - no resampling")
 // There are no float non-sse repacking routine, so we map to the existing integer non-sse routine.
 #define		DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
-DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse,		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	NONSSE_FLOAT_CONVERSION, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix " - FR - NON-SSE-Float - no resampling")
+DECLARE_CONV_BLOCK(convert_fn_prefix##_nonsse,		src_fmt, dst_fmt, 		CPUID_FEATURE_NONE, 	NONSSE_FLOAT_CONVERSION, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix " - FR - NON-SSEFloat - no resampling")
 
 
 // The following macro defines non-sse, sse2 and ssse3 repacking conversion blocks
