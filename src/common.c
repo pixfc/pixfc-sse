@@ -42,6 +42,7 @@ const float       rgb_8bit_to_yuv_8bit_coef[][3][3] =
 		 {-0.101f, -0.339f,  0.439f},
 		 { 0.439f, -0.399f, -0.040f}},
 	};
+
 const int32_t     rgb_8bit_to_yuv_8bit_off[][3] =
 	{
 		{ 0, 128, 128 },	// full range
@@ -153,6 +154,34 @@ const int32_t     yuv_10bit_to_rgb_8bit_off[][3] =
 		{ -64, -512, -512 },
 		{ -64, -512, -512 },
 	};
+
+
+const float       yuv_10bit_to_rgb_10bit_coef[][3][3] =
+	{
+		// full range
+		{{ 1.0f,    0.0f,    1.4f  },
+		 { 1.0f,   -0.343f, -0.711f},
+		 { 1.0f,    1.765f,  0.0f  }},
+
+		// bt601
+		{{ 1.164f,  0.0f,    1.596f},
+		 { 1.164f, -0.392f, -0.813f},
+		 { 1.164f,  2.017f,  0.0f  }},
+
+		// bt709
+		{{ 1.164f,  0.0f,    1.793f},
+		 { 1.164f, -0.213f, -0.533f},
+		 { 1.164f,  2.112f,  0.0f  }},
+	};
+
+
+const int32_t     yuv_10bit_to_rgb_10bit_off[][3] =
+	{
+		{   0, -512, -512},	// full range
+		{ -64, -512, -512},	// bt601
+		{ -64, -512, -512}	// bt709
+	};
+
 
 
 /*
@@ -326,7 +355,7 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
 
 #ifdef DEBUG
-#if 0
+#if 1
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 32bit signed
 	int32_t*	array = (int32_t *)reg;

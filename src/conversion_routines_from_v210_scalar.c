@@ -38,15 +38,26 @@
 			*(dst++) = CLIP_PIXEL(g);\
 			*(dst++) = CLIP_PIXEL(r);\
 			*(dst++) = 0;\
-		} else  if (dest_fmt == PixFcRGB24) {\
+		} else if (dest_fmt == PixFcRGB24) {\
 			*(dst++) = CLIP_PIXEL(r);\
 			*(dst++) = CLIP_PIXEL(g);\
 			*(dst++) = CLIP_PIXEL(b);\
-		} else  {	/* PixFcBGR24 */\
+		} else if (dest_fmt == PixFcBGR24) {\
 			*(dst++) = CLIP_PIXEL(b);\
 			*(dst++) = CLIP_PIXEL(g);\
 			*(dst++) = CLIP_PIXEL(r);\
-		}
+		} else {\
+			uint32_t temp;\
+			temp = (((uint32_t)CLIP_10BIT_PIXEL(b) & 0x3FF) << 2);/
+			temp |= (((uint32_t)CLIP_10BIT_PIXEL(g) & 0x3FF) << 12);/
+			temp |= (((uint32_t)CLIP_10BIT_PIXEL(r) & 0x3FF) << 22);/
+			dst[3] = in8[0];\
+			dst[2] = in8[1];\
+			dst[1] = in8[2];\
+			dst[0] = in8[3];\
+			}
+
+
 
 #define CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v) \
 	r = ((coeffs[0][0] * ((y) + offsets[0])) + (coeffs[0][1] * ((u) + offsets[1])) + (coeffs[0][2] * ((v) + offsets[2]))) >> coef_shift;\

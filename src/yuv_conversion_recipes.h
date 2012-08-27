@@ -832,6 +832,92 @@
 			unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set\
 		);
 
+
+
+
+
+/*
+ * NNB upsampling v210 to r210
+ */
+// Loop core handling 48 pixels
+#define NNB_UPSAMPLE_V210_TO_R210_CORE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	unpack_fn_prefix##instr_set(v210_in, &unpack_out[0], &unpack_out[2], &unpack_out[4]);\
+	v210_in += 4;\
+	print_xmm16u("Main Y1-8", &unpack_out[0]);\
+	print_xmm16u("Main UV1-8", &unpack_out[1]);\
+	print_xmm16u("Main Y9-16", &unpack_out[2]);\
+	print_xmm16u("Main UV9-16", &unpack_out[3]);\
+	print_xmm16u("Main Y17-24", &unpack_out[4]);\
+	print_xmm16u("Main UV17-24", &unpack_out[5]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("Main R1-8", &convert_out[0]);\
+	print_xmm16("Main G1-8", &convert_out[1]);\
+	print_xmm16("Main B1-8", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+	r210_out += 2;\
+	conv_fn_prefix##instr_set(&unpack_out[2], convert_out);\
+	print_xmm16("Main R9-16", &convert_out[0]);\
+	print_xmm16("Main G9-16", &convert_out[1]);\
+	print_xmm16("Main B9-16", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+	r210_out += 2;\
+	conv_fn_prefix##instr_set(&unpack_out[4], convert_out);\
+	print_xmm16("Main R17-24", &convert_out[0]);\
+	print_xmm16("Main G17-24", &convert_out[1]);\
+	print_xmm16("Main B17-24", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+	r210_out += 2;\
+
+// Last 16 pixels
+#define NNB_UPSAMPLE_V210_TO_R210_LAST_16PIX(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	unpack_fn_prefix##instr_set(v210_in, &unpack_out[0], &unpack_out[2], &unpack_out[4]);\
+	print_xmm16u("L16 Y1-8", &unpack_out[0]);\
+	print_xmm16u("L16 UV1-8", &unpack_out[1]);\
+	print_xmm16u("L16 Y9-16", &unpack_out[2]);\
+	print_xmm16u("L16 UV9-16", &unpack_out[3]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L16 R1-8", &convert_out[0]);\
+	print_xmm16("L16 G1-8", &convert_out[1]);\
+	print_xmm16("L16 B1-8", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+	r210_out += 2;\
+	conv_fn_prefix##instr_set(&unpack_out[2], convert_out);\
+	print_xmm16("L16 R9-16", &convert_out[0]);\
+	print_xmm16("L16 G9-16", &convert_out[1]);\
+	print_xmm16("L16 B9-16", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+
+// Last 8 pixels
+#define NNB_UPSAMPLE_V210_TO_R210_LAST_8PIX(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+	unpack_fn_prefix##instr_set(v210_in, &unpack_out[0], &unpack_out[2], &unpack_out[4]);\
+	/* dont update v210_ptr as this is the end of the line and it will be udpated by the loop macro anyway. */\
+	/* Same goes for r210_out */\
+	print_xmm16u("L8 Y1-8", &unpack_out[0]);\
+	print_xmm16u("L8 UV1-8", &unpack_out[1]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L8 R1-8", &convert_out[0]);\
+	print_xmm16("L8 G1-8", &convert_out[1]);\
+	print_xmm16("L8 B1-8", &convert_out[2]);\
+	pack_fn(convert_out, r210_out);\
+
+/*
+ * Convert v210 to r210 using NNB upsampling
+ */
+#define V210_TO_R210_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, instr_set) \
+	__m128i*	v210_in = (__m128i *) source_buffer;\
+	__m128i*	r210_out = (__m128i *) dest_buffer;\
+	__m128i		unpack_out[6];\
+	__m128i		convert_out[3];\
+	FROM_V120_24_PIX_OUTER_CONVERSION_LOOP(\
+		v210_in, r210_out,\
+		NNB_UPSAMPLE_V210_TO_R210_CORE, /* 24-pixel core */\
+		NNB_UPSAMPLE_V210_TO_R210_CORE,	/* last 24 pixels */\
+		NNB_UPSAMPLE_V210_TO_R210_LAST_8PIX,	/* last 8 pixels */\
+		NNB_UPSAMPLE_V210_TO_R210_LAST_16PIX,	/* last 16 pixels */\
+		unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set\
+	);
+
+
 /*
  * Convert V210 to YUV422I
  */

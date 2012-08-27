@@ -64,6 +64,16 @@
 				instr_set\
 		)
 
+#define CONVERT_TO_R210(pack_fn, instr_set)\
+		DO_CONVERSION_1U_1P(\
+				V210_TO_R210_RECIPE,\
+				unpack_4v_v210_to_y_uv_vectors_,\
+				pack_fn,\
+				nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_,\
+				4,\
+				instr_set\
+		)
+
 
 /*
  *

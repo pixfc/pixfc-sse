@@ -50,6 +50,10 @@ extern const int32_t      yuv_8bit_to_rgb_10bit_off[][3];
 extern const float        yuv_10bit_to_rgb_8bit_coef[][3][3];
 extern const int32_t      yuv_10bit_to_rgb_8bit_off[][3];
 
+extern const float        yuv_10bit_to_rgb_10bit_coef[][3][3];
+extern const int32_t      yuv_10bit_to_rgb_10bit_off[][3];
+
+
 
 // Conversion matrices left-shifted by 8
 extern const int32_t      rgb_8bit_to_yuv_8bit_coef_lhs8[][3][3];
@@ -411,105 +415,70 @@ extern const int32_t      yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3];
 /*
  * Outer loop for conversions to / from v210.
  * This loop makes the following assumptions:
- * - a width multiple of 16,
+ * - a width multiple of 8,
  * - the v210 core conversion loop handles 24 pixels at a time,
  * - v210 has a buffer large enough to accommodate multiple of 48 pixels
  *   (even though the width (in pixel) does not have to be multiple of 48
  *    thanks to padding bytes at the end of each line).
  *
- * Because of these assumptions, there are only 3 cases to cover depending on the width:
+ * There are only 3 cases to cover depending on the width:
  *
- * - width % 24 == 0, a multiple of 48 pixels have been handled. The v210_ptr will point to the
- *   start of the next v210 line and won't need adjusting.
+ * - width % 24 == 0,
+ * - width % 24 == 8,
+ * - width % 24 == 16
  *
- * - width % 24 == 8, after handling the 8 leftover pixels, a multiple of 48 pixels will have been
- *   handled. The v210_ptr will point to the start of the next v210 line and won't need adjusting.
+ * The macro manages the v210 and output buffer pointers so they always will point to the right place.
  *
- * - width % 24 == 16, after handling the 16 leftover pixels, the v210 pointer needs to be incremented by
- *   another 24 pixels to point to the start of the next v210 line.
- *
- *
- *
- *
- * JUSTIFICATION:
- *
- * A quick look at multiples of 16 and their modulo 24 will show the above pattern:
- *	k    	16*k	  (16*k) % 24	  (16*k) % 48
- *	1    	  16	       16	         16
- *	2    	  32	        8	         32
- *	3    	  48	        0	          0
- *	4    	  64	       16	         16
- *	5    	  80	        8	         32
- *	6    	  96	        0	          0
- *	7    	 112	       16	         16
- *	8    	 128	        8	         32
- *	9    	 144	        0	          0
- *	10    	 160	       16	         16
- *	11    	 176	        8	         32
- *	12    	 192	        0	          0
- *	13    	 208	       16	         16
- *	14    	 224	        8	         32
- *	15    	 240	        0	          0
- *	16    	 256	       16	         16
- *	17    	 272	        8	         32
- *	18    	 288	        0	          0
- *	19    	 304	       16	         16
- *	20    	 320	        8	         32
- *
- * Looking carefully at the above table, we can see that:
- *  16k % 24 == 0 always happens on a multiple of 48 pixels, ie. when 16k % 48 == 0.
- *  This means that at the end of the conversion, the pointer in the v210 buffer will point
- *  to the start of next v210 line, and does not need adjusting.
- *
- *  16k % 24 == 8 always happens right before 16*(k + 1) % 24 == 0.
- *  When 16k % 24 == 8, we have dealt with (16k - 8) v210 pixels in the 24-pixel core loop
- *  and there are 8 remaining pixels. Also, 16*(k + 1) % 24 == 0 on the next line
- *  means the next 48-pixel boundary is at (k + 1)*16. So, the start of the next v210 line is
- *  (k + 1)*16 - (16k -8) = 24 pixels away. What this means is that after reading/writing the
- *  missing 8 pixels (in a group of 24 pixels), the pointer into the v210 buffer wont need adjusting.
- *
- *  When 16k % 24 == 16, we have dealt with (16k - 16) v210 pixels in the 24-pixel core loop
- *  and there are 16 remaining pixels. The next 48-pixel boundary is at (k + 2)*16. So, the
- *  start of the next v210 line is (k + 2)*16 - (16k -16) = 48 pixels away. What this means is that
- *  after reading/writing the missing 16 pixels (in a group of 24 pixels), the pointer into the
- *  v210 buffer will still need to be adjusted by 24 pixels to point to the start of the next
- *  v210 line.
  */
-#define FROM_V120_24_PIX_OUTER_CONVERSION_LOOP(core, core_last24, leftover_8, leftover_16, v210_ptr, ...)\
+#define FROM_V120_24_PIX_OUTER_CONVERSION_LOOP(v210_ptr, out_ptr, core, core_last24, leftover_8, leftover_16, ...)\
 		uint32_t	width = pixfc->width;\
 		uint32_t	line = pixfc->height;\
-		uint32_t	pixel = width;\
+		uint8_t		*src = (uint8_t *)source_buffer;\
+		uint8_t		*dst = (uint8_t *)dest_buffer;\
+		uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, width);\
+		uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, width);\
+		uint32_t	pixel;\
 		if ((width % 24) == 0) {\
 			while(line-- > 0) {\
-				/* Handle the last 24 pixels outside the loop*/\
-				while(pixel > 24) {\
+				v210_ptr = (__m128i *)src;\
+				out_ptr = (__m128i *)dst;\
+				pixel = width - 24; /* Handle the last 24 pixels outside the loop*/\
+				while(pixel > 0) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
 				core_last24(__VA_ARGS__);\
-				pixel = width;\
+				src += src_row_byte_count;\
+				dst += dst_row_byte_count;\
 			}\
 		} else if ((width % 24) == 8) {\
 			while(line-- > 0) {\
-				while(pixel > 24) {\
+				v210_ptr = (__m128i *)src;\
+				out_ptr = (__m128i *)dst;\
+				pixel = width - 24; /* Handle the last 24 pixels outside the loop*/\
+				while(pixel > 0) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
 				leftover_8(__VA_ARGS__);\
-				/* v210_ptr already points to the start of next line */;\
-				pixel = width;\
+				src += src_row_byte_count;\
+				dst += dst_row_byte_count;\
 			}\
 		} else { /* width % 24 == 16 */\
 			while(line-- > 0) {\
-				while(pixel > 24) {\
+				v210_ptr = (__m128i *)src;\
+				out_ptr = (__m128i *)dst;\
+				pixel = width - 24; /* Handle the last 24 pixels outside the loop*/\
+				while(pixel > 0) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
 				leftover_16(__VA_ARGS__);\
-				pixel = width;\
-				v210_ptr += 4;\
+				src += src_row_byte_count;\
+				dst += dst_row_byte_count;\
 			}\
 		}
+
 #define TO_V120_24_PIX_OUTER_CONVERSION_LOOP(core_first24, core, leftover_8, first_leftover_16, leftover_16, v210_ptr, ...)\
 		uint32_t	width = pixfc->width;\
 		uint32_t	line = pixfc->height;\

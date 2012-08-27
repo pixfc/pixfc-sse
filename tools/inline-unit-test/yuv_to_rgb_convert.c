@@ -59,12 +59,27 @@
         return 0;\
     }
 
+#define CHECK_FN_10BIT_SSSE3_1(fn_suffix)\
+    uint32_t    check_ ## fn_suffix() {\
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_3_8BIT_VECT, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
+        CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_3_10BIT_VECT, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
+        return 0;\
+    }
+
+
 #define CHECK_FN_10BIT_2(fn_suffix)\
 	uint32_t    check_ ## fn_suffix() {\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_10BIT_VECT1, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_10BIT_VECT2, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3_sse41, DECLARE_1_Y_UV_10BIT_VECT1, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
 		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3_sse41, DECLARE_1_Y_UV_10BIT_VECT2, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
+		return 0;\
+	}
+
+#define CHECK_FN_10BIT_SSSE3_2(fn_suffix)\
+	uint32_t    check_ ## fn_suffix() {\
+		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_10BIT_VECT1, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
+		CHECK_INLINE_1IN(fn_suffix ## _scalar, fn_suffix ## _sse2_ssse3, DECLARE_1_Y_UV_10BIT_VECT2, 3, MAX_DIFF_10BIT,  compare_16bit_output);\
 		return 0;\
 	}
 
@@ -456,6 +471,133 @@ DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
 DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
 		nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709,
 		yuv_8bit_to_rgb_10bit_coef[2], yuv_8bit_to_rgb_10bit_off[2], CHECK_FN_8BIT_SSSE3);
+
+
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UY into 3 vectors of 8 short 10-bit R, G & B
+ * using full range YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			22 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1		0		1.4		]	( Y )
+ * G = 	[ 1		-0.343	-0.711	]	( U - 512 )
+ * B = 	[ 1		1.765	0		]	( V - 512 )
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
+		nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors,
+		yuv_10bit_to_rgb_10bit_coef[0], yuv_10bit_to_rgb_10bit_off[0], CHECK_FN_10BIT_SSSE3);
+
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			19 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164		0			1.596	]	( Y - 64)
+ * G = 	[ 1.164		-0.392		-0.813	]	( U - 512 )
+ * B = 	[ 1.164		2.017		0		]	( V - 512 )
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
+		nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt601,
+		yuv_10bit_to_rgb_10bit_coef[1], yuv_10bit_to_rgb_10bit_off[1], CHECK_FN_10BIT_SSSE3);
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt709 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Uses nearest neighbour upsampling:
+ * U12 & V12 are used as chroma values for both pixel 1 and 2
+ *
+ * Total latency: 			19 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164		0			1.793	]	( Y - 64 )
+ * G = 	[ 1.164		-0.213		-0.533	]	( U - 512 )
+ * B = 	[ 1.164		2.112		0		]	( V - 512 )
+ *
+ *
+ * INPUT:
+ *
+ * 2 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVect
+ * U12 0	V12 0	U34 0	V34 0	U56 0	V56 0	U78 0	V78 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DECLARE_NNB_UPSAMPLE_N_CONVERT_CHECK(
+		nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt709,
+		yuv_10bit_to_rgb_10bit_coef[2], yuv_10bit_to_rgb_10bit_off[2], CHECK_FN_10BIT_SSSE3);
+
 
 /*
  *

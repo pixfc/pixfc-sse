@@ -250,9 +250,9 @@ void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, ui
 		dprintf("Checking " #inline_sse "\n");\
         print_xmm16u_array(ARRAY_SIZE(input), "INPUT", _AM(input[0]));\
 		inline_scalar(_AM(input[0]), scalar_out);\
-        print_xmm10beu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);\
+        print_xmm16_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);\
 		inline_sse(_AM(input[0]), sse_out);\
-        print_xmm10beu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
+        print_xmm16_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
 		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
 	} while (0)
 
