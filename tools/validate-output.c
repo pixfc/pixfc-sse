@@ -47,13 +47,15 @@ static	__m128i	*				out_scalar = NULL;// buffer holding scalar converted data fo
 
 //
 // Use the conversion block at the provided index to convert image of given width and height in in buffer to out buffer
-static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w, uint32_t h) {
+static uint32_t		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w, uint32_t h) {
 	struct PixFcSSE *	pixfc = NULL;
+	uint32_t	result;
 	
 	// Create struct pixfc
-	if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
-		pixfc_log("Error create struct pixfc\n");
-		return -1;
+	result = create_pixfc_for_conversion_block(index, &pixfc, w, h);
+	if (result != PixFc_OK) {
+		pixfc_log("Error create struct pixfc (%d)\n", result);
+		return result;
 	}
 	
 	// Perform conversion
@@ -404,7 +406,11 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 
 
 		// Do SSE conversion
-		if (do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height) != 0)
+		result = do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height);
+		if (result == PixFc_UnsupportedSourceImageDimension)
+			// invalid width / height for given dest pixel format, move on to next conversion
+			continue;
+		else if (result != 0)
 			return -1;
 
 		// Do scalar conversion if required

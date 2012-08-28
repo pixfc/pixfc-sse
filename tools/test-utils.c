@@ -69,14 +69,42 @@ void _mm_storeu_si128(__m128i *dest, __m128i src) {
 const InputFile		input_files[] = {
 
 	{	PixFcYUYV,		1280, 	1024,		"1280x1024.yuyv",	},
+	{	PixFcYUYV,		112, 	2,			NULL,				},
+	{	PixFcYUYV,		104, 	2,			NULL,				},
+	{	PixFcYUYV,		96, 	2,			NULL,				},
+	{	PixFcYUYV,		80, 	2,			NULL,				},
+	{	PixFcYUYV,		72, 	2,			NULL,				},
+	{	PixFcYUYV,		64, 	2,			NULL,				},
 	{	PixFcYUYV,		48, 	2,			NULL,				},
 	{	PixFcYUYV,		32, 	2,			NULL,				},
 	{	PixFcYUYV,		16, 	2,			NULL,				},
+	{	PixFcYUYV,		8, 		2,			NULL,				},
+	{	PixFcYUYV,		80, 	1,			NULL,				},
+	{	PixFcYUYV,		72, 	1,			NULL,				},
+	{	PixFcYUYV,		64, 	1,			NULL,				},
+	{	PixFcYUYV,		48, 	1,			NULL,				},
+	{	PixFcYUYV,		32, 	1,			NULL,				},
+	{	PixFcYUYV,		16, 	1,			NULL,				},
+	{	PixFcYUYV,		8, 		1,			NULL,				},
 
 	{	PixFcUYVY,		1920, 	1080,		"1920x1080.uyvy",	},
+	{	PixFcUYVY,		112, 	2,			NULL,				},
+	{	PixFcUYVY,		104, 	2,			NULL,				},
+	{	PixFcUYVY,		96, 	2,			NULL,				},
+	{	PixFcUYVY,		80, 	2,			NULL,				},
+	{	PixFcUYVY,		72, 	2,			NULL,				},
+	{	PixFcUYVY,		64, 	2,			NULL,				},
 	{	PixFcUYVY,		48, 	2,			NULL,				},
 	{	PixFcUYVY,		32, 	2,			NULL,				},
 	{	PixFcUYVY,		16, 	2,			NULL,				},
+	{	PixFcUYVY,		8, 		2,			NULL,				},
+	{	PixFcUYVY,		80, 	1,			NULL,				},
+	{	PixFcUYVY,		72, 	1,			NULL,				},
+	{	PixFcUYVY,		64, 	1,			NULL,				},
+	{	PixFcUYVY,		48, 	1,			NULL,				},
+	{	PixFcUYVY,		32, 	1,			NULL,				},
+	{	PixFcUYVY,		16, 	1,			NULL,				},
+	{	PixFcUYVY,		8, 		1,			NULL,				},
 
 	{	PixFcYUV422P,	1280, 	1024,		"1280x1024.yuv422p",},
 	{	PixFcYUV422P,	32, 	2,			NULL,				},
@@ -86,9 +114,23 @@ const InputFile		input_files[] = {
 
 	{	PixFcV210,		1920, 	1080,		"1920x1080.v210",	},
 	{	PixFcV210,		1280, 	720,		NULL,				},
+	{	PixFcV210,		112, 	2,			NULL,				},
+	{	PixFcV210,		104, 	2,			NULL,				},
+	{	PixFcV210,		96, 	2,			NULL,				},
+	{	PixFcV210,		80, 	2,			NULL,				},
+	{	PixFcV210,		72, 	2,			NULL,				},
+	{	PixFcV210,		64, 	2,			NULL,				},
 	{	PixFcV210,		48, 	2,			NULL,				},
 	{	PixFcV210,		32, 	2,			NULL,				},
 	{	PixFcV210,		16, 	2,			NULL,				},
+	{	PixFcV210,		8, 		2,			NULL,				},
+	{	PixFcV210,		80, 	1,			NULL,				},
+	{	PixFcV210,		72, 	1,			NULL,				},
+	{	PixFcV210,		64, 	1,			NULL,				},
+	{	PixFcV210,		48, 	1,			NULL,				},
+	{	PixFcV210,		32, 	1,			NULL,				},
+	{	PixFcV210,		16, 	1,			NULL,				},
+	{	PixFcV210,		8, 		1,			NULL,				},
 
 	{	PixFcARGB,		1920, 	1080,		NULL,				},
 	{	PixFcARGB,		48, 	2,			NULL,				}, // to test to v210
@@ -272,7 +314,8 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 
 	// make sure the height is valid
 	if (width % desc->width_multiple != 0) {
-		pixfc_log("width is not multiple of %u\n", desc->width_multiple);
+		pixfc_log("%s requires width to be multiple of %u - have %u\n",
+				desc->name,	desc->width_multiple, width);
 		return -1;
 	}
 
@@ -750,13 +793,13 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 	// Index valid ?
 	if (index >= conversion_blocks_count) {
 		pixfc_log("Invalid conversion block index\n");
-		return -1;
+		return 1;
 	}
 
 	// Does the CPU have the required features ?
 	if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
 		pixfc_log("Conversion block required CPU features unsupported by CPU\n");
-		return -2;
+		return 2;
 	}
 
 	// Create flags for this conversion block
@@ -770,12 +813,10 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 			ROW_SIZE(conversion_blocks[index].source_fmt, width),
 			ROW_SIZE(conversion_blocks[index].dest_fmt, width),
 			flags);
-	if (result != 0) {
+	if (result != 0)
 		pixfc_log("Error (%d) creating struct pixfc for conversion '%s' %ux%u\n", result, conversion_blocks[index].name, width, height);
-		return -3;
-	}
 
-	return 0;
+	return result;
 }
 
 int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t src_row_bytes, uint32_t dest_row_bytes) {

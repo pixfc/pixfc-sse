@@ -61,6 +61,7 @@ extern const int32_t      rgb_8bit_to_yuv_10bit_coef_lhs8[][3][3];
 extern const int32_t      yuv_8bit_to_rgb_8bit_coef_lhs8[][3][3];
 extern const int32_t      yuv_10bit_to_rgb_8bit_coef_lhs8[][3][3];
 extern const int32_t      yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3];
+extern const int32_t      yuv_10bit_to_rgb_10bit_coef_lhs8[][3][3];
 
 #ifdef __INTEL_CPU__
 
@@ -455,8 +456,8 @@ extern const int32_t      yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3];
 			while(line-- > 0) {\
 				v210_ptr = (__m128i *)src;\
 				out_ptr = (__m128i *)dst;\
-				pixel = width - 24; /* Handle the last 24 pixels outside the loop*/\
-				while(pixel > 0) {\
+				pixel = width; /* Handle the last 24 pixels outside the loop*/\
+				while(pixel > 24) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
@@ -468,8 +469,8 @@ extern const int32_t      yuv_8bit_to_rgb_10bit_coef_lhs8[][3][3];
 			while(line-- > 0) {\
 				v210_ptr = (__m128i *)src;\
 				out_ptr = (__m128i *)dst;\
-				pixel = width - 24; /* Handle the last 24 pixels outside the loop*/\
-				while(pixel > 0) {\
+				pixel = width; /* Handle the last 24 pixels outside the loop*/\
+				while(pixel > 24) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\

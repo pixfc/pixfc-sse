@@ -46,16 +46,19 @@
 			*(dst++) = CLIP_PIXEL(b);\
 			*(dst++) = CLIP_PIXEL(g);\
 			*(dst++) = CLIP_PIXEL(r);\
-		} else {\
+		} else if (dest_fmt == PixFcR210) {\
 			uint32_t temp;\
-			temp = (((uint32_t)CLIP_10BIT_PIXEL(b) & 0x3FF) << 2);/
-			temp |= (((uint32_t)CLIP_10BIT_PIXEL(g) & 0x3FF) << 12);/
-			temp |= (((uint32_t)CLIP_10BIT_PIXEL(r) & 0x3FF) << 22);/
-			dst[3] = in8[0];\
-			dst[2] = in8[1];\
-			dst[1] = in8[2];\
-			dst[0] = in8[3];\
-			}
+			uint8_t *tmp8 = (uint8_t *) &temp;\
+			temp = ((uint32_t)CLIP_10BIT_PIXEL(b) & 0x3FF);\
+			temp |= (((uint32_t)CLIP_10BIT_PIXEL(g) & 0x3FF) << 10);\
+			temp |= (((uint32_t)CLIP_10BIT_PIXEL(r) & 0x3FF) << 20);\
+			*dst++ = tmp8[3];\
+			*dst++ = tmp8[2];\
+			*dst++ = tmp8[1];\
+			*dst++ = tmp8[0];\
+		} else {\
+			printf("Unknown RGB pixel format\n");\
+		}
 
 
 
@@ -93,6 +96,7 @@
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
+		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			/* Convert as many chunks of 6 pixels as possible,
@@ -148,6 +152,7 @@
 				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 			}\
 			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			dst += padding_bytes;\
 			pixel = 0;\
 		}\
 	}
@@ -156,6 +161,9 @@
 DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_10bit_to_rgb_8bit_off[0])
 DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt601_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_8bit_off[1])
 DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_8bit_off[2])
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_10bit_rgb_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[0], 8, yuv_10bit_to_rgb_10bit_off[0])
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_10bit_rgb_bt601_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_10bit_off[1])
+DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_10bit_rgb_bt709_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_10bit_off[2])
 
 
 //
@@ -170,6 +178,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse, y
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
+		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			/* Convert as many chunks of 6 pixels as possible,
@@ -225,6 +234,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse, y
 				CONVERT_N_STORE_FLOAT(coeffs, offsets, y, u, v);\
 			}\
 			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			dst += padding_bytes;\
 			pixel = 0;\
 		}\
 	}
@@ -233,6 +243,9 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse, y
 DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_nonsse_float, yuv_10bit_to_rgb_8bit_coef[0], yuv_10bit_to_rgb_8bit_off[0])
 DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_bt601_nonsse_float, yuv_10bit_to_rgb_8bit_coef[1], yuv_10bit_to_rgb_8bit_off[1])
 DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_bt709_nonsse_float, yuv_10bit_to_rgb_8bit_coef[2], yuv_10bit_to_rgb_8bit_off[2])
+DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_10bit_rgb_nonsse_float, yuv_10bit_to_rgb_10bit_coef[0], yuv_10bit_to_rgb_10bit_off[0])
+DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_10bit_rgb_bt601_nonsse_float, yuv_10bit_to_rgb_10bit_coef[1], yuv_10bit_to_rgb_10bit_off[1])
+DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_10bit_rgb_bt709_nonsse_float, yuv_10bit_to_rgb_10bit_coef[2], yuv_10bit_to_rgb_10bit_off[2])
 
 
 
@@ -248,6 +261,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_bt709_non
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v, next_u, next_v;\
+		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			u = (*src & 0x3FF);\
@@ -327,6 +341,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_bt709_non
 				CONVERT_N_STORE(coeffs, coef_shift, offsets, y, u, v);\
 			}\
 			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			dst += padding_bytes;\
 			pixel = 0;\
 		}\
 	}
@@ -335,6 +350,9 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_rgb_bt709_non
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_10bit_to_rgb_8bit_off[0])
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_bt601_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_8bit_off[1])
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_rgb_bt709_nonsse, yuv_10bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_8bit_off[2])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_10bit_rgb_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[0], 8, yuv_10bit_to_rgb_10bit_off[0])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_10bit_rgb_bt601_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[1], 8, yuv_10bit_to_rgb_10bit_off[1])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any_10bit_rgb_bt709_nonsse, yuv_10bit_to_rgb_10bit_coef_lhs8[2], 8, yuv_10bit_to_rgb_10bit_off[2])
 
 
 
@@ -350,6 +368,7 @@ DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v, next_u, next_v;\
+		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			u = (*src & 0x3FF);\
@@ -429,6 +448,7 @@ DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any
 				CONVERT_N_STORE_FLOAT(coeffs, offsets, y, u, v);\
 			}\
 			src = (uint32_t*) ((uint8_t*)in + line * ROW_SIZE(PixFcV210, conv->width));\
+			dst += padding_bytes;\
 			pixel = 0;\
 		}\
 	}
@@ -437,6 +457,9 @@ DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_rgb_nonsse_float, yuv_10bit_to_rgb_8bit_coef[0], yuv_10bit_to_rgb_8bit_off[0])
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_rgb_bt601_nonsse_float, yuv_10bit_to_rgb_8bit_coef[1], yuv_10bit_to_rgb_8bit_off[1])
 DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_rgb_bt709_nonsse_float, yuv_10bit_to_rgb_8bit_coef[2], yuv_10bit_to_rgb_8bit_off[2])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_10bit_rgb_nonsse_float, yuv_10bit_to_rgb_10bit_coef[0], yuv_10bit_to_rgb_10bit_off[0])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_10bit_rgb_bt601_nonsse_float, yuv_10bit_to_rgb_10bit_coef[1], yuv_10bit_to_rgb_10bit_off[1])
+DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION_FLOAT(upsample_n_convert_v210_to_any_10bit_rgb_bt709_nonsse_float, yuv_10bit_to_rgb_10bit_coef[2], yuv_10bit_to_rgb_10bit_off[2])
 
 
 

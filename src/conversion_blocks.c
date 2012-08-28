@@ -356,6 +356,18 @@ DECLARE_AVG_BT709_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt7
  */
 const struct  ConversionBlock		conversion_blocks[] = {
 
+	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK				(convert_v210_to_r210, PixFcV210, PixFcR210, 8, 1, "v210 to r210"),
+	DECLARE_NNB_CONV_BLOCK(convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+	DECLARE_NNB_FLOAT_CONV_BLOCK(convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+
+	DECLARE_NNB_BT601_SSE2_SSSE3_CONV_BLOCK				(convert_v210_to_r210_bt601, PixFcV210, PixFcR210, 8, 1, "v210 to r210"),
+	DECLARE_NNB_BT601_CONV_BLOCK(convert_v210_to_any_10bit_rgb_bt601, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+	DECLARE_NNB_BT601_FLOAT_CONV_BLOCK(convert_v210_to_any_10bit_rgb_bt601, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+
+	DECLARE_NNB_BT709_SSE2_SSSE3_CONV_BLOCK				(convert_v210_to_r210_bt709, PixFcV210, PixFcR210, 8, 1, "v210 to r210"),
+	DECLARE_NNB_BT709_CONV_BLOCK(convert_v210_to_any_10bit_rgb_bt709, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+	DECLARE_NNB_BT709_FLOAT_CONV_BLOCK(convert_v210_to_any_10bit_rgb_bt709, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+
 	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, "ARGB to YUYV"),
