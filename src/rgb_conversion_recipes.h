@@ -29,11 +29,13 @@
  */
 #undef  GENERATE_UNALIGNED_INLINES
 #define GENERATE_UNALIGNED_INLINES 0
+#include "rgb_pack.h"
 #include "rgb_unpack.h"
 #include "yuv_pack.h"
 
 #undef  GENERATE_UNALIGNED_INLINES
 #define GENERATE_UNALIGNED_INLINES 1
+#include "rgb_pack.h"
 #include "rgb_unpack.h"
 #include "yuv_pack.h"
 
@@ -688,6 +690,42 @@
 
 
 
+/*
+ * 		R G B 3 2
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+#define RGB32_TO_R210_RECIPE(unpack_fn, pack_fn) \
+	uint32_t	width = pixfc->width;\
+	uint32_t	line = pixfc->height;\
+	uint8_t		*src = (uint8_t *)source_buffer;\
+	uint8_t		*dst = (uint8_t *)dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, width);\
+	uint32_t	pixel;\
+	__m128i*	rgb_in;\
+	__m128i*	rgb_out;\
+	__m128i		unpack_out[3];\
+	while(line-- > 0) {\
+		rgb_in = (__m128i *) src;\
+		rgb_out = (__m128i *) dst;\
+		pixel = width;\
+		while(pixel > 0) {\
+			unpack_fn(rgb_in, unpack_out);\
+			unpack_out[0] = _mm_slli_epi16(unpack_out[0], 2);\
+			unpack_out[1] = _mm_slli_epi16(unpack_out[1], 2);\
+			unpack_out[2] = _mm_slli_epi16(unpack_out[2], 2);\
+			pack_fn(unpack_out, rgb_out);\
+			rgb_in += 2;\
+			rgb_out += 2;\
+			pixel -= 8;\
+		}\
+		src += src_row_byte_count;\
+		dst += dst_row_byte_count;\
+	}
 
 
 /*
@@ -1668,5 +1706,44 @@
 			unpack_fn, y_conv_fn, uv_conv_fn, pack_fn, instr_set\
 		)
 
+/*
+ * 		R G B 2 4
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+#define RGB24_TO_R210_RECIPE(unpack_fn, pack_fn) \
+	uint32_t	width = pixfc->width;\
+	uint32_t	line = pixfc->height;\
+	uint8_t		*src = (uint8_t *)source_buffer;\
+	uint8_t		*dst = (uint8_t *)dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, width);\
+	uint32_t	pixel;\
+	__m128i*	rgb_in;\
+	__m128i*	rgb_out;\
+	__m128i		unpack_out[6];\
+	while(line-- > 0) {\
+		rgb_in = (__m128i *) src;\
+		rgb_out = (__m128i *) dst;\
+		pixel = width;\
+		while(pixel > 0) {\
+			unpack_fn(rgb_in, unpack_out);\
+			unpack_out[0] = _mm_slli_epi16(unpack_out[0], 2);\
+			unpack_out[1] = _mm_slli_epi16(unpack_out[1], 2);\
+			unpack_out[2] = _mm_slli_epi16(unpack_out[2], 2);\
+			unpack_out[3] = _mm_slli_epi16(unpack_out[3], 2);\
+			unpack_out[4] = _mm_slli_epi16(unpack_out[4], 2);\
+			unpack_out[5] = _mm_slli_epi16(unpack_out[5], 2);\
+			pack_fn(unpack_out, rgb_out);\
+			rgb_in += 3;\
+			rgb_out += 4;\
+			pixel -= 16;\
+		}\
+		src += src_row_byte_count;\
+		dst += dst_row_byte_count;\
+	}
 
 #endif /* RGB_CONVERSION_RECIPES_H_ */

@@ -49,6 +49,22 @@
 			printf("Unknown source pixel format in non-SSE conversion from RGB\n");\
 	}while(0)\
 
+#define PACK_R210(r, g, b, dst, dest_fmt) \
+	if (dest_fmt == PixFcR210) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		dprint("R: %d G: %d B: %d\n", CLIP_10BIT_PIXEL(r), CLIP_10BIT_PIXEL(g), CLIP_10BIT_PIXEL(b));\
+		tmp = CLIP_10BIT_PIXEL(b);\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 10);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 20);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
+	} else {\
+		printf("unknown rgb destination format\n");\
+	}
+
 #define PACK_YUV422(dst, y1, u, y2, v, dest_fmt) do {\
 			if (dest_fmt == PixFcYUYV) {\
 				*(dst++) = CLIP_PIXEL(y1);\
@@ -804,3 +820,40 @@ DEFINE_ANY_RGB_TO_YUV420_FLOAT_FN(convert_rgb_to_yuv420_bt601_nonsse_float, rgb_
 DEFINE_ANY_RGB_TO_YUV420_FLOAT_FN(convert_rgb_to_yuv420_bt709_nonsse_float, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2]);
 
 
+
+/*
+ *
+ * 		A R G B
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+// This conversion assumes an even number of pixels
+void		convert_rgb_to_10bit_rgb_nonsse(const struct PixFcSSE* pixfc, void* in, void* out) {
+	PixFcPixelFormat 	src_fmt = pixfc->source_fmt;
+	PixFcPixelFormat 	dst_fmt = pixfc->dest_fmt;
+	uint32_t 			pixel = 0;
+	uint32_t			line = 0;
+	uint8_t*			src = (uint8_t *) in;
+	uint8_t*			dst = (uint8_t *) out;
+	uint32_t			dst_row_byte_count = ROW_SIZE(dst_fmt, pixfc->width);
+	int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;
+	while(line++ < pixfc->height){
+		while(pixel < pixfc->width) {
+			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);
+			r1 *= 4;
+			g1 *= 4;
+			b1 *= 4;
+			PACK_R210(r1, g1, b1, dst, dst_fmt);
+			r2 *= 4;
+			g2 *= 4;
+			b2 *= 4;
+			PACK_R210(r2, g2, b2, dst, dst_fmt);
+			pixel += 2;
+		}
+		dst = (uint8_t*)out + line * dst_row_byte_count;
+		pixel = 0;
+	}
+}

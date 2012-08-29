@@ -230,4 +230,19 @@ void 		convert_rgb_to_yuv420_bt601_nonsse_float(const struct PixFcSSE* conv, voi
 void 		convert_rgb_to_yuv420_bt709_nonsse_float(const struct PixFcSSE* conv, void* in, void* out);
 
 
+
+/*
+ *
+ * 		A R G B
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+void		convert_argb_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_rgb_to_10bit_rgb_nonsse(const struct PixFcSSE *, void *, void *);
+
+
+
 #endif /* CONVERSION_ROUTINES_FROM_ARGB_H_ */

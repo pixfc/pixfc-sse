@@ -277,3 +277,18 @@ void		convert_bgra_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source
 void		downsample_n_convert_bgra_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
 	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3);
 }
+
+
+
+/*
+ *
+ * 		B G R A
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+void		convert_bgra_to_r210_sse2_ssse3(const struct PixFcSSE *pixfc, void *source_buffer, void *dest_buffer) {
+	DO_REPACK2(RGB32_TO_R210_RECIPE, unpack_bgra_to_r_g_b_vectors_sse2_ssse3, pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3);
+}

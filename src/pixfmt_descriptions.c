@@ -202,7 +202,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 	
 	{
 		    PixFcARGB,
-		    4, 1, 0, 16, 1, 1,
+		    4, 1, 0, 8, 1, 1,
 		    {
 		    	// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x0000FF000000FF00LL, 0x00FF000000FF0000LL),
@@ -225,7 +225,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcBGRA,
-		    4, 1, 0, 16, 1, 1,
+		    4, 1, 0, 8, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x00FF000000FF0000LL, 0x0000FF000000FF00LL),

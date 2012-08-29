@@ -246,6 +246,12 @@ DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_
 DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
+// The following macro defines non-sse and ssse3 repacking conversion blocks
+#define		DECLARE_R210_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
+DECLARE_REPACK_SSE2_SSSE3_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
 
 
 
@@ -372,6 +378,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// ARGB to v210
 	DECLARE_V210_CONV_BLOCKS(convert_argb_to_v210, downsample_n_convert_argb_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcARGB, PixFcV210, 16, 1, 2, 1, "ARGB to v210"),
 
+	// ARGB to r210
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_argb_to_r210, convert_rgb_to_10bit_rgb, PixFcARGB, PixFcR210, 8, 1, 2, 1, "ARGB to r210"),
 
 	//
 	// BGRA to YUYV
@@ -388,6 +396,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// BGRA to v210
 	DECLARE_V210_CONV_BLOCKS(convert_bgra_to_v210, downsample_n_convert_bgra_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcBGRA, PixFcV210, 16, 1, 2, 1, "BGRA to v210"),
+
+	// BGRA to r210
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_bgra_to_r210, convert_rgb_to_10bit_rgb, PixFcBGRA, PixFcR210, 8, 1, 2, 1, "BGRA to r210"),
 
 
 	//
@@ -406,6 +417,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// RGB24 to v210
 	DECLARE_V210_CONV_BLOCKS(convert_rgb24_to_v210, downsample_n_convert_rgb24_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcRGB24, PixFcV210, 16, 1, 2, 1, "RGB24 to v210"),
 
+	// BGR24 to r210
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_rgb24_to_r210, convert_rgb_to_10bit_rgb, PixFcRGB24, PixFcR210, 16, 1, 2, 1, "RGB24 to r210"),
+
 
 	//
 	// BGR24 to YUYV
@@ -423,6 +437,8 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGR24 to v210
 	DECLARE_V210_CONV_BLOCKS(convert_bgr24_to_v210, downsample_n_convert_bgr24_to_v210, convert_rgb_to_v210, downsample_n_convert_rgb_to_v210, PixFcBGR24, PixFcV210, 16, 1, 2, 1, "BGR24 to v210"),
 
+	// BGR24 to r210
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_bgr24_to_r210, convert_rgb_to_10bit_rgb, PixFcBGR24, PixFcR210, 16, 1, 2, 1, "BGR24 to r210"),
 
 	//
 	// YUYV to ARGB
