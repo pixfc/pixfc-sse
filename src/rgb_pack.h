@@ -711,7 +711,7 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, __m128i* input, __m128i* 
  *
  *
  * OUTPUT:
- * 2 vectors of 4 r210 pixels
+ * 4 vectors of 16 r210 pixels
  *  R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
  *  R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
  *  R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12

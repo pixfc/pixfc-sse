@@ -70,18 +70,15 @@ void		convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		upsample_n_convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to RGB32/24		NON SSE integer
+// V210 to anyRGB		NON SSE integer
 void 		convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_rgb_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to RGB32/24		NON SSE float
-void 		convert_v210_to_any_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
-void 		upsample_n_convert_v210_to_any_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
-
-
-// V210 to 10bitRGB		NON SSE integer
 void 		convert_v210_to_any_10bit_rgb_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to 10bitRGB		NON SSE float
+
+// V210 to anyRGB		NON SSE float
+void 		convert_v210_to_any_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
+void 		upsample_n_convert_v210_to_any_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		convert_v210_to_any_10bit_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_nonsse_float(const struct PixFcSSE* , void* , void*);
 
@@ -138,18 +135,15 @@ void		convert_v210_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, voi
 void		upsample_n_convert_v210_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to RGB32/24		NON SSE integer
+// V210 to anyRGB		NON SSE integer
 void 		convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to RGB32/24		NON SSE float
-void 		convert_v210_to_any_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
-void 		upsample_n_convert_v210_to_any_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
-
-
-// V210 to 10bitRGB		NON SSE integer
 void 		convert_v210_to_any_10bit_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_bt601_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to 10bitRGB		NON SSE float
+
+// V210 to anyRGB		NON SSE float
+void 		convert_v210_to_any_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
+void 		upsample_n_convert_v210_to_any_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		convert_v210_to_any_10bit_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_bt601_nonsse_float(const struct PixFcSSE* , void* , void*);
 
@@ -204,18 +198,15 @@ void		convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, voi
 void		upsample_n_convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to RGB32/24		NON SSE integer
+// V210 to anyRGB		NON SSE integer
 void 		convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to RGB32/24		NON SSE float
-void 		convert_v210_to_any_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
-void 		upsample_n_convert_v210_to_any_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
-
-
-// V210 to 10bitRGB		NON SSE integer
 void 		convert_v210_to_any_10bit_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_bt709_nonsse(const struct PixFcSSE* , void* , void*);
-// V210 to 10bitRGB		NON SSE float
+
+// V210 to anyRGB		NON SSE float
+void 		convert_v210_to_any_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
+void 		upsample_n_convert_v210_to_any_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		convert_v210_to_any_10bit_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
 void 		upsample_n_convert_v210_to_any_10bit_rgb_bt709_nonsse_float(const struct PixFcSSE* , void* , void*);
 

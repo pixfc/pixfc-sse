@@ -462,6 +462,10 @@ static uint32_t do_conversion(uint32_t index, uint32_t w, uint32_t h) {
 }
 
 static uint32_t check_conversion_buffer_sizes() {
+	static const uint32_t	w_8_1[] = {8, 8*2,  8*3,  8*4,  8*5,  8*6,   8, 8*2,  8*3,  8*4,  8*5,  8*6,    720, 720, 960, 960+8, 960+8, 960+48, 1280, 1920};
+	static const uint32_t	h_8_1[] = {1,  1,    1,    1,    1,    1,    2,  2,    2,    2,    2,    2,    480, 576, 720,  720,    720,    720,   1024, 1080};
+	static const uint32_t 	size_count_8_1 = sizeof(w_8_1)/sizeof(w_8_1[0]);
+	//
 	static const uint32_t	w_16_1[] = {16, 16*2, 16*3, 16*4, 16*5, 16*6, 16, 16*2, 16*3, 16*4, 16*5, 16*6, 720, 720, 960, 960+16, 960+32, 960+48, 1280, 1920};
 	static const uint32_t	h_16_1[] = {1,  1,    1,    1,    1,    1,    2,  2,    2,    2,    2,    2,    480, 576, 720,  720,    720,    720,   1024, 1080};
 	static const uint32_t 	size_count_16_1 = sizeof(w_16_1)/sizeof(w_16_1[0]);
@@ -483,7 +487,11 @@ static uint32_t check_conversion_buffer_sizes() {
 
 	// Loop over all conversion blocks
 	for(conv_index = 0; conv_index < conversion_blocks_count; conv_index++) {
-		if ((conversion_blocks[conv_index].width_multiple == 16) && (conversion_blocks[conv_index].height_multiple == 1)) {
+		if ((conversion_blocks[conv_index].width_multiple == 8) && (conversion_blocks[conv_index].height_multiple == 1)) {
+			width_array = w_8_1;
+			height_array = h_8_1;
+			array_size = size_count_8_1;
+		} else if ((conversion_blocks[conv_index].width_multiple == 16) && (conversion_blocks[conv_index].height_multiple == 1)) {
 			width_array = w_16_1;
 			height_array = h_16_1;
 			array_size = size_count_16_1;

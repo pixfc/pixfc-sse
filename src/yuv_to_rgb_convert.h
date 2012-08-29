@@ -1784,7 +1784,7 @@ DEFINE_NNB_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
  * Uses nearest neighbour upsampling:
  * U12 & V12 are used as chroma values for both pixel 1 and 2
  *
- * Total latency: 			22 cycles
+ * Total latency: 			16 cycles
  * Num of pixel handled:	8
  *
  * R = 	[ 1		0		1.4		]	( Y )
@@ -1792,9 +1792,9 @@ DEFINE_NNB_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
  * B = 	[ 1		1.765	0		]	( V - 512 )
  *
  *
- * 		[ 256	0		358		]	left shift by 8
- * 		[ 256	-88		-182	]
- * 		[ 256	452		0		]
+ * 		[ 1		0		358		]	U & V coeffs left shifted by 8
+ * 		[ 1		-88		-182	]
+ * 		[ 1		452		0		]
  *
  *
  * INPUT:
@@ -2143,6 +2143,44 @@ EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* o
 	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));\
 	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));\
 	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(_M(yVect), _M(uvEven));\
+}
+
+/*
+ * Variation on the previous macro (uvR, uvG & uvB coeffs are left shifted by 8 bits) PLUS:
+ *  - no Y offset
+ *  - no Y coeff
+ */
+#define	DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE6(fn_name, uvOffset, uvRCoef, uvGCoef, uvBCoef) \
+EXTERN_INLINE void fn_name(__m128i* in_3_v16i_y_uvOdd_uvEven_vectors, __m128i* out_3_v16i_rgb_vectors)\
+{\
+	CONST_M128I(sub128, uvOffset, uvOffset);\
+	CONST_M128I(uvRCoeffs, uvRCoef, uvRCoef);\
+	CONST_M128I(uvGCoeffs, uvGCoef, uvGCoef);\
+	CONST_M128I(uvBCoeffs, uvBCoef, uvBCoef);\
+	CONST_M128I(shuff1,	0xFFFF0605FFFF0201LL, 0xFFFF0E0DFFFF0A09LL);\
+	CONST_M128I(shuff2,	0x0605FFFF0201FFFFLL, 0x0E0DFFFF0A09FFFFLL);\
+	M128I(uvOdd, 0x0LL, 0x0LL);\
+	M128I(uvEven, 0x0LL, 0x0LL);\
+	in_3_v16i_y_uvOdd_uvEven_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(sub128));\
+	in_3_v16i_y_uvOdd_uvEven_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(sub128));\
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(uvRCoeffs));\
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));\
+	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(uvRCoeffs));\
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));\
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));\
+	out_3_v16i_rgb_vectors[0] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[0], _M(uvEven));\
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(uvGCoeffs));\
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));\
+	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(uvGCoeffs));\
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));\
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));\
+	out_3_v16i_rgb_vectors[1] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[0], _M(uvEven));\
+	_M(uvOdd) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[1], _M(uvBCoeffs));\
+	_M(uvOdd) = _mm_shuffle_epi8(_M(uvOdd), _M(shuff1));\
+	_M(uvEven) = _mm_madd_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[2], _M(uvBCoeffs));\
+	_M(uvEven) = _mm_shuffle_epi8(_M(uvEven), _M(shuff2));\
+	_M(uvEven) = _mm_or_si128(_M(uvEven), _M(uvOdd));\
+	out_3_v16i_rgb_vectors[2] = _mm_add_epi16(in_3_v16i_y_uvOdd_uvEven_vectors[0], _M(uvEven));\
 }
 /*
  * The first macro expands to:
@@ -2709,6 +2747,157 @@ DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
 		0xFDDEFF26FDDEFF26LL,
 		0x0000087300000873LL)
 
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UY into 3 vectors of 8 short 10-bit R, G & B
+ * using full range YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ *
+ * Total latency: 			32 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1		0		1.4		]	( Y )
+ * G = 	[ 1		-0.343	-0.711	]	( U - 512 )
+ * B = 	[ 1		1.765	0		]	( V - 512 )
+ *
+ *
+ * 		[ 256	0		358		]	left shift by 8
+ * 		[ 256	-88		-182	]
+ * 		[ 256	452		0		]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVectOdd
+ * U1 0		V1 0	U3 0	V3 0	U5	0	V5 0	U7 0	V7 0
+ *
+ * uvVectEven
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE6(convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_sse2_ssse3,
+		0xFE00FE00FE00FE00LL, 0x0166000001660000LL, 0xFF4AFFA8FF4AFFA8LL, 0x000001C4000001C4LL);
+
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ *
+ * Total latency: 			19 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164		0			1.596	]	( Y - 64)
+ * G = 	[ 1.164		-0.392		-0.813	]	( U - 512 )
+ * B = 	[ 1.164		2.017		0		]	( V - 512 )
+ *
+ *
+ * 		[ 9535		0			 409	]	Y coeffs left shifted by 13 bits
+ * 		[ 9535		-100		-208	]	U, V coeffs left shifted by 8 bits
+ * 		[ 9535		516			 0		]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVectOdd
+ * U1 0		V1 0	U3 0	V3 0	U5	0	V5 0	U7 0	V7 0
+ *
+ * uvVectEven
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
+		convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt601_sse2_ssse3,
+		0xFFC0FFC0FFC0FFC0LL,
+		0xFE00FE00FE00FE00LL,
+		0x253F253F253F253FLL, 13,
+		0x0199000001990000LL,
+		0xFF30FF9CFF30FF9CLL,
+		0x0000020400000204LL)
+
+/*
+ * Convert 2 vectors of 8 short 10-bit Y, UV into 3 vectors of 8 short 10-bit R, G & B
+ * using bt709 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ *
+ * Total latency: 			19 cycles
+ * Num of pixel handled:	8
+ *
+ * R = 	[ 1.164		0			1.793	]	( Y - 64 )
+ * G = 	[ 1.164		-0.213		-0.533	]	( U - 512 )
+ * B = 	[ 1.164		2.112		0		]	( V - 512 )
+ *
+ *
+ * 		[ 9535		0			458		]	Y coeffs left shifted by 13 bits
+ * 		[ 9535		-55			-136	]	U, V coeffs left shifted by 8 bits
+ * 		[ 9535		541			0		]
+ *
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ * uvVectOdd
+ * U1 0		V1 0	U3 0	V3 0	U5	0	V5 0	U7 0	V7 0
+ *
+ * uvVectEven
+ * U2 0		V2 0	U4 0	V4 0	U6 0	V6 0	U8 0	V8 0
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+DEFINE_UPSAMPLED_Y_UV_TO_RGB_SSE2_SSSE3_INLINE5(
+		convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt709_sse2_ssse3,
+		0xFFC0FFC0FFC0FFC0LL,
+		0xFE00FE00FE00FE00LL,
+		0x253F253F253F253FLL, 13,
+		0x01CA000001CA0000LL,
+		0xFF78FFC9FF78FFC9LL,
+		0x0000021D0000021DLL)
 
 #endif	// __INTEL_CPU__
 
