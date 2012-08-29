@@ -533,52 +533,46 @@ extern const int32_t      yuv_10bit_to_rgb_10bit_coef_lhs8[][3][3];
  *   (even though the width (in pixel) does not have to be multiple of 48
  *    thanks to padding bytes at the end of each line).
  *
- * Because of these assumptions, there are only 3 cases to cover depending on the width:
- * - width % 48 == 0,
- * - width % 48 == 16
- * - width % 48 == 32
- * Unlike the previous outer loop where 24 pixels where handled in the core loop, here the core
- * loop here handles 48 pixels, which IS the v210 buffer modulo. Therefore, the v210 pointer is
- * guaranteed to point to the start of the next v210 line in all 3 cases.
+ * Because of these assumptions, there are 6 cases to cover depending on width % 48:
+ * 0, 8, 16, 24, 32, 40
  */
-#define FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(core_preamble, core, core_last48, leftover_16, leftover_32, ...)\
+#define FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftovers, ...) \
+			while(line-- > 0) {\
+				v210_ptr = (__m128i *)src;\
+				out_ptr = (__m128i *)dst;\
+				core_preamble(__VA_ARGS__);\
+				while(pixel > 48) /* handle as many chunks of 48 pixels in the loop */{\
+					core(__VA_ARGS__);\
+					pixel -= 48;\
+				}\
+				leftovers(__VA_ARGS__);\
+				src += src_row_byte_count;\
+				dst += dst_row_byte_count;\
+				pixel = width;\
+			}
+
+#define FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(v210_ptr, out_ptr, core_preamble, core, last_48, leftover_8, leftover_16, leftover_24, leftover_32, leftover_40, ...)\
 		uint32_t	width = pixfc->width;\
 		uint32_t	line = pixfc->height;\
 		uint32_t	pixel = width;\
+		uint8_t		*src = (uint8_t *)source_buffer;\
+		uint8_t		*dst = (uint8_t *)dest_buffer;\
+		uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, width);\
+		uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, width);\
 		if ((width % 48) == 0) {\
-			while(line-- > 0) {\
-				core_preamble(__VA_ARGS__);\
-				while(pixel > 48) /* handle the last 48 pixels outside the loop*/{\
-					core(__VA_ARGS__);\
-					pixel -= 48;\
-				}\
-				core_last48(__VA_ARGS__);\
-				/* v210_ptr already points to the start of next line */;\
-				pixel = width;\
-			}\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, last_48, __VA_ARGS__)\
+		} else if ((width % 48) == 8) {\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftover_8, __VA_ARGS__)\
 		} else if ((width % 48) == 16) {\
-			while(line-- > 0) {\
-				core_preamble(__VA_ARGS__);\
-				while(pixel > 48) {\
-					core(__VA_ARGS__);\
-					pixel -= 48;\
-				}\
-				leftover_16(__VA_ARGS__);\
-				/* v210_ptr already points to the start of next line */;\
-				pixel = width;\
-			}\
-		} else { /* width % 48 == 32 */\
-			while(line-- > 0) {\
-				core_preamble(__VA_ARGS__);\
-				while(pixel > 48) {\
-					core(__VA_ARGS__);\
-					pixel -= 48;\
-				}\
-				leftover_32(__VA_ARGS__);\
-				/* v210_ptr already points to the start of next line */;\
-				pixel = width;\
-			}\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftover_16, __VA_ARGS__)\
+		} else if ((width % 48) == 24) {\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftover_24, __VA_ARGS__)\
+		} else if ((width % 48) == 32) {\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftover_32, __VA_ARGS__)\
+ 		} else if ((width % 48) == 40) {\
+			FROM_V210_48_PIX_INNER_LOOP(v210_ptr, out_ptr, core_preamble, core, leftover_40, __VA_ARGS__)\
 		}
+
 #define TO_V120_48_PIX_OUTER_CONVERSION_LOOP(core_first48, core, first_leftover_16, leftover_16, first_leftover_32, leftover_32, ...)\
 		uint32_t	width = pixfc->width;\
 		uint32_t	line = pixfc->height;\

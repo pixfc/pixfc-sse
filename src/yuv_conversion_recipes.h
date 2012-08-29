@@ -397,11 +397,15 @@
 	__m128i*    v210_in = (__m128i *) source_buffer;\
 	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
+			v210_in, rgb_out_buf,\
 			AVG_UPSAMPLE_V210_TO_RGB_PREAMBLE,\
 			AVG_UPSAMPLE_V210_TO_RGB_CORE,\
 			AVG_UPSAMPLE_V210_TO_RGB_CORE_LAST48,\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_8 */\
 			AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER16,\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_24 */\
 			AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32,\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_40 */\
 			unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set\
 	)
 
@@ -824,11 +828,15 @@
 	__m128i		unpack_out[6];\
 	__m128i		convert_out[6];\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
+			v210_in, rgb_out_buf,\
 			EMPTY, 							/* no preamble */\
 			NNB_UPSAMPLE_V210_TO_RGB_CORE,	/* 48-pixel */\
 			NNB_UPSAMPLE_V210_TO_RGB_CORE,	/* last 48-pixel */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_8 */\
 			NNB_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER16,	/* last 16 pixels */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_24 */\
 			NNB_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32,	/* last 32 pixels */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_40 */\
 			unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set\
 		);
 
@@ -981,11 +989,15 @@
 	__m128i*	yuv_out = (__m128i*) dest_buffer;\
 	__m128i		unpack_out[8];\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
+			v210_in, yuv_out, \
 			EMPTY,									/* No preamble */\
 			V210_TO_YUV422I_CORE,					/* 48 pixel core loop */\
 			V210_TO_YUV422I_CORE,					/* Last 48 pixels */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_8 */\
 			V210_TO_YUV422I_CORE_LEFTOVER16,		/* Last 16 pixels */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_24 */\
 			V210_TO_YUV422I_CORE_LEFTOVER32,		/* Last 32 pixels */\
+			EMPTY, /* There is a multiple of 16 pixels, so no leftover_40 */\
 			unpack_fn_prefix, pack_fn, instr_set\
 		)
 
