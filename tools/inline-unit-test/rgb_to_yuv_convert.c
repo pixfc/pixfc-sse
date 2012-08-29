@@ -361,6 +361,120 @@ DECLARE_RGB_TO_Y_CHECK(convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709, rgb_8
 
 
 
+
+
+/*
+ * Convert 3 vectors of 8 short 10-bit R, G, B into 1 vector of 8 short 8-bit Y
+ * using full range RGB to YCbCr conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			11 cycles
+ * Num of pixel handled:	8
+ *
+ * Y = 	[  0  ] + [  0.075		0.147		0.029	]	( R )
+ *
+ *				All coeffs are left-shifted by 16 bits
+  * 			  [	  4899		9617		1868	]
+ *
+ * Note: the Y calculation involves only positive values and coefficients and
+ * thus uses only unsigned math.
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * OUTPUT:
+ *
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ */
+DECLARE_RGB_TO_Y_CHECK(convert_10bit_r_g_b_vectors_to_8bit_y_vector, rgb_10bit_to_yuv_8bit_coef[0], rgb_10bit_to_yuv_8bit_off[0], CHECK_FN_8BIT_3IN);
+
+
+/*
+ * Convert 3 vectors of 8 short 10-bit R, G, B into 1 vector of 8 short 9-bit Y
+ * using BT601 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			12 cycles
+ * Num of pixel handled:	8
+ *
+ * Y = 	[  16  ] + [  0.064		  0.126		0.025	]	( R )
+ *
+ *				All coeffs are left-shifted by 16 bits
+ * 					[  4211		  8258		1606	]
+ *
+ * Note: the Y calculation involves only positive values and coefficients and
+ * thus uses only unsigned math.
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * OUTPUT:
+ *
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ */
+DECLARE_RGB_TO_Y_CHECK(convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt601, rgb_10bit_to_yuv_8bit_coef[1], rgb_10bit_to_yuv_8bit_off[1], CHECK_FN_8BIT_3IN);
+
+/*
+ * Convert 3 vectors of 8 short 10-bit R, G, B into 1 vector of 8 short 8-bit Y
+ * using BT709 YCbCr to RGB conversion equations from
+ * http://www.equasys.de/colorconversion.html
+ *
+ * Total latency: 			12 cycles
+ * Num of pixel handled:	8
+ *
+ * Y = 	[  16  ] + [  0.046		 0.154		0.016	]	( R )
+ *
+ *				All coeffs are left-shifted by 16 bits
+ * 					[  2998		10060		1016	]
+ *
+ * Note: the Y calculation involves only positive values and coefficients and
+ * thus uses only unsigned math.
+ *
+ * INPUT:
+ *
+ * 3 vectors of 8 short:
+ * rVect
+ * R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * OUTPUT:
+ *
+ * yVect
+ * Y1 0		Y2 0	Y3 0	Y4 0	Y5 0	Y6 0	Y7 0	Y8 0
+ *
+ */
+DECLARE_RGB_TO_Y_CHECK(convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt709, rgb_10bit_to_yuv_8bit_coef[2], rgb_10bit_to_yuv_8bit_off[2], CHECK_FN_8BIT_3IN);
+
+
+
+
 /*
  *
  *		R		G		B
