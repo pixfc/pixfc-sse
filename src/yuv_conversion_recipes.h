@@ -176,7 +176,7 @@
  */
 
 // Preamble: unpacks 24 pixels
-#define AVG_UPSAMPLE_V210_TO_RGB_PREAMBLE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define AVG_UPSAMPLE_V210_TO_RGB_PREAMBLE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set, ...) \
 	unpack_fn_prefix##instr_set(v210_in, &unpack_out[0], &unpack_out[3], &unpack_out[6]);\
 	v210_in += 4;\
 	print_xmm16u("Pre Y1-8", &unpack_out[0]);\
@@ -193,7 +193,7 @@
  *  - converts 48 pixels
  *  - unpacks 24 more for the next round
  */
-#define AVG_UPSAMPLE_V210_TO_RGB_CORE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define AVG_UPSAMPLE_V210_TO_RGB_CORE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set, ...) \
 	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
 	print_xmm16u("Main UVeven1-8", &unpack_out[2]);\
 	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
@@ -258,7 +258,7 @@
 /*
  * Handles last 48 pixels
  */
-#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LAST48(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LAST48(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set, ...) \
 	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
 	print_xmm16u("L48 UVeven1-8", &unpack_out[2]);\
 	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
@@ -315,7 +315,7 @@
 /*
  * Handles 16 pixels leftover
  */
-#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER16(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER16(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set, ...) \
 	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
 	print_xmm16u("L16 UVeven1-8", &unpack_out[2]);\
 	reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
@@ -337,7 +337,7 @@
 /*
  * Handles 32 pixels leftover
  */
-#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
+#define AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set, ...) \
 	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
 	print_xmm16u("L32 UVeven1-8", &unpack_out[2]);\
 	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
@@ -394,8 +394,8 @@
 	/*	10:	UVodd 25 - 32				*/\
 	/*	11:	UVeven 25 - 32				*/\
 	__m128i		convert_out[6];\
-	__m128i*    v210_in = (__m128i *) source_buffer;\
-	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
+	__m128i*    v210_in;\
+	__m128i*	rgb_out_buf;\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
 			v210_in, rgb_out_buf,\
 			AVG_UPSAMPLE_V210_TO_RGB_PREAMBLE,\
@@ -407,6 +407,137 @@
 			AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32,\
 			EMPTY, /* There is a multiple of 16 pixels, so no leftover_40 */\
 			unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set\
+	)
+
+
+
+/*
+ *
+ * AVG upsampling V210 to R210
+ *
+ */
+
+
+/*
+ * Handles 40 pixels leftover
+ */
+#define AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER40(unpack_fn_prefix, pack16_fn, conv_fn_prefix, output_stride, instr_set, pack8_fn) \
+	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+	print_xmm16u("L40 UVeven1-8", &unpack_out[2]);\
+	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+	print_xmm16u("Main UVeven9-16", &unpack_out[5]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L40 R1-8", &convert_out[0]);\
+	print_xmm16("L40 G1-8", &convert_out[1]);\
+	print_xmm16("L40 B1-8", &convert_out[2]);\
+	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+	print_xmm16("L40 R9-16", &convert_out[3]);\
+	print_xmm16("L40 G9-16", &convert_out[4]);\
+	print_xmm16("L40 B9-16", &convert_out[5]);\
+	pack16_fn(convert_out, rgb_out_buf);\
+	rgb_out_buf += output_stride;\
+	unpack_out[0] = _mm_load_si128(&unpack_out[6]);\
+	unpack_out[1] = _mm_load_si128(&unpack_out[7]);\
+	unpack_fn_prefix##instr_set(v210_in, &unpack_out[3], &unpack_out[6], &unpack_out[9]);\
+	v210_in += 4;\
+	print_xmm16u("L40 Y25-32", &unpack_out[3]);\
+	print_xmm16u("L40 UVodd25-32", &unpack_out[4]);\
+	print_xmm16u("L40 Y33-40", &unpack_out[6]);\
+	print_xmm16u("L40 UVodd33-40", &unpack_out[7]);\
+	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+	print_xmm16u("L40 UVeven17-24", &unpack_out[2]);\
+	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+	print_xmm16u("L40 UVeven25-32", &unpack_out[5]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L40 R17-24", &convert_out[0]);\
+	print_xmm16("L40 G17-24", &convert_out[1]);\
+	print_xmm16("L40 B17-24", &convert_out[2]);\
+	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+	print_xmm16("L40 R25-32", &convert_out[3]);\
+	print_xmm16("L40 G25-32", &convert_out[4]);\
+	print_xmm16("L40 B25-32", &convert_out[5]);\
+	pack16_fn(convert_out, rgb_out_buf);\
+	rgb_out_buf += output_stride;\
+	reconstruct_last_missing_uv_##instr_set(&unpack_out[7], &unpack_out[8]);\
+	print_xmm16u("L40 UVeven33-40", &unpack_out[8]);\
+	conv_fn_prefix##instr_set(&unpack_out[6], convert_out);\
+	print_xmm16("L40 R33-40", &convert_out[0]);\
+	print_xmm16("L40 G33-40", &convert_out[1]);\
+	print_xmm16("L40 B33-40", &convert_out[2]);\
+	pack8_fn(convert_out, rgb_out_buf);\
+
+/*
+ * Handles 24 pixels leftover
+ */
+#define AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER24(unpack_fn_prefix, pack16_fn, conv_fn_prefix, output_stride, instr_set, pack8_fn) \
+	reconstruct_missing_uv_##instr_set(&unpack_out[1], &unpack_out[4], &unpack_out[2]);\
+	print_xmm16u("L24 UVeven1-8", &unpack_out[2]);\
+	reconstruct_missing_uv_##instr_set(&unpack_out[4], &unpack_out[7], &unpack_out[5]);\
+	print_xmm16u("Main UVeven9-16", &unpack_out[5]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L24 R1-8", &convert_out[0]);\
+	print_xmm16("L24 G1-8", &convert_out[1]);\
+	print_xmm16("L24 B1-8", &convert_out[2]);\
+	conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
+	print_xmm16("L24 R9-16", &convert_out[3]);\
+	print_xmm16("L24 G9-16", &convert_out[4]);\
+	print_xmm16("L24 B9-16", &convert_out[5]);\
+	pack16_fn(convert_out, rgb_out_buf);\
+	rgb_out_buf += output_stride;\
+	reconstruct_last_missing_uv_##instr_set(&unpack_out[7], &unpack_out[8]);\
+	print_xmm16u("L24 UVeven17-24", &unpack_out[8]);\
+	conv_fn_prefix##instr_set(&unpack_out[6], convert_out);\
+	print_xmm16("L24 R17-24", &convert_out[0]);\
+	print_xmm16("L24 G17-24", &convert_out[1]);\
+	print_xmm16("L24 B17-24", &convert_out[2]);\
+	pack8_fn(convert_out, rgb_out_buf);\
+
+/*
+ * Handles 8 pixels leftover
+ */
+#define AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER8(unpack_fn_prefix, pack16_fn, conv_fn_prefix, output_stride, instr_set, pack8_fn) \
+	reconstruct_last_missing_uv_##instr_set(&unpack_out[1], &unpack_out[2]);\
+	print_xmm16u("L24 UVeven1-8", &unpack_out[2]);\
+	conv_fn_prefix##instr_set(unpack_out, convert_out);\
+	print_xmm16("L24 R1-8", &convert_out[0]);\
+	print_xmm16("L24 G1-8", &convert_out[1]);\
+	print_xmm16("L24 B1-8", &convert_out[2]);\
+	pack8_fn(convert_out, rgb_out_buf);\
+
+/*
+ * Convert v210 to r210 using AVG upsampling
+ */
+#define UPSAMPLE_V210_TO_R210_RECIPE(unpack_fn_prefix, pack16_fn, pack8_fn, conv_fn_prefix, output_stride, instr_set) \
+	__m128i		unpack_out[12];\
+	/*	The above array holds:			*/\
+	/*	0:	Y  1 - 8					*/\
+	/*	1:	UVodd 1 - 8					*/\
+	/*	2:	UVeven 1 - 8				*/\
+	/*	3:	Y  9 - 16					*/\
+	/*	4:	UVodd 9 - 16				*/\
+	/*	5:	UVeven 9 - 16				*/\
+	/*	6:	Y  17 - 24					*/\
+	/*	7:	UVodd 17 - 24				*/\
+	/*	8:	UVeven 17 - 24				*/\
+	/*	9:	Y  25 - 32					*/\
+	/*	10:	UVodd 25 - 32				*/\
+	/*	11:	UVeven 25 - 32				*/\
+	__m128i		convert_out[6];\
+	__m128i*    v210_in;\
+	__m128i*	rgb_out_buf;\
+	/* Reuse existing preamble, core, last 48, lefover_16 and leftover_32 */\
+	/* from UPSAMPLE_V210_TO_RGB_RECIPE. Add the leftover_8,24,40 impl. */\
+	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
+		v210_in, rgb_out_buf,\
+		AVG_UPSAMPLE_V210_TO_RGB_PREAMBLE, \
+		AVG_UPSAMPLE_V210_TO_RGB_CORE,\
+		AVG_UPSAMPLE_V210_TO_RGB_CORE_LAST48,\
+		AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER8,\
+		AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER16,\
+		AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER24,\
+		AVG_UPSAMPLE_V210_TO_RGB_CORE_LEFTOVER32,\
+		AVG_UPSAMPLE_V210_TO_R210_CORE_LEFTOVER40,\
+		unpack_fn_prefix, pack16_fn, conv_fn_prefix, 4, instr_set, pack8_fn\
 	)
 
 
@@ -823,8 +954,8 @@
  * Convert v210 to RGB using NNB upsampling
  */
 #define V210_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
-	__m128i*	v210_in = (__m128i *) source_buffer;\
-	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
+	__m128i*	v210_in;\
+	__m128i*	rgb_out_buf;\
 	__m128i		unpack_out[6];\
 	__m128i		convert_out[6];\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
@@ -985,8 +1116,8 @@
 	yuv_out += 2;\
 
 #define V210_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, instr_set) \
-	__m128i*	v210_in = (__m128i*) source_buffer;\
-	__m128i*	yuv_out = (__m128i*) dest_buffer;\
+	__m128i*	v210_in;\
+	__m128i*	yuv_out;\
 	__m128i		unpack_out[8];\
 	FROM_V120_48_PIX_OUTER_CONVERSION_LOOP(\
 			v210_in, yuv_out, \

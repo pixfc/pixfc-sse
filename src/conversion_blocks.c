@@ -356,6 +356,10 @@ DECLARE_AVG_BT709_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt7
  */
 const struct  ConversionBlock		conversion_blocks[] = {
 
+	DECLARE_AVG_SSE2_SSSE3_CONV_BLOCK				(upsample_n_convert_v210_to_r210, PixFcV210, PixFcR210, 8, 1, "v210 to r210"),
+	DECLARE_AVG_CONV_BLOCK(upsample_n_convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+	DECLARE_AVG_FLOAT_CONV_BLOCK(upsample_n_convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
+
 	DECLARE_NNB_SSE2_SSSE3_CONV_BLOCK				(convert_v210_to_r210, PixFcV210, PixFcR210, 8, 1, "v210 to r210"),
 	DECLARE_NNB_CONV_BLOCK(convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),
 	DECLARE_NNB_FLOAT_CONV_BLOCK(convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 2, 1, "v210 to r210"),

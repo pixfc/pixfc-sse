@@ -64,12 +64,13 @@
 				instr_set\
 		)
 
-#define UPSAMPLE_AND_CONVERT_TO_R210(pack_fn, instr_set)\
-		DO_CONVERSION_1U_1P(\
-				UPSAMPLE_V210_TO_RGB_RECIPE,\
+#define UPSAMPLE_AND_CONVERT_TO_R210(pack16_fn, pack8_fn, instr_set)\
+		DO_CONVERSION_1U_2P(\
+				UPSAMPLE_V210_TO_R210_RECIPE,\
 				unpack_4v_v210_to_y_uv_vectors_,\
-				pack_fn,\
-				convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_,\
+				pack16_fn,\
+				pack8_fn,\
+				convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_,\
 				3,\
 				instr_set\
 		)
@@ -195,9 +196,9 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
  * 		R 2 1 0
  *
  */
-//void		upsample_n_convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
-//	UPSAMPLE_AND_CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3, sse2_ssse3);
-//}
+void		upsample_n_convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_R210(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, sse2_ssse3);
+}
 
 void		convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_R210(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, sse2_ssse3);
