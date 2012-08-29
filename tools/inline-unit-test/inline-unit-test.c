@@ -52,7 +52,9 @@ int main(int argc, char **argv) {
     check_unpack_bgr24_to_ga_br_vectors();
     check_unpack_bgr24_to_r_g_b_vectors();
     check_unpack_2_r210_to_r_g_b_vectors();
+    check_unpack_4_r210_to_r_g_b_vectors();
     check_unpack_2_r10k_to_r_g_b_vectors();
+    check_unpack_4_r10k_to_r_g_b_vectors();
 
     // RGB to YUV convert
     check_convert_r_g_b_vectors_to_y_vector();

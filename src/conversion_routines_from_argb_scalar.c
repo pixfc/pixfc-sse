@@ -823,7 +823,7 @@ DEFINE_ANY_RGB_TO_YUV420_FLOAT_FN(convert_rgb_to_yuv420_bt709_nonsse_float, rgb_
 
 /*
  *
- * 		A R G B
+ * 		any R G B
  *
  * 		T O
  *
@@ -843,13 +843,13 @@ void		convert_rgb_to_10bit_rgb_nonsse(const struct PixFcSSE* pixfc, void* in, vo
 	while(line++ < pixfc->height){
 		while(pixel < pixfc->width) {
 			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);
-			r1 *= 4;
-			g1 *= 4;
-			b1 *= 4;
+			r1 <<= 2;
+			g1 <<= 2;
+			b1 <<= 2;
 			PACK_R210(r1, g1, b1, dst, dst_fmt);
-			r2 *= 4;
-			g2 *= 4;
-			b2 *= 4;
+			r2 <<= 2;
+			g2 <<= 2;
+			b2 <<= 2;
 			PACK_R210(r2, g2, b2, dst, dst_fmt);
 			pixel += 2;
 		}

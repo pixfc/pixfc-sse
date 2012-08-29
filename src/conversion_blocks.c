@@ -31,6 +31,7 @@
 #include "conversion_routines_from_rgb24.h"
 #include "conversion_routines_from_bgr24.h"
 #include "conversion_routines_from_v210.h"
+#include "conversion_routines_from_r210.h"
 
 #define 	DECLARE_CONV_BLOCK(convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, width_mult_count, height_mult_count, desc)\
 { convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, width_mult_count, height_mult_count, desc }
@@ -239,6 +240,13 @@ DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_c
 DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
 DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
 
+// The following macro defines non-sse and sse2 repacking conversion blocks
+#define		DECLARE_YUV422P_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
+DECLARE_REPACK_SSE2_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix),\
+DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(non_sse_convert_fn_prefix, src_fmt, dst_fmt, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)
+
+
 // The following macro defines non-sse, ssse3 and sse41 repacking conversion blocks
 #define		DECLARE_V210_REPACK_CONV_BLOCK(convert_fn_prefix, non_sse_convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, nonsse_width_mult_count, nonsse_height_mult_count, desc_str_prefix)\
 DECLARE_REPACK_SSE2_SSSE3_SSE41_CONV_BLOCK(convert_fn_prefix, src_fmt, dst_fmt, width_mult_count, height_mult_count, desc_str_prefix),\
@@ -363,6 +371,20 @@ DECLARE_AVG_BT709_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt7
 const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
+	// r210 to ARGB
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_argb, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcARGB, 16, 1, 1, 1, "r210 to ARGB"),
+
+	// r210 to BGRA
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_bgra, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcBGRA, 16, 1, 1, 1, "r210 to BGRA"),
+
+	// r210 to RGB24
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_rgb24, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcRGB24, 16, 1, 1, 1, "r210 to RGB24"),
+
+	// r210 to BGR24
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_bgr24, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcBGR24, 16, 1, 1, 1, "r210 to BGR24"),
+
+
+	//
 	// ARGB to YUYV
 	DECLARE_CONV_BLOCKS(convert_argb_to_yuyv, downsample_n_convert_argb_to_yuyv, convert_rgb_to_yuv422, downsample_n_convert_rgb_to_yuv422, PixFcARGB, PixFcYUYV, 16, 1, 2, 1, "ARGB to YUYV"),
 
@@ -380,6 +402,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// ARGB to r210
 	DECLARE_R210_REPACK_CONV_BLOCK(convert_argb_to_r210, convert_rgb_to_10bit_rgb, PixFcARGB, PixFcR210, 8, 1, 2, 1, "ARGB to r210"),
+
 
 	//
 	// BGRA to YUYV
@@ -439,6 +462,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// BGR24 to r210
 	DECLARE_R210_REPACK_CONV_BLOCK(convert_bgr24_to_r210, convert_rgb_to_10bit_rgb, PixFcBGR24, PixFcR210, 16, 1, 2, 1, "BGR24 to r210"),
+
 
 	//
 	// YUYV to ARGB
@@ -503,14 +527,11 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	DECLARE_R210_CONV_BLOCKS(convert_yuv422p_to_r210, upsample_n_convert_yuv422p_to_r210, convert_yuv422p_to_any_10bit_rgb, upsample_n_convert_yuv422p_to_any_10bit_rgb, PixFcYUV422P, PixFcR210, 32, 1, 2, 1, "YUV422P to r210"),
 
 	// YUV422P to YUYV
-	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, "YUV422P to YUYV"),
-	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 2, 1, "YUV422P to YUYV"),
-	DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 2, 1, "YUV422P to YUYV"),
+	DECLARE_YUV422P_REPACK_CONV_BLOCK(convert_yuv422p_to_yuyv, convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, 2, 1, "YUV422P to UYVY"),
 
 	// YUV422P to UYVY
-	DECLARE_REPACK_SSE2_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, 1, "YUV422P to UYVY"),
-	DECLARE_REPACK_NONSSE_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 2, 1, "YUV422P to UYVY"),
-	DECLARE_REPACK_NONSSE_FLOAT_CONV_BLOCK(convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 2, 1, "YUV422P to UYVY"),
+	DECLARE_YUV422P_REPACK_CONV_BLOCK(convert_yuv422p_to_uyvy, convert_yuv422p_to_uyvy, PixFcYUV422P, PixFcUYVY, 32, 1, 2, 1, "YUV422P to UYVY"),
+
 	
 	//
 	// YUV420P to ARGB

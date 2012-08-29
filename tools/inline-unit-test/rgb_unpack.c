@@ -537,6 +537,78 @@ uint32_t    check_unpack_2_r210_to_r_g_b_vectors(){
 }
 
 /*
+ * Unpack 2 r210 vectors (8 pixels) into 3 R, G, B vectors
+ *
+ * Total latency:				8
+ * Number of pixels handled:	15
+ *
+ * INPUT
+  * 4 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *	R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *	R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * rVect
+ * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
+ *
+ * gVect
+ * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
+ *
+ * bVect
+ * B9 0		B10 0	B11 0	B12 0	B13 0	B14 0	B15 0	B16 0
+ */
+void unpack_4_r210_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
+	uint8_t		le_input[64] = {0};
+	uint8_t*	le_in = le_input;
+	uint8_t*	input = (uint8_t *) in;
+	uint32_t*	input32 = (uint32_t *)le_input;
+	uint16_t*	output = (uint16_t *)out;
+	uint32_t	index = 0;
+
+	// Switch r210 buffer's endianness
+	for(index = 0; index < 16; index++) {
+		le_in[3] = input[0];
+		le_in[2] = input[1];
+		le_in[1] = input[2];
+		le_in[0] = input[3];
+
+		le_in += 4;
+		input += 4;
+	}
+
+	for(index = 1; index <= 16; index++) {
+		output[0] = (input32[0] >> 20) & 0x3FF;	// R
+		output[8] = (input32[0] >> 10) & 0x3FF;	// G
+		output[16]= (input32[0]) & 0x3FF;		// B
+		input32++;
+		output++;
+
+		if (index == 8)
+			output += 16;
+	}
+}
+
+uint32_t    check_unpack_4_r210_to_r_g_b_vectors(){
+	CHECK_INLINE_1IN(unpack_4_r210_to_r_g_b_vectors_sse2_ssse3, unpack_4_r210_to_r_g_b_vectors_sse2_ssse3,
+			DECLARE_4_RGB_10BIT_VECT, 6, MAX_DIFF_UNPACKING, compare_16bit_output);
+	return 0;
+}
+
+/*
  * Unpack 2 r10k vectors (8 pixels) into 3 R, G, B vectors
  *
  * Total latency:				17
@@ -592,5 +664,79 @@ void unpack_2_r10k_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
 uint32_t    check_unpack_2_r10k_to_r_g_b_vectors(){
 	CHECK_INLINE_1IN(unpack_2_r10k_to_r_g_b_vectors_scalar, unpack_2_r10k_to_r_g_b_vectors_sse2_ssse3,
 			DECLARE_2_RGB_10BIT_VECT, 3, MAX_DIFF_UNPACKING, compare_16bit_output);
+	return 0;
+}
+
+
+/*
+ * Unpack 4 r10k vectors (16 pixels) into 6 R, G, B vectors
+ *
+ * Total latency:				15
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 4 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *	R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *	R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * rVect
+ * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
+ *
+ * gVect
+ * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
+ *
+ * bVect
+ * B9 0		B10 0	B11 0	B12 0	B13 0	B14 0	B15 0	B16 0
+ */
+void unpack_4_r10k_to_r_g_b_vectors_scalar(__m128i* in, __m128i* out) {
+	uint8_t		le_input[64] = {0};
+	uint8_t*	le_in = le_input;
+	uint8_t*	input = (uint8_t *) in;
+	uint32_t*	input32 = (uint32_t *)le_input;
+	uint16_t*	output = (uint16_t *)out;
+	uint32_t	index = 0;
+
+	// Switch r210 buffer's endianness
+	for(index = 0; index < 16; index++) {
+		le_in[3] = input[0];
+		le_in[2] = input[1];
+		le_in[1] = input[2];
+		le_in[0] = input[3];
+
+		le_in += 4;
+		input += 4;
+	}
+
+	for(index = 1; index <= 16; index++) {
+		output[0] = (input32[0] >> 22) & 0x3FF;	// R
+		output[8] = (input32[0] >> 12) & 0x3FF;	// G
+		output[16]= (input32[0] >> 2) & 0x3FF;	// B
+		input32++;
+		output++;
+
+		if (index == 8)
+			output += 16;
+	}
+}
+
+
+uint32_t    check_unpack_4_r10k_to_r_g_b_vectors(){
+	CHECK_INLINE_1IN(unpack_4_r10k_to_r_g_b_vectors_scalar, unpack_4_r10k_to_r_g_b_vectors_sse2_ssse3,
+			DECLARE_4_RGB_10BIT_VECT, 6, MAX_DIFF_UNPACKING, compare_16bit_output);
 	return 0;
 }

@@ -133,14 +133,20 @@ const InputFile		input_files[] = {
 	{	PixFcV210,		8, 		1,			NULL,				},
 
 	{	PixFcARGB,		1920, 	1080,		NULL,				},
+	{	PixFcARGB,		64,		2,			NULL,				}, // to test to r210
 	{	PixFcARGB,		48, 	2,			NULL,				}, // to test to v210
 	{	PixFcARGB,		32,		2,			NULL,				}, // to test to YUV420p
+	{	PixFcARGB,		24,		2,			NULL,				}, // to test to r210
 	{	PixFcARGB,		16, 	2,			NULL,				}, // to test to v210
+	{	PixFcARGB,		8, 		2,			NULL,				}, // to test to r210
 
 	{	PixFcBGRA,		1920, 	1080,		NULL,				},
+	{	PixFcBGRA,		64, 	2,			NULL,				},
 	{	PixFcBGRA,		48, 	2,			NULL,				},
 	{	PixFcBGRA,		32, 	2,			NULL,				},
+	{	PixFcBGRA,		24, 	2,			NULL,				},
 	{	PixFcBGRA,		16, 	2,			NULL,				},
+	{	PixFcBGRA,		8, 		2,			NULL,				},
 
 	{	PixFcRGB24,		1920, 	1080,		NULL,				},
 	{	PixFcRGB24,		48, 	2,			NULL,				},
@@ -151,6 +157,15 @@ const InputFile		input_files[] = {
 	{	PixFcBGR24,		48, 	2,			NULL,				},
 	{	PixFcBGR24,		32, 	2,			NULL,				},
 	{	PixFcBGR24,		16, 	2,			NULL,				},
+
+	{	PixFcR210,		1920, 	1080,		NULL,				},
+	{	PixFcR210,		64, 	2,			NULL,				},
+	{	PixFcR210,		48, 	2,			NULL,				},
+	{	PixFcR210,		40, 	2,			NULL,				},
+	{	PixFcR210,		32, 	2,			NULL,				},
+	{	PixFcR210,		24, 	2,			NULL,				},
+	{	PixFcR210,		16, 	2,			NULL,				},
+	{	PixFcR210,		8,	 	2,			NULL,				},
 };
 const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
 

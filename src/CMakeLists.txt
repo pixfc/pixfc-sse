@@ -33,6 +33,10 @@ list(APPEND PIXFC_SRC_LIST
 	conversion_routines_from_v210_bt601.c
 	conversion_routines_from_v210_bt709.c
 	conversion_routines_from_v210_scalar.c
+	conversion_routines_from_r210.c
+	conversion_routines_from_r210_bt601.c
+	conversion_routines_from_r210_bt709.c
+	conversion_routines_from_r210_scalar.c
 )
 
 # header files
