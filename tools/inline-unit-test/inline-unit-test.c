@@ -69,6 +69,10 @@ int main(int argc, char **argv) {
     check_convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt601();
     check_convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt709();
 
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector();
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector_bt601();
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector_bt709();
+
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector();
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601();
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709();
@@ -76,6 +80,14 @@ int main(int argc, char **argv) {
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector();
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601();
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709();
+
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_bt601();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_bt709();
+
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_bt601();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_bt709();
 
     check_convert_ag_rb_vectors_to_y_vector();
     check_convert_ga_br_vectors_to_y_vector();
