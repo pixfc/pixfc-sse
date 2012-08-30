@@ -64,6 +64,27 @@
 		printf("unknown rgb destination format\n");\
 	}
 
+#define PACK_YUV422(y1, u, y2, v, dst, dest_fmt) do {\
+			if (dest_fmt == PixFcYUYV) {\
+				*(dst++) = CLIP_PIXEL(y1);\
+				*(dst++) = CLIP_PIXEL(u);\
+				*(dst++) = CLIP_PIXEL(y2);\
+				*(dst++) = CLIP_PIXEL(v);\
+			} else if (dest_fmt == PixFcUYVY) {\
+				*(dst++) = CLIP_PIXEL(u);\
+				*(dst++) = CLIP_PIXEL(y1);\
+				*(dst++) = CLIP_PIXEL(v);\
+				*(dst++) = CLIP_PIXEL(y2);\
+			} else if (dest_fmt == PixFcYUV422P) {\
+				*(y_plane++) = CLIP_PIXEL(y1);\
+				*(y_plane++) = CLIP_PIXEL(y2);\
+				*(u_plane++) = CLIP_PIXEL(u);\
+				*(v_plane++) = CLIP_PIXEL(v);\
+			} else {\
+				printf("Unknown output format in non-SSE conversion from RGB\n");\
+			}\
+		} while(0)
+
 /*
  *
  * 		R 2 1 0

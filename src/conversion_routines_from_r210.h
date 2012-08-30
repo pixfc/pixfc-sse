@@ -26,6 +26,13 @@
 #include "pixfc-sse.h"
 
 
+// r210 to YUYV			SSE2 SSSE3
+void		convert_r210_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r210_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+
+
+
+
 /*
  *
  * 		R 2 1 0

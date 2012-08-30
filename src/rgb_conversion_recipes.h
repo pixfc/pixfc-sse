@@ -46,7 +46,7 @@
 #include "pixfmt_descriptions.h"
 
 /*
- * 		R G B 3 2
+ * 		R G B 3 2  /  1 0 B I T  R G B
  *
  * 		T O
  *
@@ -57,9 +57,11 @@
  * We have 2 RGB32 to YUV422 conversion implementations:
  * - The first one unpacks 8 pixels into 3 16bit vectors R,G & B.
  * - The second one unpacks 8 pixels into 4 16bit AG & RB vectors.
+ *
+ * Only the first one is shared by both RGB32 and r210 to YUV.
  */
 
-// NNB Core conversion loop, common to RGB32 to YUV422 planar & interleaved NNB conversions
+// NNB Core conversion loop, common to RGB32/r210 to YUV422 planar & interleaved NNB conversions
 #define RGB32_TO_YUV422_NNB_LOOP_CORE(unpack_fn, downsample_fn, y_conv_fn, uv_conv_fn)\
 	unpack_fn(rgb_in, unpack_out);\
 	print_xmm16u("R 1-8", &unpack_out[0]);\
@@ -89,23 +91,36 @@
 	rgb_in += 2;\
 	pixel_count -= 16;
 
-//  NNB Interleaved conversion 1
+//  NNB Interleaved conversion 1 (from RGB32 and r210)
 #define RGB32_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	__m128i*	rgb_in = (__m128i *) source_buffer;\
-	__m128i*	yuv_out = (__m128i *) dest_buffer;\
-	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i		*rgb_in;\
+	__m128i		*yuv_out;\
+	uint8_t		*next_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, pixfc->width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
+	uint32_t	pixel_count;\
+	uint32_t	line = pixfc->height;\
+	uint32_t	width = pixfc->width;\
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[4];\
-	while(pixel_count > 0) {\
-		RGB32_TO_YUV422_NNB_LOOP_CORE(\
-				unpack_fn_prefix##instr_set,\
-				nnb_422_downsample_r_g_b_vectors_##instr_set,\
-				y_conv_fn, uv_conv_fn);\
-		pack_fn(convert_out, yuv_out);\
-		yuv_out += 2;\
-	};\
+	while(line-- > 0) {\
+		pixel_count = width;\
+		rgb_in = (__m128i *) next_src;\
+		yuv_out = (__m128i *) next_dst;\
+		while(pixel_count > 0) {\
+			RGB32_TO_YUV422_NNB_LOOP_CORE(\
+					unpack_fn_prefix##instr_set,\
+					nnb_422_downsample_r_g_b_vectors_##instr_set,\
+					y_conv_fn, uv_conv_fn);\
+			pack_fn(convert_out, yuv_out);\
+			yuv_out += 2;\
+		}\
+		next_src += src_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+	}
 
-// NNB planar conversion 1
+// NNB planar conversion 1 (from RGB32 and r210)
 #define RGB32_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	uint32_t	pixel_count = pixfc->pixel_count;\
 	__m128i*	rgb_in = (__m128i *) source_buffer;\
@@ -203,28 +218,41 @@
 
 // Average interleave conversion 1
 #define AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE(unpack_fn_prefix, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
-	__m128i*	rgb_in = (__m128i *) source_buffer;\
-	__m128i*	yuv_out = (__m128i *) dest_buffer;\
-	uint32_t	pixel_count = pixfc->pixel_count;\
+	__m128i		*rgb_in;\
+	__m128i		*yuv_out;\
+	uint8_t		*next_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, pixfc->width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
+	uint32_t	pixel_count;\
+	uint32_t	line = pixfc->height;\
+	uint32_t	width = pixfc->width;\
 	__m128i		previous[3];\
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[4];\
-	RGB32_TO_YUV422_AVG_CORE_LOOP1(\
-			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
-			uv_conv_fn);\
-	pack_fn(convert_out, yuv_out);\
-	yuv_out += 2;\
-	while(pixel_count > 0) {\
+	while(line-- > 0) {\
+		pixel_count = width;\
+		rgb_in = (__m128i *) next_src;\
+		yuv_out = (__m128i *) next_dst;\
 		RGB32_TO_YUV422_AVG_CORE_LOOP1(\
-			unpack_fn_prefix##instr_set, y_conv_fn,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
-			avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
-			uv_conv_fn);\
+				unpack_fn_prefix##instr_set, y_conv_fn,\
+				avg_422_downsample_first_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+				avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+				uv_conv_fn);\
 		pack_fn(convert_out, yuv_out);\
 		yuv_out += 2;\
-	};\
+		while(pixel_count > 0) {\
+			RGB32_TO_YUV422_AVG_CORE_LOOP1(\
+				unpack_fn_prefix##instr_set, y_conv_fn,\
+				avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+				avg_422_downsample_r_g_b_vectors_n_save_previous_##instr_set, unpack_out,\
+				uv_conv_fn);\
+			pack_fn(convert_out, yuv_out);\
+			yuv_out += 2;\
+		}\
+		next_src += src_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+	}
 
 // Average planar conversion 1
 #define AVG_DOWNSAMPLE_RGB32_TO_YUV422P_RECIPE(unpack_fn_prefix, pack_lo_fn, pack_hi_fn, y_conv_fn, uv_conv_fn, instr_set) \
