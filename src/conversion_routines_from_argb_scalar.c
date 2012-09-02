@@ -45,6 +45,23 @@
 		} else if (src_fmt == PixFcBGR24) {\
 			b1 = *(src++); g1 = *(src++); r1 = *(src++);\
 			b2 = *(src++); g2 = *(src++); r2 = *(src++);\
+		} else if (src_fmt == PixFcR210) {\
+			uint32_t tmp;\
+			uint8_t *p = (uint8_t *) &tmp;\
+			p[3] = *src++;\
+			p[2] = *src++;\
+			p[1] = *src++;\
+			p[0] = *src++;\
+			b1 = tmp & 0x3ff;\
+			g1 = (tmp >> 10) & 0x3ff;\
+			r1 = (tmp >> 20) & 0x3ff;\
+			p[3] = *src++;\
+			p[2] = *src++;\
+			p[1] = *src++;\
+			p[0] = *src++;\
+			b2 = tmp & 0x3ff;\
+			g2 = (tmp >> 10) & 0x3ff;\
+			r2 = (tmp >> 20) & 0x3ff;\
 		} else\
 			printf("Unknown source pixel format in non-SSE conversion from RGB\n");\
 	}while(0)\
@@ -53,7 +70,7 @@
 	if (dest_fmt == PixFcR210) {\
 		uint32_t tmp;\
 		uint8_t *p = (uint8_t *) &tmp;\
-		dprint("R: %d G: %d B: %d\n", CLIP_10BIT_PIXEL(r), CLIP_10BIT_PIXEL(g), CLIP_10BIT_PIXEL(b));\
+		/* dprint("R: %d G: %d B: %d\n", CLIP_10BIT_PIXEL(r), CLIP_10BIT_PIXEL(g), CLIP_10BIT_PIXEL(b)); */\
 		tmp = CLIP_10BIT_PIXEL(b);\
 		tmp |= ((CLIP_10BIT_PIXEL(g)) << 10);\
 		tmp |= ((CLIP_10BIT_PIXEL(r)) << 20);\
@@ -106,20 +123,25 @@
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t 			line = conv->height;\
+		uint32_t			pixel;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		uint8_t*			y_plane = dst;\
-		uint8_t*			u_plane = dst + pixel_count;\
-		uint8_t*			v_plane = u_plane + pixel_count / 2;\
+		uint8_t*			u_plane = dst + conv->pixel_count;\
+		uint8_t*			v_plane = u_plane + conv->pixel_count / 2;\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
-		while(pixel_num < pixel_count){\
-			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			NNB_CONVERT_RGB_TO_YUV422(r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
-			PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-			pixel_num += 2;\
+		while(line-- > 0) {\
+			pixel = conv->width;\
+			while(pixel > 0){\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				NNB_CONVERT_RGB_TO_YUV422(r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
+				PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
+				pixel -= 2;\
+			}\
+			src += src_padding_bytes;\
 		}\
 	}\
 
@@ -137,20 +159,25 @@ DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, rgb_8bit_to_yuv_8bi
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t 			line = conv->height;\
 		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		uint8_t*			y_plane = dst;\
-		uint8_t*			u_plane = dst + pixel_count;\
-		uint8_t*			v_plane = u_plane + pixel_count / 2;\
+		uint8_t*			u_plane = dst + conv->pixel_count;\
+		uint8_t*			v_plane = u_plane + conv->pixel_count / 2;\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
-		while(pixel_num < pixel_count){\
-			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			NNB_CONVERT_RGB_TO_YUV422_FLOAT(r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
-			PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-			pixel_num += 2;\
+		while(line-- > 0) {\
+			pixel_num = conv->width;\
+			while(pixel_num > 0){\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				NNB_CONVERT_RGB_TO_YUV422_FLOAT(r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
+				PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
+				pixel_num -= 2;\
+			}\
+			src += src_padding_bytes;\
 		}\
 	}\
 
@@ -183,25 +210,30 @@ DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_rgb_to_yuv422_bt709_nonsse_float, rgb_8bi
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		uint32_t 			pixel_num = 2; /* handle the first 2 pixels outside main loop */\
-		uint32_t			pixel_count = conv->pixel_count;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			line = conv->height;\
+		uint32_t 			pixel_num;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		uint8_t*			y_plane = dst;\
-		uint8_t*			u_plane = dst + pixel_count;\
-		uint8_t*			v_plane = u_plane + pixel_count / 2;\
+		uint8_t*			u_plane = dst + conv->pixel_count;\
+		uint8_t*			v_plane = u_plane + conv->pixel_count / 2;\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1, y2, u, v;\
-		UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-		AVG_CONVERT_RGB_TO_YUV422(r1, g1, b1, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
-		prev_r = r2; prev_g = g2; prev_b = b2;\
-		PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-		while(pixel_num < pixel_count){\
+		while(line-- > 0) {\
+			pixel_num = conv->width - 2; /* first 2 pixels handled outside main loop */\
 			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			AVG_CONVERT_RGB_TO_YUV422(prev_r, prev_g, prev_b, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
+			AVG_CONVERT_RGB_TO_YUV422(r1, g1, b1, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
 			prev_r = r2; prev_g = g2; prev_b = b2;\
 			PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-			pixel_num += 2;\
+			while(pixel_num > 0){\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				AVG_CONVERT_RGB_TO_YUV422(prev_r, prev_g, prev_b, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coef_shift, coeffs, offsets);\
+				prev_r = r2; prev_g = g2; prev_b = b2;\
+				PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
+				pixel_num -= 2;\
+			}\
+			src += src_padding_bytes;\
 		}\
 	}\
 
@@ -220,25 +252,30 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_rgb_to_yuv422
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		uint32_t 			pixel_num = 2; /* handle the first 2 pixels outside main loop */\
-		uint32_t			pixel_count = conv->pixel_count;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			line = conv->height;\
+		uint32_t 			pixel_num;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		uint8_t*			y_plane = dst;\
-		uint8_t*			u_plane = dst + pixel_count;\
-		uint8_t*			v_plane = u_plane + pixel_count / 2;\
+		uint8_t*			u_plane = dst + conv->pixel_count;\
+		uint8_t*			v_plane = u_plane + conv->pixel_count / 2;\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1, y2, u, v;\
-		UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-		AVG_CONVERT_RGB_TO_YUV422_FLOAT(r1, g1, b1, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
-		prev_r = r2; prev_g = g2; prev_b = b2;\
-		PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-		while(pixel_num < pixel_count){\
+		while(line-- > 0) {\
+			pixel_num = conv->width - 2; /* first 2 pixels handled outside main loop */\
 			UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
-			AVG_CONVERT_RGB_TO_YUV422_FLOAT(prev_r, prev_g, prev_b, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
+			AVG_CONVERT_RGB_TO_YUV422_FLOAT(r1, g1, b1, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
 			prev_r = r2; prev_g = g2; prev_b = b2;\
 			PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
-			pixel_num += 2;\
+			while(pixel_num > 0){\
+				UNPACK_RGB(src, r1, g1, b1, r2, g2, b2, src_fmt);\
+				AVG_CONVERT_RGB_TO_YUV422_FLOAT(prev_r, prev_g, prev_b, r1, g1, b1, r2, g2, b2, y1, u, v, y2, coeffs, offsets);\
+				prev_r = r2; prev_g = g2; prev_b = b2;\
+				PACK_YUV422(dst, y1, u, y2, v, dest_fmt);\
+				pixel_num -= 2;\
+			}\
+			src += src_padding_bytes;\
 		}\
 	}\
 

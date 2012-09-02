@@ -69,16 +69,15 @@ static uint32_t		do_image_conversion(uint32_t index, void* in, void *out, uint32
 static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
 	uint32_t 	i;
 	uint32_t 	buffer_size = IMG_SIZE(fmt, width, height);
-	uint8_t		*sse_start = out_sse;
 	uint32_t	max_diff_seen = 0;
 	for(i = 0; i < buffer_size; i++) {
 		if(abs(*out_scalar - *out_sse) > max_diff_seen)
 				max_diff_seen = abs(*out_scalar - *out_sse);
 		if(abs(*out_scalar - *out_sse) > max_diff) {
-			printf("Pixel %ux%u (offset: %llu 8-bit ptr) differ by %u : SSE: %hhu - Scalar: %hhu\n",
+			printf("Pixel %ux%u (offset: %u 8-bit ptr) differ by %u : SSE: %hhu - Scalar: %hhu\n",
 					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width + 1,
 					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) / width + 1,
-					(unsigned long long)(out_sse - sse_start),
+					i,
 					abs(*out_scalar - *out_sse), *out_sse, *out_scalar);
 			return -1;
 		}

@@ -458,7 +458,7 @@ __m128i     _fake_mm_blendv_epi8(__m128i v1, __m128i v2, __m128i mask) {
 
 
 #ifdef DEBUG
-#if 1
+#if 0
 void print_xmm32(char *name, __m128i *reg) {
 	// print register as 32bit signed
 	int32_t*	array = (int32_t *)reg;

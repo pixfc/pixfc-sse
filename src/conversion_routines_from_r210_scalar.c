@@ -33,7 +33,7 @@
 		b = tmp & 0x3ff;\
 		g = (tmp >> 10) & 0x3ff;\
 		r = (tmp >> 20) & 0x3ff;\
-		dprint("R: %d G: %d B: %d\n", r, g, b);\
+		/* dprint("R: %d G: %d B: %d\n", r, g, b); */\
 	} else {\
 		printf("unknown rgb source format\n");\
 	}
@@ -42,7 +42,7 @@
 
 #define PACK_RGB(r, g, b, dst, dest_fmt) \
 	if (dest_fmt == PixFcARGB) {\
-		dprint("R: %d G: %d B: %d\n", CLIP_PIXEL(r), CLIP_PIXEL(g), CLIP_PIXEL(b));\
+		/* dprint("R: %d G: %d B: %d\n", CLIP_PIXEL(r), CLIP_PIXEL(g), CLIP_PIXEL(b)); */\
 		*(dst++) = 0;\
 		*(dst++) = CLIP_PIXEL(r);\
 		*(dst++) = CLIP_PIXEL(g);\
