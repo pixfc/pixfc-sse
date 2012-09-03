@@ -86,6 +86,11 @@ typedef enum {
 	// see http://www.bitjazz.com/en/products/sheervideo/faq/formats/pixel_formats.php#r210
 	PixFcR210,
 
+	// Interleaved 10-bit RGB   - 10-bit components
+	// 4 bytes per pixel        - row bytes is (width + 63) / 64 * 256 bytes long (integer math !!)
+	// see http://www.bitjazz.com/en/products/sheervideo/faq/formats/pixel_formats.php#r10k
+	PixFcR10k,
+	
 	//
 	//
 	PixFcFormatCount

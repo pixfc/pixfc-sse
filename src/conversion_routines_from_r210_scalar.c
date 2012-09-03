@@ -34,6 +34,17 @@
 		g = (tmp >> 10) & 0x3ff;\
 		r = (tmp >> 20) & 0x3ff;\
 		/* dprint("R: %d G: %d B: %d\n", r, g, b); */\
+	} else if (src_fmt == PixFcR10k) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		p[3] = *src++;\
+		p[2] = *src++;\
+		p[1] = *src++;\
+		p[0] = *src++;\
+		b = (tmp >> 2) & 0x3ff;\
+		g = (tmp >> 12) & 0x3ff;\
+		r = (tmp >> 22) & 0x3ff;\
+		/* dprint("R: %d G: %d B: %d\n", r, g, b); */\
 	} else {\
 		printf("unknown rgb source format\n");\
 	}

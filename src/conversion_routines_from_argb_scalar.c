@@ -62,6 +62,23 @@
 			b2 = tmp & 0x3ff;\
 			g2 = (tmp >> 10) & 0x3ff;\
 			r2 = (tmp >> 20) & 0x3ff;\
+		} else if (src_fmt == PixFcR10k) {\
+			uint32_t tmp;\
+			uint8_t *p = (uint8_t *) &tmp;\
+			p[3] = *src++;\
+			p[2] = *src++;\
+			p[1] = *src++;\
+			p[0] = *src++;\
+			b1 = (tmp >> 2) & 0x3ff;\
+			g1 = (tmp >> 12) & 0x3ff;\
+			r1 = (tmp >> 22) & 0x3ff;\
+			p[3] = *src++;\
+			p[2] = *src++;\
+			p[1] = *src++;\
+			p[0] = *src++;\
+			b2 = (tmp >> 2) & 0x3ff;\
+			g2 = (tmp >> 12) & 0x3ff;\
+			r2 = (tmp >> 22) & 0x3ff;\
 		} else\
 			printf("Unknown source pixel format in non-SSE conversion from RGB\n");\
 	}while(0)\
@@ -74,6 +91,17 @@
 		tmp = CLIP_10BIT_PIXEL(b);\
 		tmp |= ((CLIP_10BIT_PIXEL(g)) << 10);\
 		tmp |= ((CLIP_10BIT_PIXEL(r)) << 20);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
+	} else if (dest_fmt == PixFcR10k) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		/* dprint("R: %d G: %d B: %d\n", CLIP_10BIT_PIXEL(r), CLIP_10BIT_PIXEL(g), CLIP_10BIT_PIXEL(b)); */\
+		tmp = (CLIP_10BIT_PIXEL(b)) << 2;\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 12);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 22);\
 		*(dst++) = p[3];\
 		*(dst++) = p[2];\
 		*(dst++) = p[1];\
@@ -900,7 +928,7 @@ DEFINE_ANY_RGB_TO_YUV420_FLOAT_FN(convert_rgb_to_yuv420_bt709_nonsse_float, rgb_
  *
  * 		T O
  *
- * 		R 2 1 0
+ * 		1 0 B I T    R G B
  *
  */
 // This conversion assumes an even number of pixels

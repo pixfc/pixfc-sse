@@ -222,12 +222,64 @@ static int		compare_r210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar,
 	return 0;
 }
 
+static int		compare_r10k_output_buffers(uint32_t* out_sse, uint32_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	uint32_t 	line = 0;
+	uint32_t 	pixel = 0;
+	uint32_t 	bytes_per_row = ROW_SIZE(fmt,  width);
+	uint32_t* 	scalar_ptr = out_scalar;
+	uint32_t* 	sse_ptr = out_sse;
+	uint32_t	scalar_le;
+	uint32_t	sse_le;
+	uint16_t 	scalar_val;
+	uint16_t 	sse_val;
+	uint32_t	max_diff_seen = 0;
+	
+	while(line++ < height) {
+		while(pixel < width){
+			scalar_le = (*scalar_ptr >> 24) & 0x000000FF;
+			scalar_le |= (*scalar_ptr >> 8) & 0x0000FF00;
+			scalar_le |= (*scalar_ptr << 8) & 0x00FF0000;
+			scalar_le |= (*scalar_ptr << 24)& 0xFF000000;
+			
+			sse_le = (*sse_ptr >> 24) & 0x000000FF;
+			sse_le |= (*sse_ptr >> 8) & 0x0000FF00;
+			sse_le |= (*sse_ptr << 8) & 0x00FF0000;
+			sse_le |= (*sse_ptr << 24)& 0xFF000000;
+			
+			scalar_val = ((scalar_le >> 2) & 0x3FF);
+			sse_val = ((sse_le >> 2) & 0x3ff);
+			COMPARE_VALUES("B");
+			
+			scalar_val = ((scalar_le >> 12) & 0x3FF);
+			sse_val = ((sse_le >> 12) & 0x3ff);
+			COMPARE_VALUES("G");
+			
+			scalar_val = ((scalar_le >> 22) & 0x3FF);
+			sse_val = ((sse_le >> 22) & 0x3ff);
+			COMPARE_VALUES("R");
+			
+			scalar_ptr++;
+			sse_ptr++;
+			pixel++;
+		}
+		scalar_ptr = out_scalar + line * bytes_per_row / 4;
+		sse_ptr = out_sse + line * bytes_per_row / 4;
+		pixel = 0;
+	}
+	
+	printf("Max diff seen: %u\n", max_diff_seen);
+	
+	return 0;
+}
+
 
 static int		compare_output_buffers(void* out_sse, void* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
 	if (fmt == PixFcV210)
 		return compare_v210_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
 	else if (fmt == PixFcR210)
 		return compare_r210_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
+	else if (fmt == PixFcR10k)
+		return compare_r10k_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
 	else
 		return compare_8bit_output_buffers((uint8_t*)out_sse, (uint8_t*)out_scalar, fmt, width, height, max_diff);
 }

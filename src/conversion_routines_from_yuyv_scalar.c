@@ -81,6 +81,16 @@
 		*(dst++) = p[2];\
 		*(dst++) = p[1];\
 		*(dst++) = p[0];\
+	} else  if (dest_fmt == PixFcR10k) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		tmp = (CLIP_10BIT_PIXEL(b)) << 2;\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 12);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 22);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
 	} else {\
 		printf("unknown rgb destination format\n");\
 	}

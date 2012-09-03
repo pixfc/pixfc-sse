@@ -159,6 +159,8 @@ const InputFile		input_files[] = {
 	{	PixFcBGR24,		16, 	2,			NULL,				},
 
 	{	PixFcR210,		1920, 	1080,		NULL,				},
+	{	PixFcR210,		96, 	2,			NULL,				},
+	{	PixFcR210,		72, 	2,			NULL,				},
 	{	PixFcR210,		64, 	2,			NULL,				},
 	{	PixFcR210,		48, 	2,			NULL,				},
 	{	PixFcR210,		40, 	2,			NULL,				},
@@ -166,6 +168,18 @@ const InputFile		input_files[] = {
 	{	PixFcR210,		24, 	2,			NULL,				},
 	{	PixFcR210,		16, 	2,			NULL,				},
 	{	PixFcR210,		8,	 	2,			NULL,				},
+	
+	{	PixFcR10k,		1920, 	1080,		NULL,				},
+	{	PixFcR10k,		96, 	2,			NULL,				},
+	{	PixFcR10k,		72, 	2,			NULL,				},
+	{	PixFcR10k,		64, 	2,			NULL,				},
+	{	PixFcR10k,		48, 	2,			NULL,				},
+	{	PixFcR10k,		40, 	2,			NULL,				},
+	{	PixFcR10k,		32, 	2,			NULL,				},
+	{	PixFcR10k,		24, 	2,			NULL,				},
+	{	PixFcR10k,		16, 	2,			NULL,				},
+	{	PixFcR10k,		8,	 	2,			NULL,				},
+
 };
 const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
 

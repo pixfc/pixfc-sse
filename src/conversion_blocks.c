@@ -32,6 +32,7 @@
 #include "conversion_routines_from_bgr24.h"
 #include "conversion_routines_from_v210.h"
 #include "conversion_routines_from_r210.h"
+#include "conversion_routines_from_r10k.h"
 
 #define 	DECLARE_CONV_BLOCK(convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, width_mult_count, height_mult_count, desc)\
 { convert_fn, src_fmt, dst_fmt, cpuid_flags, attributes, width_mult_count, height_mult_count, desc }
@@ -377,6 +378,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// r210 to UYVY
 	DECLARE_R210_CONV_BLOCKS(convert_r210_to_uyvy, downsample_n_convert_r210_to_uyvy, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR210, PixFcUYVY, 16, 1, 2, 1, "r210 to UYVY"),
 
+	// r210 to YUV422p
+	DECLARE_R210_CONV_BLOCKS(convert_r210_to_yuv422p, downsample_n_convert_r210_to_yuv422p, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR210, PixFcYUV422P, 32, 1, 2, 1, "r210 to YUV422p"),
+
 	// r210 to v210
 	DECLARE_V210_CONV_BLOCKS(convert_r210_to_v210, downsample_n_convert_r210_to_v210, convert_10bit_rgb_to_v210, downsample_n_convert_10bit_rgb_to_v210, PixFcR210, PixFcV210, 8, 1, 2, 1, "r210 to v210"),
 
@@ -391,6 +395,32 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// r210 to BGR24
 	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_bgr24, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcBGR24, 16, 1, 1, 1, "r210 to BGR24"),
+
+	
+	//
+	// r10k to YUYV
+	DECLARE_R210_CONV_BLOCKS(convert_r10k_to_yuyv, downsample_n_convert_r10k_to_yuyv, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR10k, PixFcYUYV, 16, 1, 2, 1, "r10k to YUYV"),
+	
+	// r10k to UYVY
+	DECLARE_R210_CONV_BLOCKS(convert_r10k_to_uyvy, downsample_n_convert_r10k_to_uyvy, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR10k, PixFcUYVY, 16, 1, 2, 1, "r10k to UYVY"),
+
+	// r10k to YUV422p
+	DECLARE_R210_CONV_BLOCKS(convert_r10k_to_yuv422p, downsample_n_convert_r10k_to_yuv422p, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR10k, PixFcYUV422P, 32, 1, 2, 1, "r10k to YUV422p"),
+
+	// r10k to v210
+	DECLARE_V210_CONV_BLOCKS(convert_r10k_to_v210, downsample_n_convert_r10k_to_v210, convert_10bit_rgb_to_v210, downsample_n_convert_10bit_rgb_to_v210, PixFcR10k, PixFcV210, 8, 1, 2, 1, "r10k to v210"),
+	
+	// r10k to ARGB
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r10k_to_argb, convert_10bit_rgb_to_any_rgb, PixFcR10k, PixFcARGB, 16, 1, 1, 1, "r10k to ARGB"),
+	
+	// r10k to BGRA
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r10k_to_bgra, convert_10bit_rgb_to_any_rgb, PixFcR10k, PixFcBGRA, 16, 1, 1, 1, "r10k to BGRA"),
+	
+	// r10k to RGB24
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r10k_to_rgb24, convert_10bit_rgb_to_any_rgb, PixFcR10k, PixFcRGB24, 16, 1, 1, 1, "r10k to RGB24"),
+	
+	// r10k to BGR24
+	DECLARE_R210_REPACK_CONV_BLOCK(convert_r10k_to_bgr24, convert_10bit_rgb_to_any_rgb, PixFcR10k, PixFcBGR24, 16, 1, 1, 1, "r10k to BGR24"),
 
 
 	//
@@ -472,7 +502,7 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	// BGR24 to r210
 	DECLARE_R210_REPACK_CONV_BLOCK(convert_bgr24_to_r210, convert_rgb_to_10bit_rgb, PixFcBGR24, PixFcR210, 16, 1, 2, 1, "BGR24 to r210"),
 
-
+	
 	//
 	// YUYV to ARGB
 	DECLARE_CONV_BLOCKS(convert_yuyv_to_argb, upsample_n_convert_yuyv_to_argb, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcYUYV, PixFcARGB, 16, 1, 2, 1, "YUYV to ARGB"),
@@ -488,6 +518,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUYV to r210
 	DECLARE_R210_CONV_BLOCKS(convert_yuyv_to_r210, upsample_n_convert_yuyv_to_r210, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcYUYV, PixFcR210, 16, 1, 2, 1, "YUYV to r210"),
+
+	// YUYV to r10k
+	DECLARE_R210_CONV_BLOCKS(convert_yuyv_to_r10k, upsample_n_convert_yuyv_to_r10k, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcYUYV, PixFcR10k, 16, 1, 2, 1, "YUYV to r10k"),
 
 	// YUYV to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_yuyv_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcYUYV, PixFcYUV422P, 32, 1, 2, 1, "YUYV to YUV422P"),
@@ -510,12 +543,15 @@ const struct  ConversionBlock		conversion_blocks[] = {
 	DECLARE_CONV_BLOCKS(convert_uyvy_to_bgr24, upsample_n_convert_uyvy_to_bgr24, convert_yuv422i_to_any_rgb, upsample_n_convert_yuv422i_to_any_rgb, PixFcUYVY, PixFcBGR24, 16, 1, 2, 1, "UYVY to BGR24"),
 
 	// UYVY to r210
-	DECLARE_R210_CONV_BLOCKS(convert_uyvy_to_r210, upsample_n_convert_uyvy_to_r210, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcUYVY, PixFcR210, 16, 1, 2, 1, "YUYV to r210"),
+	DECLARE_R210_CONV_BLOCKS(convert_uyvy_to_r210, upsample_n_convert_uyvy_to_r210, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcUYVY, PixFcR210, 16, 1, 2, 1, "UYVY to r210"),
+
+	// UYVY to rk10
+	DECLARE_R210_CONV_BLOCKS(convert_uyvy_to_r10k, upsample_n_convert_uyvy_to_r10k, convert_yuv422i_to_any_10bit_rgb, upsample_n_convert_yuv422i_to_any_10bit_rgb, PixFcUYVY, PixFcR10k, 16, 1, 2, 1, "UYVY to r10k"),
 
 	// UYVY to YUV422P
 	DECLARE_REPACK_CONV_BLOCK(convert_uyvy_to_yuv422p, convert_yuv422i_to_yuv422p, PixFcUYVY, PixFcYUV422P, 32, 1, 2, 1, "UYVY to YUV422P"),
 
-	// YUYV to V210
+	// UYVY to V210
 	DECLARE_V210_REPACK_CONV_BLOCK(convert_uyvy_to_v210, convert_yuv422i_to_v210, PixFcUYVY, PixFcV210, 16, 1, 2, 1, "UYVY to v210"),
 
 
@@ -534,6 +570,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// YUV422P to r210
 	DECLARE_R210_CONV_BLOCKS(convert_yuv422p_to_r210, upsample_n_convert_yuv422p_to_r210, convert_yuv422p_to_any_10bit_rgb, upsample_n_convert_yuv422p_to_any_10bit_rgb, PixFcYUV422P, PixFcR210, 32, 1, 2, 1, "YUV422P to r210"),
+
+	// YUV422P to r10k
+	DECLARE_R210_CONV_BLOCKS(convert_yuv422p_to_r10k, upsample_n_convert_yuv422p_to_r10k, convert_yuv422p_to_any_10bit_rgb, upsample_n_convert_yuv422p_to_any_10bit_rgb, PixFcYUV422P, PixFcR10k, 32, 1, 2, 1, "YUV422P to r10k"),
 
 	// YUV422P to YUYV
 	DECLARE_YUV422P_REPACK_CONV_BLOCK(convert_yuv422p_to_yuyv, convert_yuv422p_to_yuyv, PixFcYUV422P, PixFcYUYV, 32, 1, 2, 1, "YUV422P to UYVY"),
@@ -571,6 +610,9 @@ const struct  ConversionBlock		conversion_blocks[] = {
 
 	// v210 to r210
 	DECLARE_R210_CONV_BLOCKS(convert_v210_to_r210, upsample_n_convert_v210_to_r210, convert_v210_to_any_10bit_rgb, upsample_n_convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR210, 8, 1, 2, 1, "v210 to r210"),
+
+	// v210 to r10k
+	DECLARE_R210_CONV_BLOCKS(convert_v210_to_r10k, upsample_n_convert_v210_to_r10k, convert_v210_to_any_10bit_rgb, upsample_n_convert_v210_to_any_10bit_rgb, PixFcV210, PixFcR10k, 8, 1, 2, 1, "v210 to r10k"),
 
 	// v210 to YUYV
 	DECLARE_V210_REPACK_CONV_BLOCK(convert_v210_to_yuyv, convert_v210_to_yuv422i, PixFcV210, PixFcYUYV, 16, 1, 2, 1, "v210 to YUYV"),

@@ -65,9 +65,14 @@ void		upsample_n_convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void 
 void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to R210			SSE2 SSSE3
+// V210 to r210			SSE2 SSSE3
 void		convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		upsample_n_convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+
+
+// V210 to r10k			SSE2 SSSE3
+void		convert_v210_to_r10k_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		upsample_n_convert_v210_to_r10k_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
 // V210 to anyRGB		NON SSE integer
@@ -130,9 +135,14 @@ void		upsample_n_convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *,
 void		convert_v210_to_bgr24_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to R210			SSE2 SSSE3
+// V210 to r210			SSE2 SSSE3
 void		convert_v210_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		upsample_n_convert_v210_to_r210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+
+
+// V210 to r10k			SSE2 SSSE3
+void		convert_v210_to_r10k_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		upsample_n_convert_v210_to_r10k_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
 // V210 to anyRGB		NON SSE integer
@@ -193,9 +203,14 @@ void		upsample_n_convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *,
 void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
-// V210 to R210			SSE2 SSSE3
+// V210 to r210			SSE2 SSSE3
 void		convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 void		upsample_n_convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+
+
+// V210 to r10k			SSE2 SSSE3
+void		convert_v210_to_r10k_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		upsample_n_convert_v210_to_r10k_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 
 // V210 to anyRGB		NON SSE integer

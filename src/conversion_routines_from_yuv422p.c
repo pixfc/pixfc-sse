@@ -200,7 +200,7 @@ void		convert_yuv422p_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_
  *
  * 		to
  *
- * 		R 2 1 0
+ * 		1 0 B I T    R G B
  *
  */
 void		upsample_n_convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
@@ -209,6 +209,14 @@ void		upsample_n_convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixf
 
 void		convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		upsample_n_convert_yuv422p_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv422p_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, sse2_ssse3);
 }
 
 
@@ -243,6 +251,16 @@ void		convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* so
 		tmp = CLIP_10BIT_PIXEL(b);\
 		tmp |= ((CLIP_10BIT_PIXEL(g)) << 10);\
 		tmp |= ((CLIP_10BIT_PIXEL(r)) << 20);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
+	} else if (dest_fmt == PixFcR10k) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		tmp = (CLIP_10BIT_PIXEL(b)) << 2;\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 12);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 22);\
 		*(dst++) = p[3];\
 		*(dst++) = p[2];\
 		*(dst++) = p[1];\

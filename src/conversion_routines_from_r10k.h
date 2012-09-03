@@ -1,5 +1,5 @@
 /*
- * conversion_routines_from_r210.h
+ * conversion_routines_from_r10k.h
  *
  * Copyright (C) 2012 PixFC Team (pixelfc@gmail.com)
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef CONVERSION_ROUTINES_FROM_R210_H_
-#define CONVERSION_ROUTINES_FROM_R210_H_
+#ifndef CONVERSION_ROUTINES_FROM_R10K_H_
+#define CONVERSION_ROUTINES_FROM_R10K_H_
 
 
 #include "pixfc-sse.h"
@@ -36,25 +36,25 @@
  *
  */
 
-// r210 to YUYV			SSE2 SSSE3
-void		convert_r210_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUYV			SSE2 SSSE3
+void		convert_r10k_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuyv_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to UYVY			SSE2 SSSE3
-void		convert_r210_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to UYVY			SSE2 SSSE3
+void		convert_r10k_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_uyvy_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to YUV422p			SSE2 SSSE3
-void		convert_r210_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUV422p			SSE2 SSSE3
+void		convert_r10k_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuv422p_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3 SSE41
-void		convert_r210_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3 SSE41
+void		convert_r10k_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3
-void		convert_r210_to_v210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3
+void		convert_r10k_to_v210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 // RGB to YUV422		NON SSE integer (declared in conversions_from_argc_scalar.c)
 void 		convert_10bit_rgb_to_yuv422_nonsse(const struct PixFcSSE *, void *, void *);
@@ -81,25 +81,25 @@ void		downsample_n_convert_10bit_rgb_to_v210_nonsse_float(const struct PixFcSSE 
  *
  */
 
-// r210 to YUYV			SSE2 SSSE3
-void		convert_r210_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUYV			SSE2 SSSE3
+void		convert_r10k_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuyv_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to UYVY			SSE2 SSSE3
-void		convert_r210_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to UYVY			SSE2 SSSE3
+void		convert_r10k_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_uyvy_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to YUV422p			SSE2 SSSE3
-void		convert_r210_to_yuv422p_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuv422p_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUV422p			SSE2 SSSE3
+void		convert_r10k_to_yuv422p_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuv422p_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3 SSE41
-void		convert_r210_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3 SSE41
+void		convert_r10k_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_bt601_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3
-void		convert_r210_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3
+void		convert_r10k_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_bt601_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 // RGB to YUV422		NON SSE integer (declared in conversions_from_argc_scalar.c)
 void 		convert_10bit_rgb_to_yuv422_bt601_nonsse(const struct PixFcSSE* conv, void* in, void* out);
@@ -127,25 +127,25 @@ void		downsample_n_convert_10bit_rgb_to_v210_bt601_nonsse_float(const struct Pix
  *
  */
 
-// r210 to YUYV			SSE2 SSSE3
-void		convert_r210_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUYV			SSE2 SSSE3
+void		convert_r10k_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuyv_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to UYVY			SSE2 SSSE3
-void		convert_r210_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to UYVY			SSE2 SSSE3
+void		convert_r10k_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_uyvy_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to YUV422p			SSE2 SSSE3
-void		convert_r210_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to YUV422p			SSE2 SSSE3
+void		convert_r10k_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_yuv422p_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3 SSE41
-void		convert_r210_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3 SSE41
+void		convert_r10k_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_bt709_sse2_ssse3_sse41(const struct PixFcSSE *, void *, void *);
 
-// r210 to v210			SSE2 SSSE3
-void		convert_r210_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		downsample_n_convert_r210_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+// r10k to v210			SSE2 SSSE3
+void		convert_r10k_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		downsample_n_convert_r10k_to_v210_bt709_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 // RGB to YUV422		NON SSE integer (declared in conversions_from_argc_scalar.c)
 void 		convert_10bit_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in, void* out);
@@ -164,19 +164,19 @@ void		downsample_n_convert_10bit_rgb_to_v210_bt709_nonsse_float(const struct Pix
 
 /*
  *
- * 		R 2 1 0
+ * 		R 1 0 K
  *
  * 		T O
  *
  * 		R G B 3 2  /  2 4
  *
  */
-void		convert_r210_to_argb_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_r210_to_bgra_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_r210_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
-void		convert_r210_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_r10k_to_argb_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_r10k_to_bgra_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_r10k_to_rgb24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_r10k_to_bgr24_sse2_ssse3(const struct PixFcSSE *, void *, void *);
 
 void		convert_10bit_rgb_to_any_rgb_nonsse(const struct PixFcSSE *, void *, void *);
 
 
-#endif 	// CONVERSION_ROUTINES_FROM_R210_H_
+#endif 	// CONVERSION_ROUTINES_FROM_R10K_H_

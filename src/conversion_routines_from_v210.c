@@ -193,7 +193,7 @@ void		convert_v210_to_bgr24_sse2_ssse3(const struct PixFcSSE * pixfc, void* sour
  *
  * 		to
  *
- * 		R 2 1 0
+ * 		1 0 B I T  R G B 
  *
  */
 void		upsample_n_convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
@@ -204,6 +204,13 @@ void		convert_v210_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* sourc
 	CONVERT_TO_R210(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, sse2_ssse3);
 }
 
+void		upsample_n_convert_v210_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_R210(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_v210_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_R210(pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, sse2_ssse3);
+}
 
 
 

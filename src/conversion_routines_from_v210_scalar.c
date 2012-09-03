@@ -56,6 +56,16 @@
 			*dst++ = tmp8[2];\
 			*dst++ = tmp8[1];\
 			*dst++ = tmp8[0];\
+		} else if (dest_fmt == PixFcR10k) {\
+		uint32_t temp;\
+		uint8_t *tmp8 = (uint8_t *) &temp;\
+		temp = (((uint32_t)CLIP_10BIT_PIXEL(b) & 0x3FF) << 2);\
+		temp |= (((uint32_t)CLIP_10BIT_PIXEL(g) & 0x3FF) << 12);\
+		temp |= (((uint32_t)CLIP_10BIT_PIXEL(r) & 0x3FF) << 22);\
+		*dst++ = tmp8[3];\
+		*dst++ = tmp8[2];\
+		*dst++ = tmp8[1];\
+		*dst++ = tmp8[0];\
 		} else {\
 			printf("Unknown RGB pixel format\n");\
 		}

@@ -274,6 +274,20 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 			3,
 			"r210",
 	},
+	
+	{
+		PixFcR10k,
+		4, 1, 0, 1, 1, 64,
+		{
+			// FIXME: I am a copy/paste of BGR24 pixels, not true r10k values
+			// 2 groups of: 2 red pix - 2 green pix - 2 blue pix - 2 white pix
+			_E(0xFF00FF0000FF0000LL, 0xFF0000FF00FF0000LL),
+			_E(0xFFFFFFFFFFFF0000LL, 0xFF00FF0000FF0000LL),
+			_E(0xFF0000FF00FF0000LL, 0xFFFFFFFFFFFF0000LL)
+		},
+		3,
+		"r10k",
+	},
 };
 
 
