@@ -28,8 +28,8 @@
 				RGB32_TO_YUV422I_RECIPE,\
 				unpack_2_r210_to_r_g_b_vectors_,\
 				pack_fn,\
-				convert_r_g_b_vectors_to_y_vector_sse2,\
-				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				convert_10bit_r_g_b_vectors_to_8bit_y_vector_sse2,\
+				convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_sse2,\
 				instr_set\
 		)
 
@@ -39,8 +39,28 @@
 				AVG_DOWNSAMPLE_RGB32_TO_YUV422I_RECIPE,\
 				unpack_2_r210_to_r_g_b_vectors_,\
 				pack_fn,\
-				convert_r_g_b_vectors_to_y_vector_sse2,\
-				convert_downsampled_422_r_g_b_vectors_to_uv_vector_sse2,\
+				convert_10bit_r_g_b_vectors_to_8bit_y_vector_sse2,\
+				convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_sse2,\
+				instr_set\
+		)
+
+#define CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				RGB32_TO_V210_RECIPE,\
+				unpack_2_r210_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_10bit_r_g_b_vectors_to_10bit_y_vector_sse2,\
+				convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_sse2,\
+				instr_set\
+		)
+
+#define DOWNSAMPLE_N_CONVERT_TO_V210(instr_set)\
+		DO_CONVERSION_1U_1P(\
+				AVG_DOWNSAMPLE_RGB32_TO_V210_RECIPE,\
+				unpack_2_r210_to_r_g_b_vectors_sse2_ssse3,\
+				pack_6_y_uv_vectors_to_4_v210_vectors_ ## instr_set,\
+				convert_10bit_r_g_b_vectors_to_10bit_y_vector_sse2,\
+				convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_sse2,\
 				instr_set\
 		)
 
@@ -54,7 +74,32 @@ void		downsample_n_convert_r210_to_yuyv_sse2_ssse3(const struct PixFcSSE *pixfc,
 	DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, sse2_ssse3);
 }
 
+// r210 to UYVY			SSE2 SSSE3
+void		convert_r210_to_uyvy_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
 
+void		downsample_n_convert_r210_to_uyvy_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_YUV422I(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, sse2_ssse3);
+}
+
+// r210 to v210			SSE2 SSSE3 SSE41
+void		convert_r210_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+void		downsample_n_convert_r210_to_v210_sse2_ssse3_sse41(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3_sse41);
+}
+
+// r210 to v210			SSE2 SSSE3
+void		convert_r210_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_V210(sse2_ssse3);
+}
+
+void		downsample_n_convert_r210_to_v210_sse2_ssse3(const struct PixFcSSE *pixfc, void* source_buffer, void* dest_buffer) {
+	DOWNSAMPLE_N_CONVERT_TO_V210(sse2_ssse3);
+}
 
 /*
  *

@@ -1428,12 +1428,14 @@
 	__m128i*	v210_out = (__m128i*) dest_buffer;\
 	__m128i		unpack_out[6];\
 	TO_V120_24_PIX_OUTER_CONVERSION_LOOP(\
+			yuv_in, v210_out,\
 			YUV422I_TO_V210_CORE, 			/* loop core for first 24 pixels */\
 			YUV422I_TO_V210_CORE, 			/* loop core for remainder groups of 24 pixels */\
+			YUV422I_TO_V210_8PIX_LEFTOVER,	/* loop core for width = 8 pixels */\
 			YUV422I_TO_V210_8PIX_LEFTOVER,	/* loop core for last 8 pixels */\
 			YUV422I_TO_V210_16PIX_LEFTOVER, /* loop core if width = 16 pixels */\
 			YUV422I_TO_V210_16PIX_LEFTOVER, /* loop core for last 16 pixels */\
-			v210_out, unpack_fn, pack_fn);
+			unpack_fn, pack_fn);
 
 
 

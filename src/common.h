@@ -489,46 +489,74 @@ extern const int32_t      yuv_10bit_to_rgb_10bit_coef_lhs8[][3][3];
 			}\
 		}
 
-#define TO_V120_24_PIX_OUTER_CONVERSION_LOOP(core_first24, core, leftover_8, first_leftover_16, leftover_16, v210_ptr, ...)\
+#define TO_V120_24_PIX_OUTER_CONVERSION_LOOP(in_ptr, v210_ptr, core_first24, core, first_leftover_8, leftover_8, first_leftover_16, leftover_16, ...)\
 		uint32_t	width = pixfc->width;\
 		uint32_t	line = pixfc->height;\
-		uint32_t	pixel = width - 24; /* Handle the first 24 pixels outside the loop*/\
+		uint8_t		*src = (uint8_t *)source_buffer;\
+		uint8_t		*dst = (uint8_t *)dest_buffer;\
+		uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, width);\
+		uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, width);\
+		uint32_t	pixel;\
 		if ((width % 24) == 0) {\
 			while(line-- > 0) {\
+				in_ptr = (__m128i *)src;\
+				v210_ptr = (__m128i *)dst;\
+				src += src_row_byte_count;\
+				dst += dst_row_byte_count;\
+				pixel = width - 24; /* Handle the first 24 pixels outside the loop*/\
 				core_first24(__VA_ARGS__);\
 				while(pixel >= 24) {\
 					core(__VA_ARGS__);\
 					pixel -= 24;\
 				}\
-				pixel = width - 24;\
 			}\
 		} else if ((width % 24) == 8) {\
-			while(line-- > 0) {\
-				core_first24(__VA_ARGS__);\
-				while(pixel > 24) {\
-					core(__VA_ARGS__);\
-					pixel -= 24;\
+			if (width == 8) {/* there are only 8 pixels on each line*/\
+				while(line-- > 0) {\
+					in_ptr = (__m128i *)src;\
+					v210_ptr = (__m128i *)dst;\
+					src += src_row_byte_count;\
+					dst += dst_row_byte_count;\
+					first_leftover_8(__VA_ARGS__);\
 				}\
-				leftover_8(__VA_ARGS__);\
-				/* v210_ptr already points to the start of next line */;\
-				pixel = width - 24;\
+			} else {\
+				while(line-- > 0) {\
+					in_ptr = (__m128i *)src;\
+					v210_ptr = (__m128i *)dst;\
+					src += src_row_byte_count;\
+					dst += dst_row_byte_count;\
+					pixel = width - 24; /* Handle the first 24 pixels outside the loop*/\
+					core_first24(__VA_ARGS__);\
+					while(pixel > 24) {\
+						core(__VA_ARGS__);\
+						pixel -= 24;\
+					}\
+					leftover_8(__VA_ARGS__);\
+				}\
 			}\
 		} else { /* width % 24 == 16 */\
-			if (width == 16) {/* there are only 16 pixels on the line*/\
+			if (width == 16) {/* there are only 16 pixels on each line*/\
 				while(line-- > 0) {\
+					in_ptr = (__m128i *)src;\
+					v210_ptr = (__m128i *)dst;\
+					src += src_row_byte_count;\
+					dst += dst_row_byte_count;\
 					first_leftover_16(__VA_ARGS__);\
 					v210_ptr += 4;\
 				}\
 			} else {\
 				while(line-- > 0) {\
+					in_ptr = (__m128i *)src;\
+					v210_ptr = (__m128i *)dst;\
+					src += src_row_byte_count;\
+					dst += dst_row_byte_count;\
+					pixel = width - 24; /* Handle the first 24 pixels outside the loop*/\
 					core_first24(__VA_ARGS__);\
 					while(pixel > 24) {\
 						core(__VA_ARGS__);\
 						pixel -= 24;\
 					}\
 					leftover_16(__VA_ARGS__);\
-					pixel = width - 24;\
-					v210_ptr += 4;\
 				}\
 			}\
 		}

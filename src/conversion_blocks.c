@@ -371,6 +371,15 @@ DECLARE_AVG_BT709_FLOAT_CONV_BLOCK			(non_sse_resample_n_convert_fn_prefix##_bt7
 const struct  ConversionBlock		conversion_blocks[] = {
 
 	//
+	// r210 to YUYV
+	DECLARE_R210_CONV_BLOCKS(convert_r210_to_yuyv, downsample_n_convert_r210_to_yuyv, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR210, PixFcYUYV, 16, 1, 2, 1, "r210 to YUYV"),
+	
+	// r210 to UYVY
+	DECLARE_R210_CONV_BLOCKS(convert_r210_to_uyvy, downsample_n_convert_r210_to_uyvy, convert_10bit_rgb_to_yuv422, downsample_n_convert_10bit_rgb_to_yuv422, PixFcR210, PixFcUYVY, 16, 1, 2, 1, "r210 to UYVY"),
+
+	// r210 to v210
+	DECLARE_V210_CONV_BLOCKS(convert_r210_to_v210, downsample_n_convert_r210_to_v210, convert_10bit_rgb_to_v210, downsample_n_convert_10bit_rgb_to_v210, PixFcR210, PixFcV210, 8, 1, 2, 1, "r210 to v210"),
+
 	// r210 to ARGB
 	DECLARE_R210_REPACK_CONV_BLOCK(convert_r210_to_argb, convert_10bit_rgb_to_any_rgb, PixFcR210, PixFcARGB, 16, 1, 1, 1, "r210 to ARGB"),
 

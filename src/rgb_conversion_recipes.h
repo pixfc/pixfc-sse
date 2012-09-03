@@ -1705,12 +1705,14 @@
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[6];\
 	TO_V120_24_PIX_OUTER_CONVERSION_LOOP(\
+			rgb_in, yuv_out,\
 			RGB32_TO_V210_NNB_LOOP_CORE, /* First 24 pixel core*/\
 			RGB32_TO_V210_NNB_LOOP_CORE, /* Remainder 24 pixel core*/\
+			RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER8, /* First leftover 8 */\
 			RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER8, /* Leftover 8 */\
 			RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER16, /* First leftover 16*/\
 			RGB32_TO_V210_NNB_LOOP_CORE_LEFTOVER16, /* Last leftover 16 */\
-			yuv_out, unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set\
+			unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set\
 		)
 
 /*
@@ -1758,11 +1760,21 @@
 	yuv_out += 4;\
 
 
-// First 24 pixel loop core
+// Main 24 pixel loop core
 #define RGB32_TO_V210_AVG_LOOP_CORE(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
 	RGB32_TO_V210_AVG_8PIXELS(0, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	RGB32_TO_V210_AVG_8PIXELS(2, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
 	RGB32_TO_V210_AVG_8PIXELS(4, "Main", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	pack_fn(convert_out, yuv_out);\
+	yuv_out += 4;\
+
+// First leftover 8 pixel loop core
+#define RGB32_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER8(unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set) \
+	RGB32_TO_V210_AVG_FIRST_8PIXELS(0, "FL8", unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set);\
+	convert_out[2] = _mm_setzero_si128();\
+	convert_out[3] = _mm_setzero_si128();\
+	convert_out[4] = _mm_setzero_si128();\
+	convert_out[5] = _mm_setzero_si128();\
 	pack_fn(convert_out, yuv_out);\
 	yuv_out += 4;\
 
@@ -1804,12 +1816,14 @@
 	__m128i		unpack_out[3];\
 	__m128i		convert_out[6];\
 	TO_V120_24_PIX_OUTER_CONVERSION_LOOP(\
+			rgb_in, yuv_out,\
 			RGB32_TO_V210_AVG_LOOP_CORE_FIRST24, \
 			RGB32_TO_V210_AVG_LOOP_CORE,\
+			RGB32_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER8,\
 			RGB32_TO_V210_AVG_LOOP_CORE_LEFTOVER8,\
 			RGB32_TO_V210_AVG_LOOP_CORE_FIRST_LEFTOVER16,\
 			RGB32_TO_V210_AVG_LOOP_CORE_LEFTOVER16,\
-			yuv_out, unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set\
+			unpack_fn, pack_fn, y_conv_fn, uv_conv_fn, instr_set\
 		)
 
 

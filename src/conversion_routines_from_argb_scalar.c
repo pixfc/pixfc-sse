@@ -149,6 +149,10 @@
 DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[0], 8, rgb_8bit_to_yuv_8bit_off[0])
 DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt601_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[1], 8, rgb_8bit_to_yuv_8bit_off[1])
 DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[2], 8, rgb_8bit_to_yuv_8bit_off[2])
+//
+DEFINE_ANY_RGB_TO_YUV422(convert_10bit_rgb_to_yuv422_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[0], 8, rgb_10bit_to_yuv_8bit_off[0])
+DEFINE_ANY_RGB_TO_YUV422(convert_10bit_rgb_to_yuv422_bt601_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[1], 8, rgb_10bit_to_yuv_8bit_off[1])
+DEFINE_ANY_RGB_TO_YUV422(convert_10bit_rgb_to_yuv422_bt709_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[2], 8, rgb_10bit_to_yuv_8bit_off[2])
 
 
 
@@ -185,7 +189,10 @@ DEFINE_ANY_RGB_TO_YUV422(convert_rgb_to_yuv422_bt709_nonsse, rgb_8bit_to_yuv_8bi
 DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_rgb_to_yuv422_nonsse_float, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0])
 DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_rgb_to_yuv422_bt601_nonsse_float, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1])
 DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_rgb_to_yuv422_bt709_nonsse_float, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2])
-
+//
+DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_10bit_rgb_to_yuv422_nonsse_float, rgb_10bit_to_yuv_8bit_coef[0], rgb_10bit_to_yuv_8bit_off[0])
+DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_10bit_rgb_to_yuv422_bt601_nonsse_float, rgb_10bit_to_yuv_8bit_coef[1], rgb_10bit_to_yuv_8bit_off[1])
+DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_10bit_rgb_to_yuv422_bt709_nonsse_float, rgb_10bit_to_yuv_8bit_coef[2], rgb_10bit_to_yuv_8bit_off[2])
 
 
 
@@ -241,6 +248,10 @@ DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_rgb_to_yuv422_bt709_nonsse_float, rgb_8bi
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_rgb_to_yuv422_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[0], 8, rgb_8bit_to_yuv_8bit_off[0])
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_rgb_to_yuv422_bt601_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[1], 8, rgb_8bit_to_yuv_8bit_off[1])
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_rgb_to_yuv422_bt709_nonsse, rgb_8bit_to_yuv_8bit_coef_lhs8[2], 8, rgb_8bit_to_yuv_8bit_off[2])
+//
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_10bit_rgb_to_yuv422_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[0], 8, rgb_10bit_to_yuv_8bit_off[0])
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_10bit_rgb_to_yuv422_bt601_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[1], 8, rgb_10bit_to_yuv_8bit_off[1])
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_10bit_rgb_to_yuv422_bt709_nonsse, rgb_10bit_to_yuv_8bit_coef_lhs8[2], 8, rgb_10bit_to_yuv_8bit_off[2])
 
 
 
@@ -283,7 +294,10 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_rgb_to_yuv422
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_yuv422_nonsse_float, rgb_8bit_to_yuv_8bit_coef[0], rgb_8bit_to_yuv_8bit_off[0])
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_yuv422_bt601_nonsse_float, rgb_8bit_to_yuv_8bit_coef[1], rgb_8bit_to_yuv_8bit_off[1])
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_yuv422_bt709_nonsse_float, rgb_8bit_to_yuv_8bit_coef[2], rgb_8bit_to_yuv_8bit_off[2])
-
+//
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_10bit_rgb_to_yuv422_nonsse_float, rgb_10bit_to_yuv_8bit_coef[0], rgb_10bit_to_yuv_8bit_off[0])
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_10bit_rgb_to_yuv422_bt601_nonsse_float, rgb_10bit_to_yuv_8bit_coef[1], rgb_10bit_to_yuv_8bit_off[1])
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_10bit_rgb_to_yuv422_bt709_nonsse_float, rgb_10bit_to_yuv_8bit_coef[2], rgb_10bit_to_yuv_8bit_off[2])
 
 
 
@@ -308,6 +322,7 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -355,8 +370,9 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_
 				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
 				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
 			}\
-		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
-		pixel = 0;\
+			src += src_padding_bytes;\
+			dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+			pixel = 0;\
 		}\
 	}\
 
@@ -364,7 +380,10 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_rgb_to_
 DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_nonsse, rgb_8bit_to_yuv_10bit_coef_lhs8[0], 8, rgb_8bit_to_yuv_10bit_off[0]);
 DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_bt601_nonsse, rgb_8bit_to_yuv_10bit_coef_lhs8[1], 8, rgb_8bit_to_yuv_10bit_off[1]);
 DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_bt709_nonsse,	rgb_8bit_to_yuv_10bit_coef_lhs8[2], 8, rgb_8bit_to_yuv_10bit_off[2]);
-
+//
+DEFINE_ANY_RGB_TO_V210_FN(convert_10bit_rgb_to_v210_nonsse, rgb_10bit_to_yuv_10bit_coef_lhs8[0], 8, rgb_10bit_to_yuv_10bit_off[0]);
+DEFINE_ANY_RGB_TO_V210_FN(convert_10bit_rgb_to_v210_bt601_nonsse, rgb_10bit_to_yuv_10bit_coef_lhs8[1], 8, rgb_10bit_to_yuv_10bit_off[1]);
+DEFINE_ANY_RGB_TO_V210_FN(convert_10bit_rgb_to_v210_bt709_nonsse, rgb_10bit_to_yuv_10bit_coef_lhs8[2], 8, rgb_10bit_to_yuv_10bit_off[2]);
 
 
 
@@ -379,6 +398,7 @@ DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_bt709_nonsse,	rgb_8bit_to_yuv_10bi
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -426,8 +446,9 @@ DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_bt709_nonsse,	rgb_8bit_to_yuv_10bi
 				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
 				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
 			}\
-		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
-		pixel = 0;\
+			src += src_padding_bytes;\
+			dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+			pixel = 0;\
 		}\
 	}\
 
@@ -435,7 +456,10 @@ DEFINE_ANY_RGB_TO_V210_FN(convert_rgb_to_v210_bt709_nonsse,	rgb_8bit_to_yuv_10bi
 DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_nonsse_float, rgb_8bit_to_yuv_10bit_coef[0], rgb_8bit_to_yuv_10bit_off[0]);
 DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_bt601_nonsse_float, rgb_8bit_to_yuv_10bit_coef[1], rgb_8bit_to_yuv_10bit_off[1]);
 DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_bt709_nonsse_float,	rgb_8bit_to_yuv_10bit_coef[2], rgb_8bit_to_yuv_10bit_off[2]);
-
+//
+DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_10bit_rgb_to_v210_nonsse_float, rgb_10bit_to_yuv_10bit_coef[0], rgb_10bit_to_yuv_10bit_off[0]);
+DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_10bit_rgb_to_v210_bt601_nonsse_float, rgb_10bit_to_yuv_10bit_coef[1], rgb_10bit_to_yuv_10bit_off[1]);
+DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_10bit_rgb_to_v210_bt709_nonsse_float,	rgb_10bit_to_yuv_10bit_coef[2], rgb_10bit_to_yuv_10bit_off[2]);
 
 
 
@@ -450,6 +474,7 @@ DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_bt709_nonsse_float,	rgb_8bit
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -504,8 +529,9 @@ DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_bt709_nonsse_float,	rgb_8bit
 				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
 				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
 			}\
-		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
-		pixel = 0;\
+			src += src_padding_bytes;\
+			dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+			pixel = 0;\
 		}\
 	}\
 
@@ -513,6 +539,10 @@ DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_rgb_to_v210_bt709_nonsse_float,	rgb_8bit
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_nonsse, rgb_8bit_to_yuv_10bit_coef_lhs8[0], 8, rgb_8bit_to_yuv_10bit_off[0]);
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_bt601_nonsse, rgb_8bit_to_yuv_10bit_coef_lhs8[1], 8, rgb_8bit_to_yuv_10bit_off[1]);
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_bt709_nonsse,	rgb_8bit_to_yuv_10bit_coef_lhs8[2], 8, rgb_8bit_to_yuv_10bit_off[2]);
+//
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_10bit_rgb_to_v210_nonsse, rgb_10bit_to_yuv_10bit_coef_lhs8[0], 8, rgb_10bit_to_yuv_10bit_off[0]);
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_10bit_rgb_to_v210_bt601_nonsse, rgb_10bit_to_yuv_10bit_coef_lhs8[1], 8, rgb_10bit_to_yuv_10bit_off[1]);
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_10bit_rgb_to_v210_bt709_nonsse,	rgb_10bit_to_yuv_10bit_coef_lhs8[2], 8, rgb_10bit_to_yuv_10bit_off[2]);
 
 
 
@@ -528,6 +558,7 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
+		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1 = 0, y2 = 0, u = 0, v = 0;\
 		while(line++ < pixfc->height){\
@@ -582,8 +613,9 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_
 				*dst = CLIP_10BIT_PIXEL(v) & 0x3FF;\
 				*dst |= (CLIP_10BIT_PIXEL(y2) & 0x3FF) << 10;\
 			}\
-		dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
-		pixel = 0;\
+			src += src_padding_bytes;\
+			dst = (uint32_t*) ((uint8_t*)out + line * ROW_SIZE(PixFcV210, pixfc->width));\
+			pixel = 0;\
 		}\
 	}\
 
@@ -591,6 +623,10 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_rgb_to_v210_
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_rgb_to_v210_nonsse_float, rgb_8bit_to_yuv_10bit_coef[0], rgb_8bit_to_yuv_10bit_off[0]);
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_rgb_to_v210_bt601_nonsse_float, rgb_8bit_to_yuv_10bit_coef[1], rgb_8bit_to_yuv_10bit_off[1]);
 DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_rgb_to_v210_bt709_nonsse_float,	rgb_8bit_to_yuv_10bit_coef[2], rgb_8bit_to_yuv_10bit_off[2]);
+//
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_10bit_rgb_to_v210_nonsse_float, rgb_10bit_to_yuv_10bit_coef[0], rgb_10bit_to_yuv_10bit_off[0]);
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_10bit_rgb_to_v210_bt601_nonsse_float, rgb_10bit_to_yuv_10bit_coef[1], rgb_10bit_to_yuv_10bit_off[1]);
+DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FLOAT_FN(downsample_n_convert_10bit_rgb_to_v210_bt709_nonsse_float,	rgb_10bit_to_yuv_10bit_coef[2], rgb_10bit_to_yuv_10bit_off[2]);
 
 
 
