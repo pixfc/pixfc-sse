@@ -118,8 +118,14 @@ void   compare_8bit_output(int8_t check_last, void *scalar_out, void *sse_out, u
 }
 
 void   compare_10bit_be_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t sse_out_count, uint32_t max_diff, char *prefix) {
+#ifndef WIN32
 	__m128i scalar_out_le[sse_out_count];
 	__m128i sse_out_le[sse_out_count];
+#else
+	// hmm this may blow on windows ...
+	__m128i scalar_out_le[10];
+	__m128i sse_out_le[10];
+#endif
 	uint8_t *in8;
 	uint8_t *out8;
 	uint32_t index;

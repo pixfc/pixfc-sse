@@ -108,13 +108,17 @@ extern const uint32_t					pixfmt_descriptions_count;
 /*
  * This macro declares a variable which contains the number of padding bytes at the end of a line, if any.
  */
+#ifdef _WIN32
+#define DECLARE_PADDING_BYTE_COUNT(var, fmt, width) \
+		uint32_t (var) =  ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom
+#else
 #define DECLARE_PADDING_BYTE_COUNT(var, fmt, width) \
 		uint32_t (var) = 0;\
 		do {\
 			(var) = ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom;\
 			dprint("Padding byte count for %d '%s' pixels: %u\n", (width), pixfmt_descriptions[(fmt)].name,  (var));\
 		} while(0)
-
+#endif
 
 /*
  * This macro expands to the size in bytes of an image of the given width and 
@@ -125,6 +129,10 @@ extern const uint32_t					pixfmt_descriptions_count;
 /*
  * This macro defines a variable that contains the number of padding __m128i vectors left at the end of a line
  */
+#ifdef WIN32
+#define DECLARE_PADDING_VECT_COUNT(var, fmt, width) \
+	uint32_t (var) = (ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom) / 16
+#else
 #define DECLARE_PADDING_VECT_COUNT(var, fmt, width) \
 	uint32_t (var) = 0;\
 	do {\
@@ -136,6 +144,6 @@ extern const uint32_t					pixfmt_descriptions_count;
 			dprint("Padding byte count %u %% 16 != 0 !!!\n", padding_size);\
 		}\
 	} while(0)
-
+#endif
 #endif 		// PIXFMT_DESCRIPTIONS_H_
 
