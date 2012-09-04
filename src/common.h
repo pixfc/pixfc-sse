@@ -793,8 +793,10 @@ uint32_t			does_cpu_support(uint64_t);
 #if defined(DEBUG) && defined(__INTEL_CPU__)
 
 void 						print_xmm32(char *name, __m128i *reg);
+void 						print_xmm32x(char *name, __m128i *reg);
 void 						print_xmm16(char *name, __m128i *reg);
 void 						print_xmm16u(char *name, __m128i *reg);
+void 						print_xmm16x(char *name, __m128i *reg);
 void 						print_xmm10u(char *name, __m128i *reg);
 void						print_xmm8u(char *name, __m128i *reg);
 void						print_xmm8x(char *name, __m128i *reg);
@@ -802,8 +804,10 @@ void						print_xmm8x(char *name, __m128i *reg);
 #else
 
 #define print_xmm32(...)
+#define print_xmm32x(...)
 #define print_xmm16(...)
 #define print_xmm16u(...)
+#define print_xmm16x(...)
 #define print_xmm10u(...)
 #define print_xmm8u(...)
 #define print_xmm8x(...)

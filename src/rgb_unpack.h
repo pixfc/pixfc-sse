@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <tmmintrin.h>
+#include <smmintrin.h>
 
 #ifndef GENERATE_UNALIGNED_INLINES
 #error "The GENERATE_UNALIGNED_INLINES macro is not defined"
@@ -48,17 +49,20 @@
 #undef INLINE_NAME
 #undef UNALIGNED_RGB32_INPUT_PREAMBLE
 #undef UNALIGNED_RGB24_INPUT_PREAMBLE
+#undef UNALIGNED_R210_INPUT_PREAMBLE
 #undef INPUT_VECT
 
 #if GENERATE_UNALIGNED_INLINES == 1
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void unaligned_ ## fn_suffix(__VA_ARGS__)
 	#define UNALIGNED_RGB32_INPUT_PREAMBLE			DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(aligned_vector, input);
 	#define UNALIGNED_RGB24_INPUT_PREAMBLE			DECLARE_VECT_ARRAY3_N_UNALIGN_LOAD(aligned_vector, input);
+	#define UNALIGNED_R210_INPUT_PREAMBLE			DECLARE_VECT_ARRAY2_N_UNALIGN_LOAD(aligned_vector, input);
 	#define INPUT_VECT								aligned_vector
 #else
 	#define INLINE_NAME(fn_suffix, ...)				EXTERN_INLINE void fn_suffix(__VA_ARGS__)
 	#define UNALIGNED_RGB32_INPUT_PREAMBLE
 	#define UNALIGNED_RGB24_INPUT_PREAMBLE
+	#define UNALIGNED_R210_INPUT_PREAMBLE
 	#define INPUT_VECT								input
 #endif
 
@@ -1129,6 +1133,86 @@ INLINE_NAME(unpack_bgr24_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* o
 	out_6_v16i_r_g_b_vectors[5] = _mm_or_si128(out_6_v16i_r_g_b_vectors[5], _M(scratch1));	// POR		1	0.33
 	// B9  0	B10 0	B11  0	B12  0	B13  0	B14  0	B15  0	B16  0
 };
+
+
+/*
+ * Unpack 2 r210 vectors (8 pixels) into 3 R, G, B vectors 
+ *
+ * Total latency:				15
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 2 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+INLINE_NAME(unpack_2_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* output) {
+	CONST_M128I(keep_low_component,	0x000003FF000003FFLL, 0x000003FF000003FFLL);
+	CONST_M128I(shuffle_le, 0x0405060700010203LL, 0x0C0D0E0F08090A0BLL);
+	M128I(scratch, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+	M128I(scratch4, 0x0LL, 0x0LL);
+	
+	UNALIGNED_R210_INPUT_PREAMBLE;
+	
+	// Re-write input vectors to little endian
+	_M(scratch3) = _mm_shuffle_epi8(INPUT_VECT[0], _M(shuffle_le));					// PSHUFB		1	0.5
+	//	B1	G1	R1		B2	G2	R2		B3	G3	R3		B4	G4	R4
+	// (10-bit words)
+
+	_M(scratch4) = _mm_shuffle_epi8(INPUT_VECT[1], _M(shuffle_le));					// PSHUFB		1	0.5
+	//	B5	G5	R5		B6	G6	R6		B7	G7	R7		B8	G8	R8
+	// (10-bit words)
+	
+	_M(scratch) = _mm_and_si128(_M(scratch3), _M(keep_low_component));				// PAND			1	0.33
+	// B1		0		B2		0		B3		0		B4		0
+
+	_M(scratch2) = _mm_and_si128(_M(scratch4), _M(keep_low_component));				// PAND			1	0.33
+	// B5		0		B6		0		B7		0		B8		0
+
+	output[2] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+
+	
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 10);									// PSRLD		1	1
+	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
+	// G1		0		G2		0		G3		0		G4		0
+	
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 10);								// PSRLD		1	1
+	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
+	// G5		0		G6		0		G7		0		G8		0
+	
+	output[1] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+
+	
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 20);									// PSRLD		1	1
+	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
+	// R1		0		R2		0		R3		0		R4		0
+	
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 20);								// PSRLD		1	1
+	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
+	// R5		0		R6		0		R7		0		R8		0
+	
+	output[0] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+}
+
+
 
 #endif	// __INTEL_CPU__
 

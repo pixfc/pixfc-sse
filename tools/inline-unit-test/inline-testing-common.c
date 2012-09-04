@@ -45,6 +45,31 @@ void	print_xmm10leu_array(uint32_t count, char *prefix, void* array) {
 	}
 }
 
+void	print_xmm10beu_array(uint32_t count, char *prefix, void* array) {
+	uint32_t	index = 0;
+	char		title[256] = {0};
+	__m128i *	data = (__m128i*) array;
+	__m128i		data_le = {0x0LL, 0x0LL};
+	uint8_t	*	in8;
+	uint8_t *	out8;
+	
+	for(index = 0; index < count; index++){
+		int i;
+		sprintf(title, "BE %s %u", prefix, index);
+		in8 = (uint8_t *)&data[index];
+		out8 = (uint8_t *)&data_le;
+		for(i = 0; i < 4; i++) {
+			out8[3] = in8[0];
+			out8[2] = in8[1];
+			out8[1] = in8[2];
+			out8[0] = in8[3];
+			out8 += 4;
+			in8 += 4;
+		}
+		print_xmm10u(title, &data_le);
+	}
+}
+
 
 void	print_xmm16u_array(uint32_t count, char *prefix, void* array) {
 	uint32_t	index = 0;
@@ -90,6 +115,40 @@ void   compare_8bit_output(int8_t check_last, void *scalar_out, void *sse_out, u
 			break;
 		}
 	}
+}
+
+void   compare_10bit_be_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t sse_out_count, uint32_t max_diff, char *prefix) {
+	__m128i scalar_out_le[sse_out_count];
+	__m128i sse_out_le[sse_out_count];
+	uint8_t *in8;
+	uint8_t *out8;
+	uint32_t index;
+	
+	// convert scalar_out to little endian
+	in8 = (uint8_t *)scalar_out;
+	out8 = (uint8_t *)scalar_out_le;
+	for(index = 0; index < 4 * 4 * sse_out_count; index += 4) {
+		out8[3] = in8[0];
+		out8[2] = in8[1];
+		out8[1] = in8[2];
+		out8[0] = in8[3];
+		out8 += 4;
+		in8 += 4;
+	}
+	
+	// convert sse_out to little endian
+	in8 = (uint8_t *)sse_out;
+	out8 = (uint8_t *)sse_out_le;
+	for(index = 0; index < 4 * 4 * sse_out_count; index += 4) {
+		out8[3] = in8[0];
+		out8[2] = in8[1];
+		out8[1] = in8[2];
+		out8[0] = in8[3];
+		out8 += 4;
+		in8 += 4;
+	}
+
+	compare_10bit_le_output(check_last, scalar_out_le, sse_out_le, sse_out_count, max_diff, prefix);
 }
 
 void   compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t sse_out_count, uint32_t max_diff, char *prefix) {

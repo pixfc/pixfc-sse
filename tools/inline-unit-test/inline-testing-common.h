@@ -57,8 +57,8 @@
 // 0		15		16		235		236		240		241     255
 #define DECLARE_3_8BIT_VECT(var)	M128I_ARRAY_VAL(var, 3, \
 														{ 0x00EB0010000F0000LL, 0x00FF00F100F000ECLL}, \
-														{ 0x00EB0010000F0000LL, 0x00FF00F100F000ECLL}, \
-														{ 0x00EB0010000F0000LL, 0x00FF00F100F000ECLL}, )
+														{ 0x00EB0010000F0001LL, 0x00FF00F100F000ECLL}, \
+														{ 0x00EB0010000F0002LL, 0x00FF00F100F000ECLL}, )
 
 // 0		1		2		15		16		17		127		128
 // 0		1		2		15		16		17		127		128
@@ -95,6 +95,12 @@
 														{ 0x003F000200010000LL, 0x020001FF00410040LL }, \
 														{ 0x03AD03AC03AB0201LL, 0x03FF03FE03C103C0LL }, )
 
+// 0, 1, 2, /**/ 63,64,65 /**/, 127,128,129 /**/,  511, 512, 513 /**/
+// 840, 841, 842, /**/ 939, 940, 941, /**/ 960, 961, 962, /**/ 1021, 1022, 1023
+#define DECLARE_2_RGB_10BIT_VECT(var)	M128I_ARRAY_VAL(var, 2, \
+														{ 0x3F00110400042000LL, 0xFF0118207F001208LL }, \
+														{ 0xABB3DE3A4827AD34LL, 0xFDFBFF3FC0072F3CLL }, )
+
 // 0		1		2		63		64		65		511		512
 // 0		0		63		63		64		64		940		940
 #define DECLARE_1_Y_UV_10BIT_VECT1(var)	M128I_ARRAY_VAL(var, 2, \
@@ -108,13 +114,13 @@
 														{ 0x03C003C003AD03ADLL, 0x03FF03FF03C103C1LL }, )
 
 
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
+// 0		61		64		940		941		960		961     1021
+// 1		62		65		940		941		960		961     1022
+// 2		63		66		940		941		960		961     1023
 #define DECLARE_3_10BIT_VECT(var)	M128I_ARRAY_VAL(var, 3, \
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, )
+														{ 0x03AC0040003D0000LL, 0x03FD03C103C003ADLL },\
+														{ 0x03AC0041003E0001LL, 0x03FE03C103C003ADLL },\
+														{ 0x03AC0042003F0002LL, 0x03FF03C103C003ADLL }, )
 
 // 0		1		2		63		64		65		511		512
 // 0		1		2		63		64		65		511		512
@@ -126,19 +132,19 @@
 														{ 0x03AD03AC03AB0201LL, 0x03FF03FE03C103C0LL }, \
 														{ 0x03AD03AC03AB0201LL, 0x03FF03FE03C103C0LL }, )
  
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
-// 0		63		64		940		941		960		961     1023
+// 0		61		64		940		941		960		961     1021
+// 1		62		65		940		941		960		961     1022
+// 2		63		66		940		941		960		961     1023
+// 0		61		64		940		941		960		961     1021
+// 1		62		65		940		941		960		961     1022
+// 2		63		66		940		941		960		961     1023
 #define DECLARE_6_10BIT_VECT(var)	M128I_ARRAY_VAL(var, 6, \
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-                                                        { 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },\
-														{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, )
+														{ 0x03AC0040003D0000LL, 0x03FD03C103C003ADLL },\
+														{ 0x03AC0041003E0001LL, 0x03FE03C103C003ADLL },\
+														{ 0x03AC0042003F0002LL, 0x03FF03C103C003ADLL },\
+														{ 0x03AC0040003D0000LL, 0x03FD03C103C003ADLL },\
+														{ 0x03AC0041003E0001LL, 0x03FE03C103C003ADLL },\
+														{ 0x03AC0042003F0002LL, 0x03FF03C103C003ADLL }, )
 
 
 
@@ -158,11 +164,13 @@
 #ifdef DEBUG
 	void	print_xmm8u_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm10leu_array(uint32_t count, char *prefix, void *array);
+	void	print_xmm10beu_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm16u_array(uint32_t count, char *prefix, void *array);
 	void	print_xmm16_array(uint32_t count, char *prefix, void *array);
 #else
 	#define print_xmm8u_array(...)
 	#define print_xmm10leu_array(...)
+	#define print_xmm10beu_array(...)
 	#define print_xmm16u_array(...)
 	#define print_xmm16_array(...)
 #endif
@@ -171,6 +179,7 @@
  * check_last specifies how many of the last values should be check. If check_last is negative, then check from start. If 0, check all values.
  */
 void	compare_8bit_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
+void	compare_10bit_be_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 void	compare_10bit_le_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, uint8_t output_count, uint32_t max_diff, char *prefix);
 
@@ -237,11 +246,11 @@ void	compare_16bit_output(int8_t check_last, void *scalar_out, void *sse_out, ui
         __m128i scalar_out[output_count];\
         __m128i sse_out[output_count];\
 		dprintf("Checking " #inline_sse "\n");\
-        /*print_xmm16u_array(ARRAY_SIZE(input), "INPUT", _AM(input[0]));*/\
+        print_xmm16u_array(ARRAY_SIZE(input), "INPUT", _AM(input[0]));\
 		inline_scalar(_AM(input[0]), scalar_out);\
-        /*print_xmm10leu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);*/\
+        print_xmm10beu_array(ARRAY_SIZE(scalar_out), "SCALAR OUT", scalar_out);\
 		inline_sse(_AM(input[0]), sse_out);\
-        /*print_xmm10leu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);*/\
+        print_xmm10beu_array(ARRAY_SIZE(sse_out), "SSE OUT", sse_out);\
 		compare_fn(0, scalar_out, sse_out, output_count, max_diff, #inline_sse);\
 	} while (0)
 
