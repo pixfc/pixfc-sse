@@ -93,7 +93,7 @@ extern const uint32_t					pixfmt_descriptions_count;
 #define ALIGNED_WIDTH(fmt, width) \
 	(\
 		((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
-			((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) & ~(pixfmt_descriptions[(fmt)].row_pixel_multiple)\
+			((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) / pixfmt_descriptions[(fmt)].row_pixel_multiple * pixfmt_descriptions[(fmt)].row_pixel_multiple\
 	)
 
 /*
@@ -101,8 +101,7 @@ extern const uint32_t					pixfmt_descriptions_count;
  */
 #define ROW_SIZE(fmt, width) \
 	( ((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
-		((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) / pixfmt_descriptions[(fmt)].row_pixel_multiple * \
-			pixfmt_descriptions[(fmt)].bytes_per_pix_num * pixfmt_descriptions[(fmt)].row_pixel_multiple / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
+		ALIGNED_WIDTH(fmt, width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
 	)
 
 /*
