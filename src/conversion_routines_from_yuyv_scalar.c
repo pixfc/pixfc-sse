@@ -110,7 +110,7 @@
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
 		uint32_t            pixels_remaining;\
 		uint32_t            lines_remaining = conv->height;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r = 0, g = 0, b = 0;\
@@ -153,7 +153,7 @@ DEFINE_YUV422I_TO_ANY_RGB_FLOAT(convert_yuv422i_to_any_10bit_rgb_bt709_nonsse_fl
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
 		uint32_t            pixels_remaining;\
 		uint32_t            lines_remaining = conv->height;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint8_t*			src = (uint8_t *) in;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r = 0, g = 0, b = 0;\
@@ -189,7 +189,7 @@ DEFINE_YUV422I_TO_ANY_RGB(convert_yuv422i_to_any_10bit_rgb_bt709_nonsse, yuv_8bi
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint32_t 			lines_remaining = conv->height;\
 		uint32_t			pixel_count;\
 		uint8_t*			src = (uint8_t *) in;\
@@ -239,7 +239,7 @@ DEFINE_UPSAMPLE_N_CONVERT_YUV422I_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422i_to
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint32_t 			lines_remaining = conv->height;\
 		uint32_t			pixel_count;\
 		uint8_t*			src = (uint8_t *) in;\

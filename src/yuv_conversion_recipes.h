@@ -118,14 +118,23 @@
 #define UPSAMPLE_YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
 	__m128i		unpack_out[8];\
 	__m128i		convert_out[6];\
-	__m128i*    yuyv_8pixels = (__m128i *) source_buffer;\
-	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
-	/* number of __m128i padding vectors left until the end of line */\
-	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
+	__m128i*    yuyv_8pixels;\
+	__m128i*	rgb_out_buf;\
 	uint32_t	pixel_count;\
 	uint32_t 	lines_remaining = pixfc->height;\
+	uint8_t		*next_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, pixfc->width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
 	while(lines_remaining-- > 0) {\
 		pixel_count = pixfc->width - 16;\
+		\
+		yuyv_8pixels = (__m128i *) next_src;\
+		rgb_out_buf = (__m128i *) next_dst;\
+		\
+		next_src += src_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+		\
 		unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
 		while(pixel_count > 0) {\
 			print_xmm16u("Y1-8", unpack_out);\
@@ -163,9 +172,6 @@
 		conv_fn_prefix##instr_set(unpack_out, convert_out);\
 		conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
 		pack_fn(convert_out, rgb_out_buf);\
-		yuyv_8pixels += 2;\
-		rgb_out_buf += output_stride;\
-		rgb_out_buf += padding_vect_to_eol;\
 	}
 
 
@@ -735,18 +741,35 @@
  *
  */
 #define UPSAMPLE_YUV422P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
- 	__m128i		unpack_out[8];\
-	__m128i		convert_out[6];\
-	__m128i*    y_plane = (__m128i *) source_buffer;\
-	__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
-	__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane  + pixfc->pixel_count / 2);\
-	__m128i*	rgb_out = (__m128i *) dest_buffer;\
+	uint32_t	y_row_byte_count = pixfc->width;\
+	uint32_t	uv_row_byte_count = y_row_byte_count / 2;\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
+	uint8_t		*next_y_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_u_src = next_y_src + pixfc->pixel_count;\
+	uint8_t		*next_v_src = next_u_src + pixfc->pixel_count / 2;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
 	uint32_t	pixel_count;\
 	uint32_t 	lines_remaining = pixfc->height;\
-	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
+	__m128i		unpack_out[8];\
+	__m128i		convert_out[6];\
+	__m128i*    y_plane;\
+	__m128i*    u_plane;\
+	__m128i*    v_plane;\
+	__m128i*	rgb_out;\
 	\
 	while(lines_remaining-- > 0) {\
 		pixel_count = pixfc->width - 32;\
+		\
+		y_plane = (__m128i *) next_y_src;\
+		u_plane = (__m128i *) next_u_src;\
+		v_plane = (__m128i *) next_v_src;\
+		rgb_out = (__m128i *) next_dst;\
+		\
+		next_y_src += y_row_byte_count;\
+		next_u_src += uv_row_byte_count;\
+		next_v_src += uv_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+		\
 		unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[4]);\
 		while(pixel_count > 0) {\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[3]);\
@@ -792,11 +815,6 @@
 		reconstruct_last_missing_uv_##instr_set(&unpack_out[4], &unpack_out[5]);\
 		conv_fn_prefix##instr_set(&unpack_out[3], &convert_out[3]);\
 		pack_fn(convert_out, rgb_out);\
-		y_plane++;\
-		u_plane++;\
-		v_plane++;\
-		rgb_out += output_stride;\
-		rgb_out += padding_vect_to_eol;\
 	}
 
 
@@ -809,15 +827,25 @@
  *
  */
 #define YUV422I_TO_RGB_RECIPE(unpack_fn_prefix, pack_fn, conv_fn_prefix, output_stride, instr_set) \
-	DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
-	__m128i*	yuyv_8pixels = (__m128i *) source_buffer;\
-	__m128i*	rgb_out_buf = (__m128i *) dest_buffer;\
+	__m128i*	yuyv_8pixels;\
+	__m128i*	rgb_out_buf;\
 	uint32_t	pixel_count;\
 	uint32_t 	lines_remaining = pixfc->height;\
 	__m128i		unpack_out[2];\
 	__m128i		convert_out[6];\
+	uint8_t		*next_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
+	uint32_t	src_row_byte_count = ROW_SIZE(pixfc->source_fmt, pixfc->width);\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
 	while(lines_remaining-- > 0) {\
 		pixel_count = pixfc->width;\
+		\
+		yuyv_8pixels = (__m128i *) next_src;\
+		rgb_out_buf = (__m128i *) next_dst;\
+		\
+		next_src += src_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+		\
 		while(pixel_count > 0) {\
 			unpack_fn_prefix##instr_set(yuyv_8pixels, unpack_out);\
 			print_xmm16u("Y", unpack_out);\
@@ -838,7 +866,6 @@
 			rgb_out_buf += output_stride;\
 			pixel_count -= 16;\
 		}\
-		rgb_out_buf += padding_vect_to_eol;\
 	}
 
 /*
@@ -1260,36 +1287,35 @@
  *
  */
 #define YUV422P_TO_RGB_RECIPE(unpack_y_fn, unpack_lo_uv_fn, unpack_hi_uv_fn, pack_fn, conv_fn_prefix, output_stride, instr_set) \
-		DECLARE_PADDING_VECT_COUNT(padding_vect_to_eol, pixfc->dest_fmt, pixfc->width);\
-		__m128i*    y_plane = (__m128i *) source_buffer;\
-		__m128i*    u_plane = (__m128i*)((uint8_t *) source_buffer + pixfc->pixel_count);\
-		__m128i*    v_plane = (__m128i*)((uint8_t *) u_plane + pixfc->pixel_count / 2);\
-		__m128i*	rgb_out = (__m128i *) dest_buffer;\
-		uint32_t	pixel_count;\
-		uint32_t 	lines_remaining = pixfc->height;\
-		__m128i		unpack_out[4];\
-		__m128i		convert_out[6];\
-		while(lines_remaining-- > 0) {\
-			pixel_count = pixfc->width - 32;\
-			while(pixel_count > 0) {\
-				unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
-				unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-				conv_fn_prefix##instr_set(unpack_out, convert_out);\
-				conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
-				pack_fn(convert_out, rgb_out);\
-				y_plane++;\
-				rgb_out += output_stride;\
-				unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
-				unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
-				conv_fn_prefix##instr_set(unpack_out, convert_out);\
-				conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
-				pack_fn(convert_out, rgb_out);\
-				y_plane++;\
-				u_plane++;\
-				v_plane++;\
-				rgb_out += output_stride;\
-				pixel_count -= 32;\
-			}\
+	uint32_t	y_row_byte_count = pixfc->width;\
+	uint32_t	uv_row_byte_count = y_row_byte_count / 2;\
+	uint32_t	dst_row_byte_count = ROW_SIZE(pixfc->dest_fmt, pixfc->width);\
+	uint8_t		*next_y_src = (uint8_t *) source_buffer;\
+	uint8_t		*next_u_src = next_y_src + pixfc->pixel_count;\
+	uint8_t		*next_v_src = next_u_src + pixfc->pixel_count / 2;\
+	uint8_t		*next_dst = (uint8_t *) dest_buffer;\
+	uint32_t	pixel_count;\
+	uint32_t 	lines_remaining = pixfc->height;\
+	__m128i*    y_plane;\
+	__m128i*    u_plane;\
+	__m128i*    v_plane;\
+	__m128i*	rgb_out;\
+	__m128i		unpack_out[4];\
+	__m128i		convert_out[6];\
+	while(lines_remaining-- > 0) {\
+		pixel_count = pixfc->width - 32;\
+		\
+		y_plane = (__m128i *) next_y_src;\
+		u_plane = (__m128i *) next_u_src;\
+		v_plane = (__m128i *) next_v_src;\
+		rgb_out = (__m128i *) next_dst;\
+		\
+		next_y_src += y_row_byte_count;\
+		next_u_src += uv_row_byte_count;\
+		next_v_src += uv_row_byte_count;\
+		next_dst += dst_row_byte_count;\
+		\
+		while(pixel_count > 0) {\
 			unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
 			unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
 			conv_fn_prefix##instr_set(unpack_out, convert_out);\
@@ -1306,8 +1332,21 @@
 			u_plane++;\
 			v_plane++;\
 			rgb_out += output_stride;\
-			rgb_out += padding_vect_to_eol;\
-		}
+			pixel_count -= 32;\
+		}\
+		unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+		unpack_lo_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+		pack_fn(convert_out, rgb_out);\
+		y_plane++;\
+		rgb_out += output_stride;\
+		unpack_y_fn(y_plane, unpack_out, &unpack_out[2]);\
+		unpack_hi_uv_fn(u_plane, v_plane, &unpack_out[1], &unpack_out[3]);\
+		conv_fn_prefix##instr_set(unpack_out, convert_out);\
+		conv_fn_prefix##instr_set(&unpack_out[2], &convert_out[3]);\
+		pack_fn(convert_out, rgb_out);\
+	}
 
 
 /*

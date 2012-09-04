@@ -106,7 +106,7 @@
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			/* Convert as many chunks of 6 pixels as possible,
@@ -188,7 +188,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_CONVERSION(convert_v210_to_any_10bit_rgb_bt709_non
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			/* Convert as many chunks of 6 pixels as possible,
@@ -271,7 +271,7 @@ DEFINE_V210_TO_ANY_RGB_NONSSE_FLOAT_CONVERSION(convert_v210_to_any_10bit_rgb_bt7
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v, next_u, next_v;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			u = (*src & 0x3FF);\
@@ -378,7 +378,7 @@ DEFINE_UPSAMPLE_V210_TO_ANY_RGB_NONSSE_CONVERSION(upsample_n_convert_v210_to_any
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v, next_u, next_v;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		\
 		while(line++ < conv->height) {\
 			u = (*src & 0x3FF);\

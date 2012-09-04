@@ -286,7 +286,7 @@ void		convert_yuv422p_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* so
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		uint32_t            pixels_remaining;\
 		uint32_t            lines_remaining = conv->height;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint8_t*			y_src = (uint8_t *) in;\
 		uint8_t*			u_src = y_src + conv->pixel_count;\
 		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
@@ -326,7 +326,7 @@ DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_10bit_rgb_bt709_nonsse, yuv_8bi
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		uint32_t            pixels_remaining;\
 		uint32_t            lines_remaining = conv->height;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint8_t*			y_src = (uint8_t *) in;\
 		uint8_t*			u_src = y_src + conv->pixel_count;\
 		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
@@ -365,7 +365,7 @@ DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_10bit_rgb_bt709_nonsse_fl
 #define DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(fn_name, coeffs, coef_shift, offsets)\
 	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint32_t 			lines_remaining = conv->height;\
 		uint32_t			pixels_remaining;\
 		uint8_t*			y_src = (uint8_t *) in;\
@@ -417,7 +417,7 @@ DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_10bit_rgb
 #define DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(fn_name, coeffs, offsets)\
 	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(padding_bytes, dest_fmt, conv->width);\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint32_t 			lines_remaining = conv->height;\
 		uint32_t			pixels_remaining;\
 		uint8_t*			y_src = (uint8_t *) in;\

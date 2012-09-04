@@ -151,7 +151,7 @@
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, conv->width);\
 		uint32_t 			line = conv->height;\
 		uint32_t			pixel;\
 		uint8_t*			src = (uint8_t *) in;\
@@ -191,7 +191,7 @@ DEFINE_ANY_RGB_TO_YUV422(convert_10bit_rgb_to_yuv422_bt709_nonsse, rgb_10bit_to_
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, conv->width);\
 		uint32_t 			line = conv->height;\
 		uint32_t 			pixel_num = 0;\
 		uint8_t*			src = (uint8_t *) in;\
@@ -245,7 +245,7 @@ DEFINE_ANY_RGB_TO_YUV422_FLOAT(convert_10bit_rgb_to_yuv422_bt709_nonsse_float, r
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, conv->width);\
 		uint32_t			line = conv->height;\
 		uint32_t 			pixel_num;\
 		uint8_t*			src = (uint8_t *) in;\
@@ -291,7 +291,7 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422(downsample_n_convert_10bit_rgb_to_
 	void 		fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
 		PixFcPixelFormat 	src_fmt = conv->source_fmt;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, conv->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, conv->width);\
 		uint32_t			line = conv->height;\
 		uint32_t 			pixel_num;\
 		uint8_t*			src = (uint8_t *) in;\
@@ -350,7 +350,7 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_YUV422_FLOAT(downsample_n_convert_10bit_r
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -426,7 +426,7 @@ DEFINE_ANY_RGB_TO_V210_FN(convert_10bit_rgb_to_v210_bt709_nonsse, rgb_10bit_to_y
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -502,7 +502,7 @@ DEFINE_ANY_RGB_TO_V210_FLOAT_FN(convert_10bit_rgb_to_v210_bt709_nonsse_float,	rg
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1, y2, u, v;\
 		while(line++ < pixfc->height){\
@@ -586,7 +586,7 @@ DEFINE_DOWNSAMPLE_N_CONVERT_ANY_RGB_TO_V210_FN(downsample_n_convert_10bit_rgb_to
 		uint32_t			line = 0;\
 		uint8_t*			src = (uint8_t *) in;\
 		uint32_t*			dst = (uint32_t *) out;\
-		DECLARE_PADDING_BYTE_COUNT(src_padding_bytes, src_fmt, pixfc->width);\
+		uint32_t			src_padding_bytes = PADDING_BYTE_COUNT(src_fmt, pixfc->width);\
 		int32_t				r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, prev_r = 0, prev_g = 0, prev_b = 0;\
 		int32_t				y1 = 0, y2 = 0, u = 0, v = 0;\
 		while(line++ < pixfc->height){\
