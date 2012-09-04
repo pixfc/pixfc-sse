@@ -69,46 +69,117 @@ void _mm_storeu_si128(__m128i *dest, __m128i src) {
 const InputFile		input_files[] = {
 
 	{	PixFcYUYV,		1280, 	1024,		"1280x1024.yuyv",	},
+	{	PixFcYUYV,		112, 	2,			NULL,				},
+	{	PixFcYUYV,		104, 	2,			NULL,				},
+	{	PixFcYUYV,		96, 	2,			NULL,				},
+	{	PixFcYUYV,		80, 	2,			NULL,				},
+	{	PixFcYUYV,		72, 	2,			NULL,				},
+	{	PixFcYUYV,		64, 	2,			NULL,				},
+	{	PixFcYUYV,		48, 	2,			NULL,				},
+	{	PixFcYUYV,		32, 	2,			NULL,				},
+	{	PixFcYUYV,		16, 	2,			NULL,				},
+	{	PixFcYUYV,		8, 		2,			NULL,				},
+	{	PixFcYUYV,		80, 	1,			NULL,				},
+	{	PixFcYUYV,		72, 	1,			NULL,				},
+	{	PixFcYUYV,		64, 	1,			NULL,				},
 	{	PixFcYUYV,		48, 	1,			NULL,				},
 	{	PixFcYUYV,		32, 	1,			NULL,				},
 	{	PixFcYUYV,		16, 	1,			NULL,				},
+	{	PixFcYUYV,		8, 		1,			NULL,				},
 
 	{	PixFcUYVY,		1920, 	1080,		"1920x1080.uyvy",	},
+	{	PixFcUYVY,		112, 	2,			NULL,				},
+	{	PixFcUYVY,		104, 	2,			NULL,				},
+	{	PixFcUYVY,		96, 	2,			NULL,				},
+	{	PixFcUYVY,		80, 	2,			NULL,				},
+	{	PixFcUYVY,		72, 	2,			NULL,				},
+	{	PixFcUYVY,		64, 	2,			NULL,				},
+	{	PixFcUYVY,		48, 	2,			NULL,				},
+	{	PixFcUYVY,		32, 	2,			NULL,				},
+	{	PixFcUYVY,		16, 	2,			NULL,				},
+	{	PixFcUYVY,		8, 		2,			NULL,				},
+	{	PixFcUYVY,		80, 	1,			NULL,				},
+	{	PixFcUYVY,		72, 	1,			NULL,				},
+	{	PixFcUYVY,		64, 	1,			NULL,				},
 	{	PixFcUYVY,		48, 	1,			NULL,				},
 	{	PixFcUYVY,		32, 	1,			NULL,				},
 	{	PixFcUYVY,		16, 	1,			NULL,				},
+	{	PixFcUYVY,		8, 		1,			NULL,				},
 
 	{	PixFcYUV422P,	1280, 	1024,		"1280x1024.yuv422p",},
-	{	PixFcYUV422P,	32, 	1,			NULL,				},
+	{	PixFcYUV422P,	32, 	2,			NULL,				},
 
 	{	PixFcYUV420P,	1280, 	1024,		"1280x1024.yuv420p",},
 	{	PixFcYUV420P,	32, 	2,			NULL,				},
 
 	{	PixFcV210,		1920, 	1080,		"1920x1080.v210",	},
 	{	PixFcV210,		1280, 	720,		NULL,				},
+	{	PixFcV210,		112, 	2,			NULL,				},
+	{	PixFcV210,		104, 	2,			NULL,				},
+	{	PixFcV210,		96, 	2,			NULL,				},
+	{	PixFcV210,		80, 	2,			NULL,				},
+	{	PixFcV210,		72, 	2,			NULL,				},
+	{	PixFcV210,		64, 	2,			NULL,				},
+	{	PixFcV210,		48, 	2,			NULL,				},
+	{	PixFcV210,		32, 	2,			NULL,				},
+	{	PixFcV210,		16, 	2,			NULL,				},
+	{	PixFcV210,		8, 		2,			NULL,				},
+	{	PixFcV210,		80, 	1,			NULL,				},
+	{	PixFcV210,		72, 	1,			NULL,				},
+	{	PixFcV210,		64, 	1,			NULL,				},
 	{	PixFcV210,		48, 	1,			NULL,				},
 	{	PixFcV210,		32, 	1,			NULL,				},
 	{	PixFcV210,		16, 	1,			NULL,				},
+	{	PixFcV210,		8, 		1,			NULL,				},
 
 	{	PixFcARGB,		1920, 	1080,		NULL,				},
+	{	PixFcARGB,		64,		2,			NULL,				}, // to test to r210
+	{	PixFcARGB,		48, 	2,			NULL,				}, // to test to v210
 	{	PixFcARGB,		32,		2,			NULL,				}, // to test to YUV420p
-	{	PixFcARGB,		48, 	1,			NULL,				}, // to test to v210
-	{	PixFcARGB,		16, 	1,			NULL,				}, // to test to v210
+	{	PixFcARGB,		24,		2,			NULL,				}, // to test to r210
+	{	PixFcARGB,		16, 	2,			NULL,				}, // to test to v210
+	{	PixFcARGB,		8, 		2,			NULL,				}, // to test to r210
 
 	{	PixFcBGRA,		1920, 	1080,		NULL,				},
+	{	PixFcBGRA,		64, 	2,			NULL,				},
+	{	PixFcBGRA,		48, 	2,			NULL,				},
 	{	PixFcBGRA,		32, 	2,			NULL,				},
-	{	PixFcBGRA,		48, 	1,			NULL,				},
-	{	PixFcBGRA,		16, 	1,			NULL,				},
+	{	PixFcBGRA,		24, 	2,			NULL,				},
+	{	PixFcBGRA,		16, 	2,			NULL,				},
+	{	PixFcBGRA,		8, 		2,			NULL,				},
 
 	{	PixFcRGB24,		1920, 	1080,		NULL,				},
+	{	PixFcRGB24,		48, 	2,			NULL,				},
 	{	PixFcRGB24,		32, 	2,			NULL,				},
-	{	PixFcRGB24,		48, 	1,			NULL,				},
-	{	PixFcRGB24,		16, 	1,			NULL,				},
+	{	PixFcRGB24,		16, 	2,			NULL,				},
 
 	{	PixFcBGR24,		1920, 	1080,		NULL,				},
+	{	PixFcBGR24,		48, 	2,			NULL,				},
 	{	PixFcBGR24,		32, 	2,			NULL,				},
-	{	PixFcBGR24,		48, 	1,			NULL,				},
-	{	PixFcBGR24,		16, 	1,			NULL,				},
+	{	PixFcBGR24,		16, 	2,			NULL,				},
+
+	{	PixFcR210,		1920, 	1080,		NULL,				},
+	{	PixFcR210,		96, 	2,			NULL,				},
+	{	PixFcR210,		72, 	2,			NULL,				},
+	{	PixFcR210,		64, 	2,			NULL,				},
+	{	PixFcR210,		48, 	2,			NULL,				},
+	{	PixFcR210,		40, 	2,			NULL,				},
+	{	PixFcR210,		32, 	2,			NULL,				},
+	{	PixFcR210,		24, 	2,			NULL,				},
+	{	PixFcR210,		16, 	2,			NULL,				},
+	{	PixFcR210,		8,	 	2,			NULL,				},
+	
+	{	PixFcR10k,		1920, 	1080,		NULL,				},
+	{	PixFcR10k,		96, 	2,			NULL,				},
+	{	PixFcR10k,		72, 	2,			NULL,				},
+	{	PixFcR10k,		64, 	2,			NULL,				},
+	{	PixFcR10k,		48, 	2,			NULL,				},
+	{	PixFcR10k,		40, 	2,			NULL,				},
+	{	PixFcR10k,		32, 	2,			NULL,				},
+	{	PixFcR10k,		24, 	2,			NULL,				},
+	{	PixFcR10k,		16, 	2,			NULL,				},
+	{	PixFcR10k,		8,	 	2,			NULL,				},
+
 };
 const uint32_t		input_files_size = sizeof(input_files) / sizeof(input_files[0]);
 
@@ -164,24 +235,38 @@ void 				print_known_pixel_formats() {
 }
 
 void 				print_known_flags() {
-	printf("  PixFcFlag_Default           = 0\n");
-	printf("  PixFcFlag_NoSSE             = 1\n");
-	printf("  PixFcFlag_SSE2Only          = 2\n");
-	printf("  PixFcFlag_SSE2_SSSE3Only    = 4\n");
-	printf("  PixFcFlag_BT601Conversion   = 128\n");
-	printf("  PixFcFlag_BT709Conversion   = 256\n");
-	printf("  PixFcFlag_NNbResamplingOnly = 16384\n");
+
+	// TODO: Update here when new flags are added
+
+	printf("  PixFcFlag_Default                = %d\n", PixFcFlag_Default);
+	printf("  PixFcFlag_NoSSE                  = %d\n", PixFcFlag_NoSSE);
+	printf("  PixFcFlag_NoSSEFloat             = %d\n", PixFcFlag_NoSSEFloat);
+	printf("  PixFcFlag_SSE2Only               = %d\n", PixFcFlag_SSE2Only);
+	printf("  PixFcFlag_SSE2_SSSE3Only         = %d\n", PixFcFlag_SSE2_SSSE3Only);
+	printf("  PixFcFlag_SSE2_SSSE3_SSE41Only   = %d\n", PixFcFlag_SSE2_SSSE3_SSE41Only);
+	printf("  PixFcFlag_BT601Conversion        = %d\n", PixFcFlag_BT601Conversion);
+	printf("  PixFcFlag_BT709Conversion        = %d\n", PixFcFlag_BT709Conversion);
+	printf("  PixFcFlag_NNbResamplingOnly      = %d\n", PixFcFlag_NNbResamplingOnly);
 }
 
 void				print_flags(PixFcFlag flags) {
+
+	// TODO: Update here when new flags are added
+
 	if ((flags & PixFcFlag_NoSSE) != 0)
 		printf("  NoSSE");
+
+	if ((flags & PixFcFlag_NoSSEFloat) != 0)
+		printf("  NoSSEFloat");
 
 	if ((flags & PixFcFlag_SSE2Only) != 0)
 		printf("  SSE2Only;");
 
 	if ((flags & PixFcFlag_SSE2_SSSE3Only) != 0)
 		printf("  SSE2_SSSE3Only");
+
+	if ((flags & PixFcFlag_SSE2_SSSE3_SSE41Only) != 0)
+			printf("  SSE2_SSSE3_SSE41Only");
 
 	if ((flags & PixFcFlag_BT601Conversion) != 0)
 		printf("  BT601Conversion");
@@ -202,14 +287,22 @@ PixFcFlag	get_matching_flags(char *flag_string) {
 	PixFcFlag	flags = PixFcFlag_Default;
 	uint32_t	flag_value = atoi(flag_string);
 
+	// TODO: Update here when new flags are added
+
 	if ((flag_value & PixFcFlag_NoSSE) != 0)
 		flags |= PixFcFlag_NoSSE;
+
+	if ((flag_value & PixFcFlag_NoSSEFloat) != 0)
+		flags |= PixFcFlag_NoSSEFloat;
 
 	if ((flag_value & PixFcFlag_SSE2Only) != 0)
 			flags |= PixFcFlag_SSE2Only;
 
 	if ((flag_value & PixFcFlag_SSE2_SSSE3Only) != 0)
 			flags |= PixFcFlag_SSE2_SSSE3Only;
+
+	if ((flag_value & PixFcFlag_SSE2_SSSE3_SSE41Only) != 0)
+			flags |= PixFcFlag_SSE2_SSSE3_SSE41Only;
 
 	if ((flag_value & PixFcFlag_BT601Conversion) != 0)
 			flags |= PixFcFlag_BT601Conversion;
@@ -250,7 +343,8 @@ uint32_t	validate_image_dimensions(PixFcPixelFormat fmt, uint32_t width, uint32_
 
 	// make sure the height is valid
 	if (width % desc->width_multiple != 0) {
-		pixfc_log("width is not multiple of %u\n", desc->width_multiple);
+		pixfc_log("%s requires width to be multiple of %u - have %u\n",
+				desc->name,	desc->width_multiple, width);
 		return -1;
 	}
 
@@ -697,11 +791,15 @@ PixFcFlag	synthesize_pixfc_flags(uint32_t index) {
 		return flags;
 	}
 	
+	// TODO: Update here when new flags are added
+
 	// Synthesize the flags based on the conversion block's flags
 	if (conversion_blocks[index].attributes & NNB_RESAMPLING)
 		flags |= PixFcFlag_NNbResamplingOnly;
 	
-	if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+	if ((conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE) && (conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION))
+		flags |= PixFcFlag_NoSSEFloat;
+	else if ((conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE) && ! (conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION))
 		flags |= PixFcFlag_NoSSE;
 	else if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_SSE2)
 		flags |= PixFcFlag_SSE2Only;
@@ -724,34 +822,38 @@ uint32_t	create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** pix
 	// Index valid ?
 	if (index >= conversion_blocks_count) {
 		pixfc_log("Invalid conversion block index\n");
-		return -1;
+		return 1;
 	}
 
 	// Does the CPU have the required features ?
 	if (does_cpu_support(conversion_blocks[index].required_cpu_features) != 0) {
 		pixfc_log("Conversion block required CPU features unsupported by CPU\n");
-		return -2;
+		return 2;
 	}
 
 	// Create flags for this conversion block
 	flags = synthesize_pixfc_flags(index);
 
 	// Create struct pixfc for this conversion block
-	result = create_pixfc(pixfc, conversion_blocks[index].source_fmt, conversion_blocks[index].dest_fmt, width, height, ROW_SIZE(conversion_blocks[index].source_fmt, width), flags);
-	if (result != 0) {
+	result = create_pixfc(pixfc,
+			conversion_blocks[index].source_fmt,
+			conversion_blocks[index].dest_fmt,
+			width, height,
+			ROW_SIZE(conversion_blocks[index].source_fmt, width),
+			ROW_SIZE(conversion_blocks[index].dest_fmt, width),
+			flags);
+	if (result != 0)
 		pixfc_log("Error (%d) creating struct pixfc for conversion '%s' %ux%u\n", result, conversion_blocks[index].name, width, height);
-		return -3;
-	}
 
-	return 0;
+	return result;
 }
 
-int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes) {
+int32_t	find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t src_row_bytes, uint32_t dest_row_bytes) {
 	struct PixFcSSE *pixfc = NULL;
 	int32_t index = -1;
 	uint32_t result;
 
-	result = create_pixfc(&pixfc, src_fmt, dst_fmt, width, height, row_bytes, flags);
+	result = create_pixfc(&pixfc, src_fmt, dst_fmt, width, height, src_row_bytes, dest_row_bytes, flags);
 	if (result == PixFc_OK) {
 		uint32_t i;
 		for(i = 0; i < conversion_blocks_count; i++) {

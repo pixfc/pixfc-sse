@@ -182,4 +182,16 @@ void 		convert_rgb_to_yuv422_bt709_nonsse(const struct PixFcSSE* conv, void* in,
 
 
 
+/*
+ *
+ * 		R G B 2 4
+ *
+ * 		T O
+ *
+ * 		R 2 1 0
+ *
+ */
+void		convert_rgb24_to_r210_sse2_ssse3(const struct PixFcSSE *, void *, void *);
+void		convert_rgb_to_10bit_rgb_nonsse(const struct PixFcSSE *, void *, void *);
+
 #endif /* CONVERSION_ROUTINES_FROM_RGB24_H_ */

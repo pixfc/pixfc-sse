@@ -83,28 +83,38 @@ typedef struct {
 extern const PixelFormatDescription		pixfmt_descriptions[];
 extern const uint32_t					pixfmt_descriptions_count;
 
+
 /*
- * This macro expands to the size in bytes of a single line in an image
- * of the given width and pixel format.
+ * This macro returns the actual width (in pixels) of an image line in the memory buffer:
+ * For pixel formats with no padding bytes at the end of a line (yuyv for instance), the actual width is returned.
+ * For pixel formats with padding bytes at the end of every line (v210 for instance requires each line to have a multiple
+ * of 48 pixels even though not all of them are used), the width is rounded up to the required alignment and returned.
+ */
+#define ALIGNED_WIDTH(fmt, width) \
+	(\
+		((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
+			((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) / pixfmt_descriptions[(fmt)].row_pixel_multiple * pixfmt_descriptions[(fmt)].row_pixel_multiple\
+	)
+
+/*
+ * This macro expands to the size in bytes (including any padding bytes) of a single line in an image of the given width and pixel format.
  */
 #define ROW_SIZE(fmt, width) \
 	( ((fmt)<0 || ((fmt)>=PixFcFormatCount)) ? 0 :\
-		((width) + pixfmt_descriptions[(fmt)].row_pixel_multiple - 1) / pixfmt_descriptions[(fmt)].row_pixel_multiple * \
-			pixfmt_descriptions[(fmt)].bytes_per_pix_num * pixfmt_descriptions[(fmt)].row_pixel_multiple / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
+		ALIGNED_WIDTH(fmt, width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
 	)
 
-#define PADDING_SIZE(fmt, width) \
-	(\
-			ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom\
-	)
+/*
+ * This macro expands to the number of padding bytes at the end of a line, if any.
+ */
+#define PADDING_BYTE_COUNT(fmt, width) \
+		(ROW_SIZE((fmt), (width)) - (width) * pixfmt_descriptions[(fmt)].bytes_per_pix_num / pixfmt_descriptions[(fmt)].bytes_per_pix_denom)
 
 /*
  * This macro expands to the size in bytes of an image of the given width and 
  * height in the given pixel format (of type PixFcPixelFormat).
  */
 #define IMG_SIZE(fmt, width, height) (ROW_SIZE(fmt, width) * (height))
-
-	
 
 #endif 		// PIXFMT_DESCRIPTIONS_H_
 

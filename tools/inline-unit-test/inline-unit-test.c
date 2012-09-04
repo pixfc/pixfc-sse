@@ -39,6 +39,8 @@ int main(int argc, char **argv) {
     check_6_rgb_vectors_in_3_bgr24_vectors();
 	check_pack_3_r_g_b_vectors_to_2_r210();
 	check_pack_6_r_g_b_vectors_to_4_r210();
+	check_pack_3_r_g_b_vectors_to_2_r10k();
+	check_pack_6_r_g_b_vectors_to_4_r10k();
 
     // RGB unpack
     check_unpack_argb_to_ag_rb_vectors();
@@ -50,6 +52,9 @@ int main(int argc, char **argv) {
     check_unpack_bgr24_to_ga_br_vectors();
     check_unpack_bgr24_to_r_g_b_vectors();
     check_unpack_2_r210_to_r_g_b_vectors();
+    check_unpack_4_r210_to_r_g_b_vectors();
+    check_unpack_2_r10k_to_r_g_b_vectors();
+    check_unpack_4_r10k_to_r_g_b_vectors();
 
     // RGB to YUV convert
     check_convert_r_g_b_vectors_to_y_vector();
@@ -60,6 +65,14 @@ int main(int argc, char **argv) {
     check_convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt601();
     check_convert_8bit_r_g_b_vectors_to_10bit_y_vector_bt709();
 
+    check_convert_10bit_r_g_b_vectors_to_8bit_y_vector();
+    check_convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt601();
+    check_convert_10bit_r_g_b_vectors_to_8bit_y_vector_bt709();
+
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector();
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector_bt601();
+    check_convert_10bit_r_g_b_vectors_to_10bit_y_vector_bt709();
+
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector();
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt601();
     check_convert_downsampled_422_r_g_b_vectors_to_uv_vector_bt709();
@@ -67,6 +80,14 @@ int main(int argc, char **argv) {
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector();
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt601();
     check_convert_downsampled_422_8bit_r_g_b_vectors_to_10bit_uv_vector_bt709();
+
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_bt601();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_8bit_uv_vector_bt709();
+
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_bt601();
+	check_convert_downsampled_422_10bit_r_g_b_vectors_to_10bit_uv_vector_bt709();
 
     check_convert_ag_rb_vectors_to_y_vector();
     check_convert_ga_br_vectors_to_y_vector();
@@ -104,14 +125,24 @@ int main(int argc, char **argv) {
 	check_convert_y_uv_vectors_to_rgb_vectors();
 	check_nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt601();
 	check_nnb_upsample_n_convert_y_uv_vectors_to_rgb_vectors_bt709();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors();
 	check_convert_y_uv_vectors_to_rgb_vectors_bt601();
 	check_convert_y_uv_vectors_to_rgb_vectors_bt709();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601();
+	check_nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709();
+	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors();
+	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt601();
+	check_nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt709();
+
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt601();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709();
 	check_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt601();
+	check_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_bt709();
 	
 	// YUV unpack
 	check_unpack_yuyv_to_y_uv_vectors();
@@ -124,6 +155,6 @@ int main(int argc, char **argv) {
     // YUV upsample
     check_reconstruct_last_missing_uv();
     check_reconstruct_missing_uv();
-	
+
 	return 0;
 }

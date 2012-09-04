@@ -47,13 +47,15 @@ static	__m128i	*				out_scalar = NULL;// buffer holding scalar converted data fo
 
 //
 // Use the conversion block at the provided index to convert image of given width and height in in buffer to out buffer
-static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w, uint32_t h) {
+static uint32_t		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w, uint32_t h) {
 	struct PixFcSSE *	pixfc = NULL;
+	uint32_t	result;
 	
 	// Create struct pixfc
-	if (create_pixfc_for_conversion_block(index, &pixfc, w, h) != 0) {
-		pixfc_log("Error create struct pixfc\n");
-		return -1;
+	result = create_pixfc_for_conversion_block(index, &pixfc, w, h);
+	if (result != PixFc_OK) {
+		pixfc_log("Error create struct pixfc (%d)\n", result);
+		return result;
 	}
 	
 	// Perform conversion
@@ -67,16 +69,15 @@ static int		do_image_conversion(uint32_t index, void* in, void *out, uint32_t w,
 static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
 	uint32_t 	i;
 	uint32_t 	buffer_size = IMG_SIZE(fmt, width, height);
-	uint8_t		*sse_start = out_sse;
 	uint32_t	max_diff_seen = 0;
 	for(i = 0; i < buffer_size; i++) {
 		if(abs(*out_scalar - *out_sse) > max_diff_seen)
 				max_diff_seen = abs(*out_scalar - *out_sse);
 		if(abs(*out_scalar - *out_sse) > max_diff) {
-			printf("Pixel %ux%u (offset: %llu) differ by %u : SSE: %hhu - Scalar: %hhu\n",
+			printf("Pixel %ux%u (offset: %u 8-bit ptr) differ by %u : SSE: %hhu - Scalar: %hhu\n",
 					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) % width + 1,
 					(i * pixfmt_descriptions[fmt].bytes_per_pix_denom / pixfmt_descriptions[fmt].bytes_per_pix_num) / width + 1,
-					(unsigned long long)(out_sse - sse_start),
+					i,
 					abs(*out_scalar - *out_sse), *out_sse, *out_scalar);
 			return -1;
 		}
@@ -93,7 +94,7 @@ static int		compare_8bit_output_buffers(uint8_t* out_sse, uint8_t* out_scalar, P
 	if(abs(scalar_val - sse_val) > max_diff_seen)\
 		max_diff_seen = abs(scalar_val - sse_val);\
 	if(abs(scalar_val - sse_val) > max_diff) {\
-		printf(component " @ Pixel %ux%u (offset: %llu) differ by %u : SSE: %hu - Scalar: %hu\n",\
+		printf(component " @ Pixel %ux%u (offset: %llu - 32bit ptr) differ by %u : SSE: %hu - Scalar: %hu\n",\
 		(pixel + 1), line,\
 		(unsigned long long)((sse_ptr - out_sse) * 4),\
 		abs(scalar_val - sse_val), sse_val, scalar_val);\
@@ -171,10 +172,114 @@ static int		compare_v210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar,
 	return 0;
 }
 
+static int		compare_r210_output_buffers(uint32_t* out_sse, uint32_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	uint32_t 	line = 0;
+	uint32_t 	pixel = 0;
+	uint32_t 	bytes_per_row = ROW_SIZE(fmt,  width);
+	uint32_t* 	scalar_ptr = out_scalar;
+	uint32_t* 	sse_ptr = out_sse;
+	uint32_t	scalar_le;
+	uint32_t	sse_le;
+	uint16_t 	scalar_val;
+	uint16_t 	sse_val;
+	uint32_t	max_diff_seen = 0;
+	
+	while(line++ < height) {
+		while(pixel < width){
+			scalar_le = (*scalar_ptr >> 24) & 0x000000FF;
+			scalar_le |= (*scalar_ptr >> 8) & 0x0000FF00;
+			scalar_le |= (*scalar_ptr << 8) & 0x00FF0000;
+			scalar_le |= (*scalar_ptr << 24)& 0xFF000000;
+
+			sse_le = (*sse_ptr >> 24) & 0x000000FF;
+			sse_le |= (*sse_ptr >> 8) & 0x0000FF00;
+			sse_le |= (*sse_ptr << 8) & 0x00FF0000;
+			sse_le |= (*sse_ptr << 24)& 0xFF000000;
+
+			scalar_val = (scalar_le & 0x3FF);
+			sse_val = (sse_le & 0x3ff);
+			COMPARE_VALUES("B");
+			
+			scalar_val = ((scalar_le >> 10) & 0x3FF);
+			sse_val = ((sse_le >> 10) & 0x3ff);
+			COMPARE_VALUES("G");
+			
+			scalar_val = ((scalar_le >> 20) & 0x3FF);
+			sse_val = ((sse_le >> 20) & 0x3ff);
+			COMPARE_VALUES("R");
+			
+			scalar_ptr++;
+			sse_ptr++;
+			pixel++;
+		}
+		scalar_ptr = out_scalar + line * bytes_per_row / 4;
+		sse_ptr = out_sse + line * bytes_per_row / 4;
+		pixel = 0;
+	}
+	
+	printf("Max diff seen: %u\n", max_diff_seen);
+	
+	return 0;
+}
+
+static int		compare_r10k_output_buffers(uint32_t* out_sse, uint32_t* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
+	uint32_t 	line = 0;
+	uint32_t 	pixel = 0;
+	uint32_t 	bytes_per_row = ROW_SIZE(fmt,  width);
+	uint32_t* 	scalar_ptr = out_scalar;
+	uint32_t* 	sse_ptr = out_sse;
+	uint32_t	scalar_le;
+	uint32_t	sse_le;
+	uint16_t 	scalar_val;
+	uint16_t 	sse_val;
+	uint32_t	max_diff_seen = 0;
+	
+	while(line++ < height) {
+		while(pixel < width){
+			scalar_le = (*scalar_ptr >> 24) & 0x000000FF;
+			scalar_le |= (*scalar_ptr >> 8) & 0x0000FF00;
+			scalar_le |= (*scalar_ptr << 8) & 0x00FF0000;
+			scalar_le |= (*scalar_ptr << 24)& 0xFF000000;
+			
+			sse_le = (*sse_ptr >> 24) & 0x000000FF;
+			sse_le |= (*sse_ptr >> 8) & 0x0000FF00;
+			sse_le |= (*sse_ptr << 8) & 0x00FF0000;
+			sse_le |= (*sse_ptr << 24)& 0xFF000000;
+			
+			scalar_val = ((scalar_le >> 2) & 0x3FF);
+			sse_val = ((sse_le >> 2) & 0x3ff);
+			COMPARE_VALUES("B");
+			
+			scalar_val = ((scalar_le >> 12) & 0x3FF);
+			sse_val = ((sse_le >> 12) & 0x3ff);
+			COMPARE_VALUES("G");
+			
+			scalar_val = ((scalar_le >> 22) & 0x3FF);
+			sse_val = ((sse_le >> 22) & 0x3ff);
+			COMPARE_VALUES("R");
+			
+			scalar_ptr++;
+			sse_ptr++;
+			pixel++;
+		}
+		scalar_ptr = out_scalar + line * bytes_per_row / 4;
+		sse_ptr = out_sse + line * bytes_per_row / 4;
+		pixel = 0;
+	}
+	
+	printf("Max diff seen: %u\n", max_diff_seen);
+	
+	return 0;
+}
+
 
 static int		compare_output_buffers(void* out_sse, void* out_scalar, PixFcPixelFormat fmt, uint32_t width, uint32_t height, uint8_t max_diff) {
 	if (fmt == PixFcV210)
 		return compare_v210_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
+	else if (fmt == PixFcR210)
+		return compare_r210_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
+	else if (fmt == PixFcR10k)
+		return compare_r10k_output_buffers((uint32_t*)out_sse, (uint32_t*)out_scalar, fmt, width, height, max_diff);
 	else
 		return compare_8bit_output_buffers((uint8_t*)out_sse, (uint8_t*)out_scalar, fmt, width, height, max_diff);
 }
@@ -299,8 +404,9 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		if ((restrict_to_flags != PixFcFlag_Default) && (sse_flags != restrict_to_flags))
 			return 0;
 
-		// Synthetise scalar conversion flags from the SSE conversion flags.
-		scalar_flags = (sse_flags & (~(PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only))) | PixFcFlag_NoSSE;
+		// Synthetise scalar conversion flags from the SSE conversion flags:
+		// Turn off SSE-related flags and add NoSSEFLoat
+		scalar_flags = (sse_flags & (~(PixFcFlag_NoSSE | PixFcFlag_SSE2Only | PixFcFlag_SSE2_SSSE3Only | PixFcFlag_SSE2_SSSE3_SSE41Only))) | PixFcFlag_NoSSEFloat;
 
 		// prepare input buffers
 		if (setup_input_buffer(in_file) != 0) {
@@ -311,18 +417,20 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		printf("Comparing '%s' with ", conversion_blocks[sse_conv_index].name);
 
 		// Find the non-sse conversion block matching the given conversion block at 'index'
-		scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width));
+		scalar_conv_index = find_conversion_block_index(src_fmt, dst_fmt, scalar_flags, in_file->width, in_file->height, ROW_SIZE(src_fmt, in_file->width), ROW_SIZE(dst_fmt, in_file->width));
 		if (scalar_conv_index == -1) {
 			pixfc_log("Error finding non-sse conversion matching '%s'\n", conversion_blocks[sse_conv_index].name);
 			return -1;
 		}
 
+		//
 		// Sanity checks
 		if ((conversion_blocks[scalar_conv_index].source_fmt != src_fmt) || (conversion_blocks[scalar_conv_index].dest_fmt != dst_fmt)) {
 			pixfc_log("SSE and scalar conversions' source and dest formats do not match.\n");
 			return -1;
 		}
-		if (conversion_blocks[sse_conv_index].attributes != conversion_blocks[scalar_conv_index].attributes) {
+		// The sse conversion's attribute should be equal to the scalar one minus the NONSSE_FLOAT attribute
+		if (conversion_blocks[sse_conv_index].attributes != (conversion_blocks[scalar_conv_index].attributes & ~(NONSSE_FLOAT_CONVERSION))) {
 			pixfc_log("SSE and scalar conversions' flags do not match.\n");
 			return -1;
 		}
@@ -349,7 +457,11 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 
 
 		// Do SSE conversion
-		if (do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height) != 0)
+		result = do_image_conversion(sse_conv_index, in, out, in_file->width, in_file->height);
+		if (result == PixFc_UnsupportedSourceImageDimension)
+			// invalid width / height for given dest pixel format, move on to next conversion
+			continue;
+		else if (result != 0)
 			return -1;
 
 		// Do scalar conversion if required
@@ -362,11 +474,14 @@ static int		check_sse_conversion_block(uint32_t sse_conv_index) {
 		if (compare_output_buffers(out, out_scalar, dst_fmt, in_file->width, in_file->height, max_diff) != 0) {
 			char sse_filename[128] = {0};
 			char scalar_filename[128] = {0};
+			char input_filename[128] = {0};
 	
-			SNPRINTF(sse_filename, sizeof(sse_filename), "from_%s-sse_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
-			SNPRINTF(scalar_filename, sizeof(scalar_filename), "from_%s-scalar_buffer", pixfmt_descriptions[conversion_blocks[sse_conv_index].source_fmt].name);
+			SNPRINTF(input_filename, sizeof(sse_filename), "%d_%d-%s_to_%s-input_buffer", in_file->width, in_file->height, pixfmt_descriptions[src_fmt].name, pixfmt_descriptions[dst_fmt].name);
+			SNPRINTF(sse_filename, sizeof(sse_filename), "%d_%d-%s_to_%s-sse_buffer", in_file->width, in_file->height, pixfmt_descriptions[src_fmt].name, pixfmt_descriptions[dst_fmt].name);
+			SNPRINTF(scalar_filename, sizeof(scalar_filename), "%d_%d-%s_to_%s-scalar_buffer", in_file->width, in_file->height, pixfmt_descriptions[src_fmt].name, pixfmt_descriptions[dst_fmt].name);
 	
-			printf("Dumping scalar and sse buffers\n");
+			printf("Dumping input, scalar and sse buffers\n");
+			write_buffer_to_file(src_fmt, in_file->width, in_file->height, input_filename, in);
 			write_buffer_to_file(dst_fmt, in_file->width, in_file->height, sse_filename, out);
 			write_buffer_to_file(dst_fmt, in_file->width, in_file->height, scalar_filename, out_scalar);
 			return 1;
@@ -397,9 +512,9 @@ int 			main(int argc, char **argv) {
 				|| ((restrict_to_dst_fmt != PixFcFormatCount) && (conversion_blocks[index].dest_fmt != restrict_to_dst_fmt)))
 			continue;
 
-		// Make sure we skipped the scalar conversion routines
+		// Make sure we skipped the scalar float conversion routines
 		// (we dont want to compare them with themselves)
-		if (conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE)
+		if ((conversion_blocks[index].required_cpu_features == CPUID_FEATURE_NONE) && ((conversion_blocks[index].attributes & NONSSE_FLOAT_CONVERSION) != 0))
 			continue;
 
 		// Make sure the CPU has the required features

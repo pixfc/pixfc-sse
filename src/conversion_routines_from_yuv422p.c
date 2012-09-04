@@ -72,6 +72,29 @@
 				instr_set\
 		)
 
+#define UPSAMPLE_AND_CONVERT_TO_RGB10(pack_fn, instr_set)\
+		DO_CONVERSION_3U_1P(\
+				UPSAMPLE_YUV422P_TO_RGB_RECIPE,\
+				unpack_yuv42Xp_to_2_y_vectors_sse2,\
+				unpack_low_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
+				pack_fn,\
+				convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_,\
+				4,\
+				instr_set\
+		)
+
+#define CONVERT_TO_RGB10(pack_fn, instr_set)\
+		DO_CONVERSION_3U_1P(\
+				YUV422P_TO_RGB_RECIPE,\
+				unpack_yuv42Xp_to_2_y_vectors_sse2,\
+				unpack_low_yuv42Xp_to_uv_vector_sse2,\
+				unpack_high_yuv42Xp_to_uv_vector_sse2,\
+				pack_fn,\
+				nnb_upsample_n_convert_8bit_y_uv_vectors_to_10bit_rgb_vectors_,\
+				4,\
+				instr_set\
+		)
 
 /*
  *
@@ -173,6 +196,32 @@ void		convert_yuv422p_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_
 
 /*
  *
+ * 		Y U V Y
+ *
+ * 		to
+ *
+ * 		1 0 B I T    R G B
+ *
+ */
+void		upsample_n_convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv422p_to_r210_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		upsample_n_convert_yuv422p_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_yuv422p_to_r10k_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_RGB10(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, sse2_ssse3);
+}
+
+
+/*
+ *
  * Non SSE conversion blocks (nearest neighbour upsampling)
  *
  */
@@ -195,98 +244,225 @@ void		convert_yuv422p_to_bgr24_sse2(const struct PixFcSSE * pixfc, void* source_
 		*(dst++) = CLIP_PIXEL(b);\
 		*(dst++) = CLIP_PIXEL(g);\
 		*(dst++) = CLIP_PIXEL(r);\
+	} else if (dest_fmt == PixFcR210) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		dprint("R: %d G: %d B: %d\n", CLIP_10BIT_PIXEL(r), CLIP_10BIT_PIXEL(g), CLIP_10BIT_PIXEL(b));\
+		tmp = CLIP_10BIT_PIXEL(b);\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 10);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 20);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
+	} else if (dest_fmt == PixFcR10k) {\
+		uint32_t tmp;\
+		uint8_t *p = (uint8_t *) &tmp;\
+		tmp = (CLIP_10BIT_PIXEL(b)) << 2;\
+		tmp |= ((CLIP_10BIT_PIXEL(g)) << 12);\
+		tmp |= ((CLIP_10BIT_PIXEL(r)) << 22);\
+		*(dst++) = p[3];\
+		*(dst++) = p[2];\
+		*(dst++) = p[1];\
+		*(dst++) = p[0];\
 	} else {\
 		printf("unknown rgb destination format\n");\
 	}
+
+#define CONVERT_YUV_TO_RGB(y, u, v, r, g, b, coef_shift, coeffs, offsets) \
+		r = (((y + offsets[0]) * coeffs[0][0])+ ((u + offsets[1]) * coeffs[0][1]) +((v + offsets[2])* coeffs[0][2])) >> coef_shift;\
+		g = (((y + offsets[0]) * coeffs[1][0])+ ((u + offsets[1]) * coeffs[1][1]) +((v + offsets[2]) * coeffs[1][2])) >> coef_shift;\
+		b = (((y + offsets[0]) * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
+
+#define CONVERT_YUV_TO_RGB_FLOAT(y, u, v, r, g, b, coeffs, offsets) \
+		r = ((y + offsets[0]) * coeffs[0][0])+ ((u + offsets[1]) * coeffs[0][1]) +((v + offsets[2])* coeffs[0][2]);\
+		g = ((y + offsets[0]) * coeffs[1][0])+ ((u + offsets[1]) * coeffs[1][1]) +((v + offsets[2]) * coeffs[1][2]);\
+		b = ((y + offsets[0]) * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2]);\
+
 
 // These conversion routines make no assumption on the number of pixels
 #define DEFINE_YUV422P_TO_ANY_RGB(fn_name, coeffs, coef_shift, offsets)\
 	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		uint32_t            pixels_remaining;\
+		uint32_t            lines_remaining = conv->height;\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
 		uint8_t*			y_src = (uint8_t *) in;\
-		uint8_t*			u_src = y_src + pixel_count;\
-		uint8_t*			v_src = u_src + pixel_count / 2;\
+		uint8_t*			u_src = y_src + conv->pixel_count;\
+		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y, u, v;\
-		while(pixel_num++ < pixel_count){\
-			y = *y_src++ + offsets[0];\
-			u = *u_src + offsets[1];\
-			v = *v_src + offsets[2];\
-			\
-			if ((pixel_num & 0x1) == 0) {\
-				u_src++;\
-				v_src++;\
+		while(lines_remaining-- > 0) {\
+			pixels_remaining = conv->width;\
+			while(pixels_remaining > 0){\
+				y = *y_src++;\
+				u = *u_src;\
+				v = *v_src;\
+				\
+				if ((pixels_remaining & 0x1) != 0) {\
+					u_src++;\
+					v_src++;\
+				}\
+				CONVERT_YUV_TO_RGB(y, u, v, r, g, b, coef_shift, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				pixels_remaining--;\
 			}\
-			\
-			r = ((y * coeffs[0][0])+ (u * coeffs[0][1]) +(v * coeffs[0][2])) >> coef_shift;\
-			g = ((y * coeffs[1][0])+ (u * coeffs[1][1]) +(v * coeffs[1][2])) >> coef_shift;\
-			b = ((y * coeffs[2][0])+ (u * coeffs[2][1]) +(v * coeffs[2][2])) >> coef_shift;\
-			\
-			PACK_RGB(r, g, b, dst);\
+			dst += padding_bytes;\
 		}\
 	}
 
 DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_8bit_off[0])
 DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_bt601_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_8bit_off[1])
 DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_rgb_bt709_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_8bit_off[2])
+DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_10bit_rgb_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_10bit_off[0])
+DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_10bit_rgb_bt601_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_10bit_off[1])
+DEFINE_YUV422P_TO_ANY_RGB(convert_yuv422p_to_any_10bit_rgb_bt709_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_10bit_off[2])
+
+
+// These conversion routines make no assumption on the number of pixels
+#define DEFINE_YUV422P_TO_ANY_RGB_FLOAT(fn_name, coeffs, offsets)\
+	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
+		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+		uint32_t            pixels_remaining;\
+		uint32_t            lines_remaining = conv->height;\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
+		uint8_t*			y_src = (uint8_t *) in;\
+		uint8_t*			u_src = y_src + conv->pixel_count;\
+		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
+		uint8_t*			dst = (uint8_t *) out;\
+		int32_t				r, g, b;\
+		int32_t				y, u, v;\
+		while(lines_remaining-- > 0) {\
+			pixels_remaining = conv->width;\
+			while(pixels_remaining > 0){\
+				y = *y_src++;\
+				u = *u_src;\
+				v = *v_src;\
+				\
+				if ((pixels_remaining & 0x1) != 0) {\
+					u_src++;\
+					v_src++;\
+				}\
+				CONVERT_YUV_TO_RGB_FLOAT(y, u, v, r, g, b, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				pixels_remaining--;\
+			}\
+			dst += padding_bytes;\
+		}\
+	}
+
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_rgb_nonsse_float, yuv_8bit_to_rgb_8bit_coef[0], yuv_8bit_to_rgb_8bit_off[0])
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_rgb_bt601_nonsse_float, yuv_8bit_to_rgb_8bit_coef[1], yuv_8bit_to_rgb_8bit_off[1])
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_rgb_bt709_nonsse_float, yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2])
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_10bit_rgb_nonsse_float, yuv_8bit_to_rgb_10bit_coef[0], yuv_8bit_to_rgb_10bit_off[0])
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_10bit_rgb_bt601_nonsse_float, yuv_8bit_to_rgb_10bit_coef[1], yuv_8bit_to_rgb_10bit_off[1])
+DEFINE_YUV422P_TO_ANY_RGB_FLOAT(convert_yuv422p_to_any_10bit_rgb_bt709_nonsse_float, yuv_8bit_to_rgb_10bit_coef[2], yuv_8bit_to_rgb_10bit_off[2])
+
+
 
 // These conversion routines only assume an even number of pixels
 #define DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(fn_name, coeffs, coef_shift, offsets)\
 	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
 		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
-		uint32_t 			pixel_num = 0;\
-		uint32_t			pixel_count = conv->pixel_count;\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
+		uint32_t 			lines_remaining = conv->height;\
+		uint32_t			pixels_remaining;\
 		uint8_t*			y_src = (uint8_t *) in;\
-		uint8_t*			u_src = y_src + pixel_count;\
-		uint8_t*			v_src = u_src + pixel_count / 2;\
+		uint8_t*			u_src = y_src + conv->pixel_count;\
+		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
 		uint8_t*			dst = (uint8_t *) out;\
 		int32_t				r, g, b;\
 		int32_t				y1, y2, u, v, next_u, next_v;\
-		u = *u_src++;\
-		v = *v_src++;\
-		while(pixel_num < pixel_count - 2){ /* handle the last two pixels out of the loop*/\
-			y1 = *y_src++ + offsets[0];\
-			y2 = *y_src++ + offsets[0];\
-			\
-			r = ((y1 * coeffs[0][0])+ ((u + offsets[1]) * coeffs[0][1]) +((v + offsets[2]) * coeffs[0][2])) >> coef_shift;\
-			g = ((y1 * coeffs[1][0])+ ((u + offsets[1]) * coeffs[1][1]) +((v + offsets[2]) * coeffs[1][2])) >> coef_shift;\
-			b = ((y1 * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
+		while(lines_remaining-- > 0){\
+			pixels_remaining = conv->width - 2; /* handle the last 2 pixels outside the loop*/\
+			u = *u_src++;\
+			v = *v_src++;\
+			while(pixels_remaining > 0){\
+				y1 = *y_src++;\
+				y2 = *y_src++;\
+				\
+				CONVERT_YUV_TO_RGB(y1, u, v, r, g, b, coef_shift, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				\
+				next_u = *u_src++;\
+				next_v = *v_src++;\
+				CONVERT_YUV_TO_RGB(y2, ((u + next_u) / 2), ((v + next_v) / 2), r, g, b, coef_shift, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				\
+				u = next_u;\
+				v = next_v;\
+				pixels_remaining -= 2;\
+			}\
+			y1 = *y_src++;\
+			y2 = *y_src++;\
+			CONVERT_YUV_TO_RGB(y1, u, v, r, g, b, coef_shift, coeffs, offsets);\
 			PACK_RGB(r, g, b, dst);\
 			\
-			next_u = *u_src++;\
-			next_v = *v_src++;\
-			u = ((u + next_u) / 2 + offsets[1]);\
-			v = ((v + next_v) / 2 + offsets[2]);\
-			r = ((y2 * coeffs[0][0])+ (u * coeffs[0][1]) +(v * coeffs[0][2])) >> coef_shift;\
-			g = ((y2 * coeffs[1][0])+ (u * coeffs[1][1]) +(v * coeffs[1][2])) >> coef_shift;\
-			b = ((y2 * coeffs[2][0])+ (u * coeffs[2][1]) +(v * coeffs[2][2])) >> coef_shift;\
+			CONVERT_YUV_TO_RGB(y2, u, v, r, g, b, coef_shift, coeffs, offsets);\
 			PACK_RGB(r, g, b, dst);\
-			\
-			u = next_u;\
-			v = next_v;\
-			pixel_num += 2;\
+			dst += padding_bytes;\
 		}\
-		y1 = *y_src++ + offsets[0];\
-		y2 = *y_src++ + offsets[0];\
-		\
-		r = ((y1 * coeffs[0][0])+ ((u + offsets[1]) * coeffs[0][1]) +((v + offsets[2]) * coeffs[0][2])) >> coef_shift;\
-		g = ((y1 * coeffs[1][0])+ ((u + offsets[1]) * coeffs[1][1]) +((v + offsets[2]) * coeffs[1][2])) >> coef_shift;\
-		b = ((y1 * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
-		PACK_RGB(r, g, b, dst);\
-		\
-		r = ((y2 * coeffs[0][0])+ ((u + offsets[1]) * coeffs[0][1]) +((v + offsets[2]) * coeffs[0][2])) >> coef_shift;\
-		g = ((y2 * coeffs[1][0])+ ((u + offsets[1]) * coeffs[1][1]) +((v + offsets[2]) * coeffs[1][2])) >> coef_shift;\
-		b = ((y2 * coeffs[2][0])+ ((u + offsets[1]) * coeffs[2][1]) +((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
-		PACK_RGB(r, g, b, dst);\
 	}
 
 DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_rgb_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_8bit_off[0])
 DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_rgb_bt601_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_8bit_off[1])
 DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_rgb_bt709_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_8bit_off[2])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_10bit_rgb_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_10bit_off[0])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_10bit_rgb_bt601_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_10bit_off[1])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB(upsample_n_convert_yuv422p_to_any_10bit_rgb_bt709_nonsse, yuv_8bit_to_rgb_10bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_10bit_off[2])
 
+
+// These conversion routines only assume an even number of pixels
+#define DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(fn_name, coeffs, offsets)\
+	void	fn_name(const struct PixFcSSE* conv, void* in, void* out) {\
+		PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+		uint32_t			padding_bytes = PADDING_BYTE_COUNT(dest_fmt, conv->width);\
+		uint32_t 			lines_remaining = conv->height;\
+		uint32_t			pixels_remaining;\
+		uint8_t*			y_src = (uint8_t *) in;\
+		uint8_t*			u_src = y_src + conv->pixel_count;\
+		uint8_t*			v_src = u_src + conv->pixel_count / 2;\
+		uint8_t*			dst = (uint8_t *) out;\
+		int32_t				r, g, b;\
+		int32_t				y1, y2, u, v, next_u, next_v;\
+		while(lines_remaining-- > 0){\
+			pixels_remaining = conv->width - 2; /* handle the last 2 pixels outside the loop*/\
+			u = *u_src++;\
+			v = *v_src++;\
+			while(pixels_remaining > 0){\
+				y1 = *y_src++;\
+				y2 = *y_src++;\
+				\
+				CONVERT_YUV_TO_RGB_FLOAT(y1, u, v, r, g, b, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				\
+				next_u = *u_src++;\
+				next_v = *v_src++;\
+				CONVERT_YUV_TO_RGB_FLOAT(y2, ((u + next_u) / 2.0f), ((v + next_v) / 2.0f), r, g, b, coeffs, offsets);\
+				PACK_RGB(r, g, b, dst);\
+				\
+				u = next_u;\
+				v = next_v;\
+				pixels_remaining -= 2;\
+			}\
+			y1 = *y_src++;\
+			y2 = *y_src++;\
+			CONVERT_YUV_TO_RGB_FLOAT(y1, u, v, r, g, b, coeffs, offsets);\
+			PACK_RGB(r, g, b, dst);\
+			\
+			CONVERT_YUV_TO_RGB_FLOAT(y2, u, v, r, g, b, coeffs, offsets);\
+			PACK_RGB(r, g, b, dst);\
+			dst += padding_bytes;\
+		}\
+	}
+
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_rgb_nonsse_float, yuv_8bit_to_rgb_8bit_coef[0], yuv_8bit_to_rgb_8bit_off[0])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_rgb_bt601_nonsse_float, yuv_8bit_to_rgb_8bit_coef[1], yuv_8bit_to_rgb_8bit_off[1])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_rgb_bt709_nonsse_float, yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_10bit_rgb_nonsse_float, yuv_8bit_to_rgb_10bit_coef[0], yuv_8bit_to_rgb_10bit_off[0])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_10bit_rgb_bt601_nonsse_float, yuv_8bit_to_rgb_10bit_coef[1], yuv_8bit_to_rgb_10bit_off[1])
+DEFINE_UPSAMPLE_N_YUV422P_TO_ANY_RGB_FLOAT(upsample_n_convert_yuv422p_to_any_10bit_rgb_bt709_nonsse_float, yuv_8bit_to_rgb_10bit_coef[2], yuv_8bit_to_rgb_10bit_off[2])
 
 /*
  * 		Y U V 4 2 2 P

@@ -1212,7 +1212,165 @@ INLINE_NAME(unpack_2_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* 
 	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
 }
 
+/*
+ * Unpack 4 r210 vectors (16 pixels) into 6 R, G, B vectors
+ *
+ * Total latency:				15
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 4 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *	R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *	R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * rVect
+ * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
+ *
+ * gVect
+ * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
+ *
+ * bVect
+ * B9 0		B10 0	B11 0	B12 0	B13 0	B14 0	B15 0	B16 0
+ */
+INLINE_NAME(unpack_4_r210_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* output) {
+	unpack_2_r210_to_r_g_b_vectors_sse2_ssse3(&input[0], &output[0]);
+	unpack_2_r210_to_r_g_b_vectors_sse2_ssse3(&input[2], &output[3]);
+}
 
+/*
+ * Unpack 2 r10k vectors (8 pixels) into 3 R, G, B vectors
+ *
+ * Total latency:				17
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 2 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ */
+INLINE_NAME(unpack_2_r10k_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* output) {
+	CONST_M128I(keep_low_component,	0x000003FF000003FFLL, 0x000003FF000003FFLL);
+	CONST_M128I(shuffle_le, 0x0405060700010203LL, 0x0C0D0E0F08090A0BLL);
+	M128I(scratch, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+	M128I(scratch3, 0x0LL, 0x0LL);
+	M128I(scratch4, 0x0LL, 0x0LL);
+
+	UNALIGNED_R210_INPUT_PREAMBLE;
+
+	// Re-write input vectors to little endian
+	_M(scratch3) = _mm_shuffle_epi8(INPUT_VECT[0], _M(shuffle_le));					// PSHUFB		1	0.5
+	//	xB1	G1	R1		xB2	G2	R2		xB3	G3	R3		xB4	G4	R4
+	// (10-bit words)
+
+	_M(scratch4) = _mm_shuffle_epi8(INPUT_VECT[1], _M(shuffle_le));					// PSHUFB		1	0.5
+	//	xB5	G5	R5		xB6	G6	R6		xB7	G7	R7		xB8	G8	R8
+	// (10-bit words)
+
+	_M(scratch3) = _mm_srli_epi32(_M(scratch3), 2);									// PSRLD		1	1
+	_M(scratch4) = _mm_srli_epi32(_M(scratch4), 2);									// PSRLD		1	1
+
+	_M(scratch) = _mm_and_si128(_M(scratch3), _M(keep_low_component));				// PAND			1	0.33
+	// B1		0		B2		0		B3		0		B4		0
+
+	_M(scratch2) = _mm_and_si128(_M(scratch4), _M(keep_low_component));				// PAND			1	0.33
+	// B5		0		B6		0		B7		0		B8		0
+
+	output[2] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+
+
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 10);									// PSRLD		1	1
+	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
+	// G1		0		G2		0		G3		0		G4		0
+
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 10);								// PSRLD		1	1
+	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
+	// G5		0		G6		0		G7		0		G8		0
+
+	output[1] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+
+
+	_M(scratch) = _mm_srli_epi32(_M(scratch3), 20);									// PSRLD		1	1
+	_M(scratch) = _mm_and_si128(_M(scratch), _M(keep_low_component));				// PAND			1	0.33
+	// R1		0		R2		0		R3		0		R4		0
+
+	_M(scratch2) = _mm_srli_epi32(_M(scratch4), 20);								// PSRLD		1	1
+	_M(scratch2) = _mm_and_si128(_M(scratch2), _M(keep_low_component));				// PAND			1	0.33
+	// R5		0		R6		0		R7		0		R8		0
+
+	output[0] = _mm_packs_epi32(_M(scratch), _M(scratch2));							// PACKSSDW		1	0.5
+	// R1 0		R2 0	R3 0	R4 0	R5 0	R6 0	R7 0	R8 0
+}
+
+/*
+ * Unpack 4 r10k vectors (16 pixels) into 6 R, G, B vectors
+ *
+ * Total latency:				15
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 4 vectors of 4 r210 pixels
+ *	R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *	R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *	R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *	R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ *
+ * OUTPUT:
+ *
+ * 3 vectors of 8 short
+ * rVect
+ * R1  0	R2  0	R3  0	R4  0	R5  0	R6  0	R7  0	R8  0
+ *
+ * gVect
+ * G1 0		G2 0	G3 0	G4 0	G5 0	G6 0	G7 0	G8 0
+ *
+ * bVect
+ * B1 0		B2 0	B3 0	B4 0	B5 0	B6 0	B7 0	B8 0
+ *
+ * rVect
+ * R9 0		R10 0	R11 0	R12 0	R13 0	R14 0	R15 0	R16 0
+ *
+ * gVect
+ * G9 0		G10 0	G11 0	G12 0	G13 0	G14 0	G15 0	G16 0
+ *
+ * bVect
+ * B9 0		B10 0	B11 0	B12 0	B13 0	B14 0	B15 0	B16 0
+ */
+INLINE_NAME(unpack_4_r10k_to_r_g_b_vectors_sse2_ssse3, __m128i* input, __m128i* output) {
+	unpack_2_r10k_to_r_g_b_vectors_sse2_ssse3(&input[0], &output[0]);
+	unpack_2_r10k_to_r_g_b_vectors_sse2_ssse3(&input[2], &output[3]);
+}
 
 #endif	// __INTEL_CPU__
 

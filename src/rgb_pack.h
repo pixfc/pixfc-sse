@@ -509,7 +509,7 @@ INLINE_NAME(pack_6_rgb_vectors_to_3_bgr24_vectors_sse2_slowpacking, __m128i* in_
 /*
  * Pack 6 R, G, B vectors (16 pixels) into 4 r210 vectors
  *
- * Total latency:				16
+ * Total latency:				17
  * Number of pixels handled:	8
  *
  * INPUT
@@ -543,8 +543,13 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, __m128i* input, __m128i* 
 	// Clamp to 0 - 1023
 	_M(scratch_b) = _mm_max_epi16(_mm_min_epi16(input[2], _M(max_value)), _M(scratch_b));//PMIN/PMAX	2	1
 	_M(scratch_g) = _mm_max_epi16(_mm_min_epi16(input[1], _M(max_value)), _M(scratch_g));//PMIN/PMAX	2	1
-	// Avoid a min/max and place the values in the right spot.
-	_M(scratch_r) = _mm_srli_epi16(_mm_slli_epi16(input[0], 6), 2);					// PSRLW / PSLLW	2	2
+	_M(scratch_r) = _mm_max_epi16(_mm_min_epi16(input[0], _M(max_value)), _M(scratch_r));//PMIN/PMAX	2	1
+	
+	print_xmm16u("R", &scratch_r);
+	print_xmm16u("G", &scratch_g);
+	print_xmm16u("B", &scratch_b);
+	// Place the values in the right spot.
+	_M(scratch_r) = _mm_slli_epi16(_M(scratch_r), 4);						// PSLLW		1	1
 
 	
 	
@@ -581,7 +586,7 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, __m128i* input, __m128i* 
 /*
  * Pack 3 R, G, B vectors (8 pixels) into 2 r210 vectors
  *
- * Total latency:				32
+ * Total latency:				34
  * Number of pixels handled:	16
  *
  * INPUT
@@ -603,9 +608,120 @@ INLINE_NAME(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, __m128i* input, __m128i* 
  *  R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
  *
  */
-#define pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3(input, output) \
-	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[0], &output[0]);\
-	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[2], &output[2])
+INLINE_NAME(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, __m128i* input, __m128i* output) {
+	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[0], &output[0]);
+	pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3(&input[3], &output[2]);
+}
+
+
+/*
+ * Pack 6 R, G, B vectors (16 pixels) into 4 r10k vectors
+ *
+ * Total latency:				19
+ * Number of pixels handled:	8
+ *
+ * INPUT
+ * 3 vectors of 8 short
+ * rVect
+ * R1		R2		R3		R4  	R5  	R6  	R7  	R8
+ *
+ * gVect
+ * G1 		G2		G3		G4		G5		G6		G7		G8
+ *
+ * bVect
+ * B1 		B2		B3		B4		B5		B6		B7		B8
+ *
+ *
+ * OUTPUT:
+ * 2 vectors of 4 r210 pixels
+ *  R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *  R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *
+ */
+INLINE_NAME(pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, __m128i* input, __m128i* output) {
+	CONST_M128I(max_value, 0x03FF03FF03FF03FFLL, 0x03FF03FF03FF03FFLL);
+	CONST_M128I(zero, 0x0LL, 0x0LL);
+	CONST_M128I(shuffle_le, 0x0405060700010203LL, 0x0C0D0E0F08090A0BLL);
+	M128I(scratch_r, 0x0LL, 0x0LL);
+	M128I(scratch_g, 0x0LL, 0x0LL);
+	M128I(scratch_b, 0x0LL, 0x0LL);
+	M128I(scratch1, 0x0LL, 0x0LL);
+	M128I(scratch2, 0x0LL, 0x0LL);
+
+	// Clamp to 0 - 1023
+	_M(scratch_b) = _mm_max_epi16(_mm_min_epi16(input[2], _M(max_value)), _M(scratch_b));//PMIN/PMAX	2	1
+	_M(scratch_g) = _mm_max_epi16(_mm_min_epi16(input[1], _M(max_value)), _M(scratch_g));//PMIN/PMAX	2	1
+	_M(scratch_r) = _mm_max_epi16(_mm_min_epi16(input[0], _M(max_value)), _M(scratch_r));//PMIN/PMAX	2	1
+	// Place the values in the right spot.
+	_M(scratch_r) = _mm_slli_epi16(_M(scratch_r), 4);						// PSLLW		1	1
+
+
+
+	_M(scratch1) = _mm_unpacklo_epi16(_M(scratch_b), _M(scratch_r));		// PUNPCKLWD	1	0.5
+	//	B1		xR1		B2		xR2		B3		xR3		B4		xR4
+
+	_M(scratch2) = _mm_unpacklo_epi16(_M(zero), _M(scratch_g));				// PUNPCKLWD	1	0.5
+	// 0		G1		0		G2		0		G3		0		G4
+	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);							// PSRLD        1	1
+
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch2));				// POR			1	0.33
+	// (10-bit words)
+	//	B1	G1	R1		B2	G2	R2		B3	G3	R3		B4	G4	R4
+
+	_M(scratch1) = _mm_slli_epi32(_M(scratch1), 2);							// PSLLD		1	1
+	//	xB1	G1	R1		xB2	G2	R2		xB3	G3	R3		xB4	G4	R4
+
+	M128_STORE(_mm_shuffle_epi8(_M(scratch1), _M(shuffle_le)), output[0]);	// PSHUFB		1	0.5
+	// Switch to big endian
+
+
+	_M(scratch1) = _mm_unpackhi_epi16(_M(scratch_b), _M(scratch_r));		// PUNPCKHWD	1	0.5
+	//	B5		xR5		B6		xR6		B7		xR7		B8		xR8
+
+	_M(scratch2) = _mm_unpackhi_epi16(_M(zero), _M(scratch_g));				// PUNPCKLWD	1	0.5
+	// 0		G5		0		G6		0		G7		0		G8
+	_M(scratch2) = _mm_srli_epi32(_M(scratch2), 6);							// PSRLD        1	1
+
+	_M(scratch1) = _mm_or_si128(_M(scratch1), _M(scratch2));				// POR			1	0.33
+	// (10-bit words)
+	//	B5	G5	R5		B6	G6	R6		B7	G7	R7		B8	G8	R8
+
+	_M(scratch1) = _mm_slli_epi32(_M(scratch1), 2);							// PSLLD		1	1
+	//	xB5	G5	R5		xB6	G6	R6		xB7	G7	R7		xB8	G8	R8
+
+	M128_STORE(_mm_shuffle_epi8(_M(scratch1), _M(shuffle_le)), output[1]);	// PSHUFB		1	0.5
+	// Switch to big endian
+}
+
+/*
+ * Pack 3 R, G, B vectors (8 pixels) into 2 r10k vectors
+ *
+ * Total latency:				38
+ * Number of pixels handled:	16
+ *
+ * INPUT
+ * 6 vectors of 8 short
+ * R1 		R2		R3		R4		R5		R6		R7		R8
+ * G1 		G2		G3		G4		G5		G6		G7		G8
+ * B1 		B2		B3		B4		B5		B6		B7		B8
+ *
+ * R9 		R10 	R11 	R12 	R13 	R14 	R15 	R16
+ * G9 		G10 	G11 	G12 	G13		G14 	G15 	G16
+ * B9 		B10 	B11 	B12 	B13 	B14 	B15 	B16
+ *
+ *
+ * OUTPUT:
+ * 4 vectors of 16 r210 pixels
+ *  R1	G1	B1		R2	G2	B2		R3	G3	B3		R4	G4	B4
+ *  R5	G5	B5		R6	G6	B6		R7	G7	B7		R8	G8	B8
+ *  R9	G9	B9		R10	G10	B10		R11	G11	B11		R12	G12	B12
+ *  R13	G13	B13		R14	G14	B14		R15	G15	B15		R16	G16	B16
+ *
+ */
+INLINE_NAME(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, __m128i* input, __m128i* output) {
+	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[0], &output[0]);
+	pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3(&input[3], &output[2]);
+}
 
 #endif 	// __INTEL_CPU__
 

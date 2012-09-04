@@ -186,7 +186,7 @@ uint32_t			create_pixfc_for_conversion_block(uint32_t index, struct PixFcSSE** p
  * returns the index of the conversion block which would be returned by create_pixfc,
  * or -1 if error
  */
-int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t row_bytes);
+int32_t				find_conversion_block_index(PixFcPixelFormat src_fmt, PixFcPixelFormat dst_fmt, PixFcFlag flags, uint32_t width, uint32_t height, uint32_t src_row_bytes, uint32_t dest_row_bytes);
 
 /*
  * Make conversion block name CSV friendly by replacing " - " with ", "

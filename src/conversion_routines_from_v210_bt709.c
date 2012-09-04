@@ -43,6 +43,18 @@
 		)
 
 
+#define UPSAMPLE_AND_CONVERT_TO_R210(pack16_fn, pack8_fn, instr_set)\
+		DO_CONVERSION_1U_2P(\
+				UPSAMPLE_V210_TO_R210_RECIPE,\
+				unpack_4v_v210_to_y_uv_vectors_,\
+				pack16_fn,\
+				pack8_fn,\
+				convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt709_,\
+				3,\
+				instr_set\
+		)
+
+
 #define CONVERT_TO_RGB32(pack_fn, instr_set)\
 		DO_CONVERSION_1U_1P(\
 				V210_TO_RGB_RECIPE,\
@@ -60,6 +72,16 @@
 				pack_fn,\
 				nnb_upsample_n_convert_10bit_y_uv_vectors_to_8bit_rgb_vectors_bt709_,\
 				3,\
+				instr_set\
+		)
+
+
+#define CONVERT_TO_R210(pack_fn, instr_set)\
+		DO_CONVERSION_1U_1P(\
+				V210_TO_R210_RECIPE,\
+				unpack_4v_v210_to_y_uv_vectors_,\
+				pack_fn,\
+				nnb_upsample_n_convert_10bit_y_uv_vectors_to_10bit_rgb_vectors_bt709_,\
 				instr_set\
 		)
 
@@ -159,5 +181,31 @@ void		upsample_n_convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE * 
 
 void		convert_v210_to_bgr24_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
 	CONVERT_TO_RGB24(pack_6_rgb_vectors_in_3_bgr24_vectors_sse2_ssse3,	sse2_ssse3);
+}
+
+
+/*
+ *
+ * 		V 2 1 0
+ *
+ * 		to
+ *
+ * 		1 0 B I T   R G B
+ *
+ */
+void		upsample_n_convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_R210(pack_6_r_g_b_vectors_to_4_r210_sse2_ssse3, pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_v210_to_r210_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_R210(pack_3_r_g_b_vectors_to_2_r210_sse2_ssse3, sse2_ssse3);
+}
+
+void		upsample_n_convert_v210_to_r10k_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	UPSAMPLE_AND_CONVERT_TO_R210(pack_6_r_g_b_vectors_to_4_r10k_sse2_ssse3, pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, sse2_ssse3);
+}
+
+void		convert_v210_to_r10k_bt709_sse2_ssse3(const struct PixFcSSE * pixfc, void* source_buffer, void* dest_buffer) {
+	CONVERT_TO_R210(pack_3_r_g_b_vectors_to_2_r10k_sse2_ssse3, sse2_ssse3);
 }
 

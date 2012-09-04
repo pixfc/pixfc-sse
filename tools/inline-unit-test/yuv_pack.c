@@ -73,7 +73,7 @@ void pack_4_y_uv_422_vectors_in_2_yuyv_vectors_scalar(__m128i* input, __m128i* o
 }
 
 uint32_t    check_pack_4_y_uv_422_vectors_in_2_yuyv_vectors() {
-    CHECK_INLINE_1IN(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_scalar, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, DECLARE_4_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_4_y_uv_422_vectors_in_2_yuyv_vectors_scalar, pack_4_y_uv_422_vectors_in_2_yuyv_vectors_sse2, DECLARE_4_8BIT_VECT, 2, MAX_DIFF_PACKING, compare_8bit_output);
 
     return 0;
 }
@@ -127,7 +127,7 @@ void pack_4_y_uv_422_vectors_in_2_uyvy_vectors_scalar(__m128i* input, __m128i* o
 }
 
 uint32_t    check_pack_4_y_uv_422_vectors_in_2_uyvy_vectors() {
-    CHECK_INLINE_1IN(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_scalar, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, DECLARE_4_8BIT_VECT, 2, MAX_DIFF_8BIT, compare_8bit_output);
+    CHECK_INLINE_1IN(pack_4_y_uv_422_vectors_in_2_uyvy_vectors_scalar, pack_4_y_uv_422_vectors_in_2_uyvy_vectors_sse2, DECLARE_4_8BIT_VECT, 2, MAX_DIFF_PACKING, compare_8bit_output);
 
     return 0;
 }
@@ -190,7 +190,7 @@ void pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_scalar( __m128i* input, __m128i*
 }
 
 uint32_t    check_pack_4_y_uv_422_vectors_in_yuvp_lo_vectors() {
-    CHECK_INLINE_1IN_3OUT(pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_scalar, pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2, DECLARE_4_8BIT_VECT, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 0);
+    CHECK_INLINE_1IN_3OUT(pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_scalar, pack_4_y_uv_422_vectors_to_yuvp_lo_vectors_sse2, DECLARE_4_8BIT_VECT, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 0);
 
     return 0;
 }
@@ -256,7 +256,7 @@ void pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_scalar(__m128i* input, __m128i* 
 }
 
 uint32_t    check_pack_4_y_uv_422_vectors_in_yuvp_hi_vectors() {
-    CHECK_INLINE_1IN_3OUT(pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_scalar, pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2, DECLARE_4_8BIT_VECT, 1, MAX_DIFF_8BIT, compare_8bit_output, 0, 8);
+    CHECK_INLINE_1IN_3OUT(pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_scalar, pack_4_y_uv_422_vectors_to_yuvp_hi_vectors_sse2, DECLARE_4_8BIT_VECT, 1, MAX_DIFF_PACKING, compare_8bit_output, 0, 8);
   return 0;
 }
 
@@ -437,30 +437,8 @@ void    pack_6_y_uv_vectors_to_4_v210_vectors_scalar(__m128i* input, __m128i* ou
 }
 
 uint32_t    check_pack_6_y_uv_vectors_to_4_v210_vectors() {
-    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_10bit_le_output);
-    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_8BIT, compare_10bit_le_output);
-//    do { 
-//		__declspec(align(16)) const __int64 input[(6)][2]={
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, 
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, 
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, 
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, 
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL }, 
-//			{ 0x03AC0040003F0000LL, 0x03FF03C103C003ADLL },
-//		};
-//		__m128i scalar_out[4];
-//		__m128i sse_out[4]; 
-//		do { 
-//			fprintf ((&__iob_func()[2]), "[ %s:%-3d ] " "Checking " "pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41" "\n", strrchr("..\\..\\..\\tools\\inline-unit-test\\yuv_pack.c", '\\')+1, 441 ); fflush((&__iob_func()[2])); 
-//		} while(0); 
-//		print_xmm16u_array((sizeof(input)/sizeof((input)[0])), "INPUT", ((__m128i *)(&(input[0])))); 
-//		pack_6_y_uv_vectors_to_4_v210_vectors_scalar(((__m128i *)(&(input[0]))), scalar_out); 
-//		print_xmm10leu_array((sizeof(scalar_out)/sizeof((scalar_out)[0])), "SCALAR OUT", scalar_out); 
-//		pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41(((__m128i *)(&(input[0]))), sse_out); 
-//		print_xmm10leu_array((sizeof(sse_out)/sizeof((sse_out)[0])), "SSE OUT", sse_out); 
-//		compare_10bit_le_output(0, scalar_out, sse_out, 4, 2, "pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41"); 
-//	} while (0);
-
+    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_PACKING, compare_10bit_le_output);
+    CHECK_INLINE_1IN(pack_6_y_uv_vectors_to_4_v210_vectors_scalar, pack_6_y_uv_vectors_to_4_v210_vectors_sse2_ssse3_sse41, DECLARE_6_10BIT_VECT, 4, MAX_DIFF_PACKING, compare_10bit_le_output);
 
     return 0;
 }

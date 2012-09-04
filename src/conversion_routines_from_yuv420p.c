@@ -193,6 +193,11 @@ void		convert_yuv420p_to_bgr24_bt709_sse2(const struct PixFcSSE * pixfc, void* s
  * Non SSE conversion block (nearest neighbour upsampling)
  *
  */
+#define 	CONVERT_YUV_TO_RGB(y, u, v, r, g, b, coef_shift, coeffs, offsets) \
+		r = (((y + offsets[0]) * coeffs[0][0]) + ((u + offsets[1]) * coeffs[0][1]) + ((v + offsets[2]) * coeffs[0][2])) >> coef_shift;\
+		g = (((y + offsets[0]) * coeffs[1][0]) + ((u + offsets[1]) * coeffs[1][1]) + ((v + offsets[2]) * coeffs[1][2])) >> coef_shift;\
+		b = (((y + offsets[0]) * coeffs[2][0]) + ((u + offsets[1]) * coeffs[2][1]) + ((v + offsets[2]) * coeffs[2][2])) >> coef_shift;\
+
 #define 	DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(fn_name, coeffs, coef_shift, offsets) \
 void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
@@ -211,16 +216,12 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 	int32_t				y, u, v;\
 	while(lines_remaining > 0){\
 		while(pixels_remaining_on_line-- > 0) {\
-			y = *y_src_line1++ + offsets[0];\
-			u = *u_src + offsets[1];\
-			v = *v_src + offsets[2];\
-			r_line1 = ((y * coeffs[0][0]) + (u * coeffs[0][1]) + (v * coeffs[0][2])) >> coef_shift;\
-			g_line1 = ((y * coeffs[1][0]) + (u * coeffs[1][1]) + (v * coeffs[1][2])) >> coef_shift;\
-			b_line1 = ((y * coeffs[2][0]) + (u * coeffs[2][1]) + (v * coeffs[2][2])) >> coef_shift;\
-			y = *y_src_line2++ + offsets[0];\
-			r_line2 = ((y * coeffs[0][0]) + (u * coeffs[0][1]) + (v * coeffs[0][2])) >> coef_shift;\
-			g_line2 = ((y * coeffs[1][0]) + (u * coeffs[1][1]) + (v * coeffs[1][2])) >> coef_shift;\
-			b_line2 = ((y * coeffs[2][0]) + (u * coeffs[2][1]) + (v * coeffs[2][2])) >> coef_shift;\
+			y = *y_src_line1++;\
+			u = *u_src;\
+			v = *v_src;\
+			CONVERT_YUV_TO_RGB(y, u, v, r_line1, g_line1, b_line1, coef_shift, coeffs, offsets);\
+			y = *y_src_line2++;\
+			CONVERT_YUV_TO_RGB(y, u, v, r_line2, g_line2, b_line2, coef_shift, coeffs, offsets);\
 			if ((pixels_remaining_on_line & 0x1) == 0) {\
 				u_src++;\
 				v_src++;\
@@ -269,9 +270,88 @@ void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
 }
 
 DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_nonsse, yuv_8bit_to_rgb_8bit_coef_lhs8[0], 8, yuv_8bit_to_rgb_8bit_off[0]);
-
 DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt601_nonsse,  yuv_8bit_to_rgb_8bit_coef_lhs8[1], 8, yuv_8bit_to_rgb_8bit_off[1]);
-
 DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FN(convert_yuv420p_to_any_rgb_bt709_nonsse,  yuv_8bit_to_rgb_8bit_coef_lhs8[2], 8, yuv_8bit_to_rgb_8bit_off[2]);
 
+
+
+#define 	CONVERT_YUV_TO_RGB_FLOAT(y, u, v, r, g, b, coeffs, offsets) \
+		r = ((y + offsets[0]) * coeffs[0][0]) + ((u + offsets[1]) * coeffs[0][1]) + ((v + offsets[2]) * coeffs[0][2]);\
+		g = ((y + offsets[0]) * coeffs[1][0]) + ((u + offsets[1]) * coeffs[1][1]) + ((v + offsets[2]) * coeffs[1][2]);\
+		b = ((y + offsets[0]) * coeffs[2][0]) + ((u + offsets[1]) * coeffs[2][1]) + ((v + offsets[2]) * coeffs[2][2]);\
+
+#define 	DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FLOAT_FN(fn_name, coeffs, offsets) \
+void 		fn_name(const struct PixFcSSE* conv, void* in, void* out){\
+	PixFcPixelFormat 	dest_fmt = conv->dest_fmt;\
+	uint32_t			output_stride = ((dest_fmt == PixFcARGB) || (dest_fmt == PixFcBGRA)) ? 4 : 3;\
+	uint32_t 			pixels_remaining_on_line = conv->width;\
+	uint32_t			lines_remaining = conv->height;\
+	uint32_t			pixel_count = conv->pixel_count;\
+	uint8_t*			y_src_line1 = (uint8_t *) in;\
+	uint8_t*			y_src_line2 = y_src_line1 + conv->width;\
+	uint8_t*			u_src = y_src_line1 + pixel_count;\
+	uint8_t*			v_src = u_src + pixel_count / 4;\
+	uint8_t*			dst_line1 = (uint8_t *) out;\
+	uint8_t*			dst_line2 = dst_line1 + conv->width * output_stride;\
+	int32_t				r_line1, g_line1, b_line1;\
+	int32_t				r_line2, g_line2, b_line2;\
+	int32_t				y, u, v;\
+	while(lines_remaining > 0){\
+		while(pixels_remaining_on_line-- > 0) {\
+			y = *y_src_line1++;\
+			u = *u_src;\
+			v = *v_src;\
+			CONVERT_YUV_TO_RGB_FLOAT(y, u, v, r_line1, g_line1, b_line1, coeffs, offsets);\
+			y = *y_src_line2++;\
+			CONVERT_YUV_TO_RGB_FLOAT(y, u, v, r_line2, g_line2, b_line2, coeffs, offsets);\
+			if ((pixels_remaining_on_line & 0x1) == 0) {\
+				u_src++;\
+				v_src++;\
+			}\
+			if (dest_fmt == PixFcARGB) {\
+				*(dst_line1++) = 0;\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line2++) = 0;\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+			} else if (dest_fmt == PixFcBGRA) {\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = 0;\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = 0;\
+			} else  if (dest_fmt == PixFcRGB24) {\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+			} else {\
+				*(dst_line1++) = CLIP_PIXEL(b_line1);\
+				*(dst_line1++) = CLIP_PIXEL(g_line1);\
+				*(dst_line1++) = CLIP_PIXEL(r_line1);\
+				*(dst_line2++) = CLIP_PIXEL(b_line2);\
+				*(dst_line2++) = CLIP_PIXEL(g_line2);\
+				*(dst_line2++) = CLIP_PIXEL(r_line2);\
+			}\
+		}\
+		pixels_remaining_on_line = conv->width;\
+		lines_remaining -= 2;\
+		y_src_line1 += conv->width;\
+		y_src_line2 += conv->width;\
+		dst_line1 += conv->width * output_stride;\
+		dst_line2 += conv->width * output_stride;\
+	}\
+}
+
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FLOAT_FN(convert_yuv420p_to_any_rgb_nonsse_float, yuv_8bit_to_rgb_8bit_coef[0], yuv_8bit_to_rgb_8bit_off[0]);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FLOAT_FN(convert_yuv420p_to_any_rgb_bt601_nonsse_float,  yuv_8bit_to_rgb_8bit_coef[1], yuv_8bit_to_rgb_8bit_off[1]);
+DEFINE_YUV420P_TO_ANY_RGB_NONSSE_FLOAT_FN(convert_yuv420p_to_any_rgb_bt709_nonsse_float,  yuv_8bit_to_rgb_8bit_coef[2], yuv_8bit_to_rgb_8bit_off[2]);
 

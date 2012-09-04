@@ -37,10 +37,10 @@
 const PixelFormatDescription		pixfmt_descriptions[] = {
 	{
 		    PixFcYUYV,
-		    2, 1, 0, 16, 1, 1,
+		    2, 1, 0, /*16*/8, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
-				_E(0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL) ,
+		    	//_E(0x15942B95FF4B544CLL, 0x80FE80FF6B1CFF1DLL) ,
 	            /*		Decimal values:
 	                    76      84      75      255
 	                    149     43      148     21
@@ -61,17 +61,17 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 				*/
 				_E(0x15002995FFFF544CLL, 0xBA001EAD6BC8FF1DLL),
 			},
-					
-		    2,				
+			1,
+		    //2,
 		    "YUYV",
 	},
 
 	{
 		    PixFcUYVY,
-		    2, 1, 0, 16, 1, 1,
+		    2, 1, 0, /*16*/8, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
-				_E(0x9415952B4BFF4C54LL, 0xFE80FF801C6B1DFFLL),
+				//_E(0x9415952B4BFF4C54LL, 0xFE80FF801C6B1DFFLL),
 	            /*		Decimal values:
 	                    84      76      255		75
 	                    43      149     21		148
@@ -91,7 +91,8 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 				*/
 				_E(0x00159529FFFF4C54LL, 0x00BAAD1EC86B1DFFLL)
 			},
-		    2,
+			1,
+		    //2,
 		    "UYVY",
 	},
 
@@ -160,7 +161,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		PixFcV210,
-		16, 6, 0, 16, 1, 48,
+		16, 6, 0, /*16*/8, 1, 48,
 		{
 			/* 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 			 Decimal values:
@@ -189,18 +190,19 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 			 512	1020	512		1016
 			 */
 			
-			_E(0x2542b12c3fc4c150LL, 0x0706b0743fc94054LL),
-			_E(0x130543f8200ff200LL, 0x000152540a4ff3fcLL),
+			//_E(0x2542b12c3fc4c150LL, 0x0706b0743fc94054LL),
+			//_E(0x130543f8200ff200LL, 0x000152540a4ff3fcLL),
 			_E(0x2b41e3201ac1d3fcLL, 0x12cff130150002e8LL),
 			_E(0x074ff250054950acLL, 0x3f8803fc2001c1acLL),
 		},
-		4,
+		2,
+		//4,
 		"v210",
 	},
 	
 	{
 		    PixFcARGB,
-		    4, 1, 0, 16, 1, 1,
+		    4, 1, 0, 8, 1, 1,
 		    {
 		    	// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x0000FF000000FF00LL, 0x00FF000000FF0000LL),
@@ -223,7 +225,7 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 
 	{
 		    PixFcBGRA,
-		    4, 1, 0, 16, 1, 1,
+		    4, 1, 0, 8, 1, 1,
 		    {
 				// 2 red pix - 2 green pix - 2 blue pix - 2 white pix
 				_E(0x00FF000000FF0000LL, 0x0000FF000000FF00LL),
@@ -257,6 +259,34 @@ const PixelFormatDescription		pixfmt_descriptions[] = {
 			},
 			3,
 		    "BGR24",
+	},
+
+	{
+			PixFcR210,
+			4, 1, 0, 1, 1, 64,
+			{
+				// FIXME: I am a copy/paste of BGR24 pixels, not true r210 values
+				// 2 groups of: 2 red pix - 2 green pix - 2 blue pix - 2 white pix
+				_E(0xFF00FF0000FF0000LL, 0xFF0000FF00FF0000LL),
+				_E(0xFFFFFFFFFFFF0000LL, 0xFF00FF0000FF0000LL),
+				_E(0xFF0000FF00FF0000LL, 0xFFFFFFFFFFFF0000LL)
+			},
+			3,
+			"r210",
+	},
+	
+	{
+		PixFcR10k,
+		4, 1, 0, 1, 1, 64,
+		{
+			// FIXME: I am a copy/paste of BGR24 pixels, not true r10k values
+			// 2 groups of: 2 red pix - 2 green pix - 2 blue pix - 2 white pix
+			_E(0xFF00FF0000FF0000LL, 0xFF0000FF00FF0000LL),
+			_E(0xFFFFFFFFFFFF0000LL, 0xFF00FF0000FF0000LL),
+			_E(0xFF0000FF00FF0000LL, 0xFFFFFFFFFFFF0000LL)
+		},
+		3,
+		"r10k",
 	},
 };
 
