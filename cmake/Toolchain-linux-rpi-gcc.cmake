@@ -9,10 +9,10 @@ SET(PIXFC_ARM_TARGET_PROCESSOR arm1176jzf-s)
 #SET(PIXFC_ARM_TARGET_ARCH armv6)
 
 # -mfloat_abi
-SET(PIXFC_ARM_TARGET_FLOAT_ABI hard)
+SET(PIXFC_ARM_TARGET_FLOAT_ABI softfp)
 
-# -mfp
+# -mfpu
 SET(PIXFC_ARM_TARGET_FPU vfp)
 
-# compiler
+# compiler (uncomment/update when cross compiling)
 #SET(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabi-gcc)
