@@ -135,4 +135,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(src)
 add_subdirectory(tools)
-add_subdirectory(tools/inline-unit-test)
+if(PIXFC_TARGET_ARCH MATCHES "Intel")
+	add_subdirectory(tools/inline-unit-test)
+endif(PIXFC_TARGET_ARCH MATCHES "Intel")
+
