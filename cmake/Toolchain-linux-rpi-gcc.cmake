@@ -14,5 +14,9 @@ SET(PIXFC_ARM_TARGET_FLOAT_ABI softfp)
 # -mfpu
 SET(PIXFC_ARM_TARGET_FPU vfp)
 
-# compiler (uncomment/update when cross compiling)
+# compiler 
+# Uncomment/update when cross compiling.
+# The default value points to GCC in the Linaro toolchain
+# as installed on Ubuntu with apt-get install gcc-arm-linux-gnueabi.
+# See https://launchpad.net/~linaro-maintainers/+archive/toolchain
 #SET(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabi-gcc)

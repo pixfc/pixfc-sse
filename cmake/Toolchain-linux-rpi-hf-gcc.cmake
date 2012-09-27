@@ -4,15 +4,15 @@ SET(CMAKE_SYSTEM_PROCESSOR armv6l)
 # -mcpu
 SET(PIXFC_ARM_TARGET_PROCESSOR arm1176jzf-s)
 
-# -march
-# not set as it conflicts with -mcpu above
-#SET(PIXFC_ARM_TARGET_ARCH armv6)
-
 # -mfloat_abi
 SET(PIXFC_ARM_TARGET_FLOAT_ABI hard)
 
 # -mfpu
 SET(PIXFC_ARM_TARGET_FPU vfp)
 
-# compiler (uncomment/udpate when cross compiling)
-#SET(CMAKE_C_COMPILER /usr/bin/arm-linux-gnueabihf-gcc)
+# compiler
+# Uncomment/udpate when cross compiling
+# The current value points to the version of GCC built specifically
+# for cross-compiling for RPi. It can be installed with :
+# sudo git clone https://github.com/raspberrypi/tools.git /opt/rpi-xtools
+#SET(CMAKE_C_COMPILER /opt/rpi-xtools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-gcc)
