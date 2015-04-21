@@ -1,0 +1,1 @@
+Please report any issues and ask your questions on the PixFC mailing list at http://groups.google.com/group/pixfc-sse
